@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MousePlaneFollower : MonoBehaviour
+public class HandController : MonoBehaviour
 {
     [Header("跟随设置")]
     public Transform target;          // 要控制的物体

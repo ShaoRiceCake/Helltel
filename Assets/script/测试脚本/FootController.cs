@@ -144,7 +144,7 @@ public class FootController : MonoBehaviour
         target = null; // 没有激活对象时，target 为 null
     }
 
-    void ResetPointer()
+    public void ResetPointer()
     {
         mousePointer.position = defaultPosition;  // 瞬间归位
         if (rb != null)
