@@ -4,33 +4,36 @@ using UnityEngine;
 
 public class Connector : MonoBehaviour
 {
-    public Vector2 _size = Vector2.one * 4f;
+    [SerializeField]
+    private Vector2 _size = Vector2.one * 4f;
+    [SerializeField]
+    public bool isConnected = false;
     void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
-        Vector2 _halfSize = _size * 0.5f;
-        Vector3 _offset = transform.position + transform.up * _halfSize.y;
-        Gizmos.DrawLine(_offset,_offset +transform.forward); 
+        Vector2 halfSize = _size * 0.5f;
+        Vector3 offset = transform.position + transform.up * halfSize.y;
+        Gizmos.DrawLine(offset,offset +transform.forward); 
 
         //定义向上的向量和向右的向量
-        Vector3 _top = transform.up*_size.y;
-        Vector3 _side = transform.right *_halfSize.x;
+        Vector3 top = transform.up*_size.y;
+        Vector3 side = transform.right *halfSize.x;
         //定义四个角的向量
-        Vector3 _topRight = transform.position + _top + _side;
-        Vector3 _topLeft = transform.position + _top - _side;
-        Vector3 _bottomRight = transform.position + _side;
-        Vector3 _bottomLeft = transform.position - _side;
-        //
-        Gizmos.DrawLine(_topRight,_topLeft);
-        Gizmos.DrawLine(_topRight,_bottomRight);
-        Gizmos.DrawLine(_topLeft,_bottomLeft);
-        Gizmos.DrawLine(_bottomRight,_bottomLeft);
-        //
+        Vector3 topRight = transform.position + top + side;
+        Vector3 topLeft = transform.position + top - side;
+        Vector3 bottomRight = transform.position + side;
+        Vector3 bottomLeft = transform.position - side;
+        
+        Gizmos.DrawLine(topRight,topLeft);
+        Gizmos.DrawLine(topRight,bottomRight);
+        Gizmos.DrawLine(topLeft,bottomLeft);
+        Gizmos.DrawLine(bottomRight,bottomLeft);
+        
         Gizmos.color *= 0.6f;
-        Gizmos.DrawLine(_topRight,_offset);
-        Gizmos.DrawLine(_topLeft,_offset);
-        Gizmos.DrawLine(_bottomRight,_offset);
-        Gizmos.DrawLine(_bottomLeft,_offset);
+        Gizmos.DrawLine(topRight,offset);
+        Gizmos.DrawLine(topLeft,offset);
+        Gizmos.DrawLine(bottomRight,offset);
+        Gizmos.DrawLine(bottomLeft,offset);
         
     }
 }
