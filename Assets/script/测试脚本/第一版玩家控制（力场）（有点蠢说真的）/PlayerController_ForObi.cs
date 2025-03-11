@@ -40,15 +40,13 @@ public class PlayerController_ForObi : MonoBehaviour
     {
         footController.enabled = isFootControlActive;
         handController.enabled = !isFootControlActive;
-
         // 可选：切换时重置状态
         if (isFootControlActive)
         {
-            handController.target.position = handController.centerPoint.position;
         }
         else
         {
-            footController.ResetPointer();
+            handController.mouseObj.transform.position = new Vector3(this.transform.position.x+1.0f, this.transform.position.y, this.transform.position.z);
         }
     }
 }
