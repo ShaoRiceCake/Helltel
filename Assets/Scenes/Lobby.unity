@@ -140,7 +140,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1741644000252997458, guid: a82e4f787192bfd48884d4dee21f59e3, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0005454829
+      value: -0.000061035156
       objectReference: {fileID: 0}
     - target: {fileID: 4029464910731812919, guid: a82e4f787192bfd48884d4dee21f59e3, type: 3}
       propertyPath: m_Pivot.x
@@ -245,6 +245,10 @@ PrefabInstance:
     - target: {fileID: 6800822467350930789, guid: a82e4f787192bfd48884d4dee21f59e3, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 83061292
+      objectReference: {fileID: 0}
+    - target: {fileID: 6800822467350930789, guid: a82e4f787192bfd48884d4dee21f59e3, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2159111049
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7157023186593836250, guid: a82e4f787192bfd48884d4dee21f59e3, type: 3}
@@ -356,22 +360,13 @@ GameObject:
   m_Component:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
-  - component: {fileID: 963194226}
   m_Layer: 0
-  m_Name: Main Camera
-  m_TagString: MainCamera
+  m_Name: UICamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &963194226
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
 --- !u!20 &963194227
 Camera:
   m_ObjectHideFlags: 0
