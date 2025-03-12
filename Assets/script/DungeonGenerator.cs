@@ -8,12 +8,30 @@ using System.IO;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    public GameObject[] tilePrefabs;   // 可生成的地牢房间预制体集合
+    [Header("暂定为电梯")]
     public GameObject startTile;      // 起始房间预制体
+    [Header("可生成的地牢房间")]
+    public GameObject[] tilePrefabs;   // 可生成的地牢房间预制体集合
+    [Header("可生成的墙")]
+    public GameObject[] blockedPrefabs;   
+    [Header("可生成的门")]
+    public GameObject[] doorPrefabs;  
+    [Header("终点房间")]
+    public GameObject[] exitPrefabs;   
+
+    
     Transform tileFrom, tileTo,tileRoot;       // 记录当前需要连接的两个房间（连接起点和终点）
+    
+    [Header("主干道长度（包含电梯）")]
+    [Range(2,100)]public int mainLenght = 10;
+    [Header("分支长度")]
+    [Range(0,50)]public int branchLenght = 5;
+    [Header("分支数")]
+    [Range(0,25)]public int branchNum = 10;
+    [Header("生成延迟")]
+    [Range(0,1f)]public float constructionDelay;
+    [Header("已生成的房间")]
     public List<Tile> generatedTiles = new List<Tile>();
-    public int mainLenght = 10;
-    public float constructionDelay = 0.5f;
 
     void Start()
     {
