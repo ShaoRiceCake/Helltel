@@ -3,32 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using System.IO;
 
 
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject[] tilePrefabs;   // 可生成的地牢房间预制体集合
     public GameObject startTile;      // 起始房间预制体
-    Transform tileFrom, tileTo;       // 记录当前需要连接的两个房间（连接起点和终点）
+    Transform tileFrom, tileTo,tileRoot;       // 记录当前需要连接的两个房间（连接起点和终点）
     public List<Tile> generatedTiles = new List<Tile>();
+    public int mainLenght = 10;
+    public float constructionDelay = 0.5f;
 
     void Start()
     {
-        tileFrom = CreatStartTile();  // 生成初始房间
-        tileTo = CreatTile();         // 生成第一个普通房间，且作为第一个要连接的房间
-        ConnectTile();
-        for (int i = 0; i < 10;i++)
-        {
-            tileTo = tileFrom;
-            tileFrom = CreatTile();
-            ConnectTile();
-        }
+        StartCoroutine(DungeonBuild());
     }
 
     void Update()
     {
         
     } 
+    IEnumerator DungeonBuild()
+    {
+        tileRoot = CreatStartTile();  // 生成初始房间
+        tileTo = tileRoot;        // 生成第一个普通房间，且作为第一个要连接的房间
+        ConnectTile();
+        for (int i = 0; i < mainLenght -1;i++)
+        {
+            yield return new WaitForSeconds(constructionDelay);
+            
+            tileFrom = tileTo;
+            tileTo = CreatTile();
+            ConnectTile();
+        }
+    }
 
     // 场景重置方法
     public void UpdateDungeon()
@@ -44,6 +53,9 @@ public class DungeonGenerator : MonoBehaviour
         tile.name = "Start Room";
         float yRot = Random.Range(0, 4) * 90f;  // 随机旋转（0°、90°、180°、270°）
         tile.transform.Rotate(0, yRot, 0);       // 用于增加房间朝向的多样性
+
+        generatedTiles.Add(new Tile(tile.transform, null));
+
         return tile.transform;
     }
 
@@ -55,6 +67,10 @@ public class DungeonGenerator : MonoBehaviour
         tile.name = tilePrefabs[tileIndex].name;
         float yRot = Random.Range(0, 4) * 90f;  // 同样的随机旋转逻辑
         tile.transform.Rotate(0, yRot, 0);
+
+        Transform origin = generatedTiles[generatedTiles.FindIndex(x =>x.tile == tileFrom)].tile;
+        generatedTiles.Add(new Tile(tile.transform, origin));
+
         return tile.transform;
     }
 
@@ -80,6 +96,8 @@ public class DungeonGenerator : MonoBehaviour
         //对接完成后进行分离，将父子级还原,将场景的父物体设置为场景生成器
         tileTo.SetParent(transform);
         connectTo.SetParent(tileTo.Find("Connectors"));
+
+        generatedTiles.Last().connector = connectFrom.GetComponent<Connector>();
     }
 
     // 获取指定房间的随机可用连接点（Connector组件）
