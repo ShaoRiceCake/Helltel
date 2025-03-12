@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
     public HandController handController;
     public FootController footController;
     public bool startWithFootControl = true;
+    public GameObject handBall;
 
     private void Start()
     {
@@ -18,6 +19,15 @@ public class PlayerController : MonoBehaviour
         {
             ToggleControlMode();
         }
+
+        if (footController.enabled)
+        {
+            handBall.SetActive(false);
+        }
+        else
+        {
+            handBall.SetActive(true);
+        }
     }
 
     private void ToggleControlMode()
@@ -26,8 +36,6 @@ public class PlayerController : MonoBehaviour
         footController.enabled = newState;
         handController.enabled = !newState;
 
-        if (!newState)
-        {
-        }
+
     }
 }

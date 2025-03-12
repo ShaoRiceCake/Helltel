@@ -4192,7 +4192,6 @@ GameObject:
   - component: {fileID: 354531470}
   - component: {fileID: 354531469}
   - component: {fileID: 354531468}
-  - component: {fileID: 354531467}
   m_Layer: 0
   m_Name: HeadBall
   m_TagString: Untagged
@@ -4200,31 +4199,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &354531467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 354531466}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9ad9ed71e143d845b14dc143f74aefc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetObject: {fileID: 354531466}
-  movingObjectLeft: {fileID: 2016286456}
-  movingObjectRight: {fileID: 1308589940}
-  springForce: 10
-  damping: 0.6
-  moveSpeed: 8
-  raycastDistance: 10
-  mouseDetectionFrameInterval: 10
-  impulseCoefficient: 0.3
-  landingThreshold: 0.5
-  raycastMask:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!135 &354531468
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -4423,6 +4397,50 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.23999983, y: 0.4799996, z: 0.34999996}
   m_Center: {x: -0.12000027, y: -0.000000059604645, z: -0.0050000846}
+--- !u!1 &574501197
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 574501199}
+  - component: {fileID: 574501198}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &574501198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574501197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &574501199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574501197}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &692516149 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100050, guid: d060a01af072c4f61a867564297730f2, type: 3}
@@ -5066,6 +5084,7 @@ GameObject:
   - component: {fileID: 1023904986}
   - component: {fileID: 1023904985}
   - component: {fileID: 1023904984}
+  - component: {fileID: 1023904992}
   - component: {fileID: 1023904991}
   m_Layer: 0
   m_Name: "HumanController\uFF08SecondDraft\uFF09"
@@ -5232,13 +5251,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 1023904983}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d90e24d2099a44daa0965dd582f5a6, type: 3}
+  m_Script: {fileID: 11500000, guid: 4b2b779dc31ab474bbf9bf408383ffe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pivotObject: {fileID: 1028044098}
-  controlObject: {fileID: 1465993400}
+  pivotObject: {fileID: 0}
+  controlObject: {fileID: 0}
   speed: 4
   radius: 5
+--- !u!114 &1023904992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023904983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70dbd8fde831c82498b77b0667aa39b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handController: {fileID: 0}
+  footController: {fileID: 0}
+  startWithFootControl: 1
+  handBall: {fileID: 0}
 --- !u!1 &1028044098
 GameObject:
   m_ObjectHideFlags: 0
@@ -7263,50 +7298,6 @@ CapsuleCollider:
   m_Height: 0.38948673
   m_Direction: 0
   m_Center: {x: -0.19474337, y: 0, z: 0}
---- !u!1 &2137812957
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2137812959}
-  - component: {fileID: 2137812958}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &2137812958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2137812957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &2137812959
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2137812957}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -7317,4 +7308,4 @@ SceneRoots:
   - {fileID: 1006729205}
   - {fileID: 2016286461}
   - {fileID: 1308589945}
-  - {fileID: 2137812959}
+  - {fileID: 574501199}

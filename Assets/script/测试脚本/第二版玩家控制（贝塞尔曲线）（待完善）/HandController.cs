@@ -5,7 +5,7 @@ public class HandController : MonoBehaviour
 {
     public GameObject pivotObject; // 定点对象
     public GameObject controlObject; // 操控对象
-    public float speed = 1.0f; // 速度控制
+    public float speed = 4.0f; // 速度控制
     public float radius = 5.0f; // 移动半径限制
 
     private Vector3 initialMousePosition; // 初始鼠标位置
