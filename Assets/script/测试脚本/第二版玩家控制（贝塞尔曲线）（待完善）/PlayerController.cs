@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public PlayerController_Hand handController;
-    public PlayerController_Foot footController;
+    public HandController handController;
+    public FootController footController;
     public bool startWithFootControl = true;
 
     private void Start()
