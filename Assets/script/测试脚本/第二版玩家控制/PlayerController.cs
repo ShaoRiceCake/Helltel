@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     public bool startWithFootControl = true;
     public ObiParticleAttachment rightHandControl;
     public GameObject handBallPrefab; // 手部球的预制体
-    public Transform handBallSpawnPosition; // 手部球生成的位置
 
     private GameObject handBall;
 
@@ -51,14 +50,14 @@ public class PlayerController : MonoBehaviour
 
     private void SpawnHandBall()
     {
-        if (handBallPrefab == null || handBallSpawnPosition == null)
+        if (handBallPrefab == null)
         {
             Debug.LogError("HandBallPrefab or HandBallSpawnPosition is not set.");
             return;
         }
 
-        // 生成手部球
-        handBall = Instantiate(handBallPrefab, handBallSpawnPosition.position, handBallSpawnPosition.rotation);
+        // 生成手部球，位置和旋转基于 handBallSpawnPosition 的实时世界坐标
+        handBall = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0],Quaternion.identity);
 
         // 将手部球绑定到 ObiParticleAttachment
         rightHandControl.target = handBall.transform;

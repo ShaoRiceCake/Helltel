@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 433861150}
   - component: {fileID: 433861149}
   - component: {fileID: 433861148}
-  - component: {fileID: 433861147}
+  - component: {fileID: 433861151}
   m_Layer: 0
   m_Name: hand
   m_TagString: Untagged
@@ -151,28 +151,12 @@ Transform:
   m_GameObject: {fileID: 433861145}
   serializedVersion: 2
   m_LocalRotation: {x: 0.014707905, y: -0.25694674, z: 0.006710906, w: 0.96629035}
-  m_LocalPosition: {x: 1.5706918, y: -0.44484523, z: 0.6748749}
+  m_LocalPosition: {x: 1.3616918, y: -1.0148453, z: -1.435125}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1016449624}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &433861147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 433861145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d90e24d2099a44daa0965dd582f5a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pivotObject: {fileID: 1016449619}
-  controlObject: {fileID: 433861145}
-  speed: 3
-  radius: 3
 --- !u!135 &433861148
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -244,6 +228,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 433861145}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &433861151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433861145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c1f27994f71e434a8065b61fe19d280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pivotObject: {fileID: 1016449619}
+  speed: 4
+  radius: 5
+  moveToPivotSpeed: 10
+  positionTolerance: 0.1
+  mouseSensitivity: 5
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,8 +534,7 @@ Transform:
   m_LocalPosition: {x: -0.209, y: -0.57, z: -2.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 433861146}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1725193400
@@ -650,3 +651,4 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 1725193404}
   - {fileID: 1016449624}
+  - {fileID: 433861146}
