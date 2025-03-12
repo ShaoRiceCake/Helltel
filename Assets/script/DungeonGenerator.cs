@@ -28,6 +28,8 @@ public class DungeonGenerator : MonoBehaviour
     [Range(0,50)]public int branchLenght = 5;
     [Header("分支数")]
     [Range(0,25)]public int branchNum = 10;
+    [Header("出现门的概率")]
+    [Range(0,100)]public int doorPercent = 25;
     [Header("生成延迟")]
     [Range(0,1f)]public float constructionDelay;
     [Header("已生成的房间")]
