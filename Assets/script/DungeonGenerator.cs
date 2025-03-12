@@ -2,21 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
 using System.Linq;
-using Unity.Collections;
+
 
 public class DungeonGenerator : MonoBehaviour
 {
     public GameObject[] tilePrefabs;   // 可生成的地牢房间预制体集合
     public GameObject startTile;      // 起始房间预制体
     Transform tileFrom, tileTo;       // 记录当前需要连接的两个房间（连接起点和终点）
+    public List<Tile> generatedTiles = new List<Tile>();
 
     void Start()
     {
         tileFrom = CreatStartTile();  // 生成初始房间
         tileTo = CreatTile();         // 生成第一个普通房间，且作为第一个要连接的房间
         ConnectTile();
+        for (int i = 0; i < 10;i++)
+        {
+            tileTo = tileFrom;
+            tileFrom = CreatTile();
+            ConnectTile();
+        }
     }
 
     void Update()
