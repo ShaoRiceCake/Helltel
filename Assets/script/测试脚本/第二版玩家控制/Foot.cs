@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SpringConstraintWithRaycast : MonoBehaviour
+public class Foot: MonoBehaviour
 {
     public GameObject targetObject; // 目标点对象
     public GameObject movingObjectLeft; // 左键控制的运动对象
