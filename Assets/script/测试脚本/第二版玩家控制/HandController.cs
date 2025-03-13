@@ -5,10 +5,11 @@ public class HandController : MonoBehaviour
 {
     public GameObject pivotObject;
     public float speed = 4.0f;
-    public float radius = 5.0f;
+    public float cylinderRadius = 5.0f;    // 圆柱体半径
+    public float cylinderHalfHeight = 5.0f; // 圆柱体半高
     public float moveToPivotSpeed = 10.0f;
     public float positionTolerance = 0.1f;
-    public float mouseSensitivity = 0.1f; // 新增鼠标灵敏度系数
+    public float mouseSensitivity = 0.1f;
 
     private GameObject controlObject;
     private bool isRightMouseDown = false;
@@ -85,14 +86,26 @@ public class HandController : MonoBehaviour
         Vector3 currentLocalPosition = pivotObject.transform.InverseTransformPoint(controlObject.transform.position);
         Vector3 newLocalPosition = currentLocalPosition + localMovementInPivotSpace * Time.deltaTime;
 
-        // 限制移动半径
-        if (newLocalPosition.magnitude > radius)
-        {
-            newLocalPosition = newLocalPosition.normalized * radius;
-        }
+        // 圆柱体范围限制
+        ApplyCylinderConstraint(ref newLocalPosition);
 
         // 应用新位置
         controlObject.transform.position = pivotObject.transform.TransformPoint(newLocalPosition);
+    }
+
+    private void ApplyCylinderConstraint(ref Vector3 position)
+    {
+        // 限制水平面移动（XZ平面）
+        Vector2 horizontal = new Vector2(position.x, position.z);
+        if (horizontal.magnitude > cylinderRadius)
+        {
+            horizontal = horizontal.normalized * cylinderRadius;
+            position.x = horizontal.x;
+            position.z = horizontal.y;
+        }
+
+        // 限制垂直高度（Y轴）
+        position.y = Mathf.Clamp(position.y, -cylinderHalfHeight, cylinderHalfHeight);
     }
 
     public void SetControlObject(GameObject controlObj)
