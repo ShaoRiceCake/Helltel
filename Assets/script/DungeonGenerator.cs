@@ -96,8 +96,7 @@ public class DungeonGenerator : MonoBehaviour
     /// </summary>
     void Start()
     {
-        // 设置随机种子（基于系统时间）
-        Random.InitState(System.DateTime.Now.Millisecond);
+        
         // 启动地牢生成流程
         StartCoroutine(DungeonBuild());
     }
@@ -126,17 +125,17 @@ public class DungeonGenerator : MonoBehaviour
         // 主路径生成循环
         for (int i = 0; i < mainLength - 1; i++)
         {
-            // 连接当前房间
-            ConnectTiles();
+            
             // 生成间隔（可视化效果）
             yield return new WaitForSeconds(constructionDelay);
             // 更新房间指针
             tileFrom = tileTo;
             tileTo = CreatTile();
+            // 连接当前房间
+            ConnectTiles();
             // 执行碰撞检测（当前为空实现）
             CollisionCheck();
             if(attempts >= maxAttempts){break;}
-            
         }
 
         // 收集未使用的连接点用于分支生成
@@ -151,28 +150,31 @@ public class DungeonGenerator : MonoBehaviour
         // 分支生成阶段
         for (int b = 0; b < branchNum; b++)
         {
-            if (availableConnectors.Count == 0) break;
-
-            // 创建分支容器
-            goContainer = new GameObject("Branch" + (b+1));
-            container = goContainer.transform;
-            container.SetParent(transform);
-
-            // 随机选择分支起点
-            int connectorIndex = Random.Range(0, availableConnectors.Count);
-            tileRoot = availableConnectors[connectorIndex].transform.parent.parent;
-            availableConnectors.RemoveAt(connectorIndex);
-
-            // 分支路径生成
-            tileTo = tileRoot;
-            for (int i = 0; i < branchLenght - 1; i++)
+            if (availableConnectors.Count > 0) 
             {
-                yield return new WaitForSeconds(constructionDelay);
-                tileFrom = tileTo;
-                tileTo = CreatTile();
-                ConnectTiles();
-                CollisionCheck();
+                // 创建分支容器
+                goContainer = new GameObject("Branch" + (b+1));
+                container = goContainer.transform;
+                container.SetParent(transform);
+
+                // 随机选择分支起点
+                int connectorIndex = Random.Range(0, availableConnectors.Count);
+                tileRoot = availableConnectors[connectorIndex].transform.parent.parent;
+                availableConnectors.RemoveAt(connectorIndex);
+
+                // 分支路径生成
+                tileTo = tileRoot;
+                for (int i = 0; i < branchLenght - 1; i++)
+                {
+                    yield return new WaitForSeconds(constructionDelay);
+                    tileFrom = tileTo;
+                    tileTo = CreatTile();
+                    ConnectTiles();
+                    CollisionCheck();
+                    if(attempts >= maxAttempts){ break;}
+                }
             }
+            else {break;}
         }
 
         // 最终清理
@@ -302,19 +304,9 @@ public class DungeonGenerator : MonoBehaviour
             if (box) Destroy(box);
         }
     }
-
-    /// <summary>
-    /// 碰撞检测与处理系统
-    /// 功能：检测新生成房间是否与现有房间发生重叠
-    /// 工作原理：
-    /// 1. 动态添加碰撞体进行空间检测
-    /// 2. 使用盒型碰撞体进行精确体积检测
-    /// 3. 实施尝试次数记录机制
-    /// </summary>
     void CollisionCheck()
     {
-        // 确保目标房间有碰撞体组件（动态添加临时碰撞体）
-        var box = tileTo.GetComponent<BoxCollider>();
+        BoxCollider box = tileTo.GetComponent<BoxCollider>();
         if (box == null)
         {
             // 创建临时触发器用于碰撞检测（不会触发物理反馈）
@@ -329,12 +321,6 @@ public class DungeonGenerator : MonoBehaviour
         
         // 获取碰撞体的半尺寸（OverlapBox需要半长宽高）
         Vector3 halfExtents = box.bounds.extents;
-
-        // 执行三维空间碰撞检测（参数说明）：
-        // - 检测中心点：房间位置 + 碰撞体中心偏移
-        // - 检测范围：碰撞体实际尺寸的一半
-        // - 检测角度：使用默认方向（可能需要根据房间旋转调整）
-        // - 检测层：只检测"Tile"层的碰撞体（需在Unity中预先设置）
         List<Collider> hits = Physics.OverlapBox(
             tileTo.position + offset, 
             halfExtents, 
