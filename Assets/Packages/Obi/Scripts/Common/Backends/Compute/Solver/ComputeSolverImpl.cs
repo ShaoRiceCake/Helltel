@@ -319,6 +319,7 @@ namespace Obi
         private void GetOrCreateColliderWorld()
         {
             colliderGrid = GameObject.FindObjectOfType<ComputeColliderWorld>();
+            Debug.Log("获取ComputeColliderWorld");
             if (colliderGrid == null)
             {
                 var world = new GameObject("ComputeCollisionWorld", typeof(ComputeColliderWorld));

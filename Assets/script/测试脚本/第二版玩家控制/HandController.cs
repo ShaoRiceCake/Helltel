@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
-
-public class HandController : MonoBehaviour
+using Unity.Netcode;
+public class HandController : NetworkBehaviour
 {
     public GameObject pivotObject;
     public float speed = 4.0f;
@@ -16,6 +16,10 @@ public class HandController : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.instance.isGameing) return;
+
+        if (!IsLocalPlayer&&NetworkManager.Singleton) return;
+
         if (controlObject == null || pivotObject == null)
         {
             Debug.LogWarning("Control object or pivot object is not set.");

@@ -183,8 +183,12 @@ namespace Obi
         }
         public void DecreaseReferenceCount()
         {
+
             if (--referenceCount <= 0 && gameObject != null)
-                DestroyImmediate(gameObject);
+            {
+                //DestroyImmediate(gameObject);
+            }
+
         }
 
         public void SetColliders(ObiNativeColliderShapeList shapes, ObiNativeAabbList bounds, ObiNativeAffineTransformList transforms)

@@ -1,6 +1,6 @@
 using UnityEngine;
-
-public class Foot: MonoBehaviour
+using Unity.Netcode;
+public class Foot: NetworkBehaviour
 {
     public GameObject targetObject; // 目标点对象
     public GameObject movingObjectLeft; // 左键控制的运动对象
@@ -35,6 +35,9 @@ public class Foot: MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.instance.isGameing) return;
+
+        if (!IsLocalPlayer && NetworkManager.Singleton) return;
         // 检测鼠标左右键是否同时按下
         if (Input.GetMouseButtonDown(0) && Input.GetMouseButtonDown(1))
         {
@@ -102,6 +105,7 @@ public class Foot: MonoBehaviour
 
     void FixedUpdate()
     {
+
         // 左键控制的运动对象的弹簧约束
         if (isSpringActiveLeft && targetObject != null && movingObjectLeft != null)
         {
