@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Foot: MonoBehaviour
 {
+    [Header("Mouse Movement Detection")]
     public GameObject targetObject; // 目标点对象
     public GameObject movingObjectLeft; // 左键控制的运动对象
     public GameObject movingObjectRight; // 右键控制的运动对象
@@ -10,6 +11,7 @@ public class Foot: MonoBehaviour
     public float moveSpeed = 15f; // 移动到碰撞落点的速度
     public float raycastDistance = 10f; // 射线检测的最大距离
     public int mouseDetectionFrameInterval = 10; // 鼠标移动检测单位帧间隔
+    public float mouseDetectionTimeInterval = 0.1f; // 单位秒（原单位帧间隔）
     public float impulseCoefficient = 0.3f; // 冲量系数
     public float landingThreshold = 0.5f; // 落地判定阈值
     public LayerMask raycastMask; // 射线检测遮罩
@@ -25,6 +27,7 @@ public class Foot: MonoBehaviour
     private int frameCounter = 0; // 帧计数器
     private Rigidbody movingRbLeft; // 左键控制的运动对象的刚体组件
     private Rigidbody movingRbRight; // 右键控制的运动对象的刚体组件
+    private float mouseDetectionTimer; // 时间间隔计时器
 
     void Start()
     {
@@ -89,6 +92,20 @@ public class Foot: MonoBehaviour
             }
         }
 
+        // 鼠标移动检测的时间间隔逻辑
+        if (isSpringActiveLeft || isSpringActiveRight)
+        {
+            mouseDetectionTimer += Time.deltaTime;
+
+            // 使用 while 来处理可能的间隔超限情况
+            while (mouseDetectionTimer >= mouseDetectionTimeInterval)
+            {
+                mouseDetectionTimer -= mouseDetectionTimeInterval;
+                DetectMouseMovement();
+            }
+        }
+
+
         // 检测是否落地并固定对象
         if (!isSpringActiveLeft && IsObjectLanded(movingObjectLeft, targetPositionLeft))
         {
@@ -147,34 +164,74 @@ public class Foot: MonoBehaviour
         }
     }
 
+    // 老，用帧检测
+    //void DetectMouseMovement()
+    //{
+    //    // 记录检测单位帧结束时的鼠标位置
+    //    mouseEndPosition = Input.mousePosition;
+
+    //    // 计算鼠标位移向量（屏幕空间）
+    //    Vector3 mouseDelta = mouseEndPosition - mouseStartPosition;
+    //    mouseDelta.z = 0; // 忽略Z轴
+
+    //    // 归一化鼠标位移向量
+    //    Vector3 normalizedMouseDelta = mouseDelta.normalized;
+
+    //    // 将鼠标位移向量转换为世界坐标系的XZ平面冲量
+    //    Vector3 impulseDirection = new Vector3(normalizedMouseDelta.x, 0, normalizedMouseDelta.y);
+    //    impulseDirection.Normalize();
+
+    //    // 根据左键或右键状态应用冲量
+    //    if (isSpringActiveLeft)
+    //    {
+    //        movingRbLeft.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
+    //    }
+    //    if (isSpringActiveRight)
+    //    {
+    //        movingRbRight.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
+    //    }
+
+    //    // 更新检测单位帧开始时的鼠标位置
+    //    mouseStartPosition = Input.mousePosition;
+    //}
+
+    // 新，用时间间隔检测，更稳定
     void DetectMouseMovement()
     {
-        // 记录检测单位帧结束时的鼠标位置
-        mouseEndPosition = Input.mousePosition;
+        // 记录当前帧的鼠标位置
+        Vector3 currentMousePos = Input.mousePosition;
 
-        // 计算鼠标位移向量（屏幕空间）
-        Vector3 mouseDelta = mouseEndPosition - mouseStartPosition;
+        // 计算自上次检测后的位移量
+        Vector3 mouseDelta = currentMousePos - mouseStartPosition;
         mouseDelta.z = 0; // 忽略Z轴
 
-        // 归一化鼠标位移向量
-        Vector3 normalizedMouseDelta = mouseDelta.normalized;
+        // 更新起始位置为当前帧位置（为下次检测准备）
+        mouseStartPosition = currentMousePos;
 
-        // 将鼠标位移向量转换为世界坐标系的XZ平面冲量
-        Vector3 impulseDirection = new Vector3(normalizedMouseDelta.x, 0, normalizedMouseDelta.y);
-        impulseDirection.Normalize();
-
-        // 根据左键或右键状态应用冲量
-        if (isSpringActiveLeft)
+        // 计算标准化的位移方向
+        if (mouseDelta.magnitude > 0.01f) // 添加微小阈值防止误触发
         {
-            movingRbLeft.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
-        }
-        if (isSpringActiveRight)
-        {
-            movingRbRight.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
-        }
+            // 将屏幕空间位移转换为世界空间方向
+            Vector3 worldDirection = new Vector3(
+                mouseDelta.x / Screen.width,
+                0,
+                mouseDelta.y / Screen.height
+            );
 
-        // 更新检测单位帧开始时的鼠标位置
-        mouseStartPosition = Input.mousePosition;
+            // 根据时间间隔标准化位移量
+            float normalizedMagnitude = mouseDelta.magnitude * (Time.deltaTime / mouseDetectionTimeInterval);
+            worldDirection = worldDirection.normalized * normalizedMagnitude;
+
+            // 应用冲量
+            if (isSpringActiveLeft)
+            {
+                movingRbLeft.AddForce(worldDirection * impulseCoefficient, ForceMode.VelocityChange);
+            }
+            if (isSpringActiveRight)
+            {
+                movingRbRight.AddForce(worldDirection * impulseCoefficient, ForceMode.VelocityChange);
+            }
+        }
     }
 
     bool IsObjectLanded(GameObject movingObject, Vector3 targetPosition)
