@@ -410,12 +410,16 @@ MonoBehaviour:
   - {fileID: 6551577643172991279, guid: ea8fc1f633e83ea4d82763558c6479e0, type: 3}
   - {fileID: 1717768317796168926, guid: a22d74c84fe16b2478066d7d14b5aa79, type: 3}
   - {fileID: 6146908721503945696, guid: 5ab258f7799ce344f98fe48166f8c16b, type: 3}
-  mainLenght: 10
-  branchLenght: 5
-  branchNum: 10
+  mainLength: 10
+  branchLenght: 9
+  branchNum: 11
   doorPercent: 25
-  constructionDelay: 0.5
+  constructionDelay: 0.003
   generatedTiles: []
+  availableConnectors: []
+  usingBoxCollider: 0
+  usingLightForDebugging: 0
+  RestoreLightsAfterDebugging: 0
 --- !u!4 &1586560304
 Transform:
   m_ObjectHideFlags: 0
@@ -719,7 +723,7 @@ Transform:
   m_GameObject: {fileID: 2091664528}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 60, z: 0}
+  m_LocalPosition: {x: 0, y: 160, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
