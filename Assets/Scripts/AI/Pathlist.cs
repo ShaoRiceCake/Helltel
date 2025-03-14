@@ -1,11 +1,11 @@
-
+ï»¿
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 public class Pathlist: MonoBehaviour
 {
 
-    public List<Transform> waypoints;//Ñ°Â·Â·¾¶µã
+    public List<Transform> waypoints;//å¯»è·¯è·¯å¾„ç‚¹
     [SerializeField]
     private bool alwaysDrawPath;
     [SerializeField]
@@ -18,7 +18,7 @@ public class Pathlist: MonoBehaviour
     {
         if (alwaysDrawPath)
         {
-            DrawPath();//»æÖÆÂ·¾¶
+            DrawPath();//ç»˜åˆ¶è·¯å¾„
         }
     }
     public void DrawPath()

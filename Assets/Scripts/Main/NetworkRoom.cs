@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -28,7 +28,7 @@ public class NetworkRoom : MonoBehaviour
         host.onClick.AddListener(BeHost); // 
         client.onClick.AddListener(Login); 
     }
-    #region ¹ãÓòÍøÍ¬²½
+    #region å¹¿åŸŸç½‘åŒæ­¥
     //private async void OnStartClientButtonClicked()
     //{
 
@@ -42,18 +42,18 @@ public class NetworkRoom : MonoBehaviour
     //    {
     //        if (ex.Message.StartsWith("Bad"))
     //        {
-    //            Debug.Log("·¿¼ä´úÂëÎŞĞ§£¡");
+    //            Debug.Log("æˆ¿é—´ä»£ç æ— æ•ˆï¼");
     //        }
-    //        // ´¦Àí Relay ·şÎñÆ÷´íÎó£¨ÀıÈçÎŞĞ§´úÂë»òÁ¬½ÓÊ§°Ü£©
+    //        // å¤„ç† Relay æœåŠ¡å™¨é”™è¯¯ï¼ˆä¾‹å¦‚æ— æ•ˆä»£ç æˆ–è¿æ¥å¤±è´¥ï¼‰
     //        Debug.LogError("Relay Error: " + ex.Message);
     //    }
     //    catch (Exception ex)
     //    {
     //        if (ex.Message.StartsWith("Value"))
     //        {
-    //            Debug.Log("·¿¼ä´úÂë²»¿ÉÎª¿Õ");
+    //            Debug.Log("æˆ¿é—´ä»£ç ä¸å¯ä¸ºç©º");
     //        }
-    //        // ´¦ÀíÆäËûÒì³£
+    //        // å¤„ç†å…¶ä»–å¼‚å¸¸
     //        Debug.LogError("General Error: " + ex.Message);
     //    }
 
@@ -96,14 +96,14 @@ public class NetworkRoom : MonoBehaviour
     //}
     #endregion
 
-    #region ±¾µØ²âÊÔ
+    #region æœ¬åœ°æµ‹è¯•
     public void Login()
     {
         NetworkManager.Singleton.StartClient();
         UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         unityTransport.SetConnectionData("127.0.0.1" ,7777);
 
-    }//µÇÂ¼
+    }//ç™»å½•
 
     public void BeHost()
     {
@@ -112,6 +112,6 @@ public class NetworkRoom : MonoBehaviour
         unityTransport.SetConnectionData("0.0.0.0", 7777);
         NetworkManager.Singleton.StartHost();
         GameManager.instance.LoadScene("Lobby");
-    }//Ö÷»úÆô¶¯
+    }//ä¸»æœºå¯åŠ¨
     #endregion
 }

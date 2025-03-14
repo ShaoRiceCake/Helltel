@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
@@ -13,19 +13,19 @@ public class PlayerListCell : MonoBehaviour
     {
         PlayerInfo = playerInfo;
         _name.text = playerInfo.name;
-        _ready.text = playerInfo.isReady ? "ÒÑ×¼±¸" : "Î´×¼±¸";
+        _ready.text = playerInfo.isReady ? "å·²å‡†å¤‡" : "æœªå‡†å¤‡";
     }
 
     public void UpdateInfo(PlayerInfo playerInfo)
     {
         PlayerInfo = playerInfo;
         _name.text = playerInfo.name;
-        _ready.text = PlayerInfo.isReady ? "ÒÑ×¼±¸" : "Î´×¼±¸";
+        _ready.text = PlayerInfo.isReady ? "å·²å‡†å¤‡" : "æœªå‡†å¤‡";
     }
 
 
     internal void SetReady(bool arg0)
     {
-        _ready.text = arg0 ? "ÒÑ×¼±¸" : "Î´×¼±¸";
+        _ready.text = arg0 ? "å·²å‡†å¤‡" : "æœªå‡†å¤‡";
     }
 }

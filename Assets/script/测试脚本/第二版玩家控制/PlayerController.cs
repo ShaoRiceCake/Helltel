@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using Obi;
 using Unity.Netcode;
 public class PlayerController : NetworkBehaviour
@@ -7,7 +7,7 @@ public class PlayerController : NetworkBehaviour
     public Foot footController;
     public bool startWithFootControl = true;
     public ObiParticleAttachment rightHandControl;
-    public GameObject handBallPrefab; // ÊÖ²¿ÇòµÄÔ¤ÖÆÌå
+    public GameObject handBallPrefab; // æ‰‹éƒ¨çƒçš„é¢„åˆ¶ä½“
     public GameObject player_camera;
     public GameObject playerColliderWorld;
     public GameObject handBall;
@@ -81,13 +81,13 @@ public class PlayerController : NetworkBehaviour
             return;
         }
         handBall = handBallPrefab;
-        // Éú³ÉÊÖ²¿Çò£¬Î»ÖÃºÍĞı×ª»ùÓÚ handBallSpawnPosition µÄÊµÊ±ÊÀ½ç×ø±ê
+        // ç”Ÿæˆæ‰‹éƒ¨çƒï¼Œä½ç½®å’Œæ—‹è½¬åŸºäº handBallSpawnPosition çš„å®æ—¶ä¸–ç•Œåæ ‡
         //handBall = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0],Quaternion.identity);
         handBall.transform.position = ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0];
-        // ½«ÊÖ²¿Çò°ó¶¨µ½ ObiParticleAttachment
+        // å°†æ‰‹éƒ¨çƒç»‘å®šåˆ° ObiParticleAttachment
         rightHandControl.target = handBall.transform;
 
-        // ½«ÊÖ²¿Çò´«µİ¸ø HandController
+        // å°†æ‰‹éƒ¨çƒä¼ é€’ç»™ HandController
         handController.SetControlObject(handBall);
     }
 

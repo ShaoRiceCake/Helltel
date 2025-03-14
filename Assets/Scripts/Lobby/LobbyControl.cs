@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -12,21 +12,21 @@ using UnityEngine.SceneManagement;
 
 public class LobbyControl : NetworkBehaviour
 {
-    [Header("Íæ¼ÒÁĞ±í")]
+    [Header("ç©å®¶åˆ—è¡¨")]
     public Transform _content;
-    [Header("·¿¼äÖĞµÄÍæ¼ÒCell")]
+    [Header("æˆ¿é—´ä¸­çš„ç©å®¶Cell")]
     public GameObject _originCell;
-    [Header("¿ªÊ¼ÓÎÏ·£¨½öÖ÷»ú£©")]
+    [Header("å¼€å§‹æ¸¸æˆï¼ˆä»…ä¸»æœºï¼‰")]
     public Button _startBtn;
-    [Header("ÍË³öÓÎÏ·")]
+    [Header("é€€å‡ºæ¸¸æˆ")]
     public Button _exitBtn;
-    [Header("×¼±¸Toggle")]
+    [Header("å‡†å¤‡Toggle")]
     public Toggle _ready;
-    [Header("ÊÇ·ñ×¼±¸")]
+    [Header("æ˜¯å¦å‡†å¤‡")]
     public TMP_Text _readyornot;
-    [Header("·¿¼ä´úÂë")]
+    [Header("æˆ¿é—´ä»£ç ")]
     public TMP_Text roomCode;
-    [Header("×Ô¶¨ÒåÃû³Æ")]
+    [Header("è‡ªå®šä¹‰åç§°")]
     public TMP_InputField _name;
 
     public bool exiting;
@@ -49,10 +49,10 @@ public class LobbyControl : NetworkBehaviour
         _ready.onValueChanged.AddListener(OnReadyToggle);
         _cellDictionary = new Dictionary<ulong, PlayerListCell>();
         _name.onEndEdit.AddListener(OnEndEdit);
-        roomCode.text = "·¿¼ä´úÂë:"+GameManager.instance.joinConde;
+        roomCode.text = "æˆ¿é—´ä»£ç :"+GameManager.instance.joinConde;
         PlayerInfo playerInfo = new PlayerInfo();
         playerInfo.id = NetworkManager.LocalClientId;
-        playerInfo.name = "Íæ¼Ò"+playerInfo.id;
+        playerInfo.name = "ç©å®¶"+playerInfo.id;
         _name.text = playerInfo.name;
         playerInfo.isReady = false;
 
@@ -97,7 +97,7 @@ public class LobbyControl : NetworkBehaviour
     {
         PlayerInfo playerInfo = new PlayerInfo();
         playerInfo.id =obj ;
-        playerInfo.name = "Íæ¼Ò" + obj;
+        playerInfo.name = "ç©å®¶" + obj;
         playerInfo.isReady = false;
         AddPlayer(playerInfo);
         UpdateAllPlayerInfos();
@@ -149,7 +149,7 @@ public class LobbyControl : NetworkBehaviour
 
     private void OnReadyToggle(bool arg0)
     {
-        _readyornot.text= arg0 ? "ÒÑ×¼±¸" : "Î´×¼±¸";
+        _readyornot.text= arg0 ? "å·²å‡†å¤‡" : "æœªå‡†å¤‡";
         _cellDictionary[NetworkManager.LocalClientId].SetReady(arg0);
         UpdatePlayerInfo(NetworkManager.LocalClientId, arg0);
         if (IsServer)
