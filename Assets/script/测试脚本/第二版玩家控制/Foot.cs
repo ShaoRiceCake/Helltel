@@ -5,6 +5,7 @@ public class Foot : MonoBehaviour
     public GameObject targetObject; // 目标点对象
     public GameObject movingObjectLeft; // 左键控制的运动对象
     public GameObject movingObjectRight; // 右键控制的运动对象
+    public GameObject forwardObject; // 新增：用于确定正朝向的对象
     public float springForce = 10f; // 弹簧力度
     public float damping = 0.6f; // 阻尼系数
     public float moveSpeed = 15f; // 移动到碰撞落点的速度
@@ -151,9 +152,16 @@ public class Foot : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // 将鼠标位移向量转换为世界坐标系的XZ平面冲量
-        Vector3 impulseDirection = new Vector3(mouseX, 0, mouseY);
-        impulseDirection.Normalize();
+        // 获取forwardObject的朝向，并确保其平行于XZ平面
+        Vector3 forwardDirection = forwardObject.transform.forward;
+        forwardDirection.y = 0; // 确保朝向平行于XZ平面
+        forwardDirection.Normalize();
+
+        // 计算右方向（垂直于forwardDirection）
+        Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+
+        // 将鼠标位移向量转换为基于forwardObject朝向的冲量方向
+        Vector3 impulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
 
         // 根据左键或右键状态应用冲量
         if (isSpringActiveLeft)
