@@ -11,7 +11,7 @@ public class PlayerController : NetworkBehaviour
     public GameObject player_camera;
     public GameObject playerColliderWorld;
     public GameObject handBall;
-
+    public GameObject enemy;
     private void Start()
     {
         handController.enabled = !startWithFootControl;
@@ -29,6 +29,11 @@ public class PlayerController : NetworkBehaviour
         GameManager.instance.OnStartGame.AddListener(() =>
         {
             GameManager.instance.isGameing = true;
+            if (IsHost)
+            {
+                var obj = Instantiate(enemy);
+                obj.GetComponent<NetworkObject>().Spawn();
+            }
         });
         if (!IsLocalPlayer)
         {

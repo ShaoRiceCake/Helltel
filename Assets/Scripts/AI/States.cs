@@ -46,11 +46,8 @@ public class PatrolState : IState
 
     public void PatrolCycle()
     {
-
-
         if (manager.agent.remainingDistance < 0.2f)
         {
-
             waitTimer += Time.deltaTime;
 
             if (waitTimer > 3f)//路径点等待大于3秒切换下一个路径点

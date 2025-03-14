@@ -13,9 +13,9 @@ public class FSM : NetworkBehaviour
     {
         if (IsHost)
         {
+
             agent = GetComponent<NavMeshAgent>();
-            agent.updateRotation = false;
-            agent.updateUpAxis = false;
+            path = GameObject.Find("PathList").GetComponent<Pathlist>();
             stateDic.Add(AIState.Patrol, new PatrolState(this));
             stateDic.Add(AIState.Attack, new AttackState(this));
             stateDic.Add(AIState.Chasing, new ChasingState(this));
@@ -42,7 +42,5 @@ public class FSM : NetworkBehaviour
             state = stateDic[next];
             state.Enter();
         }
-
-
     }
 }
