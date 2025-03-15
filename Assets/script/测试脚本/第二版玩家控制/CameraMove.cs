@@ -56,8 +56,8 @@ public class CameraMove : MonoBehaviour
             transform.localEulerAngles = new Vector3(currentXRotation, 0, 0);
         }
 
-        // 处理滚轮拉近拉远视角
-        HandleZoom();
+        //// 处理滚轮拉近拉远视角
+        //HandleZoom();
     }
 
     void HandleZoom()
