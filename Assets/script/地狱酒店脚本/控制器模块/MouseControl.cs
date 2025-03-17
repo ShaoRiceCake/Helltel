@@ -1,8 +1,8 @@
+
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 
-public class MouseControl : InputControl_Base
+public class MouseControl : MonoBehaviour
 {
     // 鼠标灵敏度
     public float MouseSensitivity
@@ -15,7 +15,7 @@ public class MouseControl : InputControl_Base
                 m_mouseSensitivity = value;
                 if (m_mouseSensitivity == 0)
                 {
-                    CustomLogger.Log("MouseSensitivity is zero!", LogType.Warning);
+                    Debug.LogWarning("mouseSensitivity is zero!");
                 }
             }
         }
@@ -28,42 +28,20 @@ public class MouseControl : InputControl_Base
         set => m_enableMouseControl = value;
     }
 
-    protected bool m_enableMouseControl = false;
+    protected bool m_enableMouseControl = true;
     private float m_mouseSensitivity = 100;
 
 
-    protected override InputDevice GetDevice()
-    {
-        return Mouse.current;
-    }
-
-    protected override void EnableDevice()
-    {
-        // 启用鼠标输入
-        m_enableMouseControl = true;
-    }
-
-    protected override void DisableDevice()
-    {
-        // 禁用鼠标输入
-        m_enableMouseControl = false;
-    }
-
     // 事件定义
     public UnityEvent onLeftMouseDown;          // 鼠标左键按下
-    public UnityEvent onRightMouseDown;        // 鼠标右键按下
-    public UnityEvent onMiddleMouseDown;       // 滚轮按下
-    public UnityEvent onMouseWheelUp;          // 滚轮向上滚动
-    public UnityEvent onMouseWheelDown;        // 滚轮向下滚动
-    public UnityEvent onBothMouseButtonsDown;  // 左右键同时按下
-    public UnityEvent<Vector2> onMouseMove;    // 相对鼠标移动量
+    public UnityEvent onRightMouseDown;         // 鼠标右键按下
+    public UnityEvent onMiddleMouseDown;        // 滚轮按下
+    public UnityEvent onMouseWheelUp;           // 滚轮向上滚动
+    public UnityEvent onMouseWheelDown;         // 滚轮向下滚动
+    public UnityEvent onBothMouseButtonsDown;   // 左右键同时按下
+    public UnityEvent<Vector2> onMouseMove;     // 相对鼠标移动量
 
     private Vector2 lastMousePosition;
-
-    protected override void InitializeController()
-    {
-        base.InitializeController(); // 调用基类初始化
-    }
 
     void Update()
     {
@@ -77,28 +55,26 @@ public class MouseControl : InputControl_Base
 
     void HandleMouseButtons()
     {
-        var mouse = Mouse.current;
-
         // 鼠标左键按下
-        if (mouse.leftButton.wasPressedThisFrame && !mouse.rightButton.isPressed)
+        if (Input.GetMouseButtonDown(0) && !Input.GetMouseButton(1))
         {
             onLeftMouseDown.Invoke();
         }
 
         // 鼠标右键按下
-        if (mouse.rightButton.wasPressedThisFrame && !mouse.leftButton.isPressed)
+        if (Input.GetMouseButtonDown(1) && !Input.GetMouseButton(0))
         {
             onRightMouseDown.Invoke();
         }
 
         // 滚轮按下
-        if (mouse.middleButton.wasPressedThisFrame)
+        if (Input.GetMouseButtonDown(2))
         {
             onMiddleMouseDown.Invoke();
         }
 
         // 左右键同时按下
-        if (mouse.leftButton.isPressed && mouse.rightButton.isPressed)
+        if (Input.GetMouseButton(0) && Input.GetMouseButton(1))
         {
             onBothMouseButtonsDown.Invoke();
         }
@@ -106,8 +82,7 @@ public class MouseControl : InputControl_Base
 
     void HandleMouseWheel()
     {
-        var mouse = Mouse.current;
-        float scroll = mouse.scroll.y.ReadValue();
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
 
         if (scroll > 0)
         {
@@ -121,8 +96,7 @@ public class MouseControl : InputControl_Base
 
     void HandleMouseMovement()
     {
-        var mouse = Mouse.current;
-        Vector2 currentMousePosition = mouse.delta.ReadValue();
+        Vector2 currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
         if (currentMousePosition != lastMousePosition)
         {
