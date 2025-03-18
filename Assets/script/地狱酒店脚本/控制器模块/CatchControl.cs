@@ -6,6 +6,7 @@ public class CatchControl : MonoBehaviour
     public GameObject m_ignoredFatherObject;
     public GameObject m_catchBall;
     public ObiParticleAttachment obiAttachment; // 新增 ObiParticleAttachment 组件
+    public bool isCacthing = true;
 
     [HideInInspector]
     public bool attchAimPos = false;
@@ -54,21 +55,32 @@ public class CatchControl : MonoBehaviour
 
     private void Update()
     {
-        aimTrans = GetClosestTransformInSphereWithPriority();
-        HandleAttachment();
+        if (isCacthing)
+        {
+            aimTrans = GetClosestTransformInSphereWithPriority();
+            HandleAttachment();
+
+        }
+        else
+        {
+            CancelCatch();
+        }
+    }
+
+    public void CancelCatch()
+    {
+        obiAttachment.target =  (m_catchBall.transform);
     }
 
     private void HandleAttachment()
     {
         if (aimTrans != null)
         {
-            obiAttachment.enabled = true;
             obiAttachment.target = aimTrans;
             attchAimPos = true;
         }
         else
         {
-            obiAttachment.enabled = false;
             attchAimPos = false;
         }
     }

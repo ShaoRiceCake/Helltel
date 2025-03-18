@@ -12,10 +12,11 @@ public class PlayerControl_FootControl : MonoBehaviour
     public float fixedHeight = 2f; // 固定下落高度
     public float impulseCoefficient = 0.3f; // 冲量系数
     public float mouseSensitivity = 0.1f; // 鼠标灵敏度
+    public float downForce = 1f; // 下坠冲力
+
 
     private bool isLeftFootUp = false; // 左腿是否抬起
     private bool isRightFootUp = false; // 右腿是否抬起
-    private bool isFreeFoot = false; // 腿部下落到指定位置
 
     private Rigidbody movingRbLeft; // 左键控制的运动对象的刚体组件
     private Rigidbody movingRbRight; // 右键控制的运动对象的刚体组件
@@ -68,28 +69,6 @@ public class PlayerControl_FootControl : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (!isLeftFootUp)
-        {
-            if (movingObjectLeft != null && !catchControlLeft.attchAimPos && !isFreeFoot)
-            {
-                MoveDown(movingObjectLeft);
-            }
-        }
-
-        if (!isRightFootUp)
-        {
-            if (movingObjectRight != null && !catchControlLeft.attchAimPos && !isFreeFoot)
-            {
-                MoveDown(movingObjectRight);
-            }
-
-        }
-
-
-    }
-
     void FixedUpdate()
     {
         // 施加抬腿时的弹簧约束-左
@@ -109,31 +88,33 @@ public class PlayerControl_FootControl : MonoBehaviour
     private void OnLiftLeftLeg()
     {
         isLeftFootUp = true;
-        catchControlLeft.enabled = false;
-        isFreeFoot = false;
+        catchControlLeft.isCacthing = false;
     }
 
     // 事件处理：抬右腿
     private void OnLiftRightLeg()
     {
         isRightFootUp = true;
-        catchControlRight.enabled = false;
-        isFreeFoot = false;
+        catchControlRight.isCacthing = false;
     }
 
     // 事件处理：放左腿
     private void OnReleaseLeftLeg()
     {
         isLeftFootUp = false;
-        catchControlLeft.enabled = true;
-
+        catchControlLeft.isCacthing = true;
+        Vector3 force = new Vector3(0,-downForce,0);
+        movingRbLeft.AddForce(force);
     }
 
     // 事件处理：放右腿
     private void OnReleaseRightLeg()
     {
-        catchControlRight.enabled = true;
+        catchControlRight.isCacthing = true;
         isRightFootUp = false;
+        Vector3 force = new Vector3(0, -downForce, 0);
+        movingRbRight.AddForce(force);
+
     }
 
     // 事件处理：取消腿部抓取
@@ -169,21 +150,6 @@ public class PlayerControl_FootControl : MonoBehaviour
         {
             movingRbRight.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
         }
-    }
-
-    void MoveDown(GameObject movingObject)
-    {
-        // 计算目标位置
-        Vector3 targetPosition = movingObject.transform.position - Vector3.up * fixedHeight;
-
-        // 移动对象
-        movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-        if(Vector3.Distance(movingObject.transform.position, targetPosition) < 0.1f)
-        {
-            isFreeFoot = true;
-        }
-
     }
 
     // 施加弹簧力

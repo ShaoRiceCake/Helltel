@@ -534,7 +534,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472459560}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 70dbd8fde831c82498b77b0667aa39b0, type: 3}
   m_Name: 
@@ -602,7 +602,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 472459560}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0439c826d85a1d4f84317b8f26e9953, type: 3}
   m_Name: 
@@ -617,6 +617,7 @@ MonoBehaviour:
   fixedHeight: 4
   impulseCoefficient: 0.3
   mouseSensitivity: 0.01
+  downForce: 1
 --- !u!1 &552725763
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,7 +738,6 @@ GameObject:
   - component: {fileID: 614721829}
   - component: {fileID: 614721828}
   - component: {fileID: 614721827}
-  - component: {fileID: 614721833}
   m_Layer: 0
   m_Name: RightFootBall
   m_TagString: Untagged
@@ -754,8 +754,8 @@ Transform:
   m_GameObject: {fileID: 614721825}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 19.129002, y: -2.3519993, z: 1.2893}
-  m_LocalScale: {x: 0.14442775, y: 0.14442775, z: 0.14442775}
+  m_LocalPosition: {x: 19.129002, y: -2.3529987, z: 1.2942}
+  m_LocalScale: {x: 0.18174787, y: 0.18174787, z: 0.18174787}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 472459561}
@@ -889,22 +889,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 614721825}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &614721833
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 614721825}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dd2595c6b23e744c9e4cf093b74e433, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ignoredFatherObject: {fileID: 472459560}
-  m_catchBall: {fileID: 614721825}
-  obiAttachment: {fileID: 1209885286}
-  attchAimPos: 0
 --- !u!1 &661437124 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -6706528246666148765, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
@@ -15029,7 +15013,7 @@ MonoBehaviour:
   m_ParticleGroup: {fileID: 893773119534038886, guid: b5b06285ef96d994a9a51edc14cbdae4, type: 2}
   m_AttachmentType: 1
   m_ConstrainOrientation: 0
-  m_Compliance: 0.001
+  m_Compliance: 0.0001
   m_BreakThreshold: Infinity
 --- !u!114 &1209885290
 MonoBehaviour:
@@ -15048,7 +15032,7 @@ MonoBehaviour:
   m_ParticleGroup: {fileID: 8649086459526323939, guid: b5b06285ef96d994a9a51edc14cbdae4, type: 2}
   m_AttachmentType: 1
   m_ConstrainOrientation: 0
-  m_Compliance: 0.001
+  m_Compliance: 0.0001
   m_BreakThreshold: Infinity
 --- !u!1001 &1233570343
 PrefabInstance:
@@ -15324,7 +15308,6 @@ GameObject:
   - component: {fileID: 1361082580}
   - component: {fileID: 1361082579}
   - component: {fileID: 1361082578}
-  - component: {fileID: 1361082584}
   m_Layer: 0
   m_Name: LeftFootBall
   m_TagString: Untagged
@@ -15341,8 +15324,8 @@ Transform:
   m_GameObject: {fileID: 1361082576}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 19.1299, y: -2.35, z: 0.9551}
-  m_LocalScale: {x: 0.16741188, y: 0.16741188, z: 0.16741188}
+  m_LocalPosition: {x: 19.1299, y: -2.351, z: 0.96}
+  m_LocalScale: {x: 0.2106711, y: 0.2106711, z: 0.2106711}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 472459561}
@@ -15476,22 +15459,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1361082576}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1361082584
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1361082576}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dd2595c6b23e744c9e4cf093b74e433, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ignoredFatherObject: {fileID: 472459560}
-  m_catchBall: {fileID: 1361082576}
-  obiAttachment: {fileID: 1209885287}
-  attchAimPos: 0
 --- !u!1 &1371355548
 GameObject:
   m_ObjectHideFlags: 0

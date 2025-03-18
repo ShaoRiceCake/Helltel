@@ -7,7 +7,6 @@ using System;using UnityEngine;namespace Obi{    [AddComponentMenu("Physics
         /// <summary>          /// The actor this attachment is added to.        /// </summary>         public ObiActor actor        {            get { return m_Actor; }        }
 
         /// <summary>          /// The target transform that the <see cref="particleGroup"/> should be attached to.        /// </summary>         public Transform target        {            get { return m_Target; }            set            {                if (value != m_Target)                {                    m_Target = value;                    Bind();                }            }        }
-
         /// <summary>          /// The particle group that should be attached to the <see cref="target"/>.        /// </summary>         public ObiParticleGroup particleGroup        {            get            {                return m_ParticleGroup;            }            set            {                if (value != m_ParticleGroup)                {                    m_ParticleGroup = value;                    Bind();                }            }        }
 
         /// <summary>          /// Whether this attachment is currently bound or not.        /// </summary>         public bool isBound        {            get { return m_Target != null && m_SolverIndices != null && m_PositionOffsets != null; }        }
