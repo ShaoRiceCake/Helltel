@@ -1,32 +1,20 @@
 using UnityEngine;
+using Obi;
 
 public class CatchControl : MonoBehaviour
 {
-    private float m_sphereRadius; // 球的半径
-    public Vector3 SphereCenter { get; set; }
-    private GameObject m_ignoredFatherObject;
+    public GameObject m_ignoredFatherObject;
+    public GameObject m_catchBall;
+    public ObiParticleAttachment obiAttachment; // 新增 ObiParticleAttachment 组件
 
+    [HideInInspector]
+    public bool attchAimPos = false;
 
-    public GameObject IgnoredFatherObject
-    {
-        set
-        {
-            if (!value)
-            {
-                Debug.LogWarning("Catch Ball Not Set Any Father Object!");
-                value = null;
-            }
-            else
-            {
-                m_ignoredFatherObject = value;
-            }
-        }
-
-    }
+    private Transform aimTrans;
+    private float m_sphereRadius;
 
     public float SphereRadius
     {
-        get => m_sphereRadius;
         set
         {
             if (value <= 0)
@@ -41,57 +29,78 @@ public class CatchControl : MonoBehaviour
         }
     }
 
-
-    private void Update()
+    private void Start()
     {
-        // 更新球心的位置（例如，跟随某个对象或手动控制）
-        SphereCenter = transform.position;
-
-        // 检测球内部的物体并找到最靠近球心的点（带优先级和忽略物体判断）
-        Vector3 closestPoint = GetClosestPointInSphereWithPriority();
-
-        if (closestPoint != Vector3.zero)
+        SphereCollider sphereCollider = m_catchBall.GetComponent<SphereCollider>();
+        if (sphereCollider != null)
         {
-            Debug.Log("最靠近球心的点: " + closestPoint);
+            m_sphereRadius = sphereCollider.radius;
+        }
+        else
+        {
+            Debug.LogError("CatchBall does not have a SphereCollider component!");
+        }
+
+        // 初始化 ObiParticleAttachment
+        if (obiAttachment == null)
+        {
+            obiAttachment = m_catchBall.GetComponent<ObiParticleAttachment>();
+            if (obiAttachment == null)
+            {
+                Debug.LogError("ObiParticleAttachment component is missing on CatchBall!");
+            }
         }
     }
 
-    private Vector3 GetClosestPointInSphereWithPriority()
+    private void Update()
     {
-        // 获取球体内的所有碰撞体
-        Collider[] hitColliders = Physics.OverlapSphere(SphereCenter, m_sphereRadius);
+        aimTrans = GetClosestTransformInSphereWithPriority();
+        HandleAttachment();
+    }
 
-        Vector3 closestPoint = Vector3.zero;
+    private void HandleAttachment()
+    {
+        if (aimTrans != null)
+        {
+            obiAttachment.enabled = true;
+            obiAttachment.target = aimTrans;
+            attchAimPos = true;
+        }
+        else
+        {
+            obiAttachment.enabled = false;
+            attchAimPos = false;
+        }
+    }
+
+    private Transform GetClosestTransformInSphereWithPriority()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(m_catchBall.transform.position, m_sphereRadius);
+
+        Transform closestTransform = null;
         float closestDistance = float.MaxValue;
-        bool hasHighPriorityObject = false; // 是否检测到高优先级物体
+        bool hasHighPriorityObject = false;
 
         foreach (var hitCollider in hitColliders)
         {
-            // 如果碰撞体是需要忽略的物体或其子物体，则跳过
             if (IsColliderIgnored(hitCollider))
             {
                 continue;
             }
 
-            // 如果已经检测到高优先级物体，且当前物体是低优先级（tag为"Floor"），则跳过
             if (hasHighPriorityObject && hitCollider.CompareTag("Floor"))
             {
                 continue;
             }
 
-            // 获取碰撞体上最靠近球心的点
-            Vector3 closestPointOnCollider = hitCollider.ClosestPoint(SphereCenter);
+            Vector3 closestPointOnCollider = hitCollider.ClosestPoint(m_catchBall.transform.position);
+            float distance = Vector3.Distance(closestPointOnCollider, m_catchBall.transform.position);
 
-            // 计算该点到球心的距离
-            float distance = Vector3.Distance(closestPointOnCollider, SphereCenter);
-
-            // 如果这个点比之前记录的点更近，则更新最近点和距离
             if (distance < closestDistance)
             {
                 closestDistance = distance;
-                closestPoint = closestPointOnCollider;
+                closestTransform = hitCollider.transform;
 
-                // 如果当前物体不是低优先级（tag不是"Floor"），标记为检测到高优先级物体
                 if (!hitCollider.CompareTag("Floor"))
                 {
                     hasHighPriorityObject = true;
@@ -99,19 +108,16 @@ public class CatchControl : MonoBehaviour
             }
         }
 
-        return closestPoint;
+        return closestTransform;
     }
 
     private bool IsColliderIgnored(Collider collider)
     {
-        // 如果未设置需要忽略的物体，则返回false
         if (m_ignoredFatherObject == null)
         {
             return false;
         }
 
-        // 检查碰撞体是否是需要忽略的物体或其子物体
         return collider.transform == m_ignoredFatherObject.transform || collider.transform.IsChildOf(m_ignoredFatherObject.transform);
     }
-
 }
