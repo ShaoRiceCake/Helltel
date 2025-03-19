@@ -450,7 +450,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 27.572, y: 358.561, z: -0.411}
---- !u!1 &1444672339
+--- !u!1 &1173383671
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -458,8 +458,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1444672341}
-  - component: {fileID: 1444672340}
+  - component: {fileID: 1173383673}
+  - component: {fileID: 1173383672}
   m_Layer: 0
   m_Name: BurstCollisionWorld
   m_TagString: Untagged
@@ -467,13 +467,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1444672340
+--- !u!114 &1173383672
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1444672339}
+  m_GameObject: {fileID: 1173383671}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1a161c4294214a4fbcb7e9e94800494, type: 3}
@@ -481,13 +481,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cellSpans:
     m_AlignBytes: 16
---- !u!4 &1444672341
+--- !u!4 &1173383673
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1444672339}
+  m_GameObject: {fileID: 1173383671}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -783,11 +783,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3408622d865c2bd4ebf34644fc2d3d15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  solver: {fileID: 1714112967}
+  obiParticleAttachment: {fileID: 1829334548}
   springStiffness: 500
   springDamping: 50
   targetPoint: {fileID: 2142871739}
-  obiParticleAttachment: {fileID: 1829334548}
 --- !u!114 &1829334551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -814,6 +813,22 @@ MonoBehaviour:
   OnParticleReleased:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1829334555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 220445675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dc018a38c4a3f74bb6856c97c81b5ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obiParticleAttachment: {fileID: 1829334548}
+  impulseMagnitude: 50
+  impulseDirection: {x: 0, y: 1, z: 0}
+  impulseDuration: 0.1
 --- !u!1 &1929705046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1133,6 +1148,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3228682924142564238, guid: 32549de8e51a4eb41a9614e8f370edb7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1829334550}
+    - targetCorrespondingSourceObject: {fileID: 3228682924142564238, guid: 32549de8e51a4eb41a9614e8f370edb7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1829334555}
   m_SourcePrefab: {fileID: 100100000, guid: 32549de8e51a4eb41a9614e8f370edb7, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -1144,4 +1162,4 @@ SceneRoots:
   - {fileID: 1714112968}
   - {fileID: 141319500}
   - {fileID: 2142871739}
-  - {fileID: 1444672341}
+  - {fileID: 1173383673}
