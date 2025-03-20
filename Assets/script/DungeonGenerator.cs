@@ -6,6 +6,7 @@ using System.Linq;
 using System.IO;
 using System.ComponentModel;
 using Unity.Collections;
+using System.Linq.Expressions;
 
 /// <summary>
 /// 地牢生成器核心类
@@ -179,6 +180,8 @@ public class DungeonGenerator : MonoBehaviour
 
         // 最终清理
         CleanupBoxes();
+        BlockedPassages();
+        
     }
 
     /// <summary>
@@ -409,6 +412,19 @@ public class DungeonGenerator : MonoBehaviour
             }else{attempts = 0;}
         }
     }
+    void BlockedPassages(){
+        foreach(Connector connector in transform.GetComponentsInChildren<Connector>()){
+            if(connector.isConnected == false){
+                Vector3 pos = connector.transform.position;
+                int wallIndex = Random.Range(0, blockedPrefabs.Length);
+                GameObject gowall = Instantiate(blockedPrefabs[wallIndex],pos,connector.transform.rotation,connector.transform)as GameObject;
+                gowall.name = blockedPrefabs[wallIndex].name;
+            }
+        }
+        
+
+    }
+
 }
 
 /* 辅助类说明：

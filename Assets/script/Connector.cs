@@ -8,9 +8,16 @@ public class Connector : MonoBehaviour
     private Vector2 _size = Vector2.one * 4f;
     [SerializeField]
     public bool isConnected = false;
+    private bool isPlaying;
+    void Start()
+    {
+        isPlaying = true;
+    }
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
+        Gizmos.color = isConnected? Color.green : Color.red;
+        if(isPlaying == false){Gizmos.color = Color.cyan;}
+        
         Vector2 halfSize = _size * 0.5f;
         Vector3 offset = transform.position + transform.up * halfSize.y;
         Gizmos.DrawLine(offset,offset +transform.forward); 
