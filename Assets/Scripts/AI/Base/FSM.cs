@@ -7,32 +7,37 @@ using System;
 
 public class FSM : NetworkBehaviour
 {
-    public AIType AItype;
+    public GameObject[] players;
     public Pathlist path;
     public NavMeshAgent agent;
     protected IState state;
     protected Dictionary<AIState, IState> stateDic = new Dictionary<AIState, IState>();
     private void Start()
     {
+
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        Init();
+    }
+
+    protected virtual void Init()
+    {
         if (IsHost)
         {
             agent = GetComponent<NavMeshAgent>();
             path = GameObject.Find("PathList").GetComponent<Pathlist>();
-            SwitchType();
+            players = GameObject.FindGameObjectsWithTag("Player");
         }
-
     }
 
-    void SwitchType()
+    public virtual void SetDestination(Transform target)
     {
-        switch (AItype)
+        if (IsHost)
         {
-            case AIType.OldMan:
-                stateDic.Add(AIState.OldManWaiting, new OldManWaiting(this));
-                stateDic.Add(AIState.OldManLonely, new OldManLonely(this));
-                stateDic.Add(AIState.OldManHappy, new OldManHappy(this));
-                stateDic.Add(AIState.OldManDie, new OldManDie(this));
-                ChangeState(AIState.OldManWaiting);break;
+            agent.SetDestination(target.position);
         }
     }
 
