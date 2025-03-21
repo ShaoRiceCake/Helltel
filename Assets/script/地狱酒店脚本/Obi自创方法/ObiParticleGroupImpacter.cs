@@ -5,7 +5,7 @@ namespace Obi
 {
     public class ObiParticleGroupImpacter : ObiParticleGroupTool
     {
-        public float impulseMagnitude = 50f; // 冲击力大小
+        public float impulseMagnitude = 200f; // 冲击力大小
         public Vector3 impulseDirection = Vector3.up; // 冲击力方向
         public float impulseDuration = 0.1f; // 冲击力作用时间
 
@@ -52,5 +52,15 @@ namespace Obi
                 StartCoroutine(ApplyImpulse());
             }
         }
+
+        public void TriggerImpulse(Vector3 direction)
+        {
+            if (!isImpacting)
+            {
+                impulseDirection = direction;
+                StartCoroutine(ApplyImpulse());
+            }
+        }
+
     }
 }

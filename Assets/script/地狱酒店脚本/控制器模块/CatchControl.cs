@@ -5,42 +5,20 @@ public class CatchControl : MonoBehaviour
 {
     public GameObject m_ignoredFatherObject;
     public GameObject m_catchBall;
-    public ObiParticleAttachment obiAttachment; // 新增 ObiParticleAttachment 组件
-    public bool isCacthing = true;
+    public ObiParticleAttachment obiAttachment; 
 
     [HideInInspector]
     public bool attchAimPos = false;
+    public bool isCacthing = true;
 
+    private SphereCollider sphereCollider;
     private Transform aimTrans;
-    private float m_sphereRadius;
-
-    public float SphereRadius
-    {
-        set
-        {
-            if (value <= 0)
-            {
-                Debug.LogWarning("Catch SphereRadius Can Not Be Used!");
-                m_sphereRadius = 0;
-            }
-            else
-            {
-                m_sphereRadius = value;
-            }
-        }
-    }
 
     private void Start()
     {
-        SphereCollider sphereCollider = m_catchBall.GetComponent<SphereCollider>();
-        if (sphereCollider != null)
-        {
-            m_sphereRadius = sphereCollider.radius;
-        }
-        else
-        {
-            Debug.LogError("CatchBall does not have a SphereCollider component!");
-        }
+        m_catchBall = this.gameObject;
+
+        sphereCollider = m_catchBall.GetComponent<SphereCollider>();
 
         // 初始化 ObiParticleAttachment
         if (obiAttachment == null)
@@ -57,9 +35,8 @@ public class CatchControl : MonoBehaviour
     {
         if (isCacthing)
         {
-            aimTrans = GetClosestTransformInSphereWithPriority();
+            OnTriggerEnter(sphereCollider);
             HandleAttachment();
-
         }
         else
         {
@@ -70,9 +47,10 @@ public class CatchControl : MonoBehaviour
     public void CancelCatch()
     {
         obiAttachment.target =  (m_catchBall.transform);
+        attchAimPos = false;
     }
-
-    private void HandleAttachment()
+    
+private void HandleAttachment()
     {
         if (aimTrans != null)
         {
@@ -85,51 +63,9 @@ public class CatchControl : MonoBehaviour
         }
     }
 
-    private Transform GetClosestTransformInSphereWithPriority()
+    private void OnTriggerEnter(Collider other)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(m_catchBall.transform.position, m_sphereRadius);
-
-        Transform closestTransform = null;
-        float closestDistance = float.MaxValue;
-        bool hasHighPriorityObject = false;
-
-        foreach (var hitCollider in hitColliders)
-        {
-            if (IsColliderIgnored(hitCollider))
-            {
-                continue;
-            }
-
-            if (hasHighPriorityObject && hitCollider.CompareTag("Floor"))
-            {
-                continue;
-            }
-
-            Vector3 closestPointOnCollider = hitCollider.ClosestPoint(m_catchBall.transform.position);
-            float distance = Vector3.Distance(closestPointOnCollider, m_catchBall.transform.position);
-
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestTransform = hitCollider.transform;
-
-                if (!hitCollider.CompareTag("Floor"))
-                {
-                    hasHighPriorityObject = true;
-                }
-            }
-        }
-
-        return closestTransform;
+        aimTrans = other.transform;
     }
 
-    private bool IsColliderIgnored(Collider collider)
-    {
-        if (m_ignoredFatherObject == null)
-        {
-            return false;
-        }
-
-        return collider.transform == m_ignoredFatherObject.transform || collider.transform.IsChildOf(m_ignoredFatherObject.transform);
-    }
 }

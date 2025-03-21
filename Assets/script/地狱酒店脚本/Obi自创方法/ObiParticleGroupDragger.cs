@@ -7,6 +7,7 @@ namespace Obi
         public float springStiffness = 500; // µ¯»É¸Õ¶È
         public float springDamping = 50;    // µ¯»É×èÄá
         public Transform targetPoint;      // Ä¿±êµã
+        public bool debugMode = false;
 
         private bool isDragging = false;
 
@@ -14,6 +15,32 @@ namespace Obi
         {
             get => isDragging;
             set => isDragging = value;
+        }
+
+        public Transform TargetPoint
+        {
+            get => targetPoint;
+            set => targetPoint = value;
+        }
+
+        void DebugMode()
+        {
+            if (debugMode)
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    isDragging = true;
+                }
+                if (Input.GetMouseButtonUp(0))
+                {
+                    isDragging = false;
+                }
+            }
+        }
+
+        private void Update()
+        {
+            DebugMode();
         }
 
         void FixedUpdate()
