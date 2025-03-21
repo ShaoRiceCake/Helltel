@@ -81,8 +81,8 @@ public class DungeonGenerator : MonoBehaviour
     [Tooltip("可用连接点池")]
     [SerializeField]
     private List<Connector> availableConnectors = new List<Connector>(); // 可用于生成分支的连接点
-    [SerializeField]
-    private DungeonState dungeonState = DungeonState.inActive;
+    
+    public DungeonState dungeonState = DungeonState.inActive;
     
     private int attempts,maxAttempts = 50;
 
@@ -118,19 +118,27 @@ public class DungeonGenerator : MonoBehaviour
         tileTo = tileRoot;
         dungeonState = DungeonState.generatingMain;
         // 主路径生成循环
-        for (int i = 0; i < mainLength - 1; i++)
+        while(generatedTiles.Count<mainLength)
         {
             
             // 生成间隔（可视化效果）
             yield return new WaitForSeconds(constructionDelay);
             // 更新房间指针
             tileFrom = tileTo;
-            tileTo = CreatTile();
+            
+            if(generatedTiles.Count == mainLength-1)
+            {
+                tileTo = CreatExitTile();
+            }
+            else
+            {
+                tileTo = CreatTile();
+            }
             // 连接当前房间
             ConnectTiles();
             // 执行碰撞检测（当前为空实现）
             CollisionCheck();
-            if(attempts >= maxAttempts){break;}
+            
         }
 
         // 收集未使用的连接点用于分支生成
@@ -176,6 +184,7 @@ public class DungeonGenerator : MonoBehaviour
         dungeonState = DungeonState.cleanup;
         //CleanupBoxes();
         BlockedPassages();
+        //SpawnDoors();
         dungeonState = DungeonState.completed;
     }
 
@@ -227,6 +236,23 @@ public class DungeonGenerator : MonoBehaviour
 
         return tile.transform;
     }
+    Transform CreatExitTile()
+    {
+        // 随机选择房间类型
+        int tileIndex = Random.Range(0, exitPrefabs.Length);
+        GameObject tile = Instantiate(exitPrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
+        tile.name = exitPrefabs[tileIndex].name;
+        
+        // 设置随机朝向
+        float yRot = Random.Range(0, 4) * 90f;
+        tile.transform.Rotate(0, yRot, 0);
+
+        // 查找父房间并记录
+        Transform origin = generatedTiles.Find(x => x.tile == tileFrom).tile;
+        generatedTiles.Add(new Tile(tile.transform, origin));
+
+        return tile.transform;
+    }
 
     /// <summary>
     /// 连接两个房间的核心方法
@@ -259,7 +285,21 @@ public class DungeonGenerator : MonoBehaviour
         connectTo.SetParent(tileTo.Find("Connectors"));
 
         // 记录连接信息
-        generatedTiles.Last().connector = connectFrom.GetComponent<Connector>();
+        var fromConnector = connectFrom.GetComponent<Connector>();
+        var toConnector = connectTo.GetComponent<Connector>();
+        fromConnector.pairedConnector = toConnector;
+        toConnector.pairedConnector = fromConnector;
+
+        // 仅在主连接点生成门（概率控制）
+        if (Random.Range(0, 100) < doorPercent && !fromConnector.hasDoor)
+        {
+            int doorIndex = Random.Range(0, doorPrefabs.Length);
+            Instantiate(doorPrefabs[doorIndex], fromConnector.transform.position, 
+                fromConnector.transform.rotation, fromConnector.transform);
+            fromConnector.hasDoor = toConnector.hasDoor = true;
+        }
+
+        generatedTiles.Last().connector = fromConnector;
     }
 
     /// <summary>
@@ -397,10 +437,17 @@ public class DungeonGenerator : MonoBehaviour
                     else
                     {return;}
                 }
-
+                //重新尝试生成并连接
                 if(tileFrom !=null)
                 {
-                    tileTo = CreatTile();
+                    if(generatedTiles.Count == mainLength-1)
+                    {
+                        tileTo = CreatExitTile();
+                    }
+                    else
+                    {
+                        tileTo = CreatTile();
+                    }
                     ConnectTiles();
                     CollisionCheck();
                 }
@@ -419,6 +466,21 @@ public class DungeonGenerator : MonoBehaviour
         
 
     }
+    // void SpawnDoors()
+    // {
+    //     if(doorPercent>0)
+    //     {
+    //         Connector[] allConnectors = transform.GetComponentsInChildren<Connector>();
+    //         for(int i = 0;i<allConnectors.Length;i++ )
+    //         {
+    //             Connector myConnector = allConnectors [i];
+    //             int doorIndex = Random.Range(0, doorPrefabs.Length);
+    //             if(myConnector.isConnected == true){
+    //                 GameObject goDoor = Instantiate(doorPrefabs[doorIndex],myConnector.transform.position,myConnector.transform.rotation,myConnector.transform)as GameObject;
+    //             }
+    //         }
+    //     }
+    // }
 
 }
 

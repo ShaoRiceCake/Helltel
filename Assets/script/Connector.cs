@@ -9,6 +9,9 @@ public class Connector : MonoBehaviour
     [SerializeField]
     public bool isConnected = false;
     private bool isPlaying;
+    // 新增属性
+    [HideInInspector] public Connector pairedConnector;
+    [HideInInspector] public bool hasDoor;
     void Start()
     {
         isPlaying = true;
