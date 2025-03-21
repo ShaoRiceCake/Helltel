@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 /// - 房间碰撞检测
 /// - 动态连接点管理
 /// </summary>
+public enum DungeonState{inActive,generatingMain,generatingBranches,cleanup,completed}
 public class DungeonGenerator : MonoBehaviour
 {
     [Header("预制体配置")]
@@ -80,16 +81,9 @@ public class DungeonGenerator : MonoBehaviour
     [Tooltip("可用连接点池")]
     [SerializeField]
     private List<Connector> availableConnectors = new List<Connector>(); // 可用于生成分支的连接点
-
-    [Header("调试选项")]
-    [Tooltip("启用碰撞体可视化")]
-    public bool usingBoxCollider;           // 是否显示碰撞体
+    [SerializeField]
+    private DungeonState dungeonState = DungeonState.inActive;
     
-    [Tooltip("临时启用灯光调试")]
-    public bool usingLightForDebugging;     // 调试用灯光开关
-    
-    [Tooltip("调试后恢复灯光")]
-    public bool RestoreLightsAfterDebugging;// 调试后是否恢复原灯光
     private int attempts,maxAttempts = 50;
 
     /// <summary>
@@ -122,7 +116,7 @@ public class DungeonGenerator : MonoBehaviour
         // 初始化起始房间
         tileRoot = CreatStartTile();
         tileTo = tileRoot;
-
+        dungeonState = DungeonState.generatingMain;
         // 主路径生成循环
         for (int i = 0; i < mainLength - 1; i++)
         {
@@ -147,7 +141,7 @@ public class DungeonGenerator : MonoBehaviour
                 availableConnectors.Add(connector);
             }
         }
-
+        dungeonState = DungeonState.generatingBranches;
         // 分支生成阶段
         for (int b = 0; b < branchNum; b++)
         {
@@ -179,9 +173,10 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         // 最终清理
-        CleanupBoxes();
+        dungeonState = DungeonState.cleanup;
+        //CleanupBoxes();
         BlockedPassages();
-        
+        dungeonState = DungeonState.completed;
     }
 
     /// <summary>
@@ -297,16 +292,16 @@ public class DungeonGenerator : MonoBehaviour
     /// <summary>
     /// 清理调试用碰撞体
     /// </summary>
-    void CleanupBoxes()
-    {
-        if (usingBoxCollider) return;
+    // void CleanupBoxes()
+    // {
+    //     if (usingBoxCollider) return;
 
-        foreach (Tile tile in generatedTiles)
-        {
-            var box = tile.tile.GetComponent<BoxCollider>();
-            if (box) Destroy(box);
-        }
-    }
+    //     foreach (Tile tile in generatedTiles)
+    //     {
+    //         var box = tile.tile.GetComponent<BoxCollider>();
+    //         if (box) Destroy(box);
+    //     }
+    // }
     void CollisionCheck()
     {
         BoxCollider box = tileTo.GetComponent<BoxCollider>();
