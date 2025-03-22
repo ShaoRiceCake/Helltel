@@ -216,7 +216,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &1334934734
+--- !u!1 &1019908026
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -224,8 +224,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1334934736}
-  - component: {fileID: 1334934735}
+  - component: {fileID: 1019908028}
+  - component: {fileID: 1019908027}
   m_Layer: 0
   m_Name: ComputeCollisionWorld
   m_TagString: Untagged
@@ -233,25 +233,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1334934735
+--- !u!114 &1019908027
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1334934734}
+  m_GameObject: {fileID: 1019908026}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1334934736
+--- !u!4 &1019908028
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1334934734}
+  m_GameObject: {fileID: 1019908026}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -14702,7 +14702,7 @@ MonoBehaviour:
   m_ParticleGroup: {fileID: -635296315564799129, guid: b5b06285ef96d994a9a51edc14cbdae4, type: 2}
   m_AttachmentType: 1
   m_ConstrainOrientation: 0
-  m_Compliance: 0.001
+  m_Compliance: 0.0001
   breakThreshold: Infinity
 --- !u!4 &3524300852253735539
 Transform:
@@ -15264,6 +15264,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1202990056046139464}
+  - component: {fileID: 6203151504655474844}
+  - component: {fileID: 6203151504655474843}
+  - component: {fileID: 6203151504655474842}
   m_Layer: 7
   m_Name: HumanController
   m_TagString: Untagged
@@ -15271,6 +15274,99 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &6203151504655474842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6203151504655474841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0f8c0ec0b036834386513a752b63297, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardObject: {fileID: 4403284944400172008}
+  handPrepareObj: {fileID: 3419569729816532863}
+  handControlAttachment: {fileID: 3445077960005477583}
+  handMoveSpeed: 4
+  cylinderRadius: 9
+  cylinderHalfHeight: 6
+  moveToPivotSpeed: 10
+  mouseSensitivity: 10
+  handBallPrefab: {fileID: 1318237025092249892, guid: 0d0f4c6bd70b79a45b5d0c096cdbca07, type: 3}
+--- !u!114 &6203151504655474843
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6203151504655474841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dbb0f3f2421a9b42a5f7e2ce4f70a93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardObject: {fileID: 4403284944400172008}
+  handPrepareObj: {fileID: 3419569729816532863}
+  handControlAttachment: {fileID: 7875069955581477200}
+  handMoveSpeed: 4
+  cylinderRadius: 9
+  cylinderHalfHeight: 6
+  moveToPivotSpeed: 10
+  mouseSensitivity: 10
+  handBallPrefab: {fileID: 1318237025092249892, guid: 0d0f4c6bd70b79a45b5d0c096cdbca07, type: 3}
+--- !u!114 &6203151504655474844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6203151504655474841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41bb324a3449bf140b178e1f7d3a1c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLiftLeftLeg:
+    m_PersistentCalls:
+      m_Calls: []
+  onLiftRightLeg:
+    m_PersistentCalls:
+      m_Calls: []
+  onReleaseLeftLeg:
+    m_PersistentCalls:
+      m_Calls: []
+  onReleaseRightLeg:
+    m_PersistentCalls:
+      m_Calls: []
+  onCancelLegGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onLiftLeftHand:
+    m_PersistentCalls:
+      m_Calls: []
+  onLiftRightHand:
+    m_PersistentCalls:
+      m_Calls: []
+  onReleaseLeftHand:
+    m_PersistentCalls:
+      m_Calls: []
+  onReleaseRightHand:
+    m_PersistentCalls:
+      m_Calls: []
+  onCancelHandGrab:
+    m_PersistentCalls:
+      m_Calls: []
+  onSwitchControlMode:
+    m_PersistentCalls:
+      m_Calls: []
+  onMouseMove:
+    m_PersistentCalls:
+      m_Calls: []
+  onDefaultMode:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &6266988581320338815
 GameObject:
   m_ObjectHideFlags: 0
@@ -15526,7 +15622,7 @@ MonoBehaviour:
     evaluationOrder: 1
     iterations: 1
     SORFactor: 1
-    enabled: 1
+    enabled: 0
   stitchConstraintParameters:
     evaluationOrder: 1
     iterations: 1
@@ -15652,7 +15748,7 @@ MonoBehaviour:
   m_ParticleGroup: {fileID: -1511041013749638491, guid: b5b06285ef96d994a9a51edc14cbdae4, type: 2}
   m_AttachmentType: 1
   m_ConstrainOrientation: 0
-  m_Compliance: 0.001
+  m_Compliance: 0.0001
   breakThreshold: Infinity
 --- !u!137 &8059615394621885926
 SkinnedMeshRenderer:
@@ -15747,8 +15843,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a643d4ffc1d5104e93066abd0b0768c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 2446707350316796410}
   forwardObject: {fileID: 4403284944400172008}
+  targetObject: {fileID: 2446707350316796410}
   footObject: {fileID: 6532190286809930968}
   mouseSensitivity: 1
   impulseCoefficient: 0.3
@@ -15936,8 +16032,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96124d38b9538de49af277643b37aa30, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 2446707350316796410}
   forwardObject: {fileID: 4403284944400172008}
+  targetObject: {fileID: 2446707350316796410}
   footObject: {fileID: 370707576301667033}
   mouseSensitivity: 1
   impulseCoefficient: 0.3
@@ -16218,4 +16314,4 @@ SceneRoots:
   - {fileID: 3571351096803338166}
   - {fileID: 6979623801883191043}
   - {fileID: 2071700123}
-  - {fileID: 1334934736}
+  - {fileID: 1019908028}

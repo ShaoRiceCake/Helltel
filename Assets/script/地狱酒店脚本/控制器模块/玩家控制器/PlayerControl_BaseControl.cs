@@ -4,11 +4,13 @@ using UnityEngine;
 public abstract class PlayerControl_BaseControl : MonoBehaviour
 {
     protected PlayerControlInformationProcess controlHandler;
+    public GameObject forwardObject;
 
-    // Start is called before the first frame update
     virtual protected void Start()
     {
         controlHandler = GetComponent<PlayerControlInformationProcess>();
+
+        NullCheckerTool.CheckNull(forwardObject, controlHandler);
     }
 
 }

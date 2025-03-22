@@ -1,24 +1,30 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(RaycastTool))]
 [RequireComponent(typeof(SpringTool))]
+[RequireComponent(typeof(Rigidbody))]
 public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 {
     public GameObject targetObject;
-    public GameObject forwardObject;
     public GameObject footObject;
+
     public float mouseSensitivity = 1f;
     public float impulseCoefficient = 0.3f; 
 
     protected Vector3 impulseDirection;
+
     protected bool isFootUp = false;
     protected bool isObjectFixed = false;
+    protected bool isCancleing = false;
+
     protected RaycastTool raycastTool;
     protected SpringTool springTool;
     protected Rigidbody movingObj;
-    protected float timeCounter_Move;
-    protected float timeCounter_Hover;
 
+    protected float timeCounter_Move = 0f;
+    protected float timeCounter_Hover = 0f;
+    protected float timeCounter_Cancle = 0f;
 
     protected override void Start()
     {
@@ -33,34 +39,13 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         springTool = footObject.GetComponent<SpringTool>();
         movingObj = footObject.GetComponent<Rigidbody>();
 
-        if (!CheckRequiredComponents())
-        {
-            return;
-        }
+        NullCheckerTool.CheckNull(raycastTool, springTool, movingObj);
 
         springTool.SetTarget(targetObject.transform);
         springTool.SetControlledObject(footObject);
         raycastTool.rayLauncher = footObject;
 
         SubscribeEvents();
-    }
-
-    protected bool CheckRequiredComponents()
-    {
-        string missingComponent =
-            !footObject ? nameof(footObject) :
-            !forwardObject ? nameof(forwardObject) :
-            !springTool ? nameof(springTool) :
-            !movingObj ? nameof(movingObj) :
-            !raycastTool ? nameof(raycastTool) : null;
-
-        if (missingComponent != null)
-        {
-            Debug.LogError($"Missing component: {missingComponent} on {gameObject.name}");
-            return false;
-        }
-
-        return true;
     }
 
 
@@ -89,10 +74,32 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     protected void OnCancelLegGrab()
     {
-
+        isCancleing = true;
+        timeCounter_Cancle = 0f;
     }
 
     protected void OnDefaultMode()
+    {
+
+    }
+
+    protected IEnumerator HandleCancelLegGrab()
+    {
+
+        if (isCancleing)
+        {
+            DisableInteractions();
+            yield return new WaitForSeconds(1f);
+            EnableInteractions();
+        }
+    }
+
+    private void DisableInteractions()
+    {
+
+    }
+
+    private void EnableInteractions()
     {
 
     }
@@ -125,6 +132,17 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
             MoveToTargetPosition(hitPos);
         }
 
+        if (isCancleing)
+        {
+            timeCounter_Cancle += Time.deltaTime;
+
+            if (timeCounter_Cancle >= 1f)
+            {
+                HandleCancelLegGrab();
+                timeCounter_Cancle = 0f; 
+                isCancleing = false;
+            }
+        }
     }
 
     protected void UnfixObject()

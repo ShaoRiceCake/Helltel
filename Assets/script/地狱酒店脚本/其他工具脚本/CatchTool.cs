@@ -1,7 +1,7 @@
 using UnityEngine;
 using Obi;
 
-public class CatchControl : MonoBehaviour
+public class CatchTool : MonoBehaviour
 {
     public GameObject m_ignoredFatherObject;
     public GameObject m_catchBall;
