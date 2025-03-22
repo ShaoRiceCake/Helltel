@@ -4,7 +4,7 @@ using UnityEngine;
 public class RaycastTool : MonoBehaviour
 {
     [Header("射线设置")]
-    private float rayLength = 5f; // 射线长度
+    private float rayLength = 10f; // 射线长度
     private Vector3 rayDirection = Vector3.down; // 射线方向
     public LayerMask ignoreLayers; // 需要忽略的Layer
     public GameObject rayLauncher;
@@ -16,14 +16,6 @@ public class RaycastTool : MonoBehaviour
 
     private RaycastHit hitInfo; // 射线碰撞信息
     private bool isHit = false; // 是否检测到碰撞
-
-    private void Start()
-    {
-        if (!rayLauncher)
-        {
-            Debug.LogWarning("RayLauncher is null!");
-        }
-    }
 
     public float RayLength
     {
@@ -84,24 +76,6 @@ public class RaycastTool : MonoBehaviour
 
         // 执行射线检测
         isHit = Physics.Raycast(rayOrigin, direction, out hitInfo, rayLength, ~ignoreLayers);
-    }
-
-    void OnDrawGizmos()
-    {
-        if (!showDebug) return;
-
-        // 绘制射线
-        Gizmos.color = rayColor;
-        Vector3 rayOrigin = transform.position;
-        Vector3 direction = transform.TransformDirection(rayDirection.normalized);
-        Gizmos.DrawLine(rayOrigin, rayOrigin + direction * rayLength);
-
-        // 如果检测到碰撞，绘制碰撞点
-        if (isHit)
-        {
-            Gizmos.color = hitPointColor;
-            Gizmos.DrawSphere(hitInfo.point, 0.1f);
-        }
     }
 
     // 获取碰撞点（如果没有碰撞，返回射线的终点）

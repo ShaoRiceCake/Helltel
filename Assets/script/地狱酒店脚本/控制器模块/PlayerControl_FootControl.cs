@@ -1,43 +1,48 @@
-using Obi;
 using UnityEngine;
 
 [RequireComponent(typeof(RaycastTool))]
-[RequireComponent(typeof(ObiParticleGroupImpacter))]
+[RequireComponent(typeof(SpringTool))]
 public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 {
-    public GameObject targetObject; // 目标点对象
-    public GameObject forwardObject; // 用于确定正朝向的对象
-
-    protected GameObject footObject; //足部控制对象
-
-    protected RaycastTool raycastTool;
-    protected ObiParticleGroupImpacter particleGroupImpacter;
-    // 参数
+    public GameObject targetObject;
+    public GameObject forwardObject;
+    public GameObject footObject;
     public float mouseSensitivity = 1f;
-    public float detectionTime= 0.1f;
+    public float impulseCoefficient = 0.3f; 
 
-    protected float timeCounter;
     protected Vector3 impulseDirection;
-
-    protected bool isFootUp = false; // 是否抬起
-    protected bool isCatching = false; // 是否抓取
+    protected bool isFootUp = false;
+    protected bool isObjectFixed = false;
+    protected RaycastTool raycastTool;
+    protected SpringTool springTool;
+    protected Rigidbody movingObj;
+    protected float timeCounter_Move;
+    protected float timeCounter_Hover;
 
 
     protected override void Start()
     {
         base.Start();
 
-        footObject = this.gameObject;
+        if (!footObject)
+        {
+            footObject = this.gameObject;
+        }
 
-        particleGroupImpacter = footObject.GetComponent<ObiParticleGroupImpacter>();
         raycastTool = footObject.GetComponent<RaycastTool>();
+        springTool = footObject.GetComponent<SpringTool>();
+        movingObj = footObject.GetComponent<Rigidbody>();
 
         if (!CheckRequiredComponents())
         {
             return;
         }
 
-        particleGroupImpacter.obiParticleAttachment = particleAttachment;
+        springTool.SetTarget(targetObject.transform);
+        springTool.SetControlledObject(footObject);
+        raycastTool.rayLauncher = footObject;
+
+        SubscribeEvents();
     }
 
     protected bool CheckRequiredComponents()
@@ -45,8 +50,8 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         string missingComponent =
             !footObject ? nameof(footObject) :
             !forwardObject ? nameof(forwardObject) :
-            !particleAttachment ? nameof(particleAttachment) :
-            !particleGroupImpacter ? nameof(particleGroupImpacter) :
+            !springTool ? nameof(springTool) :
+            !movingObj ? nameof(movingObj) :
             !raycastTool ? nameof(raycastTool) : null;
 
         if (missingComponent != null)
@@ -67,7 +72,6 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         }
     }
 
-    // 订阅事件
     protected virtual void SubscribeEvents()
     {
         controlHandler.onCancelLegGrab.AddListener(OnCancelLegGrab);
@@ -75,7 +79,6 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         controlHandler.onMouseMove.AddListener(OnMouseMove);
     }
 
-    // 取消订阅事件
     protected virtual void UnsubscribeEvents()
     {
         controlHandler.onCancelLegGrab.RemoveListener(OnCancelLegGrab);
@@ -84,64 +87,76 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     }
 
 
-    // 事件处理：取消腿部约束
     protected void OnCancelLegGrab()
     {
+
     }
 
-    // 事件处理：无操作状态
     protected void OnDefaultMode()
     {
-        Transform rayTrans = raycastTool.GetHitTrans();
-        if (rayTrans != null && !isCatching)
-        {
-            particleAttachment.BindToTarget(rayTrans);
-            isCatching = true;
-        }
-        else
-        {
-            particleAttachment.enabled = false;
-            isCatching = false;
-        }
+
     }
 
-    // 事件处理：鼠标移动
     protected void OnMouseMove(Vector2 mouseDelta)
     {
-        // 获取forwardObject的朝向，并确保其平行于XZ平面
-        Vector3 forwardDirection = forwardObject.transform.forward;
-        forwardDirection.y = 0; // 确保朝向平行于XZ平面
-        forwardDirection.Normalize();
+        if (isFootUp)
+        {
+            float mouseX = mouseDelta.x * mouseSensitivity;
+            float mouseY = mouseDelta.y * mouseSensitivity;
 
-        // 计算右方向（垂直于forwardDirection）
-        Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+            Vector3 forwardDirection = forwardObject.transform.forward;
+            forwardDirection.y = 0; 
+            forwardDirection.Normalize();
 
-        // 将鼠标位移向量转换为基于forwardObject朝向的冲量方向
-        impulseDirection = (rightDirection * mouseDelta.x * mouseSensitivity + forwardDirection * mouseDelta.y * mouseSensitivity).normalized;
+            Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
 
+            Vector3 impulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
+
+            movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
+        }
     }
-
 
     protected virtual void Update()
     {
+        Vector3 hitPos = raycastTool.GetHitPoint();
 
-        // 根据单位时间施加腿部移动冲量
-        if (isFootUp)
+        if (!isFootUp && hitPos != Vector3.zero)
         {
-            timeCounter += Time.deltaTime;
-            if (timeCounter >= detectionTime)
-            {
-                timeCounter = 0f; // 重置时间计数器
-                FootImpact(impulseDirection);
-            }
+            MoveToTargetPosition(hitPos);
         }
 
     }
 
-    // 调用粒子组冲量器施加默认冲量
-    protected  void FootImpact(Vector3 impulseDirection)
+    protected void UnfixObject()
     {
-        particleGroupImpacter.TriggerImpulse(impulseDirection);
+        movingObj.isKinematic = false;
+        isObjectFixed = false;
     }
+    protected void FixObject()
+    {
+        if (!isObjectFixed)
+        {
+            movingObj.velocity = Vector3.zero;
+            movingObj.angularVelocity = Vector3.zero;
+            movingObj.isKinematic = true;
+            isObjectFixed = true;
+        }
+    }
+
+    protected void MoveToTargetPosition(Vector3 targetPosition)
+    {
+        Vector3 direction = targetPosition - movingObj.position;
+        float distance = direction.magnitude;
+
+        if (distance > 0.1)
+        {
+            movingObj.velocity = direction.normalized * 10;
+        }
+        else
+        {
+            FixObject();
+        }
+    }
+
 
 }

@@ -162,6 +162,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
     private void OnMouseMove(Vector2 mouseDelta)
     {
         onMouseMove?.Invoke(mouseDelta); // 发布鼠标移动量
+
     }
 
     // 鼠标无按键操作事件处理
