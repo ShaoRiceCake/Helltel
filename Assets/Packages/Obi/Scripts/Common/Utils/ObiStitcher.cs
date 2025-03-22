@@ -34,9 +34,9 @@ namespace Obi
         [SerializeField] [HideInInspector] private ObiActor actor1 = null;          /**< one of the actors used by the stitcher.*/
         [SerializeField] [HideInInspector] private ObiActor actor2 = null;           /**< the second actor used by the stitcher.*/
 
-        [HideInInspector] public ObiNativeIntList particleIndices = new ObiNativeIntList();
-        [HideInInspector] public ObiNativeFloatList stiffnesses = new ObiNativeFloatList();
-        [HideInInspector] public ObiNativeFloatList lambdas = new ObiNativeFloatList();
+        [HideInInspector] public ObiNativeIntList particleIndices;
+        [HideInInspector] public ObiNativeFloatList stiffnesses;
+        [HideInInspector] public ObiNativeFloatList lambdas;
 
         //private IntPtr batch;
         private IStitchConstraintsBatchImpl m_BatchImpl;
@@ -176,6 +176,10 @@ namespace Obi
 
                 inSolver = true;
 
+                particleIndices = new ObiNativeIntList();
+                stiffnesses = new ObiNativeFloatList();
+                lambdas = new ObiNativeFloatList();
+
                 // create a constraint batch (CreateStitchConstraints() in burst returns a singleton):
                 m_BatchImpl = solver.implementation.CreateConstraintsBatch(Oni.ConstraintType.Stitch) as IStitchConstraintsBatchImpl;
 
@@ -195,6 +199,10 @@ namespace Obi
             // Oni.RemoveBatch(actor1.solver.OniSolver, batch);
             if (inSolver && m_BatchImpl != null)
             {
+                lambdas.Dispose();
+                particleIndices.Dispose();
+                stiffnesses.Dispose();
+
                 solver.implementation.DestroyConstraintsBatch(m_BatchImpl as IStitchConstraintsBatchImpl);
                 m_BatchImpl.Destroy();
                 m_BatchImpl = null;

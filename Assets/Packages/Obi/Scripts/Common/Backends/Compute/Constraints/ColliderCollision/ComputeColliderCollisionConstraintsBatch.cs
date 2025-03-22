@@ -11,7 +11,7 @@ namespace Obi
             m_ConstraintType = Oni.ConstraintType.Collision;
         }
 
-        public override void Initialize(float substepTime)
+        public override void Initialize(float stepTime, float substepTime, int steps, float timeLeft)
         {
             if (solverAbstraction.simplexCounts.simplexCount > 0 && solverImplementation.colliderGrid.colliderCount > 0)
             {

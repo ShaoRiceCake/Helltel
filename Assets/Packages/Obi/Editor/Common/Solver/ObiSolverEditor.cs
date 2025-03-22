@@ -69,6 +69,7 @@ namespace Obi
         SerializedProperty shapeMatchingConstraintParameters;
         SerializedProperty tetherConstraintParameters;
         SerializedProperty pinConstraintParameters;
+        SerializedProperty pinholeConstraintParameters;
         SerializedProperty stitchConstraintParameters;
         SerializedProperty densityConstraintParameters;
         SerializedProperty stretchShearConstraintParameters;
@@ -132,6 +133,7 @@ namespace Obi
             shapeMatchingConstraintParameters = serializedObject.FindProperty("shapeMatchingConstraintParameters");
             tetherConstraintParameters = serializedObject.FindProperty("tetherConstraintParameters");
             pinConstraintParameters = serializedObject.FindProperty("pinConstraintParameters");
+            pinholeConstraintParameters = serializedObject.FindProperty("pinholeConstraintParameters");
             stitchConstraintParameters = serializedObject.FindProperty("stitchConstraintParameters");
             densityConstraintParameters = serializedObject.FindProperty("densityConstraintParameters");
             stretchShearConstraintParameters = serializedObject.FindProperty("stretchShearConstraintParameters");
@@ -262,6 +264,9 @@ namespace Obi
 
                 constraintLabelContent.text = "Pin";
                 EditorGUILayout.PropertyField(pinConstraintParameters, constraintLabelContent);
+
+                constraintLabelContent.text = "Pinhole";
+                EditorGUILayout.PropertyField(pinholeConstraintParameters, constraintLabelContent);
 
                 constraintLabelContent.text = "Stitch";
                 EditorGUILayout.PropertyField(stitchConstraintParameters, constraintLabelContent);

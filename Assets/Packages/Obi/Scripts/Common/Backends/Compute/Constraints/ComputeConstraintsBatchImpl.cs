@@ -45,7 +45,7 @@ namespace Obi
 
         protected ObiNativeFloatList lambdasList;
 
-        public virtual void Initialize(float substepTime)
+        public virtual void Initialize(float stepTime, float substepTime, int steps, float timeLeft)
         {
             if (lambdasList != null)
             {

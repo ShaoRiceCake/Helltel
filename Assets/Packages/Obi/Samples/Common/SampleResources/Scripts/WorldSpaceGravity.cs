@@ -1,21 +1,24 @@
 ﻿using UnityEngine;
 using Obi;
 
-[RequireComponent(typeof(ObiSolver))]
-public class WorldSpaceGravity : MonoBehaviour
+namespace Obi.Samples
 {
-
-    ObiSolver solver;
-    public Vector3 worldGravity = new Vector3(0,-9.81f,0);
-
-    void Awake()
+    [RequireComponent(typeof(ObiSolver))]
+    public class WorldSpaceGravity : MonoBehaviour
     {
-        solver = GetComponent<ObiSolver>();
-    }
 
-    void Update()
-    {
-        solver.parameters.gravity = transform.InverseTransformDirection(worldGravity);
-        solver.PushSolverParameters();
+        ObiSolver solver;
+        public Vector3 worldGravity = new Vector3(0, -9.81f, 0);
+
+        void Awake()
+        {
+            solver = GetComponent<ObiSolver>();
+        }
+
+        void Update()
+        {
+            solver.parameters.gravity = transform.InverseTransformDirection(worldGravity);
+            solver.PushSolverParameters();
+        }
     }
 }

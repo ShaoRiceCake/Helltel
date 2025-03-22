@@ -107,17 +107,39 @@ using System;using System.Collections.Generic;using UnityEngine;using Unity.C
                 return;
             }
 
-            // traverse the hierarchy and store the bones in a list:
+            // traverse the hierarchy and store the bones in a list, only those that exist in the blueprint.
+            Queue<Transform> bpQueue = new Queue<Transform>();
+            bpQueue.Enqueue(bprint.rootBone);
+
             boneTransforms = new List<Transform>();
-            while (queue.Count > 0)
+            while (queue.Count > 0 && bpQueue.Count > 0)
             {
                 var bone = queue.Dequeue();
+                var bpBone = bpQueue.Dequeue();
 
-                if (bone != null)
+                if (bone != null && bpBone != null)
                 {
                     boneTransforms.Add(bone);
-                    foreach (Transform child in bone)
-                        queue.Enqueue(child);
+
+                    int a = 0, b = 0;
+                    int childCountA = bone.childCount;
+                    int childCountB = bpBone.childCount;
+
+                    while (a < childCountA && b < childCountB)
+                    {
+                        var childA = bone.GetChild(a);
+                        var childB = bpBone.GetChild(b);
+
+                        // bone exists both in the blueprint and the scene:
+                        if (childA.name == childB.name)
+                        {
+                            queue.Enqueue(childA);
+                            bpQueue.Enqueue(childB);
+                            a++; b++;
+                        }
+                        // bone only exists in the scene:
+                        else a++;
+                    }
                 }
             }
 
@@ -139,28 +161,34 @@ using System;using System.Collections.Generic;using UnityEngine;using Unity.C
                 return;
 
             var bprint = (ObiSoftbodySurfaceBlueprint)softbody.softbodyBlueprint;
+            var brotation = Matrix4x4.Rotate(Quaternion.Inverse(bprint.boneRotation));
 
             for (int i = 0; i < bprint.bonePairs.Count; ++i)
             {
                 int solverIndex = softbody.solverIndices[bprint.bonePairs[i].x];
-                var bone = boneTransforms[bprint.bonePairs[i].y];
 
-                Matrix4x4 deformMatrix = softbody.solver.transform.worldToLocalMatrix * bone.transform.localToWorldMatrix * bprint.boneBindPoses[bprint.bonePairs[i].y];
+                // Ignore blueprint bones that don't exist.
+                if (bprint.bonePairs[i].y < boneTransforms.Count)
+                {
+                    var bone = boneTransforms[bprint.bonePairs[i].y];
 
-                softbody.solver.startPositions[solverIndex] =
-                softbody.solver.endPositions[solverIndex] =
-                softbody.solver.positions[solverIndex] = deformMatrix.MultiplyPoint3x4(softbody.solver.restPositions[solverIndex]);
+                    Matrix4x4 deformMatrix = softbody.solver.transform.worldToLocalMatrix * bone.transform.localToWorldMatrix * bprint.boneBindPoses[bprint.bonePairs[i].y] * brotation;
 
-                softbody.solver.startOrientations[solverIndex] =
-                softbody.solver.endOrientations[solverIndex] =
-                softbody.solver.orientations[solverIndex] = deformMatrix.rotation * softbody.solver.restOrientations[solverIndex];
+                    softbody.solver.startPositions[solverIndex] =
+                    softbody.solver.endPositions[solverIndex] =
+                    softbody.solver.positions[solverIndex] = deformMatrix.MultiplyPoint3x4(softbody.solver.restPositions[solverIndex]);
+
+                    softbody.solver.startOrientations[solverIndex] =
+                    softbody.solver.endOrientations[solverIndex] =
+                    softbody.solver.orientations[solverIndex] = deformMatrix.rotation * softbody.solver.restOrientations[solverIndex];
+                }
             }
         }        public void Bind()        {
             if (skinMap != null && softbody != null && softbody.softbodyBlueprint != null)
             {
                 skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();                InitializeInfluences();
 
-                var blueprintTransform = transform.gameObject == softbody.gameObject ? Matrix4x4.TRS(Vector3.zero, softbody.softbodyBlueprint.rotation, softbody.softbodyBlueprint.scale) : Matrix4x4.identity;
+                var blueprintTransform = Matrix4x4.TRS(Vector3.zero, softbody.softbodyBlueprint.rotation, softbody.softbodyBlueprint.scale);
 
                 skinMap.MapParticlesToVertices(skinnedMeshRenderer.sharedMesh, softbody, transform.localToWorldMatrix * blueprintTransform, softbody.transform.worldToLocalMatrix, radius, falloff, maxInfluences, true, softbodyInfluence, m_softbodyInfluences);                skinMap.checksum = softbody.softbodyBlueprint.checksum;
             }        }        RenderSystem<ObiSoftbodySkinner> ObiRenderer<ObiSoftbodySkinner>.CreateRenderSystem(ObiSolver solver)        {            switch (solver.backendType)            {

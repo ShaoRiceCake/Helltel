@@ -132,7 +132,7 @@ float4 NearestPointOnEdge(float4 a, float4 b, float4 p, out float mu, bool clamp
     ap.w = 0;
     ab.w = 0;
 
-    mu = dot(ap, ab) / dot(ab, ab);
+    mu = dot(ap, ab) / (dot(ab, ab) + EPSILON);
 
     if (clampToSegment)
         mu = saturate(mu);
@@ -147,7 +147,7 @@ float3 NearestPointOnEdge(float3 a, float3 b, float3 p, out float mu, bool clamp
     float3 ap = p - a;
     float3 ab = b - a;
 
-    mu = dot(ap, ab) / dot(ab, ab);
+    mu = dot(ap, ab) / (dot(ab, ab) + EPSILON);
 
     if (clampToSegment)
         mu = saturate(mu);

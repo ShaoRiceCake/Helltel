@@ -149,12 +149,13 @@ namespace Obi
         {
             SetConstraintsDirty(Oni.ConstraintType.ShapeMatching);
             SetSelfCollisions(m_SelfCollisions);
+            SetMassScale(m_MassScale);
             SetSimplicesDirty();
         }
 
-        public override void LoadBlueprint(ObiSolver solver)
+        internal override void LoadBlueprint()
         {
-            base.LoadBlueprint(solver);
+            base.LoadBlueprint();
             RecalculateCenterShape();
             SetSelfCollisions(m_SelfCollisions);
         }

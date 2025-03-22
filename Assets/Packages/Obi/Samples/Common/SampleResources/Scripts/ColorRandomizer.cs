@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Obi
+namespace Obi.Samples
 {
 	[RequireComponent(typeof(ObiActor))]
 	public class ColorRandomizer : MonoBehaviour

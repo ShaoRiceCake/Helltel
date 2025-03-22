@@ -118,6 +118,9 @@ namespace Obi
         public GraphicsBuffer normalsIntBuffer;
         public GraphicsBuffer tangentsIntBuffer;
 
+        public GraphicsBuffer deformableEdgesBuffer;
+        public GraphicsBuffer deformableTrianglesBuffer;
+
         public GraphicsBuffer solverToWorldBuffer;
         public GraphicsBuffer worldToSolverBuffer;
         public GraphicsBuffer inertialFrameBuffer;
@@ -255,6 +258,7 @@ namespace Obi
             constraints[(int)Oni.ConstraintType.BendTwist] = new ComputeBendTwistConstraints(this);
             constraints[(int)Oni.ConstraintType.StretchShear] = new ComputeStretchShearConstraints(this);
             constraints[(int)Oni.ConstraintType.Pin] = new ComputePinConstraints(this);
+            constraints[(int)Oni.ConstraintType.Pinhole] = new ComputePinholeConstraints(this);
             constraints[(int)Oni.ConstraintType.Skin] = new ComputeSkinConstraints(this);
             constraints[(int)Oni.ConstraintType.Aerodynamics] = new ComputeAerodynamicConstraints(this);
             constraints[(int)Oni.ConstraintType.Stitch] = new ComputeStitchConstraints(this);
@@ -394,6 +398,14 @@ namespace Obi
             var dm = constraints[(int)Oni.ConstraintType.Distance] as ComputeDistanceConstraints;
             if (dm != null)
                 dm.RequestDataReadback();
+
+            var pm = constraints[(int)Oni.ConstraintType.Pin] as ComputePinConstraints;
+            if (pm != null)
+                pm.RequestDataReadback();
+
+            var phm = constraints[(int)Oni.ConstraintType.Pinhole] as ComputePinholeConstraints;
+            if (phm != null)
+                phm.RequestDataReadback();
         }
 
         public void InitializeFrame(Vector4 translation, Vector4 scale, Quaternion rotation)
@@ -453,7 +465,7 @@ namespace Obi
         {
             if (indices.count > 0)
             {
-                var deformableTrianglesBuffer = indices.AsComputeBuffer<int>();
+                deformableTrianglesBuffer = indices.AsComputeBuffer<int>();
                 var deformableUVsBuffer = uvs.AsComputeBuffer<Vector2>();
 
                 deformableTrisShader.SetBuffer(updateNormalsKernel, "deformableTriangles", deformableTrianglesBuffer);
@@ -466,7 +478,7 @@ namespace Obi
         {
             if (indices.count > 0)
             {
-                var deformableEdgesBuffer = indices.AsComputeBuffer<int>();
+                deformableEdgesBuffer = indices.AsComputeBuffer<int>();
 
                 deformableTrisShader.SetBuffer(updateEdgeNormalsKernel, "deformableEdges", deformableEdgesBuffer);
                 deformableTrisShader.SetInt("edgeCount", deformableEdgeCount);
@@ -550,6 +562,7 @@ namespace Obi
             if (activeParticleCount > 0 && reducedBounds != null)
             {
                 boundsShader.SetFloat("deltaTime", stepTime);
+                boundsShader.SetFloat("collisionMargin", abstraction.parameters.collisionMargin);
 
                 int boundsCount = simplexCounts.simplexCount;
                 int threadGroups = ComputeMath.ThreadGroupCount(boundsCount, 256);
@@ -861,6 +874,14 @@ namespace Obi
             if (dm != null)
                 dm.WaitForReadback();
 
+            var pm = constraints[(int)Oni.ConstraintType.Pin] as ComputePinConstraints;
+            if (pm != null)
+                pm.WaitForReadback();
+
+            var phm = constraints[(int)Oni.ConstraintType.Pinhole] as ComputePinholeConstraints;
+            if (phm != null)
+                phm.WaitForReadback();
+
             abstraction.externalForces.WipeToZero();
             abstraction.externalTorques.WipeToZero();
             abstraction.externalForces.Upload();
@@ -944,14 +965,14 @@ namespace Obi
 
                 // Update positions:
                 solverShader.Dispatch(updatePositionsKernel, threadGroups, 1, 1);
-
-                // Update diffuse particles:
-                int substepsLeft = Mathf.RoundToInt(timeLeft / substepTime);
-                int foamPadding = Mathf.CeilToInt(abstraction.substeps / (float)abstraction.foamSubsteps);
-
-                if (substepsLeft % foamPadding == 0)
-                    UpdateDiffuseParticles(substepTime * foamPadding);
             }
+
+            // Update diffuse particles:
+            int substepsLeft = Mathf.RoundToInt(timeLeft / substepTime);
+            int foamPadding = Mathf.CeilToInt(abstraction.substeps / (float)abstraction.foamSubsteps);
+
+            if (substepsLeft % foamPadding == 0)
+                UpdateDiffuseParticles(substepTime * foamPadding);
 
             return handle;
         }
@@ -968,23 +989,23 @@ namespace Obi
             }
         }
 
-        private void ApplyConstraints(float stepTime, float substepTime, int substeps, float timeLeft)
+        private void ApplyConstraints(float stepTime, float substepTime, int steps, float timeLeft)
         {
             // calculate max amount of iterations required, and initialize constraints..
-            int maxIterations = 0;            for (int i = 0; i < Oni.ConstraintTypeCount; ++i)            {                var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)i);                if (parameters.enabled)                {                    maxIterations = Mathf.Max(maxIterations, parameters.iterations);                    constraints[i].Initialize(substepTime);                }            }
+            int maxIterations = 0;            for (int i = 0; i < Oni.ConstraintTypeCount; ++i)            {                var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)i);                if (parameters.enabled)                {                    maxIterations = Mathf.Max(maxIterations, parameters.iterations);                    constraints[i].Initialize(stepTime, substepTime, steps, timeLeft);                }            }
 
             // calculate iteration paddings:
             for (int i = 0; i < Oni.ConstraintTypeCount; ++i)            {                var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)i);                if (parameters.enabled && parameters.iterations > 0)                    padding[i] = Mathf.CeilToInt(maxIterations / (float)parameters.iterations);                else                    padding[i] = maxIterations;            }
 
             // perform projection iterations:
-            for (int i = 1; i < maxIterations; ++i)            {                for (int j = 0; j < Oni.ConstraintTypeCount; ++j)                {                    if (j != (int)Oni.ConstraintType.Aerodynamics)                    {                        var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)j);                        if (parameters.enabled && i % padding[j] == 0)                            constraints[j].Project(stepTime, substepTime, substeps, timeLeft);                    }                }            }
+            for (int i = 1; i < maxIterations; ++i)            {                for (int j = 0; j < Oni.ConstraintTypeCount; ++j)                {                    if (j != (int)Oni.ConstraintType.Aerodynamics)                    {                        var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)j);                        if (parameters.enabled && i % padding[j] == 0)                            constraints[j].Project(stepTime, substepTime, steps, timeLeft);                    }                }            }
 
             // final iteration, all groups together:
-            for (int i = 0; i < Oni.ConstraintTypeCount; ++i)            {                if (i != (int)Oni.ConstraintType.Aerodynamics)                {                    var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)i);                    if (parameters.enabled && parameters.iterations > 0)                        constraints[i].Project(stepTime, substepTime, substeps, timeLeft);                }            }
+            for (int i = 0; i < Oni.ConstraintTypeCount; ++i)            {                if (i != (int)Oni.ConstraintType.Aerodynamics)                {                    var parameters = m_Solver.GetConstraintParameters((Oni.ConstraintType)i);                    if (parameters.enabled && parameters.iterations > 0)                        constraints[i].Project(stepTime, substepTime, steps, timeLeft);                }            }
 
             // Despite friction constraints being applied after collision (since coulomb friction depends on normal impulse)
             // we perform a collision iteration right at the end to ensure the final state meets the Signorini-Fichera conditions.
-            var param = m_Solver.GetConstraintParameters(Oni.ConstraintType.ParticleCollision);            if (param.enabled && param.iterations > 0)                constraints[(int)Oni.ConstraintType.ParticleCollision].Project(stepTime, substepTime, substeps, timeLeft);            param = m_Solver.GetConstraintParameters(Oni.ConstraintType.Collision);            if (param.enabled && param.iterations > 0)                constraints[(int)Oni.ConstraintType.Collision].Project(stepTime, substepTime, substeps, timeLeft);
+            var param = m_Solver.GetConstraintParameters(Oni.ConstraintType.ParticleCollision);            if (param.enabled && param.iterations > 0)                constraints[(int)Oni.ConstraintType.ParticleCollision].Project(stepTime, substepTime, steps, timeLeft);            param = m_Solver.GetConstraintParameters(Oni.ConstraintType.Collision);            if (param.enabled && param.iterations > 0)                constraints[(int)Oni.ConstraintType.Collision].Project(stepTime, substepTime, steps, timeLeft);
         }
 
         public IObiJobHandle ApplyInterpolation(IObiJobHandle inputDeps, ObiNativeVector4List startPositions, ObiNativeQuaternionList startOrientations, float stepTime, float unsimulatedTime)

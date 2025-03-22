@@ -34,7 +34,7 @@ namespace Obi
             m_ConstraintCount = count;
         }
 
-        public override JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        public override JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
         {
             var clearPins = new ClearPinsJob
             {
@@ -53,7 +53,7 @@ namespace Obi
             inputDeps = updatePins.Schedule(m_ConstraintCount, 128, inputDeps);
 
             // clear lambdas:
-            return base.Initialize(inputDeps, substepTime);
+            return base.Initialize(inputDeps, stepTime, substepTime, steps, timeLeft);
         }
 
         public override JobHandle Evaluate(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
@@ -157,6 +157,7 @@ namespace Obi
                 if (colliderIndex < 0)
                     return;
 
+                // Increment the amount of constraints affecting this rigidbody for mass splitting:
                 int rigidbodyIndex = shapes[colliderIndex].rigidbodyIndex;
                 if (rigidbodyIndex >= 0)
                 {
@@ -233,13 +234,12 @@ namespace Obi
                 {
                     var rigidbody = rigidbodies[rigidbodyIndex];
 
-                    // predict rigidbody transform:
-                    var predictedTrfm = transforms[colliderIndex].Integrate(rigidbody.velocity + rigidbodyLinearDeltas[rigidbodyIndex],
-                                                                            rigidbody.angularVelocity + rigidbodyAngularDeltas[rigidbodyIndex], frameEnd);
+                    // predict offset point position using rb velocity at that point (can't integrate transform since position != center of mass)
+                    float4 velocityAtPoint = BurstMath.GetRigidbodyVelocityAtPoint(rigidbodyIndex, inertialFrame.frame.InverseTransformPoint(worldPinOffset), rigidbodies, rigidbodyLinearDeltas, rigidbodyAngularDeltas, inertialFrame);
+                    predictedPinOffset = BurstIntegration.IntegrateLinear(predictedPinOffset, inertialFrame.frame.TransformVector(velocityAtPoint), frameEnd);
 
-                    // predict offset point position and rb rotation at the end of the step:
-                    predictedPinOffset = predictedTrfm.TransformPoint(offsets[i]);
-                    predictedRotation = predictedTrfm.rotation;
+                    // predict rotation at the end of the step:
+                    predictedRotation = BurstIntegration.IntegrateAngular(predictedRotation, rigidbody.angularVelocity + rigidbodyAngularDeltas[rigidbodyIndex], stepTime);
 
                     // calculate linear and angular rigidbody effective masses (mass splitting: multiply by constraint count)
                     rigidbodyLinearW = rigidbody.inverseMass * rigidbody.constraintCount;
@@ -281,7 +281,7 @@ namespace Obi
                     quaternion omega_plus;
                     omega_plus.value = omega.value + restDarboux[i].value;  //delta Omega with - omega_0
                     omega.value -= restDarboux[i].value;                    //delta Omega with + omega_0
-                    if (math.lengthsq(omega.value.xyz) > math.lengthsq(omega_plus.value.xyz))
+                    if (math.lengthsq(omega.value) > math.lengthsq(omega_plus.value))
                         omega = omega_plus;
 
                     float3 dlambda = (omega.value.xyz - compliances.y * lambda.xyz) / (compliances.y + invRotationalMasses[particleIndex] + rigidbodyAngularW + BurstMath.epsilon);

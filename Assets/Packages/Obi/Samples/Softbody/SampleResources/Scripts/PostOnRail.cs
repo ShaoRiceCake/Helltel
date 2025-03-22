@@ -1,42 +1,44 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Obi;
 
-public class PostOnRail : MonoBehaviour
+namespace Obi.Samples
 {
-    public Vector3 startPoint;
-    public Vector3 endPoint;
-    public float speed = 50;
-    public float wait = 1;
-    public float stabilization = 1;
-    public bool initialDirection = true;
-
-    float direction = 1;
-
-    private void Awake()
+    public class PostOnRail : MonoBehaviour
     {
-        direction = initialDirection ? 1 : -1;
-    }
+        public Vector3 startPoint;
+        public Vector3 endPoint;
+        public float speed = 50;
+        public float wait = 1;
+        public float stabilization = 1;
+        public bool initialDirection = true;
 
-    void FixedUpdate()
-    {
+        float direction = 1;
 
-        // project the transform to the rail:
-        float mu;
-        Vector3 projection = ObiUtils.ProjectPointLine(startPoint, endPoint, transform.position, out mu);
+        private void Awake()
+        {
+            direction = initialDirection ? 1 : -1;
+        }
 
-        if (direction > 0 && mu >= 1 ||
-            direction < 0 && mu <= 0)
-            direction *= -1;
+        void FixedUpdate()
+        {
 
-        GetComponent<Rigidbody>().velocity = ((endPoint - startPoint).normalized * direction * speed + (projection - transform.position) * stabilization) * Time.fixedDeltaTime;
-    }
+            // project the transform to the rail:
+            float mu;
+            Vector3 projection = ObiUtils.ProjectPointLine(startPoint, endPoint, transform.position, out mu);
 
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.DrawLine(startPoint, endPoint);
-        Gizmos.DrawWireSphere(startPoint, 0.2f);
-        Gizmos.DrawWireSphere(endPoint, 0.2f);
+            if (direction > 0 && mu >= 1 ||
+                direction < 0 && mu <= 0)
+                direction *= -1;
+
+            GetComponent<Rigidbody>().velocity = ((endPoint - startPoint).normalized * direction * speed + (projection - transform.position) * stabilization) * Time.fixedDeltaTime;
+        }
+
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.DrawLine(startPoint, endPoint);
+            Gizmos.DrawWireSphere(startPoint, 0.2f);
+            Gizmos.DrawWireSphere(endPoint, 0.2f);
+        }
     }
 }
