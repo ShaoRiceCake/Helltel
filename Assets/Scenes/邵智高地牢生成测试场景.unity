@@ -383,10 +383,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1586560302}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bb4ec794af4d30438587e32e69ec9cd, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87a94e2cdac8242acf534b973b6104, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startTile: {fileID: 6551577643172991279, guid: ea8fc1f633e83ea4d82763558c6479e0, type: 3}
+  startTile: {fileID: 0}
   tilePrefabs:
   - {fileID: 7190530939421546850, guid: 9c80dc5f4645cf74d9851cbd558a0f12, type: 3}
   - {fileID: 6881580276718791791, guid: 8bdd27933c8f88c4daa5272f777a6935, type: 3}
@@ -404,22 +404,18 @@ MonoBehaviour:
   doorPrefabs:
   - {fileID: 4693191324333178762, guid: d0b58bc455ae1f74f8c8694a964a7935, type: 3}
   - {fileID: 2424739538366229017, guid: 776880d4fe899df4eab9edb824c2a8f4, type: 3}
-  - {fileID: 4693191324333178762, guid: d0f5ddbea084f714d8ec4a6a1213439c, type: 3}
-  - {fileID: 2424739538366229017, guid: bf6c9b0d0c6da8e48bfa6158751907d0, type: 3}
   exitPrefabs:
   - {fileID: 6551577643172991279, guid: ea8fc1f633e83ea4d82763558c6479e0, type: 3}
   - {fileID: 1717768317796168926, guid: a22d74c84fe16b2478066d7d14b5aa79, type: 3}
   - {fileID: 6146908721503945696, guid: 5ab258f7799ce344f98fe48166f8c16b, type: 3}
   mainLength: 10
-  branchLenght: 6
-  branchNum: 4
-  doorPercent: 18
+  branchLenght: 5
+  branchNum: 10
+  doorPercent: 25
   constructionDelay: 0
   generatedTiles: []
   availableConnectors: []
-  usingBoxCollider: 0
-  usingLightForDebugging: 0
-  RestoreLightsAfterDebugging: 0
+  dungeonState: 0
 --- !u!4 &1586560304
 Transform:
   m_ObjectHideFlags: 0
