@@ -28,7 +28,7 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject[] tilePrefabs;      // 可随机选择的普通房间预制体
     
     [Tooltip("墙体障碍物预制体（预留功能）")]
-    public GameObject[] blockedPrefabs;    // 障碍物预制体集合（当前版本未使用）
+    public GameObject[] blockedPrefabs;    // 障碍物预制体集合
     
     [Tooltip("门预制体（预留功能）")]
     public GameObject[] doorPrefabs;      // 门类型预制体集合（当前版本未使用）
