@@ -11,6 +11,8 @@ public class PlayerControl_RightHandControl : PlayerControl_HandControl
 
     protected override void Update()
     {
+        base.Update();
+
         if (currentHand == 2 && !handObject)
         {
             handObject = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0], Quaternion.identity);
@@ -19,10 +21,10 @@ public class PlayerControl_RightHandControl : PlayerControl_HandControl
         }
         else
         {
-            if (handObject != null)
+            if (handObject != null && currentHand != 2)
             {
                 Destroy(handObject);
-
+                handObject = null;
                 handControlAttachment.target = null;
             }
         }

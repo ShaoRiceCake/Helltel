@@ -1,7 +1,8 @@
 using UnityEngine;
 using Obi;
+using static PlayerControlInformationProcess;
 
-public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
+public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 {
     public GameObject handPrepareObj;
 
@@ -10,7 +11,6 @@ public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
     public float handMoveSpeed = 4.0f;
     public float cylinderRadius = 9.0f;
     public float cylinderHalfHeight = 6.0f;
-    public float moveToPivotSpeed = 10.0f;
     public float mouseSensitivity = 10f;
 
     public GameObject handBallPrefab;
@@ -65,18 +65,24 @@ public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
         controlHandler.onLiftRightHand.AddListener(OnLiftRightHand);
         controlHandler.onReleaseRightHand.AddListener(OnReleaseRightHand);
         controlHandler.onCancelHandGrab.AddListener(OnCancelHandGrab);
-        controlHandler.onMouseMove.AddListener(OnMouseMove);
+        controlHandler.onMouseMoveUpdate.AddListener(OnMouseMove);
 
     }
 
     protected virtual void UnsubscribeEvents()
     {
         controlHandler.onCancelHandGrab.RemoveListener(OnCancelHandGrab);
-        controlHandler.onMouseMove.RemoveListener(OnMouseMove);
+        controlHandler.onMouseMoveUpdate.RemoveListener(OnMouseMove);
 
     }
 
-    protected abstract void Update();
+    protected virtual void Update()
+    {
+        if(controlHandler.m_currentControlMode == ControlMode.LegControl)
+        {
+            CurrentHand = 0;
+        }
+    }
   
     protected void OnCancelHandGrab()
     {
@@ -111,16 +117,23 @@ public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
 
     protected void OnMouseMove(Vector2 mouseDelta)
     {
-        if (currentHand == 0)
+        if (currentHand == 0 || handObject == null || handPrepareObj == null)
             return;
 
         float mouseX = mouseDelta.x * mouseSensitivity;
         float mouseY = mouseDelta.y * mouseSensitivity;
 
+
         Vector3 localMovement = Vector3.zero;
 
         if (isMouseDown)
+        {
+            localMovement = new Vector3(mouseX, mouseY, 0) * handMoveSpeed;
+        }
+        else
+        {
             localMovement = new Vector3(mouseX, 0, mouseY) * handMoveSpeed;
+        }
 
         Vector3 forwardDirection = forwardObject.transform.forward;
         forwardDirection.y = 0; 
@@ -129,11 +142,11 @@ public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
         Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
 
         Vector3 worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
-        worldMovement.y = localMovement.y; 
+        worldMovement.y = localMovement.y;
 
         Vector3 newWorldPosition = handObject.transform.position + worldMovement * Time.deltaTime;
 
-        Vector3 newLocalPosition = handObject.transform.InverseTransformPoint(newWorldPosition);
+        Vector3 newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
 
         ApplyCylinderConstraint(ref newLocalPosition);
 
@@ -151,6 +164,4 @@ public abstract class PlayerControl_HandControl : PlayerControl_CameraControl
         }
         position.y = Mathf.Clamp(position.y, -cylinderHalfHeight, cylinderHalfHeight);
     }
-
-
 }

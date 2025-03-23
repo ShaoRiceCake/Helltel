@@ -15,13 +15,6 @@ public static class NullCheckerTool
         MethodBase callerMethod = new System.Diagnostics.StackTrace().GetFrame(1).GetMethod();
         ParameterInfo[] parameters = callerMethod.GetParameters();
 
-        // 检查参数数量是否匹配
-        if (objects.Length != parameters.Length)
-        {
-            Debug.LogError($"Parameter count mismatch in method '{callerMethod.Name}'. Expected {parameters.Length}, got {objects.Length}.");
-            return;
-        }
-
         // 遍历所有传入的对象
         for (int i = 0; i < objects.Length; i++)
         {

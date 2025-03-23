@@ -61,14 +61,14 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     {
         controlHandler.onCancelLegGrab.AddListener(OnCancelLegGrab);
         controlHandler.onDefaultMode.AddListener(OnDefaultMode);
-        controlHandler.onMouseMove.AddListener(OnMouseMove);
+        controlHandler.onMouseMoveFixedUpdate.AddListener(OnMouseMove);
     }
 
     protected virtual void UnsubscribeEvents()
     {
         controlHandler.onCancelLegGrab.RemoveListener(OnCancelLegGrab);
         controlHandler.onDefaultMode.RemoveListener(OnDefaultMode);
-        controlHandler.onMouseMove.RemoveListener(OnMouseMove);
+        controlHandler.onMouseMoveFixedUpdate.RemoveListener(OnMouseMove);
     }
 
 
@@ -166,9 +166,9 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         Vector3 direction = targetPosition - movingObj.position;
         float distance = direction.magnitude;
 
-        if (distance > 0.1)
+        if (distance > 0.2)
         {
-            movingObj.velocity = direction.normalized * 10;
+            movingObj.velocity = direction.normalized * 15;
         }
         else
         {

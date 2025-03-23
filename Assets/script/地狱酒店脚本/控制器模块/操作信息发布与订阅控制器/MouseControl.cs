@@ -39,7 +39,8 @@ public class MouseControl : MonoBehaviour
     public UnityEvent onMouseWheelUp;           // 滚轮向上滚动
     public UnityEvent onMouseWheelDown;         // 滚轮向下滚动
     public UnityEvent onBothMouseButtonsDown;   // 左右键同时按下
-    public UnityEvent<Vector2> onMouseMove;     // 相对鼠标移动量
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // 固定时间步长相对运动
+    public UnityEvent<Vector2> onMouseMoveUpdate;     // 每帧相对运动
     public UnityEvent onNoMouseButtonDown; // 鼠标无按键操作
 
     private Vector2 lastMousePosition;
@@ -56,7 +57,8 @@ public class MouseControl : MonoBehaviour
         if (onMouseWheelDown == null) onMouseWheelDown = new UnityEvent();
         if (onBothMouseButtonsDown == null) onBothMouseButtonsDown = new UnityEvent();
         if (onNoMouseButtonDown == null) onNoMouseButtonDown = new UnityEvent();
-        if (onMouseMove == null) onMouseMove = new UnityEvent<Vector2>();
+        if (onMouseMoveFixedUpdate == null) onMouseMoveFixedUpdate = new UnityEvent<Vector2>();
+        if (onMouseMoveUpdate == null) onMouseMoveUpdate = new UnityEvent<Vector2>();
     }
 
     void Update()
@@ -66,6 +68,7 @@ public class MouseControl : MonoBehaviour
 
         HandleMouseButtons();
         HandleMouseWheel();
+        HandleMouseMovementUpdate(); // 每帧处理鼠标移动
 
         if (!Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
@@ -78,7 +81,7 @@ public class MouseControl : MonoBehaviour
         if (!m_enableMouseControl)
             return;
 
-        HandleMouseMovement();
+        HandleMouseMovementFixedUpdate(); // 固定时间步长处理鼠标移动
     }
 
     void HandleMouseButtons()
@@ -135,16 +138,25 @@ public class MouseControl : MonoBehaviour
         }
     }
 
-    void HandleMouseMovement()
+    void HandleMouseMovementFixedUpdate()
     {
         Vector2 currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-
         if (currentMousePosition != lastMousePosition)
         {
-            Vector2 mouseDelta = currentMousePosition * m_mouseSensitivity * Time.deltaTime;
-            onMouseMove?.Invoke(mouseDelta);
+            Vector2 mouseDelta = currentMousePosition * m_mouseSensitivity * Time.fixedDeltaTime;
+            onMouseMoveFixedUpdate?.Invoke(mouseDelta);
         }
+        lastMousePosition = currentMousePosition;
+    }
 
+    void HandleMouseMovementUpdate()
+    {
+        Vector2 currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        if (currentMousePosition != lastMousePosition)
+        {
+            Vector2 mouseDelta = currentMousePosition * m_mouseSensitivity;
+            onMouseMoveUpdate?.Invoke(mouseDelta);
+        }
         lastMousePosition = currentMousePosition;
     }
 }

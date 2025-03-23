@@ -6,39 +6,34 @@ using UnityEngine.InputSystem;
 
 public class PlayerControlInformationProcess : MonoBehaviour
 {
-    // 控制模式枚举
     public enum ControlMode
     {
-        LegControl, // 腿部控制
-        HandControl // 手部控制
+        LegControl,
+        HandControl
     }
 
-    // 当前控制模式
-    private ControlMode m_currentControlMode = ControlMode.LegControl;
-
-    // 鼠标控制组件
+    public ControlMode m_currentControlMode = ControlMode.LegControl;
     private MouseControl m_mouseControl;
 
-    // 封装后的事件
-    public UnityEvent onLiftLeftLeg; // 抬起左腿
-    public UnityEvent onLiftRightLeg; // 抬起右腿
-    public UnityEvent onReleaseLeftLeg; // 释放左腿
-    public UnityEvent onReleaseRightLeg; // 释放右腿
-    public UnityEvent onCancelLegGrab; // 取消腿部抓取
+    public UnityEvent onLiftLeftLeg;
+    public UnityEvent onLiftRightLeg;
+    public UnityEvent onReleaseLeftLeg;
+    public UnityEvent onReleaseRightLeg;
+    public UnityEvent onCancelLegGrab;
 
-    public UnityEvent onLiftLeftHand; // 抬起左手
-    public UnityEvent onLiftRightHand; // 抬起右手
-    public UnityEvent onReleaseLeftHand; // 释放左手
-    public UnityEvent onReleaseRightHand; // 释放右手
-    public UnityEvent onCancelHandGrab; // 取消手部抓取
+    public UnityEvent onLiftLeftHand;
+    public UnityEvent onLiftRightHand;
+    public UnityEvent onReleaseLeftHand;
+    public UnityEvent onReleaseRightHand;
+    public UnityEvent onCancelHandGrab;
 
-    public UnityEvent onSwitchControlMode; // 切换手-腿控制
-    public UnityEvent<Vector2> onMouseMove; // 鼠标相对位移
-    public UnityEvent onDefaultMode; // 默认模式
+    public UnityEvent onSwitchControlMode;
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // 固定时间步长相对运动
+    public UnityEvent<Vector2> onMouseMoveUpdate;     // 每帧相对运动
+    public UnityEvent onDefaultMode;
 
     void Awake()
     {
-        // 初始化所有事件
         if (onLiftLeftLeg == null) onLiftLeftLeg = new UnityEvent();
         if (onLiftRightLeg == null) onLiftRightLeg = new UnityEvent();
         if (onReleaseLeftLeg == null) onReleaseLeftLeg = new UnityEvent();
@@ -52,26 +47,25 @@ public class PlayerControlInformationProcess : MonoBehaviour
         if (onCancelHandGrab == null) onCancelHandGrab = new UnityEvent();
 
         if (onSwitchControlMode == null) onSwitchControlMode = new UnityEvent();
-        if (onMouseMove == null) onMouseMove = new UnityEvent<Vector2>();
+        if (onMouseMoveFixedUpdate == null) onMouseMoveFixedUpdate = new UnityEvent<Vector2>();
+        if (onMouseMoveUpdate == null) onMouseMoveUpdate = new UnityEvent<Vector2>();
         if (onDefaultMode == null) onDefaultMode = new UnityEvent();
 
-        // 自动添加 MouseControl 组件
         m_mouseControl = gameObject.AddComponent<MouseControl>();
 
-        // 添加事件监听
         m_mouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
         m_mouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
         m_mouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
         m_mouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
         m_mouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
         m_mouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
-        m_mouseControl.onMouseMove.AddListener(OnMouseMove);
+        m_mouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
+        m_mouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
         m_mouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
     }
 
     void OnDestroy()
     {
-        // 取消订阅事件
         if (m_mouseControl != null)
         {
             m_mouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
@@ -80,95 +74,91 @@ public class PlayerControlInformationProcess : MonoBehaviour
             m_mouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
             m_mouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
             m_mouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
-            m_mouseControl.onMouseMove.RemoveListener(OnMouseMove);
+            m_mouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
+            m_mouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
             m_mouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
         }
     }
 
-    // 鼠标左键按下事件处理
     private void OnLeftMouseDown()
     {
         if (m_currentControlMode == ControlMode.LegControl)
         {
-            onLiftLeftLeg?.Invoke(); // 抬起左腿
+            onLiftLeftLeg?.Invoke();
         }
         else if (m_currentControlMode == ControlMode.HandControl)
         {
-            onLiftLeftHand?.Invoke(); // 抬起左手
+            onLiftLeftHand?.Invoke();
         }
     }
 
-    // 鼠标右键按下事件处理
     private void OnRightMouseDown()
     {
         if (m_currentControlMode == ControlMode.LegControl)
         {
-            onLiftRightLeg?.Invoke(); // 抬起右腿
+            onLiftRightLeg?.Invoke();
         }
         else if (m_currentControlMode == ControlMode.HandControl)
         {
-            onLiftRightHand?.Invoke(); // 抬起右手
+            onLiftRightHand?.Invoke();
         }
     }
 
-    // 鼠标左键抬起事件处理
     private void OnLeftMouseUp()
     {
         if (m_currentControlMode == ControlMode.LegControl)
         {
-            onReleaseLeftLeg?.Invoke(); // 释放左腿
+            onReleaseLeftLeg?.Invoke();
         }
         else if (m_currentControlMode == ControlMode.HandControl)
         {
-            onReleaseLeftHand?.Invoke(); // 释放左手
+            onReleaseLeftHand?.Invoke();
         }
     }
 
-    // 鼠标右键抬起事件处理
     private void OnRightMouseUp()
     {
         if (m_currentControlMode == ControlMode.LegControl)
         {
-            onReleaseRightLeg?.Invoke(); // 释放右腿
+            onReleaseRightLeg?.Invoke();
         }
         else if (m_currentControlMode == ControlMode.HandControl)
         {
-            onReleaseRightHand?.Invoke(); // 释放右手
+            onReleaseRightHand?.Invoke();
         }
     }
 
-    // 鼠标左右键同时按下事件处理
     private void OnBothMouseButtonsDown()
     {
         if (m_currentControlMode == ControlMode.LegControl)
         {
-            onCancelLegGrab?.Invoke(); // 取消腿部抓取
+            onCancelLegGrab?.Invoke();
         }
         else if (m_currentControlMode == ControlMode.HandControl)
         {
-            onCancelHandGrab?.Invoke(); // 取消手部抓取
+            onCancelHandGrab?.Invoke();
         }
     }
 
-    // 鼠标中键按下事件处理（切换控制模式）
     private void OnMiddleMouseDown()
     {
-        // 切换控制模式
         m_currentControlMode = (m_currentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
-        onSwitchControlMode?.Invoke(); // 发布切换控制模式事件
+        onSwitchControlMode?.Invoke();
     }
 
-    // 鼠标移动事件处理
-    private void OnMouseMove(Vector2 mouseDelta)
+    private void OnMouseMoveFixedUpdate(Vector2 mouseDelta)
     {
-        onMouseMove?.Invoke(mouseDelta); // 发布鼠标移动量
-
+        onMouseMoveFixedUpdate?.Invoke(mouseDelta);
     }
 
-    // 鼠标无按键操作事件处理
+    private void OnMouseMoveUpdate(Vector2 mouseDelta)
+    {
+        onMouseMoveUpdate?.Invoke(mouseDelta);
+    }
+
     private void OnNoMouseButtonDown()
     {
-        onDefaultMode?.Invoke(); // 进入默认模式
+        onDefaultMode?.Invoke();
     }
 
     public void SetSensitivity(float newSensitivity)
