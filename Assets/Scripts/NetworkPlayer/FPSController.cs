@@ -11,22 +11,22 @@ public class FPSController : NetworkBehaviour
 {
 
 
-    [Header("Õı³£ÒÆ¶¯ËÙ¶È")]
+    [Header("æ­£å¸¸ç§»åŠ¨é€Ÿåº¦")]
     public float normalspeed = 3f;
 
-    [Header("Êó±êXÖáËÙ¶È")]
+    [Header("é¼ æ ‡Xè½´é€Ÿåº¦")]
     public float sensityX = 10f;
 
-    [Header("Êó±êYÖáËÙ¶È")]
+    [Header("é¼ æ ‡Yè½´é€Ÿåº¦")]
     public float sensityY = 10f;
 
-    [Header("×îĞ¡ÊÓÒ°")]
+    [Header("æœ€å°è§†é‡")]
     public float minfield = -80f;
 
-    [Header("×î´óÊÓÒ°")]
+    [Header("æœ€å¤§è§†é‡")]
     public float maxfield = 80f;
 
-    [Header("Íæ¼ÒÉãÏñ»ú")]
+    [Header("ç©å®¶æ‘„åƒæœº")]
     public Transform player_camera;
 
     private CharacterController controller;

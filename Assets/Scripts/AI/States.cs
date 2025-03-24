@@ -53,7 +53,7 @@ public class PatrolState : IState
 
             waitTimer += Time.deltaTime;
 
-            if (waitTimer > 3f)//Â·¾¶µãµÈ´ý´óÓÚ3ÃëÇÐ»»ÏÂÒ»¸öÂ·¾¶µã
+            if (waitTimer > 3f)//è·¯å¾„ç‚¹ç­‰å¾…å¤§äºŽ3ç§’åˆ‡æ¢ä¸‹ä¸€ä¸ªè·¯å¾„ç‚¹
             {
                 if (waypointIndex < manager.path.waypoints.Count - 1)
                     waypointIndex++;

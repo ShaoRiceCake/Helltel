@@ -59,7 +59,7 @@ public class GameManager : Singleton<GameManager>
         if (sceneName == "Game")
         {
             OnStartGame?.Invoke();
-            Debug.Log("游戏开始");
+            Debug.Log("脫脦脧路驴陋脢录");
         }
 
     }
