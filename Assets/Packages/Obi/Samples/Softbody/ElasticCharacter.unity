@@ -752,6 +752,11 @@ MonoBehaviour:
     iterations: 3
     SORFactor: 1
     enabled: 0
+  pinholeConstraintParameters:
+    evaluationOrder: 1
+    iterations: 1
+    SORFactor: 1
+    enabled: 1
   stitchConstraintParameters:
     evaluationOrder: 1
     iterations: 2
@@ -1592,6 +1597,7 @@ MonoBehaviour:
   groupID: 1
   m_CollisionMaterial: {fileID: 0}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: aa8f769477894417abef8b24ea3de193, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1
@@ -1620,7 +1626,7 @@ MonoBehaviour:
   m_AttachmentType: 0
   m_ConstrainOrientation: 0
   m_Compliance: 0
-  m_BreakThreshold: Infinity
+  breakThreshold: Infinity
 --- !u!114 &1611976914
 MonoBehaviour:
   m_ObjectHideFlags: 0

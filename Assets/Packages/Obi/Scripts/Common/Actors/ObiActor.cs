@@ -79,6 +79,16 @@ namespace Obi
         public event ActorStepCallback OnSimulationStart;
 
         /// <summary>
+        /// Called after simulation ends.
+        /// </summary>
+        public event ActorStepCallback OnSimulationEnd;
+
+        /// <summary>
+        /// You can use this callback to issue GPU->CPU readbacks.
+        /// </summary>
+        public event ActorCallback OnRequestReadback;
+
+        /// <summary>
         /// Called at the end of each frame, after interpolation but before rendering.
         /// </summary>
         public event ActorStepCallback OnInterpolate;
@@ -95,6 +105,8 @@ namespace Obi
         /// </summary>
         [HideInInspector] public List<int>[] solverBatchOffsets;
 
+        public int deformableEdgesOffset { protected set; get; } /**< index of the first deformable edge in the solver that belongs to this rope.*/
+
         protected ObiSolver m_Solver;
         protected bool m_Loaded = false;
         public int groupID = 0;
@@ -102,14 +114,16 @@ namespace Obi
         private ObiActorBlueprint m_State;
         private ObiActorBlueprint m_BlueprintInstance;
         private ObiPinConstraintsData m_PinConstraints;
+        private ObiPinholeConstraintsData m_PinholeConstraints;
         private BufferedForces bufferedForces = new BufferedForces();
         [SerializeField] [HideInInspector] protected ObiCollisionMaterial m_CollisionMaterial;
         [SerializeField] [HideInInspector] protected bool m_SurfaceCollisions = false;
+        [SerializeField] [HideInInspector] [Min(ObiUtils.epsilon)] protected float m_MassScale = 1;
 
         /// <summary>
         /// The solver in charge of simulating this actor.
         /// </summary>
-        /// This is the first ObiSlver component found up the actor's hierarchy.
+        /// This is the first ObiSolver component found up the actor's hierarchy.
         public ObiSolver solver
         {
             get { return m_Solver; }
@@ -121,7 +135,7 @@ namespace Obi
         /// </summary>
         public bool isLoaded
         {
-            get { return m_Loaded; }
+            get { return m_Solver != null && m_Loaded; }
         }
 
         /// <summary>
@@ -162,6 +176,22 @@ namespace Obi
                         m_Solver.dirtySimplices |= simplexTypes;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Scale applied to this actor's particle masses.
+        /// </summary>
+        public float massScale
+        {
+            get
+            {
+                return m_MassScale;
+            }
+            set
+            {
+                if (Mathf.Abs(m_MassScale - value) > ObiUtils.epsilon)
+                    SetMassScale(value);
             }
         }
 
@@ -330,6 +360,7 @@ namespace Obi
                 solverBatchOffsets[i] = new List<int>();
 
             m_PinConstraints = new ObiPinConstraintsData();
+            m_PinholeConstraints = new ObiPinholeConstraintsData();
 
             // when an actor is enabled, grabs the first solver up its hierarchy,
             // initializes it (if not initialized) and gets added to it.
@@ -400,6 +431,31 @@ namespace Obi
             }
         }
 
+        /// <summary>
+        /// Sets the mass of all particles in the actor to their blueprint values, multiplied by a scale factor.
+        /// </summary>
+        /// <param name="scale"> new mass scale.
+        protected void SetMassScale(float scale)
+        {
+            if (Application.isPlaying && isLoaded && particleCount > 0)
+            {
+                scale = Mathf.Max(ObiUtils.epsilon, scale);
+
+                for (int i = 0; i < particleCount; ++i)
+                {
+                    int solverIndex = solverIndices[i];
+
+                    if (m_Solver.invMasses[solverIndex] > 0)
+                        m_Solver.invMasses[solverIndex] = sharedBlueprint.invMasses[i] / scale;
+
+                    if (m_Solver.invRotationalMasses[solverIndex] > 0 && sharedBlueprint.invRotationalMasses != null && i < sharedBlueprint.invRotationalMasses.Length)
+                       m_Solver.invRotationalMasses[solverIndex] = sharedBlueprint.invRotationalMasses[i] / scale;
+                }
+
+                UpdateParticleProperties();
+            }
+        }
+
         protected virtual void OnBlueprintRegenerate(ObiActorBlueprint blueprint)
         {
             // Reload by removing the current blueprint from the solver,
@@ -437,6 +493,11 @@ namespace Obi
         public virtual void ProvideDeformableEdges(ObiNativeIntList deformableEdges)
         {
 
+        }
+
+        public virtual int GetDeformableEdgeCount()
+        {
+            return 0;
         }
 
         /// <summary>
@@ -693,6 +754,8 @@ namespace Obi
             // pin constraints are a special case, because they're not stored in a blueprint. They are created at runtime at stored in the actor itself.
             if (type == Oni.ConstraintType.Pin)
                 return m_PinConstraints;
+            if (type == Oni.ConstraintType.Pinhole)
+                return m_PinholeConstraints;
 
             if (sharedBlueprint != null)
                 return sharedBlueprint.GetConstraintsByType(type);
@@ -888,6 +951,8 @@ namespace Obi
                     m_Solver.invMasses[solverIndex] = invMass;
                     m_Solver.invRotationalMasses[solverIndex] = invMass;
                 }
+
+                UpdateParticleProperties();
             }
         }
 
@@ -1015,10 +1080,10 @@ namespace Obi
                     m_Solver.angularVelocities[k] = l2sTransform.MultiplyVector(bp.angularVelocities[i]);
 
                 if (bp.invMasses != null && i < bp.invMasses.Length)
-                    m_Solver.invMasses[k] = bp.invMasses[i];
+                    m_Solver.invMasses[k] = bp.invMasses[i] / m_MassScale;
 
                 if (bp.invRotationalMasses != null && i < bp.invRotationalMasses.Length)
-                    m_Solver.invRotationalMasses[k] = bp.invRotationalMasses[i];
+                    m_Solver.invRotationalMasses[k] = bp.invRotationalMasses[i] / m_MassScale;
 
                 if (bp.principalRadii != null && i < bp.principalRadii.Length)
                 {
@@ -1144,9 +1209,9 @@ namespace Obi
         #region Solver callbacks
 
         /// <summary>  
-        /// Loads this actor's blueprint into a given solver. Automatically called by <see cref="ObiSolver"/>.
+        /// Loads this actor's blueprint into the current solver. Automatically called by <see cref="ObiSolver"/>.
         /// </summary> 
-        public virtual void LoadBlueprint(ObiSolver solver)
+        internal virtual void LoadBlueprint()
         {
             var bp = sharedBlueprint;
 
@@ -1166,7 +1231,7 @@ namespace Obi
         /// <summary>  
         /// Unloads this actor's blueprint from a given solver. Automatically called by <see cref="ObiSolver"/>.
         /// </summary> 
-        public virtual void UnloadBlueprint(ObiSolver solver)
+        internal virtual void UnloadBlueprint()
         {
             // instantiate blueprint and store current state in the instance:
             if (Application.isPlaying)
@@ -1214,12 +1279,12 @@ namespace Obi
 
         public virtual void SimulationEnd(float simulatedTime, float substepTime)
         {
-
+            OnSimulationEnd?.Invoke(this, simulatedTime, substepTime);
         }
 
         public virtual void RequestReadback()
         {
-
+            OnRequestReadback?.Invoke(this);
         }
 
         public virtual void Interpolate(float simulatedTime, float substepTime)

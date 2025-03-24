@@ -35,11 +35,6 @@ namespace Obi
         /// </summary>
         [HideInInspector] public ObiNativeFloatList stiffnesses = new ObiNativeFloatList();
 
-        /// <summary>
-        /// One float per constraint: break threshold.
-        /// </summary>
-        [HideInInspector] public ObiNativeFloatList breakThresholds = new ObiNativeFloatList();
-
         public override Oni.ConstraintType constraintType
         {
             get { return Oni.ConstraintType.Pin; }
@@ -54,7 +49,7 @@ namespace Obi
         {
         }
 
-        public void AddConstraint(int solverIndex, ObiColliderBase body, Vector3 offset, Quaternion restDarboux, float linearCompliance, float rotationalCompliance, float breakThreshold)
+        public void AddConstraint(int solverIndex, ObiColliderBase body, Vector3 offset, Quaternion restDarboux, float linearCompliance, float rotationalCompliance)
         {
             RegisterConstraint();
 
@@ -65,7 +60,6 @@ namespace Obi
             restDarbouxVectors.Add(restDarboux);
             stiffnesses.Add(linearCompliance);
             stiffnesses.Add(rotationalCompliance);
-            breakThresholds.Add(breakThreshold);
         }
 
         public override void Clear()
@@ -108,13 +102,11 @@ namespace Obi
                 offsets.ResizeUninitialized(m_ActiveConstraintCount + batch.activeConstraintCount);
                 restDarbouxVectors.ResizeUninitialized(m_ActiveConstraintCount + batch.activeConstraintCount);
                 stiffnesses.ResizeUninitialized((m_ActiveConstraintCount + batch.activeConstraintCount) * 2);
-                breakThresholds.ResizeUninitialized(m_ActiveConstraintCount + batch.activeConstraintCount);
                 lambdas.ResizeInitialized((m_ActiveConstraintCount + batch.activeConstraintCount) * 4);
 
                 offsets.CopyFrom(batch.offsets, 0, m_ActiveConstraintCount, batch.activeConstraintCount);
                 restDarbouxVectors.CopyFrom(batch.restDarbouxVectors, 0, m_ActiveConstraintCount, batch.activeConstraintCount);
                 stiffnesses.CopyFrom(batch.stiffnesses, 0, m_ActiveConstraintCount * 2, batch.activeConstraintCount * 2);
-                breakThresholds.CopyFrom(batch.breakThresholds, 0, m_ActiveConstraintCount, batch.activeConstraintCount);
 
                 for (int i = 0; i < batch.activeConstraintCount; ++i)
                 {
@@ -145,7 +137,6 @@ namespace Obi
             colliderIndices.Dispose();
             offsets.Dispose();
             stiffnesses.Dispose();
-            breakThresholds.Dispose();
 
             if (solver != null && solver.implementation != null)
                 solver.implementation.DestroyConstraintsBatch(m_BatchImpl as IConstraintsBatchImpl);

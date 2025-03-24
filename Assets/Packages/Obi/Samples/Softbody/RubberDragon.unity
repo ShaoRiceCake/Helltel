@@ -33219,7 +33219,7 @@ MonoBehaviour:
     maxAnisotropy: 3
     sleepThreshold: 0.001
     maxVelocity: 50
-    maxAngularVelocity: 10
+    maxAngularVelocity: 20
     collisionMargin: 0.01
     maxDepenetration: 10
     colliderCCD: 1
@@ -33299,6 +33299,11 @@ MonoBehaviour:
     iterations: 3
     SORFactor: 1
     enabled: 0
+  pinholeConstraintParameters:
+    evaluationOrder: 1
+    iterations: 1
+    SORFactor: 1
+    enabled: 1
   stitchConstraintParameters:
     evaluationOrder: 1
     iterations: 2
@@ -33381,6 +33386,7 @@ MonoBehaviour:
   groupID: 1
   m_CollisionMaterial: {fileID: 0}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: 3e45405fcf51940378b6767310314840, type: 2}
   m_SelfCollisions: 1
   centerBatch: -1
@@ -33409,7 +33415,7 @@ MonoBehaviour:
   m_AttachmentType: 0
   m_ConstrainOrientation: 0
   m_Compliance: 0
-  m_BreakThreshold: Infinity
+  breakThreshold: Infinity
 --- !u!114 &1829334543
 MonoBehaviour:
   m_ObjectHideFlags: 0

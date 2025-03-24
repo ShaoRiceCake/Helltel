@@ -153,7 +153,13 @@ namespace Obi
 
             // offset indices:
             for (int i = 0; i < triangleCount * 3; ++i)
-                indices.Add(triangles[triangleOffset * 3 + i] - vertexOffset);
+            {
+                int index = triangles[triangleOffset * 3 + i] - vertexOffset;
+
+                // clamp indices to zero, since decimated ropes have unused triangles
+                // that reference vertex 0. Subtracting the vertex offset from these results in a negative index.
+                indices.Add(Mathf.Max(0,index));
+            }
 
             bakedMesh.SetIndexBufferParams(triangleCount * 3, IndexFormat.UInt32);
             bakedMesh.SetIndexBufferData(indices.AsNativeArray<int>(), 0, 0, triangleCount * 3, MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontValidateIndices);

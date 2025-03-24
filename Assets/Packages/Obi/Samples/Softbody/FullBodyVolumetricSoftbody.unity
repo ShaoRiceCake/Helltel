@@ -547,6 +547,11 @@ MonoBehaviour:
     iterations: 3
     SORFactor: 1
     enabled: 0
+  pinholeConstraintParameters:
+    evaluationOrder: 1
+    iterations: 1
+    SORFactor: 1
+    enabled: 1
   stitchConstraintParameters:
     evaluationOrder: 1
     iterations: 2
@@ -4461,6 +4466,7 @@ MonoBehaviour:
   groupID: 1
   m_CollisionMaterial: {fileID: 0}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: 6370f4f4d673545c09079de4b06ad461, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1

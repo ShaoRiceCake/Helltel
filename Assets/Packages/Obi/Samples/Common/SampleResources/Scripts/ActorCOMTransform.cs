@@ -1,21 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Obi;
 
-public class ActorCOMTransform : MonoBehaviour
+namespace Obi.Samples
 {
-   
-    public Vector3 offset;
-    public ObiActor actor;
-
-    public void Update()
+    public class ActorCOMTransform : MonoBehaviour
     {
-        if (actor != null && actor.isLoaded)
+
+        public Vector3 offset;
+        public ObiActor actor;
+
+        public void Update()
         {
-            Vector3 com;
-            actor.GetMass(out com);
-            transform.position = actor.solver.transform.TransformPoint(com) + offset;
+            if (actor != null && actor.isLoaded)
+            {
+                Vector3 com;
+                actor.GetMass(out com);
+                transform.position = actor.solver.transform.TransformPoint(com) + offset;
+            }
         }
     }
 }

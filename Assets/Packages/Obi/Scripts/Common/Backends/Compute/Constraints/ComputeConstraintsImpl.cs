@@ -8,7 +8,7 @@ namespace Obi
 {
     public interface IComputeConstraintsImpl : IConstraints
     {
-        void Initialize(float substepTime);
+        void Initialize(float stepTime, float substepTime, int steps, float timeLeft);
         void Project(float stepTime, float substepTime, int substeps, float timeLeft);
         void Dispose();
 
@@ -60,13 +60,13 @@ namespace Obi
             return count;
         }
 
-        public void Initialize(float substepTime)
+        public void Initialize(float stepTime, float substepTime, int steps, float timeLeft)
         {
             // initialize all batches in parallel:
             if (batches.Count > 0)
             {
                 for (int i = 0; i < batches.Count; ++i)
-                    if (batches[i].enabled) batches[i].Initialize(substepTime);
+                    if (batches[i].enabled) batches[i].Initialize(stepTime, substepTime, steps, timeLeft);
             }
 
         }

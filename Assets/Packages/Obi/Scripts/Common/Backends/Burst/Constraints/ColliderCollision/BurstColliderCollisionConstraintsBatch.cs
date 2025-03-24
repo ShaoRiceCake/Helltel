@@ -17,7 +17,7 @@ namespace Obi
             m_ConstraintType = Oni.ConstraintType.Collision;
         }
 
-        public override JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        public override JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
         {
             var updateContacts = new UpdateContactsJob()
             {

@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace Obi
+namespace Obi.Samples
 {
     public class MoveAndRotate : MonoBehaviour
     {

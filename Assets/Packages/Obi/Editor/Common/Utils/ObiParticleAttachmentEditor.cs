@@ -30,7 +30,7 @@ namespace Obi
             attachmentType = serializedObject.FindProperty("m_AttachmentType");
             constrainOrientation = serializedObject.FindProperty("m_ConstrainOrientation");
             compliance = serializedObject.FindProperty("m_Compliance");
-            breakThreshold = serializedObject.FindProperty("m_BreakThreshold");
+            breakThreshold = serializedObject.FindProperty("breakThreshold");
         }
 
         public override void OnInspectorGUI()

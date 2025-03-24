@@ -17,7 +17,7 @@ namespace Obi
             m_ConstraintType = Oni.ConstraintType.Density;
         }
 
-        public override JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        public override JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
         {
             return inputDeps;
         }
