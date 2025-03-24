@@ -20,6 +20,7 @@ using System.Linq.Expressions;
 public enum DungeonState{inActive,generatingMain,generatingBranches,cleanup,completed}
 public class DungeonGenerator : MonoBehaviour
 {
+    const float ROOM_SCALE = 1.3f;
     [Header("电梯配置")]
     [Tooltip("场景中固定的电梯Tile（需包含Connector组件）")]
     public Transform elevatorTile; // 电梯
@@ -205,6 +206,7 @@ public class DungeonGenerator : MonoBehaviour
     {
         // 实例化起始房间
         GameObject tile = Instantiate(startTile, Vector3.zero, Quaternion.identity, container);
+        tile.transform.localScale = Vector3.one * ROOM_SCALE; 
         tile.name = "Start Room";
         
         // 初始化房间数据
@@ -226,6 +228,7 @@ public class DungeonGenerator : MonoBehaviour
         // 随机选择房间类型
         int tileIndex = Random.Range(0, tilePrefabs.Length);
         GameObject tile = Instantiate(tilePrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
+        tile.transform.localScale = Vector3.one * ROOM_SCALE; 
         tile.name = tilePrefabs[tileIndex].name;
         
         // 设置随机朝向
@@ -282,29 +285,33 @@ public class DungeonGenerator : MonoBehaviour
         
         if (elevatorConnector == null || startConnector == null) return;
 
-        // 临时父子关系（关键步骤）
+        // 计算缩放补偿因子
+        Vector3 scaleCompensation = new Vector3(
+            1 / elevatorConnector.transform.lossyScale.x,
+            1 / elevatorConnector.transform.lossyScale.y,
+            1 / elevatorConnector.transform.lossyScale.z
+        );
+
+        // 临时父子关系（带缩放补偿）
         startRoom.SetParent(elevatorConnector.transform);
         
-        // 精确对齐逻辑（修正反向问题）
-        // 确保电梯连接器forward方向与起始房间连接器forward方向相反
+        // 精确对齐逻辑（考虑缩放）
         startRoom.localRotation = Quaternion.Euler(0, 180f, 0) * 
                                 Quaternion.Inverse(startConnector.transform.localRotation);
         
-        // 计算基于连接器位置的偏移量
-        Vector3 offset = elevatorConnector.transform.forward * 
-                    (startConnector.transform.localPosition.magnitude + 
-                        elevatorConnector.transform.localPosition.magnitude);
+        // 计算基于实际缩放的位置偏移
+        Vector3 scaledOffset = (elevatorConnector.transform.forward * ROOM_SCALE) * 
+                         (startConnector.transform.localPosition.magnitude + 
+                          elevatorConnector.transform.localPosition.magnitude);
         
+        // 应用缩放补偿
+        //offset = Vector3.Scale(offset, scaleCompensation);
+
         // 恢复层级关系
         startRoom.SetParent(container);
         
-        // 应用最终位置（关键修正）
-        startRoom.position = elevator.position + offset;
-        
-        // 调试可视化（可选）
-        //Debug.DrawLine(elevator.position, startRoom.position, Color.red, 5f);
-        //Debug.Log($"电梯方向：{elevatorConnector.transform.forward}\n" +
-                //$"起始房间方向：{startConnector.transform.forward}");
+        // 最终位置计算
+        startRoom.position = elevator.position + scaledOffset;
     }
 
     /// <summary>
@@ -480,8 +487,9 @@ public class DungeonGenerator : MonoBehaviour
             GameObject doorPrefab = doorPrefabs[doorIndex];
             
             // 在from连接点生成门
-            Instantiate(doorPrefab, from.transform.position, 
-                    from.transform.rotation, from.transform);
+            GameObject door = Instantiate(doorPrefab, from.transform.position, 
+                    from.transform.rotation, from.transform)as GameObject;
+            //door.transform.localScale = Vector3.one * ROOM_SCALE;
             
             // 标记已生成门
             from.hasDoor = to.hasDoor = true;

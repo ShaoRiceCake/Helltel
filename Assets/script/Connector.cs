@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Connector : MonoBehaviour
 {
-    [SerializeField]
-    private Vector2 _size = Vector2.one * 4f;
+    
+    private Vector2 _size = Vector2.one * 5.2f;
     [SerializeField]
     public bool isConnected = false;
     private bool isPlaying;
     [HideInInspector] public bool hasDoor = false;
     void Start()
     {
+        //_size = Vector2.one * 5.2f;
         isPlaying = true;
     }
     void OnDrawGizmos()
