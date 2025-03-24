@@ -22,7 +22,7 @@ public class DungeonGenerator : MonoBehaviour
 {
     [Header("电梯配置")]
     [Tooltip("场景中固定的电梯Tile（需包含Connector组件）")]
-    public Transform elevatorTile; // 新增电梯引用字段
+    public Transform elevatorTile; // 电梯
     [Tooltip("起始房间（建议包含多个方向的连接点）")]
     public GameObject startTile;          // 起始走廊预制体
     
@@ -33,7 +33,7 @@ public class DungeonGenerator : MonoBehaviour
     public GameObject[] blockedPrefabs;    // 障碍物预制体集合
     
     [Tooltip("门预制体（预留功能）")]
-    public GameObject[] doorPrefabs;      // 门类型预制体集合（当前版本未使用）
+    public GameObject[] doorPrefabs;      // 门类型预制体集合
     
     [Tooltip("出口房间预制体（预留功能）")]
     public GameObject[] exitPrefabs;       // 终点房间集合（当前版本未使用）
@@ -195,7 +195,7 @@ public class DungeonGenerator : MonoBehaviour
     /// </summary>
     public void UpdateDungeon()
     {
-        SceneManager.LoadScene("邵智高地牢生成测试场景");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     /// <summary>
@@ -271,6 +271,8 @@ public class DungeonGenerator : MonoBehaviour
 
         // 记录连接信息
         generatedTiles.Last().connector = connectFrom.GetComponent<Connector>();
+        SpawnDoor(connectFrom.GetComponent<Connector>(), 
+             connectTo.GetComponent<Connector>());
     }
     void ConnectElevator(Transform startRoom, Transform elevator)
     {
@@ -300,9 +302,9 @@ public class DungeonGenerator : MonoBehaviour
         startRoom.position = elevator.position + offset;
         
         // 调试可视化（可选）
-        Debug.DrawLine(elevator.position, startRoom.position, Color.red, 5f);
-        Debug.Log($"电梯方向：{elevatorConnector.transform.forward}\n" +
-                $"起始房间方向：{startConnector.transform.forward}");
+        //Debug.DrawLine(elevator.position, startRoom.position, Color.red, 5f);
+        //Debug.Log($"电梯方向：{elevatorConnector.transform.forward}\n" +
+                //$"起始房间方向：{startConnector.transform.forward}");
     }
 
     /// <summary>
@@ -459,8 +461,31 @@ public class DungeonGenerator : MonoBehaviour
                 gowall.name = blockedPrefabs[wallIndex].name;
             }
         }
+    }
+    /// <summary>
+    /// 在连接点生成门（根据概率）
+    /// </summary>
+    void SpawnDoor(Connector from, Connector to)
+    {
+        if (doorPercent <= 0) return;
         
-
+        // 概率检查
+        if (Random.Range(0, 100) < doorPercent)
+        {
+            // 避免重复生成
+            if (from.hasDoor || to.hasDoor) return;
+            
+            // 随机选择门预制体
+            int doorIndex = Random.Range(0, doorPrefabs.Length);
+            GameObject doorPrefab = doorPrefabs[doorIndex];
+            
+            // 在from连接点生成门
+            Instantiate(doorPrefab, from.transform.position, 
+                    from.transform.rotation, from.transform);
+            
+            // 标记已生成门
+            from.hasDoor = to.hasDoor = true;
+        }
     }
 
 }
