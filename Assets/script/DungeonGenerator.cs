@@ -20,9 +20,11 @@ using System.Linq.Expressions;
 public enum DungeonState{inActive,generatingMain,generatingBranches,cleanup,completed}
 public class DungeonGenerator : MonoBehaviour
 {
-    [Header("预制体配置")]
+    [Header("电梯配置")]
+    [Tooltip("场景中固定的电梯Tile（需包含Connector组件）")]
+    public Transform elevatorTile; // 新增电梯引用字段
     [Tooltip("起始房间（建议包含多个方向的连接点）")]
-    public GameObject startTile;          // 起始房间预制体（通常为入口/电梯）
+    public GameObject startTile;          // 起始走廊预制体
     
     [Tooltip("普通房间预制体集合（需包含Connector组件）")]
     public GameObject[] tilePrefabs;      // 可随机选择的普通房间预制体
@@ -116,6 +118,15 @@ public class DungeonGenerator : MonoBehaviour
         // 初始化起始房间
         tileRoot = CreatStartTile();
         tileTo = tileRoot;
+        if (elevatorTile != null)
+        {
+            // 调用专用连接方法
+            ConnectElevator(tileRoot, elevatorTile);
+            
+            // 强制刷新连接状态（重要！）
+            tileRoot.GetComponentInChildren<Connector>().isConnected = true;
+            elevatorTile.GetComponentInChildren<Connector>().isConnected = true;
+        }
         dungeonState = DungeonState.generatingMain;
         // 主路径生成循环
         for (int i = 0; i < mainLength - 1; i++)
@@ -260,6 +271,38 @@ public class DungeonGenerator : MonoBehaviour
 
         // 记录连接信息
         generatedTiles.Last().connector = connectFrom.GetComponent<Connector>();
+    }
+    void ConnectElevator(Transform startRoom, Transform elevator)
+    {
+        // 获取双方的连接点
+        Connector elevatorConnector = elevator.GetComponentInChildren<Connector>();
+        Connector startConnector = startRoom.GetComponentInChildren<Connector>();
+        
+        if (elevatorConnector == null || startConnector == null) return;
+
+        // 临时父子关系（关键步骤）
+        startRoom.SetParent(elevatorConnector.transform);
+        
+        // 精确对齐逻辑（修正反向问题）
+        // 确保电梯连接器forward方向与起始房间连接器forward方向相反
+        startRoom.localRotation = Quaternion.Euler(0, 180f, 0) * 
+                                Quaternion.Inverse(startConnector.transform.localRotation);
+        
+        // 计算基于连接器位置的偏移量
+        Vector3 offset = elevatorConnector.transform.forward * 
+                    (startConnector.transform.localPosition.magnitude + 
+                        elevatorConnector.transform.localPosition.magnitude);
+        
+        // 恢复层级关系
+        startRoom.SetParent(container);
+        
+        // 应用最终位置（关键修正）
+        startRoom.position = elevator.position + offset;
+        
+        // 调试可视化（可选）
+        Debug.DrawLine(elevator.position, startRoom.position, Color.red, 5f);
+        Debug.Log($"电梯方向：{elevatorConnector.transform.forward}\n" +
+                $"起始房间方向：{startConnector.transform.forward}");
     }
 
     /// <summary>
