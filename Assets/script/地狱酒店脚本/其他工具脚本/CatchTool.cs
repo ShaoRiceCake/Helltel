@@ -104,7 +104,7 @@ public class CatchTool : MonoBehaviour
         ConfigureJoint(_joint);
     }
 
-    private void ConfigureJoint(ConfigurableJoint joint)
+    private static void ConfigureJoint(ConfigurableJoint joint)
     {
         // 设置为双向约束
         joint.xMotion = ConfigurableJointMotion.Locked;
