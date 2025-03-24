@@ -368,7 +368,7 @@ public class DungeonGenerator : MonoBehaviour
             tileTo.position + offset, 
             halfExtents, 
             Quaternion.identity, 
-            LayerMask.GetMask("Tile")
+            LayerMask.GetMask("Floor")
         ).ToList();
 
         // 碰撞结果分析
