@@ -1,71 +1,64 @@
 using UnityEngine;
 using Obi;
+using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
-    public GameObject m_ignoredFatherObject;
-    public GameObject m_catchBall;
+    [HideInInspector]
+    public bool attachAimPos = false;
+    public bool isCatching = true;
     public ObiParticleAttachment obiAttachment; 
 
-    [HideInInspector]
-    public bool attchAimPos = false;
-    public bool isCacthing = true;
+    private SphereCollider _sphereCollider;
+    private Transform _catchAimTrans;
 
-    private SphereCollider sphereCollider;
-    private Transform aimTrans;
+    private GameObject CatchBall { get; set; }
+
+    public GameObject IgnoredFatherObject { get; set; }
 
     private void Start()
     {
-        m_catchBall = this.gameObject;
+        CancelCatch();
+        HandleAttachment();
 
-        sphereCollider = m_catchBall.GetComponent<SphereCollider>();
-
-        // ≥ı ºªØ ObiParticleAttachment
-        if (obiAttachment == null)
-        {
-            obiAttachment = m_catchBall.GetComponent<ObiParticleAttachment>();
-            if (obiAttachment == null)
-            {
-                Debug.LogError("ObiParticleAttachment component is missing on CatchBall!");
-            }
-        }
+        _sphereCollider = CatchBall.GetComponent<SphereCollider>();
+        
+        NullCheckerTool.CheckNull(CatchBall,_sphereCollider,IgnoredFatherObject,obiAttachment);
     }
 
     private void Update()
     {
-        if (isCacthing)
+        if (isCatching)
         {
-            OnTriggerEnter(sphereCollider);
-            HandleAttachment();
+            OnTriggerEnter(_sphereCollider);
         }
         else
         {
-            CancelCatch();
         }
     }
 
-    public void CancelCatch()
+    private void CancelCatch()
     {
-        obiAttachment.target =  (m_catchBall.transform);
-        attchAimPos = false;
+        obiAttachment.target =  (CatchBall.transform);
+        attachAimPos = false;
     }
     
 private void HandleAttachment()
     {
-        if (aimTrans != null)
+        if (_catchAimTrans)
         {
-            obiAttachment.target = aimTrans;
-            attchAimPos = true;
+            obiAttachment.target = _catchAimTrans;
+            attachAimPos = true;
         }
         else
         {
-            attchAimPos = false;
+            attachAimPos = false;
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        aimTrans = other.transform;
+        _catchAimTrans = other.transform;
     }
 
 }
