@@ -5,23 +5,20 @@ using static PlayerControlInformationProcess;
 public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 {
     public GameObject handPrepareObj;
-
     public ObiParticleAttachment handControlAttachment;
-
     public float handMoveSpeed = 4.0f;
     public float cylinderRadius = 9.0f;
     public float cylinderHalfHeight = 6.0f;
     public float mouseSensitivity = 10f;
 
     protected GameObject HandBallPrefab;
-    
+    protected int CurrentPlayerHand;
+    protected GameObject HandObject;
+    protected CatchTool  CatchTool;
+        
+    private bool _isMouseDown;
     private ControlBallGenerator _controlBallGenerator;
 
-    protected int CurrentPlayerHand;
-
-    protected GameObject HandObject;
-
-    private bool _isMouseDown;
 
     public int CurrentHand
     {
@@ -44,12 +41,16 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     {
         base.Start();
         
+        CatchTool = gameObject.AddComponent<CatchTool>();
+        
         _controlBallGenerator = gameObject.AddComponent<ControlBallGenerator>();
         
         HandBallPrefab = _controlBallGenerator.GenerateControlBall();
         
         if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj, HandBallPrefab, handControlAttachment);
 
+        CatchTool.enabled = false;
+        
         SubscribeEvents();
     }
 

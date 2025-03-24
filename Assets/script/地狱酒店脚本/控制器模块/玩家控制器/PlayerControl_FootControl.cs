@@ -104,25 +104,46 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     }
 
-    protected void OnMouseMove(Vector2 mouseDelta)
+    // protected void OnMouseMove(Vector2 mouseDelta)
+    // {
+    //     if (isFootUp)
+    //     {
+    //         float mouseX = mouseDelta.x * mouseSensitivity;
+    //         float mouseY = mouseDelta.y * mouseSensitivity;
+    //
+    //         Vector3 forwardDirection = forwardObject.transform.forward;
+    //         forwardDirection.y = 0; 
+    //         forwardDirection.Normalize();
+    //
+    //         Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+    //
+    //         Vector3 impulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
+    //
+    //         movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
+    //     }
+    // }
+
+    private void OnMouseMove(Vector2 mouseDelta)
     {
-        if (isFootUp)
-        {
-            float mouseX = mouseDelta.x * mouseSensitivity;
-            float mouseY = mouseDelta.y * mouseSensitivity;
+        if (!isFootUp) return;
+        var mouseX = mouseDelta.x * mouseSensitivity;
+        var mouseY = mouseDelta.y * mouseSensitivity;
 
-            Vector3 forwardDirection = forwardObject.transform.forward;
-            forwardDirection.y = 0; 
-            forwardDirection.Normalize();
+        var forwardDirection = forwardObject.transform.forward;
+        forwardDirection.y = 0; 
+        forwardDirection.Normalize();
 
-            Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+        var rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
 
-            Vector3 impulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
+        // 计算水平方向上的冲量方向
+        var horizontalImpulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
 
-            movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
-        }
+        // 将冲量方向改为斜下方45度方向
+        var impulseDirection = (horizontalImpulseDirection + Vector3.down/2).normalized;
+
+        movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
     }
-
+    
     protected virtual void Update()
     {
         Vector3 hitPos = raycastTool.GetHitPoint();
