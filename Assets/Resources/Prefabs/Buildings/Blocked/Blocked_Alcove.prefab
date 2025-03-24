@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 249279574461431334}
   - component: {fileID: 209961267024699649}
   - component: {fileID: 6823163750859227961}
+  - component: {fileID: -7667050612249484543}
   m_Layer: 0
   m_Name: Blocked_Alcove
   m_TagString: Untagged
@@ -105,3 +106,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 4, z: 0.31098664}
   m_Center: {x: 0, y: 2, z: 0.15549302}
+--- !u!114 &-7667050612249484543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2610976636490881824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6757b231cedd544c583ef8aeaf773b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thickness: 0
+  inverted: 0
+  material: {fileID: 0}
+  filter: -65535
+  m_SourceCollider: {fileID: 0}
+  m_DistanceField: {fileID: 0}
