@@ -13,29 +13,29 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float cylinderHalfHeight = 6.0f;
     public float mouseSensitivity = 10f;
 
-    public GameObject handBallPrefab;
+    protected GameObject HandBallPrefab;
+    
+    private ControlBallGenerator _controlBallGenerator;
 
-    protected int currentHand = 0;
+    protected int CurrentPlayerHand;
 
-    protected GameObject handObject;
+    protected GameObject HandObject;
 
-    protected bool isMouseDown = false;
+    private bool _isMouseDown;
 
     public int CurrentHand
     {
-        // 0是未控制任意一条手臂，1是左臂，2是右臂
-
-        get => currentHand;
+        get => CurrentPlayerHand;
         set
         {
             if(value < 0 || value > 2)
             {
-                Debug.LogError("Unknown currentHand!");
-                currentHand = 0;
+                Debug.LogError("Unknown CurrentPlayerHand!");
+                CurrentPlayerHand = 0;
             }
             else
             {
-                currentHand = value;
+                CurrentPlayerHand = value;
             }
         }
     }
@@ -43,8 +43,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     protected override void Start()
     {
         base.Start();
-
-        NullCheckerTool.CheckNull(handPrepareObj, handBallPrefab, handControlAttachment);
+        
+        _controlBallGenerator = gameObject.AddComponent<ControlBallGenerator>();
+        
+        HandBallPrefab = _controlBallGenerator.GenerateControlBall();
+        
+        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj, HandBallPrefab, handControlAttachment);
 
         SubscribeEvents();
     }
@@ -83,50 +87,49 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
             CurrentHand = 0;
         }
     }
-  
-    protected void OnCancelHandGrab()
+
+    private void OnCancelHandGrab()
     {
         CurrentHand = 0;
     }
     protected virtual void OnLiftLeftHand()
     {
         CurrentHand = 1;
-        isMouseDown = true;
+        _isMouseDown = true;
 
     }
 
     protected virtual void OnReleaseLeftHand()
     {
         CurrentHand = 1;
-        isMouseDown = false;
+        _isMouseDown = false;
 
     }
     protected virtual void OnLiftRightHand()
     {
         CurrentHand = 2;
-        isMouseDown = true;
+        _isMouseDown = true;
 
     }
 
     protected virtual void OnReleaseRightHand()
     {
         CurrentHand = 2;
-        isMouseDown = false;
+        _isMouseDown = false;
 
     }
 
-    protected void OnMouseMove(Vector2 mouseDelta)
+    private void OnMouseMove(Vector2 mouseDelta)
     {
-        if (currentHand == 0 || handObject == null || handPrepareObj == null)
+        if (CurrentPlayerHand == 0 || HandObject == null || handPrepareObj == null)
             return;
 
-        float mouseX = mouseDelta.x * mouseSensitivity;
-        float mouseY = mouseDelta.y * mouseSensitivity;
+        var mouseX = mouseDelta.x * mouseSensitivity;
+        var mouseY = mouseDelta.y * mouseSensitivity;
+        
+        var localMovement = Vector3.zero;
 
-
-        Vector3 localMovement = Vector3.zero;
-
-        if (isMouseDown)
+        if (_isMouseDown)
         {
             localMovement = new Vector3(mouseX, mouseY, 0) * handMoveSpeed;
         }
@@ -135,27 +138,27 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
             localMovement = new Vector3(mouseX, 0, mouseY) * handMoveSpeed;
         }
 
-        Vector3 forwardDirection = forwardObject.transform.forward;
+        var forwardDirection = forwardObject.transform.forward;
         forwardDirection.y = 0; 
         forwardDirection.Normalize();
 
-        Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+        var rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
 
-        Vector3 worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
+        var worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
         worldMovement.y = localMovement.y;
 
-        Vector3 newWorldPosition = handObject.transform.position + worldMovement * Time.deltaTime;
+        var newWorldPosition = HandObject.transform.position + worldMovement * Time.deltaTime;
 
-        Vector3 newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
+        var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
 
         ApplyCylinderConstraint(ref newLocalPosition);
 
-        handObject.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        HandObject.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
     }
 
-    protected void ApplyCylinderConstraint(ref Vector3 position)
+    private void ApplyCylinderConstraint(ref Vector3 position)
     {
-        Vector2 horizontal = new Vector2(position.x, position.z);
+        var horizontal = new Vector2(position.x, position.z);
         if (horizontal.magnitude > cylinderRadius)
         {
             horizontal = horizontal.normalized * cylinderRadius;

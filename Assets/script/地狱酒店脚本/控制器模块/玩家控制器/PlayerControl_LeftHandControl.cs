@@ -13,18 +13,18 @@ public class PlayerControl_LeftHandControl : PlayerControl_HandControl
     {
         base.Update();
 
-        if (currentHand == 1 && !handObject)
+        if (CurrentPlayerHand == 1 && !HandObject)
         {
-            handObject = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0], Quaternion.identity);
+            HandObject = Instantiate(HandBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0], Quaternion.identity);
 
-            handControlAttachment.target = handObject.transform;
+            handControlAttachment.target = HandObject.transform;
         }
         else
         {
-            if (handObject != null && currentHand != 1)
+            if (HandObject != null && CurrentPlayerHand != 1)
             {
-                Destroy(handObject);
-                handObject = null; 
+                Destroy(HandObject);
+                HandObject = null; 
                 handControlAttachment.target = null;
             }
         }

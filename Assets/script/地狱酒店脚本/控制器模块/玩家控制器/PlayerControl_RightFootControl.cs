@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class PlayerControl_RightFootControl : PlayerControl_FootControl
 {
     protected override void Start()
@@ -29,11 +27,4 @@ public class PlayerControl_RightFootControl : PlayerControl_FootControl
         springTool.isSpringEnabled = false;
 
     }
-
-    protected override void Update()
-    {
-        base.Update();
-    }
-
-
 }
