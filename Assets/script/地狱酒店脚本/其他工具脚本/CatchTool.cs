@@ -1,165 +1,135 @@
 using UnityEngine;
-using System.Collections;
+using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
-    [HideInInspector]
-    public bool isCatching = true;
+    [Header("Settings")]
+    public LayerMask floorLayer; 
+    public float catchRadiusMultiplier = 1f; 
 
+    [Header("References")]
+    public ObiParticleAttachment obiAttachment;
+    public GameObject catchDetectCylinder; 
+
+    // 运行时状态
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
     private bool _isGrabbing;
-    private bool _isReleasing;
-    private GameObject _grabbedObject;
-    private Coroutine _releaseCoroutine;
-    private ConfigurableJoint _joint; 
+    public GameObject currentTarget;
+    private Transform catchAimTrans; 
 
+    // 属性封装
     public GameObject CatchBall
     {
         get => _catchBall;
         set
         {
             _catchBall = value;
+            if (!_catchBall) return;
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
-            NullCheckerTool.CheckNull(_catchBall, _sphereCollider);
+            catchAimTrans =  _catchBall.transform;
+            NullCheckerTool.CheckNull(_catchBall, _sphereCollider, obiAttachment,catchAimTrans);
         }
+    }
+
+    public List<GameObject> preSelectedObjects = new();
+
+    private void Start()
+    {
+        if (catchDetectCylinder == null)
+        {
+            Debug.LogError("catchDetectCylinder未分配！");
+            return;
+        }
+
+        var detector = catchDetectCylinder.GetComponent<CatchDetectorTool>();
+        if (detector == null)
+        {
+            Debug.LogError("catchDetectCylinder上缺少CatchDetectorTool组件！");
+            return;
+        }
+    
+        detector.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
     }
 
     private void Update()
     {
-        if (isCatching)
-        {
-            HandleCatchInput();
-        }
+        
+        if(!_catchBall) return; 
+        
+        UpdateTargetSelection();
+        HandleInput();
     }
 
-    private void HandleCatchInput()
+    private void UpdatePreSelectedObjects(List<GameObject> detectedObjects)
     {
-        if (!Input.GetKeyDown(KeyCode.E)) return;
-        if (_isGrabbing)
+        preSelectedObjects = detectedObjects;
+    }
+
+    private void UpdateTargetSelection()
+    {
+        if (!_sphereCollider) return;
+        //
+        // // 优先级1: 检测Floor层对象
+        // var floorColliders = Physics.OverlapSphere(
+        //     _catchBall.transform.position, 
+        //     _sphereCollider.radius * catchRadiusMultiplier, 
+        //     floorLayer);
+        //
+        // if (floorColliders.Length > 0)
+        // {
+        //     currentTarget = floorColliders[0].gameObject;
+        //     return;
+        // }
+
+        // 优先级2: 从预选列表中选择最近的
+        if (preSelectedObjects.Count > 0)
         {
-            ReleaseObject();
+            currentTarget = preSelectedObjects
+                .OrderBy(obj => Vector3.Distance(
+                    obj.transform.position, 
+                    catchAimTrans.position))
+                .FirstOrDefault();
         }
         else
         {
-            AttemptGrab();
+            currentTarget = null;
         }
     }
 
-    private void AttemptGrab()
+    private void HandleInput()
     {
-        var colliders = Physics.OverlapSphere(_sphereCollider.transform.position, _sphereCollider.radius);
-        var validObjects = (from collider in colliders where !collider.CompareTag("Uncatchable") && !IsChildOfUncatchable(collider.transform) select collider.gameObject).ToList();
-
-        if (validObjects.Count <= 0) return;
-        var targetObject = SelectTargetObject(validObjects);
-        GrabObject(targetObject);
-    }
-
-    private static bool IsChildOfUncatchable(Transform transform)
-    {
-        while (transform.parent != null)
+        if (!Input.GetKeyDown(KeyCode.E)) return;
+        
+        if (currentTarget && !_isGrabbing)
         {
-            if (transform.parent.CompareTag("Uncatchable"))
-            {
-                return true;
-            }
-            transform = transform.parent;
+            GrabObject(currentTarget);
         }
-        return false;
-    }
-
-    private static GameObject SelectTargetObject(List<GameObject> objects)
-    {
-        GameObject floorObject = null;
-        GameObject otherObject = null;
-
-        foreach (var obj in objects)
+        else
         {
-            if (obj.layer == LayerMask.NameToLayer("Floor"))
-            {
-                floorObject = obj;
-            }
-            else
-            {
-                otherObject = obj;
-            }
+            ReleaseObject();
         }
-
-        return otherObject != null ? otherObject : floorObject;
     }
 
-    private void GrabObject(GameObject targetObject)
+    private void GrabObject(GameObject target)
     {
-        _grabbedObject = targetObject;
+        if(!target) return;
         _isGrabbing = true;
+        
+        obiAttachment.BindToTarget(target.transform);
+        obiAttachment.enabled = true;
 
-        // 创建 ConfigurableJoint
-        _joint = _catchBall.AddComponent<ConfigurableJoint>();
-        _joint.connectedBody = _grabbedObject.GetComponent<Rigidbody>();
-
-        // 配置约束
-        ConfigureJoint(_joint);
-    }
-
-    private static void ConfigureJoint(ConfigurableJoint joint)
-    {
-        // 设置为双向约束
-        joint.xMotion = ConfigurableJointMotion.Locked;
-        joint.yMotion = ConfigurableJointMotion.Locked;
-        joint.zMotion = ConfigurableJointMotion.Locked;
-
-        joint.angularXMotion = ConfigurableJointMotion.Locked;
-        joint.angularYMotion = ConfigurableJointMotion.Locked;
-        joint.angularZMotion = ConfigurableJointMotion.Locked;
-
-        // 设置强力约束
-        joint.breakForce = Mathf.Infinity; // 永不断裂
-        joint.breakTorque = Mathf.Infinity; // 永不断裂
     }
 
     private void ReleaseObject()
     {
-        if (_isReleasing)
-        {
-            return;
-        }
-
-        _isReleasing = true;
-        _releaseCoroutine = StartCoroutine(ReleaseCoroutine());
-    }
-
-    private IEnumerator ReleaseCoroutine()
-    {
-        // 销毁约束
-        if (_joint != null)
-        {
-            Destroy(_joint);
-            _joint = null;
-        }
-
         _isGrabbing = false;
-
-        var startTime = Time.time;
-        while (Time.time - startTime < 1f)
-        {
-            if (!_sphereCollider.bounds.Intersects(_grabbedObject.GetComponent<Collider>().bounds))
-            {
-                break;
-            }
-            yield return null;
-        }
-
-        _grabbedObject = null;
-        _isReleasing = false;
+        
+        obiAttachment.enabled = false;
+        obiAttachment.BindToTarget(null);
     }
 
-    private void OnDisable()
-    {
-        if (_releaseCoroutine == null) return;
-        StopCoroutine(_releaseCoroutine);
-        _isReleasing = false;
-    }
 }

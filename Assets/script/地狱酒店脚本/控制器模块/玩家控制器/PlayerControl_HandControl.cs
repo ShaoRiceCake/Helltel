@@ -7,14 +7,14 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public GameObject handPrepareObj;
     public ObiParticleAttachment handControlAttachment;
     public float handMoveSpeed = 4.0f;
-    public float cylinderRadius = 9.0f;
-    public float cylinderHalfHeight = 6.0f;
+    public float cylinderRadius = 10.0f;
+    public float cylinderHalfHeight = 7.0f;
     public float mouseSensitivity = 10f;
+    public CatchTool  CatchTool;
 
     protected GameObject HandBallPrefab;
     protected int CurrentPlayerHand;
     protected GameObject HandObject;
-    protected CatchTool  CatchTool;
         
     private bool _isMouseDown;
     private ControlBallGenerator _controlBallGenerator;
@@ -25,7 +25,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         get => CurrentPlayerHand;
         set
         {
-            if(value < 0 || value > 2)
+            if(value is < 0 or > 2)
             {
                 Debug.LogError("Unknown CurrentPlayerHand!");
                 CurrentPlayerHand = 0;
@@ -41,15 +41,11 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     {
         base.Start();
         
-        CatchTool = gameObject.AddComponent<CatchTool>();
-        
         _controlBallGenerator = gameObject.AddComponent<ControlBallGenerator>();
         
-        HandBallPrefab = _controlBallGenerator.GenerateControlBall();
+        HandBallPrefab = ControlBallGenerator.GenerateControlBall();
         
-        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj, HandBallPrefab, handControlAttachment);
-
-        CatchTool.enabled = false;
+        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,CatchTool, HandBallPrefab, handControlAttachment);
         
         SubscribeEvents();
     }
