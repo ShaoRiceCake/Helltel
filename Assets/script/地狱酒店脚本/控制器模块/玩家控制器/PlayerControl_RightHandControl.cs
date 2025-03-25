@@ -1,7 +1,6 @@
 
 using UnityEngine;
 
-
 public class PlayerControl_RightHandControl : PlayerControl_HandControl
 {
 
