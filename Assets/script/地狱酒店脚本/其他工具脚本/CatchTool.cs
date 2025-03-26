@@ -19,7 +19,9 @@ public class CatchTool : MonoBehaviour
     private GameObject _catchBall;
     private bool _isGrabbing;
     public GameObject currentTarget;
-    private Transform catchAimTrans; 
+    private Transform _catchAimTrans; 
+    public GameObject _currentHighlightedObject; // 当前已高亮的物体
+
 
     // 属性封装
     public GameObject CatchBall
@@ -30,8 +32,8 @@ public class CatchTool : MonoBehaviour
             _catchBall = value;
             if (!_catchBall) return;
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
-            catchAimTrans =  _catchBall.transform;
-            NullCheckerTool.CheckNull(_catchBall, _sphereCollider, obiAttachment,catchAimTrans);
+            _catchAimTrans =  _catchBall.transform;
+            NullCheckerTool.CheckNull(_catchBall, _sphereCollider, obiAttachment,_catchAimTrans);
         }
     }
 
@@ -57,9 +59,8 @@ public class CatchTool : MonoBehaviour
 
     private void Update()
     {
-        
-        if(!_catchBall) return; 
-        
+        if(!_catchBall) return;
+        HighLightTarget();
         UpdateTargetSelection();
         HandleInput();
     }
@@ -91,7 +92,7 @@ public class CatchTool : MonoBehaviour
             currentTarget = preSelectedObjects
                 .OrderBy(obj => Vector3.Distance(
                     obj.transform.position, 
-                    catchAimTrans.position))
+                    _catchAimTrans.position))
                 .FirstOrDefault();
         }
         else
@@ -99,7 +100,32 @@ public class CatchTool : MonoBehaviour
             currentTarget = null;
         }
     }
-
+    private void HighLightTarget()
+    {
+        // 如果新目标就是当前已高亮的物体，则不做任何操作
+        if (currentTarget == _currentHighlightedObject) return;
+    
+        // 先取消旧物体的高亮
+        if (_currentHighlightedObject)
+        {
+            var oldOutline = _currentHighlightedObject.GetComponent<Outline>();
+            if (oldOutline) oldOutline.enabled = false;
+        }
+    
+        // 高亮新物体
+        if (currentTarget)
+        {
+            var newOutline = currentTarget.GetComponent<Outline>();
+            if (!newOutline) return;
+            newOutline.enabled = true;
+            _currentHighlightedObject = currentTarget; // 更新记录
+        }
+        else
+        {
+            _currentHighlightedObject = null; // 没有目标时清空记录
+        }
+    }
+    
     private void HandleInput()
     {
         if (!Input.GetKeyDown(KeyCode.E)) return;
