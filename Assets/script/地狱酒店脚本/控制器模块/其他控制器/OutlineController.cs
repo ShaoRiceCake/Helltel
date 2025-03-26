@@ -1,23 +1,24 @@
 using UnityEngine;
-using cakeslice; // 确保 Outline 组件的命名空间正确
+using cakeslice;
 
-[RequireComponent(typeof(Outline))] // 强制要求挂载对象必须有 Outline 组件
+[RequireComponent(typeof(Outline))]
 public class OutlineController : MonoBehaviour
 {
     [Header("Settings")]
     [Tooltip("是否在游戏开始时关闭 Outline 高亮")]
     [SerializeField] private bool disableOnStart = true;
+    [Tooltip("是否锁定当前状态（锁定后无法修改高亮状态）")]
+    [SerializeField] private bool isLocked;
 
     private Outline _outline;
     private bool _isInitialized;
 
     private void Awake()
     {
-        // 获取 Outline 组件
         _outline = GetComponent<Outline>();
         if (_outline == null)
         {
-            Debug.LogError("OutlineController: 未找到 Outline 组件！", this);
+            Debug.LogError("OutlineController: Outline component not found!", this);
             return;
         }
         _isInitialized = true;
@@ -25,42 +26,49 @@ public class OutlineController : MonoBehaviour
 
     private void Start()
     {
-        if (disableOnStart && _isInitialized)
+        if (disableOnStart && _isInitialized && !isLocked)
         {
-            // 延迟一帧关闭（避免与其他初始化逻辑冲突）
             StartCoroutine(DisableAfterFrame());
         }
     }
 
     private System.Collections.IEnumerator DisableAfterFrame()
     {
-        yield return null; // 等待一帧
-        SetOutlineEnabled(false);
+        yield return null;
+        _outline.enabled = false;
     }
 
-    /// <summary>
-    /// 外部控制 Outline 的开启/关闭
-    /// </summary>
+    // === 外部控制接口 ===
     public void SetOutlineEnabled(bool isEnabled)
     {
-        if (!_isInitialized) return;
+        if (!_isInitialized || isLocked) return;
         _outline.enabled = isEnabled;
     }
 
-    /// <summary>
-    /// 切换 Outline 的开关状态
-    /// </summary>
     public void ToggleOutline()
     {
-        if (!_isInitialized) return;
+        if (!_isInitialized || isLocked) return;
         _outline.enabled = !_outline.enabled;
     }
 
-    /// <summary>
-    /// 直接获取当前 Outline 的启用状态
-    /// </summary>
     public bool IsOutlineEnabled()
     {
         return _isInitialized && _outline.enabled;
+    }
+
+    // === 锁定/解锁功能 ===
+    public void LockOutlineState()
+    {
+        isLocked = true;
+    }
+
+    public void UnlockOutlineState()
+    {
+        isLocked = false;
+    }
+
+    public bool IsLocked()
+    {
+        return isLocked;
     }
 }

@@ -2,8 +2,6 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
-using cakeslice;
-using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
@@ -19,10 +17,10 @@ public class CatchTool : MonoBehaviour
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
     private bool _isGrabbing;
-    public GameObject currentTarget;
+    private GameObject _currentTarget;
     private Transform _catchAimTrans; 
-    public GameObject _currentHighlightedObject; // 当前已高亮的物体
-
+    private GameObject _currentHighlightedObject;
+    private OutlineController _currentGrabbedOutline; // 当前被抓取对象的OutlineController
 
     // 属性封装
     public GameObject CatchBall
@@ -74,23 +72,10 @@ public class CatchTool : MonoBehaviour
     private void UpdateTargetSelection()
     {
         if (!_sphereCollider) return;
-        //
-        // // 优先级1: 检测Floor层对象
-        // var floorColliders = Physics.OverlapSphere(
-        //     _catchBall.transform.position, 
-        //     _sphereCollider.radius * catchRadiusMultiplier, 
-        //     floorLayer);
-        //
-        // if (floorColliders.Length > 0)
-        // {
-        //     currentTarget = floorColliders[0].gameObject;
-        //     return;
-        // }
 
-        // 优先级2: 从预选列表中选择最近的
         if (preSelectedObjects.Count > 0)
         {
-            currentTarget = preSelectedObjects
+            _currentTarget = preSelectedObjects
                 .OrderBy(obj => Vector3.Distance(
                     obj.transform.position, 
                     _catchAimTrans.position))
@@ -98,13 +83,14 @@ public class CatchTool : MonoBehaviour
         }
         else
         {
-            currentTarget = null;
+            _currentTarget = null;
         }
     }
+
     private void HighLightTarget()
     {
-        // 如果新目标就是当前已高亮的物体，则不做任何操作
-        if (currentTarget == _currentHighlightedObject) return;
+        // 如果正在抓取或者新目标就是当前已高亮的物体，则不做任何操作
+        if (_isGrabbing || _currentTarget == _currentHighlightedObject) return;
     
         // 先取消旧物体的高亮
         if (_currentHighlightedObject)
@@ -115,17 +101,17 @@ public class CatchTool : MonoBehaviour
         }
     
         // 高亮新物体
-        if (currentTarget)
+        if (_currentTarget)
         {
-            var newOutline = currentTarget.GetComponent<OutlineController>();
+            var newOutline = _currentTarget.GetComponent<OutlineController>();
             if (!newOutline) return;
             
             newOutline.SetOutlineEnabled(true);
-            _currentHighlightedObject = currentTarget; // 更新记录
+            _currentHighlightedObject = _currentTarget;
         }
         else
         {
-            _currentHighlightedObject = null; // 没有目标时清空记录
+            _currentHighlightedObject = null;
         }
     }
     
@@ -133,9 +119,9 @@ public class CatchTool : MonoBehaviour
     {
         if (!Input.GetKeyDown(KeyCode.E)) return;
         
-        if (currentTarget && !_isGrabbing)
+        if (_currentTarget && !_isGrabbing)
         {
-            GrabObject(currentTarget);
+            GrabObject(_currentTarget);
         }
         else
         {
@@ -146,19 +132,33 @@ public class CatchTool : MonoBehaviour
     private void GrabObject(GameObject target)
     {
         if(!target) return;
-        _isGrabbing = true;
         
+        // 获取并处理Outline
+        _currentGrabbedOutline = target.GetComponent<OutlineController>();
+        if (_currentGrabbedOutline)
+        {
+            _currentGrabbedOutline.SetOutlineEnabled(false); // 关闭高亮
+            _currentGrabbedOutline.LockOutlineState(); // 锁定状态
+        }
+        
+        _isGrabbing = true;
         obiAttachment.BindToTarget(target.transform);
         obiAttachment.enabled = true;
-
     }
 
     private void ReleaseObject()
     {
-        _isGrabbing = false;
+        if (!_isGrabbing) return;
         
+        // 解锁并恢复Outline状态
+        if (_currentGrabbedOutline)
+        {
+            _currentGrabbedOutline.UnlockOutlineState();
+            _currentGrabbedOutline = null;
+        }
+        
+        _isGrabbing = false;
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
     }
-
 }

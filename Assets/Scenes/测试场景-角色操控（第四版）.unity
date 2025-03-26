@@ -154,50 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableOnStart: 1
---- !u!1 &328971419
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 328971421}
-  - component: {fileID: 328971420}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &328971420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 328971419}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &328971421
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 328971419}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  isLocked: 0
 --- !u!1 &434276013
 GameObject:
   m_ObjectHideFlags: 0
@@ -337,6 +294,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableOnStart: 1
+  isLocked: 0
 --- !u!1 &946212779
 GameObject:
   m_ObjectHideFlags: 0
@@ -454,8 +412,6 @@ MonoBehaviour:
   catchRadiusMultiplier: 1
   obiAttachment: {fileID: 8901611197010065133}
   catchDetectCylinder: {fileID: 1413919681}
-  currentTarget: {fileID: 0}
-  _currentHighlightedObject: {fileID: 0}
   preSelectedObjects: []
 --- !u!114 &1053235418
 MonoBehaviour:
@@ -475,8 +431,6 @@ MonoBehaviour:
   catchRadiusMultiplier: 1
   obiAttachment: {fileID: 8901611197010065134}
   catchDetectCylinder: {fileID: 1413919681}
-  currentTarget: {fileID: 0}
-  _currentHighlightedObject: {fileID: 0}
   preSelectedObjects: []
 --- !u!1 &1110877965 stripped
 GameObject:
@@ -541,6 +495,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableOnStart: 1
+  isLocked: 0
 --- !u!1 &1413919681
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,6 +649,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableOnStart: 1
+  isLocked: 0
+--- !u!1 &1599193660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1599193662}
+  - component: {fileID: 1599193661}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1599193661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599193660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1599193662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599193660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1743971518 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 907665061176133210, guid: be4c742712bd1174ab2282469931b296, type: 3}
@@ -1096,12 +1096,32 @@ PrefabInstance:
       value: Uncatchable
       objectReference: {fileID: 0}
     - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 3.864108
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.024892932
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.943971
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.92
+      value: 1.903
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.292
       objectReference: {fileID: 0}
     - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.638
+      value: 4.046
+      objectReference: {fileID: 0}
+    - target: {fileID: 2830440793097311940, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3137460494380390516, guid: a3b8d34e00ed5f3438d1351bef19f5e3, type: 3}
       propertyPath: kinematicForParticles
@@ -1258,6 +1278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   disableOnStart: 1
+  isLocked: 0
 --- !u!1 &7737370058728949910 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7293024255040863197, guid: be4c742712bd1174ab2282469931b296, type: 3}
@@ -1309,4 +1330,4 @@ SceneRoots:
   - {fileID: 3571351096803338166}
   - {fileID: 1033206650830123851}
   - {fileID: 2071700123}
-  - {fileID: 328971421}
+  - {fileID: 1599193662}
