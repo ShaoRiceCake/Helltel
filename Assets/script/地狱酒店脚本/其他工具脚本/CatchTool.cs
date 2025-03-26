@@ -2,6 +2,7 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using cakeslice;
 using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
@@ -108,16 +109,18 @@ public class CatchTool : MonoBehaviour
         // 先取消旧物体的高亮
         if (_currentHighlightedObject)
         {
-            var oldOutline = _currentHighlightedObject.GetComponent<Outline>();
-            if (oldOutline) oldOutline.enabled = false;
+            var oldOutline = _currentHighlightedObject.GetComponent<OutlineController>();
+            if (oldOutline)
+                oldOutline.SetOutlineEnabled(false);
         }
     
         // 高亮新物体
         if (currentTarget)
         {
-            var newOutline = currentTarget.GetComponent<Outline>();
+            var newOutline = currentTarget.GetComponent<OutlineController>();
             if (!newOutline) return;
-            newOutline.enabled = true;
+            
+            newOutline.SetOutlineEnabled(true);
             _currentHighlightedObject = currentTarget; // 更新记录
         }
         else
