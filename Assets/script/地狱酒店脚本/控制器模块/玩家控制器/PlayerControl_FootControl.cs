@@ -11,20 +11,16 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     public float mouseSensitivity = 1f;
     public float impulseCoefficient = 0.3f; 
+    
+    protected bool IsFootUp = false;
+    private bool _isObjectFixed ;
+    private bool _isCanceling;
 
-    protected Vector3 impulseDirection;
-
-    protected bool isFootUp = false;
-    protected bool isObjectFixed = false;
-    protected bool isCancleing = false;
-
-    protected RaycastTool raycastTool;
-    protected SpringTool springTool;
-    protected Rigidbody movingObj;
-
-    protected float timeCounter_Move = 0f;
-    protected float timeCounter_Hover = 0f;
-    protected float timeCounter_Cancle = 0f;
+    private RaycastTool _raycastTool;
+    protected SpringTool SpringTool;
+    private Rigidbody _movingObj;
+    
+    private float _timeCounterCancel;
 
     protected override void Start()
     {
@@ -32,18 +28,18 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
         if (!footObject)
         {
-            footObject = this.gameObject;
+            if (gameObject != null) footObject = gameObject;
         }
 
-        raycastTool = footObject.GetComponent<RaycastTool>();
-        springTool = footObject.GetComponent<SpringTool>();
-        movingObj = footObject.GetComponent<Rigidbody>();
+        _raycastTool = footObject.GetComponent<RaycastTool>();
+        SpringTool = footObject.GetComponent<SpringTool>();
+        _movingObj = footObject.GetComponent<Rigidbody>();
 
-        NullCheckerTool.CheckNull(raycastTool, springTool, movingObj);
+        NullCheckerTool.CheckNull(_raycastTool, SpringTool, _movingObj);
 
-        springTool.SetTarget(targetObject.transform);
-        springTool.SetControlledObject(footObject);
-        raycastTool.rayLauncher = footObject;
+        SpringTool.SetTarget(targetObject.transform);
+        SpringTool.SetControlledObject(footObject);
+        _raycastTool.rayLauncher = footObject;
 
         SubscribeEvents();
     }
@@ -57,7 +53,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         }
     }
 
-    protected virtual void SubscribeEvents()
+    private void SubscribeEvents()
     {
         controlHandler.onCancelLegGrab.AddListener(OnCancelLegGrab);
         controlHandler.onDefaultMode.AddListener(OnDefaultMode);
@@ -72,60 +68,18 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     }
 
 
-    protected void OnCancelLegGrab()
+    private void OnCancelLegGrab()
     {
-        isCancleing = true;
-        timeCounter_Cancle = 0f;
     }
 
-    protected void OnDefaultMode()
+    private void OnDefaultMode()
     {
 
     }
-
-    protected IEnumerator HandleCancelLegGrab()
-    {
-
-        if (isCancleing)
-        {
-            DisableInteractions();
-            yield return new WaitForSeconds(1f);
-            EnableInteractions();
-        }
-    }
-
-    private void DisableInteractions()
-    {
-
-    }
-
-    private void EnableInteractions()
-    {
-
-    }
-
-    // protected void OnMouseMove(Vector2 mouseDelta)
-    // {
-    //     if (isFootUp)
-    //     {
-    //         float mouseX = mouseDelta.x * mouseSensitivity;
-    //         float mouseY = mouseDelta.y * mouseSensitivity;
-    //
-    //         Vector3 forwardDirection = forwardObject.transform.forward;
-    //         forwardDirection.y = 0; 
-    //         forwardDirection.Normalize();
-    //
-    //         Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
-    //
-    //         Vector3 impulseDirection = (rightDirection * mouseX + forwardDirection * mouseY).normalized;
-    //
-    //         movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
-    //     }
-    // }
 
     private void OnMouseMove(Vector2 mouseDelta)
     {
-        if (!isFootUp) return;
+        if (!IsFootUp) return;
         var mouseX = mouseDelta.x * mouseSensitivity;
         var mouseY = mouseDelta.y * mouseSensitivity;
 
@@ -141,61 +95,46 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         // 将冲量方向改为斜下方45度方向
         var impulseDirection = (horizontalImpulseDirection + Vector3.down/2).normalized;
 
-        movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
+        _movingObj.AddForce(impulseDirection * impulseCoefficient, ForceMode.Impulse);
     }
     
     protected virtual void Update()
     {
-        Vector3 hitPos = raycastTool.GetHitPoint();
+        var hitPos = _raycastTool.GetHitPoint();
 
-        if (!isFootUp && hitPos != Vector3.zero)
+        if (!IsFootUp && hitPos != Vector3.zero)
         {
             MoveToTargetPosition(hitPos);
-        }
-
-        if (isCancleing)
-        {
-            timeCounter_Cancle += Time.deltaTime;
-
-            if (timeCounter_Cancle >= 1f)
-            {
-                HandleCancelLegGrab();
-                timeCounter_Cancle = 0f; 
-                isCancleing = false;
-            }
         }
     }
 
     protected void UnfixObject()
     {
-        movingObj.isKinematic = false;
-        isObjectFixed = false;
-    }
-    protected void FixObject()
-    {
-        if (!isObjectFixed)
-        {
-            movingObj.velocity = Vector3.zero;
-            movingObj.angularVelocity = Vector3.zero;
-            movingObj.isKinematic = true;
-            isObjectFixed = true;
-        }
+        _movingObj.isKinematic = false;
+        _isObjectFixed = false;
     }
 
-    protected void MoveToTargetPosition(Vector3 targetPosition)
+    private void FixObject()
     {
-        Vector3 direction = targetPosition - movingObj.position;
-        float distance = direction.magnitude;
+        if (_isObjectFixed) return;
+        _movingObj.velocity = Vector3.zero;
+        _movingObj.angularVelocity = Vector3.zero;
+        _movingObj.isKinematic = true;
+        _isObjectFixed = true;
+    }
+
+    private void MoveToTargetPosition(Vector3 targetPosition)
+    {
+        var direction = targetPosition - _movingObj.position;
+        var distance = direction.magnitude;
 
         if (distance > 0.2)
         {
-            movingObj.velocity = direction.normalized * 15;
+            _movingObj.velocity = direction.normalized * 15;
         }
         else
         {
             FixObject();
         }
     }
-
-
 }

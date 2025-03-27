@@ -17,16 +17,16 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
 
     protected virtual void OnLiftLeftLeg() 
     {
-        isFootUp = true;
+        IsFootUp = true;
         UnfixObject();
-        springTool.isSpringEnabled = true;
+        SpringTool.isSpringEnabled = true;
 
     }
 
     protected virtual void OnReleaseLeftLeg()
     {
-        isFootUp = false;
-        springTool.isSpringEnabled = false;
+        IsFootUp = false;
+        SpringTool.isSpringEnabled = false;
 
     }
 

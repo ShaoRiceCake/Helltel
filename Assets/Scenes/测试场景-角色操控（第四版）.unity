@@ -295,6 +295,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableOnStart: 1
   isLocked: 0
+--- !u!1 &655439932
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 655439934}
+  - component: {fileID: 655439933}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &655439933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655439932}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &655439934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655439932}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &946212779
 GameObject:
   m_ObjectHideFlags: 0
@@ -547,7 +591,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1413919681}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -636,50 +680,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableOnStart: 1
   isLocked: 0
---- !u!1 &1599193660
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1599193662}
-  - component: {fileID: 1599193661}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1599193661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599193660}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1599193662
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1599193660}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1743971518 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 907665061176133210, guid: be4c742712bd1174ab2282469931b296, type: 3}
@@ -836,6 +836,14 @@ PrefabInstance:
       propertyPath: springForce
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 223920229253159949, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 223920229253159949, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 319296583318732750, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_TagString
       value: Uncatchable
@@ -884,6 +892,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 713078911680709176, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 907665061176133210, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.125
@@ -907,6 +919,18 @@ PrefabInstance:
     - target: {fileID: 2705255773445242353, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3496616351502458537, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3496616351502458537, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3913372002238148844, guid: be4c742712bd1174ab2282469931b296, type: 3}
+      propertyPath: m_CollisionDetection
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4315816931925642921, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: CatchTool
@@ -954,7 +978,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5342755400335005265, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5510947481242816290, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_Name
@@ -986,7 +1010,7 @@ PrefabInstance:
       objectReference: {fileID: 8901611197010065133}
     - target: {fileID: 6444901373976432960, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6762332050767795050, guid: be4c742712bd1174ab2282469931b296, type: 3}
       propertyPath: m_TagString
@@ -1332,4 +1356,4 @@ SceneRoots:
   - {fileID: 3571351096803338166}
   - {fileID: 1033206650830123851}
   - {fileID: 2071700123}
-  - {fileID: 1599193662}
+  - {fileID: 655439934}
