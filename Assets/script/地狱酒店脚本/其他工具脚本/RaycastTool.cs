@@ -1,120 +1,85 @@
 using UnityEngine;
 
-[ExecuteInEditMode] // 允许在编辑模式下运行
+[ExecuteInEditMode] 
 public class RaycastTool : MonoBehaviour
 {
-    [Header("射线设置")]
-    private float rayLength = 10f; // 射线长度
-    private Vector3 rayDirection = Vector3.down; // 射线方向
-    public LayerMask ignoreLayers; // 需要忽略的Layer
+    private float _rayLength = 10f; 
+    private Vector3 _rayDirection = Vector3.down; 
+    public LayerMask ignoreLayers; 
     public GameObject rayLauncher;
 
-    [Header("调试")]
-    public bool showDebug = false; // 是否显示调试信息
-    public Color rayColor = Color.green; // 射线颜色
-    public Color hitPointColor = Color.red; // 碰撞点颜色
-
-    private RaycastHit hitInfo; // 射线碰撞信息
-    private bool isHit = false; // 是否检测到碰撞
+    private RaycastHit _hitInfo; 
+    private bool _isHit ;
 
     public float RayLength
     {
-        get => rayLength;
+        get => _rayLength;
         set
         {
-            if (rayLength <= 0)
+            if (_rayLength <= 0)
             {
                 Debug.LogWarning("RayLength is zero!");
-                rayLength = value;
             }
-            else
-            {
-                rayLength = value;
-            }
+
+            _rayLength = value;
         }
     }
 
     public Vector3 RyDirection
     {
-        get => rayDirection;
+        get => _rayDirection;
         set
         {
             if (RyDirection == Vector3.zero)
             {
                 Debug.LogWarning("RyDirection is zero!");
-                rayDirection = value;
             }
-            else
-            {
-                rayDirection = value;
-            }
+
+            _rayDirection = value;
         }
     }
 
 
-    void Update()
+    private void Update()
     {
         PerformRaycast();
     }
 
-    void PerformRaycast()
+    private void PerformRaycast()
     {
-        // 计算射线的起点和方向
         Vector3 rayOrigin;
         Vector3 direction;
         if (rayLauncher)
         {
             rayOrigin = rayLauncher.transform.position;
-            direction = rayLauncher.transform.TransformDirection(rayDirection.normalized);
+            direction = rayLauncher.transform.TransformDirection(_rayDirection.normalized);
 
         }
         else
         {
             rayOrigin = transform.position;
-            direction = transform.TransformDirection(rayDirection.normalized);
+            direction = transform.TransformDirection(_rayDirection.normalized);
         }
 
-        // 执行射线检测
-        isHit = Physics.Raycast(rayOrigin, direction, out hitInfo, rayLength, ~ignoreLayers);
+        _isHit = Physics.Raycast(rayOrigin, direction, out _hitInfo, _rayLength, ~ignoreLayers);
     }
 
-    // 获取碰撞点（如果没有碰撞，返回射线的终点）
     public Transform GetHitTrans()
     {
-        if (isHit)
-        {
-            return hitInfo.transform;
-        }
-        else
-        {
-            return null;
-        }
+        return _isHit ? _hitInfo.transform : null;
     }
 
-    // 获取碰撞点（如果没有碰撞，返回射线的终点）
     public Vector3 GetHitPoint()
     {
-        if (isHit)
-        {
-            return hitInfo.point;
-        }
-        else
-        {
-            return Vector3.zero;
-        }
+        return _isHit ? _hitInfo.point : Vector3.zero;
     }
 
-
-
-    // 获取是否检测到碰撞
     public bool IsHit()
     {
-        return isHit;
+        return _isHit;
     }
-
-    // 获取碰撞信息
     public RaycastHit GetHitInfo()
     {
-        return hitInfo;
+        return _hitInfo;
     }
 }

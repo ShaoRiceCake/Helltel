@@ -11,20 +11,15 @@ public class ControlBallGenerator : MonoBehaviour
         controlBall.tag = "Uncatchable";
         
         // 设置缩放为 0.3 倍
-        controlBall.transform.localScale = Vector3.one * 0.5f;
+        controlBall.transform.localScale = Vector3.one * 0.2f;
 
-        // 配置 Sphere Collider 为触发器
+        // 配置 Sphere Collider 
         var sphereCollider = controlBall.GetComponent<SphereCollider>();
         if (!sphereCollider)
         {
+            controlBall.AddComponent<SphereCollider>();
         }
-        else
-        {
-            sphereCollider = controlBall.AddComponent<SphereCollider>();
-        }
-
-        sphereCollider.isTrigger = true;
-
+        
         // 禁用渲染器组件
         var renderer = controlBall.GetComponent<Renderer>();
         if (renderer != null)
