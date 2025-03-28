@@ -118,13 +118,15 @@ void Project (uint3 id : SV_DispatchThreadID)
     {
         rigidbody rb = rigidbodies[rigidbodyIndex];
 
-        // predict rigidbody transform:
-        transform predictedTrfm = transforms[colliderIndex].Integrate(rb.velocity + asfloat(linearDeltasAsInt[rigidbodyIndex]),
-                                                                      rb.angularVelocity + asfloat(angularDeltasAsInt[rigidbodyIndex]), frameEnd);
-                                                                      
-        // predict offset point position and rb rotation at the end of the step:
-        predictedPinOffset = predictedTrfm.TransformPoint(offsets[i]);
-        predictedRotation = predictedTrfm.rotation;
+        // predict offset point position using rb velocity at that point (can't integrate transform since position != center of mass)
+        float4 velocityAtPoint = GetRigidbodyVelocityAtPoint(rigidbodies[rigidbodyIndex],inertialSolverFrame[0].frame.InverseTransformPoint(worldPinOffset), 
+                                                             asfloat(linearDeltasAsInt[rigidbodyIndex]), 
+                                                             asfloat(angularDeltasAsInt[rigidbodyIndex]), inertialSolverFrame[0]);
+
+        predictedPinOffset = IntegrateLinear(predictedPinOffset, inertialSolverFrame[0].frame.TransformVector(velocityAtPoint), frameEnd);
+
+        // predict rotation at the end of the step:
+        predictedRotation = IntegrateAngular(predictedRotation, rb.angularVelocity + asfloat(angularDeltasAsInt[rigidbodyIndex]), frameEnd);
 
         // calculate linear and angular rigidbody effective masses (mass splitting: multiply by constraint count)
         rigidbodyLinearW = rb.inverseMass * rb.constraintCount; 
@@ -165,7 +167,7 @@ void Project (uint3 id : SV_DispatchThreadID)
         quaternion omega_plus;
         omega_plus = omega + restDarboux[i];        //delta Omega with - omega_0
         omega -= restDarboux[i];                    //delta Omega with + omega_0
-        if (dot(omega.xyz, omega.xyz) > dot(omega_plus.xyz, omega_plus.xyz))
+        if (dot(omega, omega) > dot(omega_plus, omega_plus))
             omega = omega_plus;
 
         float3 dlambda = (omega.xyz - compliances.y * lambda.xyz) / (compliances.y + invRotationalMasses[particleIndex] + rigidbodyAngularW + EPSILON);

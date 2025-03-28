@@ -28,7 +28,7 @@ namespace Obi
             m_ConstraintCount = count;
         }
 
-        public override void Initialize(float substepTime)
+        public override void Initialize(float stepTime, float substepTime, int steps, float timeLeft)
         {
             if (m_ConstraintCount > 0)
             {
@@ -52,7 +52,7 @@ namespace Obi
             }
 
             // clear lambdas:
-            base.Initialize(substepTime);
+            base.Initialize(stepTime, substepTime, steps, timeLeft);
         }
 
         public override void Evaluate(float stepTime, float substepTime, int steps, float timeLeft)
@@ -124,6 +124,16 @@ namespace Obi
                 int threadGroups = ComputeMath.ThreadGroupCount(m_ConstraintCount, 128);
                 shader.Dispatch(applyKernel, threadGroups, 1, 1);
             }
+        }
+
+        public void RequestDataReadback()
+        {
+            lambdasList.Readback();
+        }
+
+        public void WaitForReadback()
+        {
+            lambdasList.WaitForReadback();
         }
 
     }

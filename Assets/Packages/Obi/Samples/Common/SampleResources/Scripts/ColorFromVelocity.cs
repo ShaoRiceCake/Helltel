@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Obi
+namespace Obi.Samples
 {
 	/**
 	 * Sample script that colors fluid particles based on their vorticity (2D only)

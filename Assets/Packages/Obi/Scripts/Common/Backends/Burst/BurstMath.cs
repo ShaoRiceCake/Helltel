@@ -342,6 +342,8 @@ namespace Obi
         /**         * Modulo operator that also follows intuition for negative arguments. That is , -1 mod 3 = 2, not -1.         */
         [MethodImpl(MethodImplOptions.AggressiveInlining)]        public static float3 nfmod(float3 a, float3 b)        {            return a - b * math.floor(a / b);        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]        public static float nfmod(float a, float b)        {            return a - b * math.floor(a / b);        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float4 diagonal(this float4x4 value)
         {
@@ -707,7 +709,7 @@ namespace Obi
             float4 ap = p - a;
             float4 ab = b - a;
 
-            mu = math.dot(ap, ab) / math.dot(ab, ab);
+            mu = math.dot(ap, ab) / (math.dot(ab, ab) + epsilon);
 
             if (clampToSegment)
                 mu = math.saturate(mu);
@@ -721,7 +723,7 @@ namespace Obi
             float3 ap = p - a;
             float3 ab = b - a;
 
-            mu = math.dot(ap, ab) / math.dot(ab, ab);
+            mu = math.dot(ap, ab) / (math.dot(ab, ab) + epsilon);
 
             if (clampToSegment)
                 mu = math.saturate(mu);

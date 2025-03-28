@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1194652801963708755}
   - component: {fileID: 5459956460352018154}
   - component: {fileID: 5680284193262816928}
+  - component: {fileID: 7196416132838695151}
   m_Layer: 0
   m_Name: DoorWay
   m_TagString: Untagged
@@ -30,7 +31,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6516604036642295442}
   m_Father: {fileID: 0}
@@ -107,6 +108,24 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2209396696226742259, guid: ea9db1a3c8dde8e4ab58302630380593, type: 3}
+--- !u!114 &7196416132838695151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4693191324333178762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6757b231cedd544c583ef8aeaf773b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thickness: 0
+  inverted: 0
+  material: {fileID: 0}
+  filter: -65535
+  m_SourceCollider: {fileID: 0}
+  m_DistanceField: {fileID: 0}
 --- !u!1001 &5594102306368469559
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -115,6 +134,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1373974685405765071}
     m_Modifications:
+    - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.99153125
@@ -153,6 +184,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1715201515636520101, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}
+      propertyPath: m_ConstrainProportionsScale
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3677761810771933491, guid: 3522c03566349ee4ab6b0e197c0e31ce, type: 3}

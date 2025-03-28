@@ -4,10 +4,10 @@ using UnityEngine;
 public class HandController : MonoBehaviour
 {
     public GameObject pivotObject;
-    public GameObject forwardObject; // 新增：用于确定正朝向的对象
+    public GameObject forwardObject; 
     public float speed = 4.0f;
-    public float cylinderRadius = 9.0f;    // 圆柱体半径
-    public float cylinderHalfHeight = 6.0f; // 圆柱体半高
+    public float cylinderRadius = 9.0f;   
+    public float cylinderHalfHeight = 6.0f; 
     public float moveToPivotSpeed = 10.0f;
     public float positionTolerance = 0.1f;
     public float mouseSensitivity = 10f;

@@ -107,7 +107,7 @@ namespace Obi
                 quaternion omega_plus;
                 omega_plus.value = omega.value + rest.value;  //delta Omega with - omega_0
                 omega.value -= rest.value;                    //delta Omega with + omega_0
-                if (math.lengthsq(omega.value.xyz) > math.lengthsq(omega_plus.value.xyz))
+                if (math.lengthsq(omega.value) > math.lengthsq(omega_plus.value))
                     omega = omega_plus;
 
                 // plasticity

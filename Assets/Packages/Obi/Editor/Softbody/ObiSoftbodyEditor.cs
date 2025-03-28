@@ -45,6 +45,7 @@ namespace Obi
         SerializedProperty collisionMaterial;
         SerializedProperty selfCollisions;
         SerializedProperty surfaceCollisions;
+        SerializedProperty massScale;
 
         SerializedProperty shapeMatchingConstraintsEnabled;
         SerializedProperty deformationResistance;
@@ -62,6 +63,7 @@ namespace Obi
             collisionMaterial = serializedObject.FindProperty("m_CollisionMaterial");
             selfCollisions = serializedObject.FindProperty("m_SelfCollisions");
             surfaceCollisions = serializedObject.FindProperty("m_SurfaceCollisions");
+            massScale = serializedObject.FindProperty("m_MassScale");
 
             shapeMatchingConstraintsEnabled = serializedObject.FindProperty("_shapeMatchingConstraintsEnabled");
             deformationResistance = serializedObject.FindProperty("_deformationResistance");
@@ -112,6 +114,7 @@ namespace Obi
             }
 
             GUILayout.EndHorizontal();
+            EditorGUILayout.PropertyField(massScale, new GUIContent("Mass scale"));
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Collisions", EditorStyles.boldLabel);
