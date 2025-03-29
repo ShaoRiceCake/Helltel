@@ -24,10 +24,10 @@ public class MonsterSpawnSystem : MonoBehaviour
     [Header("通过死亡最多能减少多少熵值")]
     public float deathFactorE = 9f;
 
-    [Header("基础电梯数")]
-    public int baseElevatorCount = 8;
-    [Header("每层增加的电梯数")]
-    public int elevatorFloorMultiplier = 3;
+    [Header("基础客梯数")]
+    public int baseGuestElevatorCount = 8;
+    [Header("每层增加的客梯数")]
+    public int guestElevatorFloorMultiplier = 3;
 
     [Header("生成设置")]
     public float checkInterval = 30f;
@@ -37,8 +37,8 @@ public class MonsterSpawnSystem : MonoBehaviour
     public List<GameObject> monsterPrefabs;
 
     //============== 运行时状态 ==============
-    private List<Transform> activeElevators = new();     // 可用电梯列表
-    private float floorTimeCounter;                      // 本层停留计时
+    private List<Transform> activeGuestElevators = new(); // 可用客梯列表
+    private float floorTimeCounter;                      // 本层停留计时（本关持续的时间）
     private float totalMoney;                            // 累计金钱
     private int totalDeaths;                             // 死亡次数
     private Dictionary<GameObject, int> spawnRecords = new(); // 生成记录
@@ -47,39 +47,40 @@ public class MonsterSpawnSystem : MonoBehaviour
     //============== 初始化流程 ==============
     void Start()
     {
-        InitializeElevators();
+        //InitializeElevators();
         InitializeSpawnData();
         StartCoroutine(SpawnRoutine());
     }
 
     /// <summary>
-    /// 初始化电梯系统
-    /// 1. 收集场景中的电梯
+    /// 客梯我还没做呢……之后再写
+    /// 初始化客梯梯系统
+    /// 1. 收集场景中的客梯
     /// 2. 根据楼层规则筛选
     /// </summary>
-    // void InitializeElevators()
-    // {
-    //     // 收集所有标记电梯
-    //     var allElevators = GameObject.FindGameObjectsWithTag("Elevator");
-    //     foreach (var e in allElevators)
-    //     {
-    //         activeElevators.Add(e.transform);
-    //     }
+    void InitializeGuestElevators()
+    {
+        // 收集所有标记的客梯
+        var allGuestElevators = GameObject.FindGameObjectsWithTag("GuestElevator");
+        foreach (var ge in allGuestElevators)
+        {
+            activeGuestElevators.Add(ge.transform);
+        }
 
-    //     // 计算允许的电梯数量
-    //     int maxElevators = Mathf.Max(
-    //         baseElevatorCount - (currentFloor * elevatorFloorMultiplier), 
-    //         1 // 保证至少1个电梯
-    //     );
+        // 计算允许的客梯数量
+        int maxGuestElevators = Mathf.Max(
+            baseGuestElevatorCount - (currentFloor * guestElevatorFloorMultiplier), 
+            1 // 保证至少1个客梯
+        );
 
-    //     // 随机移除多余的电梯
-    //     while (activeElevators.Count > maxElevators)
-    //     {
-    //         int index = Random.Range(0, activeElevators.Count);
-    //         Destroy(activeElevators[index].gameObject);
-    //         activeElevators.RemoveAt(index);
-    //     }
-    // }
+        // 随机移除多余的客梯
+        while (activeGuestElevators.Count > maxGuestElevators)
+        {
+            int index = Random.Range(0, activeGuestElevators.Count);
+            Destroy(activeGuestElevators[index].gameObject);
+            activeGuestElevators.RemoveAt(index);
+        }
+    }
 
     /// <summary>
     /// 初始化生成记录数据
@@ -132,8 +133,12 @@ public class MonsterSpawnSystem : MonoBehaviour
     /// <summary>
     /// 生成条件检查
     /// </summary>
-    bool CanSpawn(Monster monster, float currentEntropy, float limit)
+    
+    
+
+    bool CanSpawn(FSM monster, float currentEntropy, float limit)
     {
+        /*注释这段是因为怪物基类里还没有这几个变量
         // 检查生成次数限制
         bool underSpawnLimit = monster.maxSpawnCount <= 0 || 
                              spawnRecords[monster.gameObject] < monster.maxSpawnCount;
@@ -142,26 +147,28 @@ public class MonsterSpawnSystem : MonoBehaviour
         bool underEntropyLimit = (currentEntropy + monster.entropyValue) <= limit;
 
         return underSpawnLimit && underEntropyLimit;
+        */
+        return false;//基类里还没有这几个变量后应删除这行
     }
-
+    
     /// <summary>
     /// 执行生成操作
     /// </summary>
-    void ExecuteSpawn(GameObject prefab, Monster monster)
+    void ExecuteSpawn(GameObject prefab, FSM monster)
     {
-        if (activeElevators.Count == 0)
+        if (activeGuestElevators.Count == 0)
         {
             Debug.LogWarning("没有可用电梯用于生成");
             return;
         }
 
         // 随机选择电梯
-        Transform elevator = activeElevators[Random.Range(0, activeElevators.Count)];
+        Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
         Vector3 spawnPoint = elevator.position + Vector3.up * 0.5f;
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
-        activeMonsters.Add(instance.GetComponent<Monster>());
+        activeMonsters.Add(instance.GetComponent<FSM>());
         spawnRecords[prefab]++;
     }
 
@@ -201,7 +208,8 @@ public class MonsterSpawnSystem : MonoBehaviour
         float total = 0f;
         foreach (var m in activeMonsters)
         {
-            total += m.entropyValue;
+            //这里是挨个相加每个怪物的熵值得出当前总熵值
+            //total += m.entropyValue;
         }
         return total;
     }
@@ -210,10 +218,10 @@ public class MonsterSpawnSystem : MonoBehaviour
     /// <summary>
     /// 怪物被击败时调用
     /// </summary>
-    public void RegisterMonsterDefeat(Monster monster)
+    public void RegisterMonsterDefeat(FSM monster)
     {
         activeMonsters.Remove(monster);
-        totalMoney += monster.moneyValue;
+        
     }
 
     /// <summary>
@@ -225,14 +233,5 @@ public class MonsterSpawnSystem : MonoBehaviour
         Debug.Log($"玩家死亡，当前死亡次数：{totalDeaths}");
     }
 
-    //============== 调试工具 ==============
-    void OnGUI()
-    {
-        GUILayout.BeginArea(new Rect(10, 40, 300, 150));
-        GUILayout.Label($"当前楼层：{currentFloor}");
-        GUILayout.Label($"熵值：{CalculateCurrentEntropy():F1}/{CalculateEntropyLimit():F1}");
-        GUILayout.Label($"存活怪物：{activeMonsters.Count}");
-        GUILayout.Label($"可用电梯：{activeElevators.Count}");
-        GUILayout.EndArea();
-    }
+   
 }
