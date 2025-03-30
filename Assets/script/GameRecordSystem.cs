@@ -4,7 +4,7 @@ using System;
 /// <summary>
 /// 游戏全局记录系统（单例模式）
 /// 负责管理金钱、绩效、天数、关卡等核心游戏数据
-/// 使用事件机制通知数据变化，保证模块间解耦
+/// 使用事件机制通知数据变化
 /// </summary>
 public class GameRecordSystem : MonoBehaviour
 {
@@ -33,6 +33,8 @@ public class GameRecordSystem : MonoBehaviour
     #endregion
 
     #region 事件定义
+    //这里定义了一堆事件，之后这些信息更新时就会同时所有相关的方法去触发
+    //之后可以通过例如recordSystem.OnMoneyChanged += 订阅了事件的方法名;来订阅
     /// <summary> 当金钱变化时触发（参数：新金额）</summary>
     public event Action<int> OnMoneyChanged;
     
@@ -56,18 +58,18 @@ public class GameRecordSystem : MonoBehaviour
     [SerializeField, Tooltip("基础绩效增长系数")]
     private float performanceGrowthRate = 1.2f;
     [SerializeField, Tooltip("钱")]
-    private int _money; //当前拥有的钱
+    private int _money; //当前拥有的钱，这里的钱在关卡内不显示出来，只在买东西时显示拥有的钱。钱和绩效是分离的，只有本日赚取的钱才是绩效
     [SerializeField, Tooltip("绩效")]
-    private int _performance; //当前的绩效
+    public int _performance; //当前的绩效。绩效是本日获得的钱。
     [SerializeField, Tooltip("绩效目标")]
-    private int _performanceTarget; //当前绩效目标
-    private int _currentLevel = 0; // 当前所在层级（0层为大厅）
-    private int _playerCount = 0;  // 当前玩家人数
-    private int _gameDay = 1;      // 当前游戏天数
+    public int _performanceTarget; //当前绩效目标
+    public int _currentLevel = 0; // 当前所在层级（0层为大厅）
+    public int _playerCount = 0;  // 当前玩家人数
+    public int _gameDay = 1;      // 当前游戏天数
     [SerializeField, Tooltip("当前时间")]
     private TimeSpan _time = new TimeSpan(0, 0, 0);
 
-    // 用于安全的获取数据。例如在别的脚本中用 GameRecordSystem.Instance.GetMoney来获取_money
+    // 用于安全的获取数据。例如在别的脚本中用 GameRecordSystem.Instance.GetMoney来获取_money;
     public int GetMoney => _money;//钱
     public int GetPerformance => _performance;//绩效
     public int GetPerformanceTarget => _performanceTarget;//绩效目标
@@ -116,6 +118,13 @@ public class GameRecordSystem : MonoBehaviour
         _performance = Mathf.Max(0, _performance + amount);
         OnMoneyChanged?.Invoke(_money);
     }
+    public void SetMoney(int amount)
+    { 
+        _money = amount;
+       
+        OnMoneyChanged?.Invoke(_money);
+    }
+
 
     /// <summary>
     /// 推进游戏天数
@@ -123,10 +132,11 @@ public class GameRecordSystem : MonoBehaviour
     public void AdvanceDay()
     {
         _gameDay++;
+        //通知所有订阅了OnDayPassed事件的订阅者新的_gameDay
         OnDayPassed?.Invoke(_gameDay);
         
-        // 每三天进行绩效检查
-        if (_gameDay % 3 == 0) CheckPerformance();
+        // 每天进行绩效检查
+        CheckPerformance();
     }
 
     /// <summary>
@@ -135,6 +145,7 @@ public class GameRecordSystem : MonoBehaviour
     public void UpdateLevel(int newLevel)
     {
         _currentLevel = Mathf.Clamp(newLevel, -18, 0); // 限制层级范围
+        //通知所有订阅了OnLevelChanged事件的订阅者新的_currentLevel
         OnLevelChanged?.Invoke(_currentLevel);
     }
 
@@ -160,12 +171,12 @@ public class GameRecordSystem : MonoBehaviour
             HandlePerformanceFailure();
         }
     }
-
+    //成功达成绩效目标
     private void HandlePerformanceSuccess()
     {
         // 计算新绩效目标
         _performanceTarget = Mathf.FloorToInt(_performanceTarget * performanceGrowthRate);
-        
+        //通知并传递所有订阅了OnPerformancePassed的订阅者并传递
         OnPerformancePassed?.Invoke(_money);
         OnMoneyChanged?.Invoke(_money);
     }
@@ -189,11 +200,11 @@ public class GameRecordSystem : MonoBehaviour
     
     
     /// <summary>
-    /// 获取到下个绩效检查日的剩余天数
+    /// 获取到下个绩效检查日的剩余天数   这个方法现在应该没用了
     /// </summary>
-    public int GetDaysUntilCheck()
-    {
-        return 3 - (_gameDay % 3);
-    }
+    // public int GetDaysUntilCheck()
+    // {
+    //     return 3 - (_gameDay % 3);
+    // }
     #endregion
 }
