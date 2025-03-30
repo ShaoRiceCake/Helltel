@@ -1,14 +1,16 @@
 using System.Collections;
 using UnityEngine;
-using Unity.Netcode;
-public class HandController : NetworkBehaviour
+
+public class HandController : MonoBehaviour
 {
     public GameObject pivotObject;
+    public GameObject forwardObject; 
     public float speed = 4.0f;
-    public float radius = 5.0f;
+    public float cylinderRadius = 9.0f;   
+    public float cylinderHalfHeight = 6.0f; 
     public float moveToPivotSpeed = 10.0f;
     public float positionTolerance = 0.1f;
-    public float mouseSensitivity = 0.1f; // 新增鼠标灵敏度系数
+    public float mouseSensitivity = 10f;
 
     private GameObject controlObject;
     private bool isRightMouseDown = false;
@@ -16,13 +18,9 @@ public class HandController : NetworkBehaviour
 
     void Update()
     {
-        if (!GameManager.instance.isGameing) return;
-
-        if (!IsLocalPlayer&&NetworkManager.Singleton) return;
-
-        if (controlObject == null || pivotObject == null)
+        if (controlObject == null || pivotObject == null || forwardObject == null)
         {
-            Debug.LogWarning("Control object or pivot object is not set.");
+            Debug.LogWarning("Control object, pivot object, or forward object is not set.");
             return;
         }
 
@@ -82,21 +80,44 @@ public class HandController : NetworkBehaviour
             localMovement = new Vector3(mouseX, 0, mouseY) * speed;
         }
 
-        // 转换到pivot的局部坐标系
-        Vector3 localMovementInPivotSpace = pivotObject.transform.InverseTransformDirection(localMovement);
+        // 获取forwardObject的朝向，并确保其平行于XZ平面
+        Vector3 forwardDirection = forwardObject.transform.forward;
+        forwardDirection.y = 0; // 确保朝向平行于XZ平面
+        forwardDirection.Normalize();
+
+        // 计算右方向（垂直于forwardDirection）
+        Vector3 rightDirection = Vector3.Cross(Vector3.up, forwardDirection).normalized;
+
+        // 将局部移动转换为世界坐标系中的移动
+        Vector3 worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
+        worldMovement.y = localMovement.y; // 保持Y轴移动不变
 
         // 计算新位置
-        Vector3 currentLocalPosition = pivotObject.transform.InverseTransformPoint(controlObject.transform.position);
-        Vector3 newLocalPosition = currentLocalPosition + localMovementInPivotSpace * Time.deltaTime;
+        Vector3 newWorldPosition = controlObject.transform.position + worldMovement * Time.deltaTime;
 
-        // 限制移动半径
-        if (newLocalPosition.magnitude > radius)
+        // 将新位置转换到pivot的局部坐标系
+        Vector3 newLocalPosition = pivotObject.transform.InverseTransformPoint(newWorldPosition);
+
+        // 圆柱体范围限制（在局部坐标系中）
+        ApplyCylinderConstraint(ref newLocalPosition);
+
+        // 将限制后的局部位置转换回世界坐标系
+        controlObject.transform.position = pivotObject.transform.TransformPoint(newLocalPosition);
+    }
+
+    private void ApplyCylinderConstraint(ref Vector3 position)
+    {
+        // 限制水平面移动（XZ平面）
+        Vector2 horizontal = new Vector2(position.x, position.z);
+        if (horizontal.magnitude > cylinderRadius)
         {
-            newLocalPosition = newLocalPosition.normalized * radius;
+            horizontal = horizontal.normalized * cylinderRadius;
+            position.x = horizontal.x;
+            position.z = horizontal.y;
         }
 
-        // 应用新位置
-        controlObject.transform.position = pivotObject.transform.TransformPoint(newLocalPosition);
+        // 限制垂直高度（Y轴）
+        position.y = Mathf.Clamp(position.y, -cylinderHalfHeight, cylinderHalfHeight);
     }
 
     public void SetControlObject(GameObject controlObj)

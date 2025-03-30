@@ -1,17 +1,16 @@
-ï»¿using UnityEngine;
+using UnityEngine;
 using Obi;
-using Unity.Netcode;
-public class PlayerController : NetworkBehaviour
+
+public class PlayerController : MonoBehaviour
 {
     public HandController handController;
     public Foot footController;
     public bool startWithFootControl = true;
     public ObiParticleAttachment rightHandControl;
-    public GameObject handBallPrefab; // æ‰‹éƒ¨çƒçš„é¢„åˆ¶ä½“
-    public GameObject player_camera;
-    public GameObject playerColliderWorld;
-    public GameObject handBall;
-    public GameObject enemy;
+    public GameObject handBallPrefab; // ÊÖ²¿ÇòµÄÔ¤ÖÆÌå
+
+    private GameObject handBall;
+
     private void Start()
     {
         handController.enabled = !startWithFootControl;
@@ -19,43 +18,19 @@ public class PlayerController : NetworkBehaviour
 
         if (!startWithFootControl)
         {
-            SpawnHandBallRpc();
+            SpawnHandBall();
         }
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        GameManager.instance.OnStartGame.AddListener(() =>
-        {
-            GameManager.instance.isGameing = true;
-            if (IsHost)
-            {
-                var obj = Instantiate(enemy);
-                obj.GetComponent<NetworkObject>().Spawn();
-            }
-        });
-        if (!IsLocalPlayer)
-        {
-            player_camera.SetActive(false);
-            DestroyImmediate(playerColliderWorld);
-        }
-
     }
 
     private void Update()
     {
-        if (!GameManager.instance.isGameing) return;
-
-        if (!IsLocalPlayer&& NetworkManager.Singleton) return;
-
         if (Input.GetMouseButtonDown(2))
         {
-            ToggleControlModeRpc();
+            ToggleControlMode();
         }
     }
-    [Rpc(SendTo.Everyone)]
-    private void ToggleControlModeRpc()
+
+    private void ToggleControlMode()
     {
         bool newState = !footController.enabled;
         footController.enabled = newState;
@@ -63,49 +38,41 @@ public class PlayerController : NetworkBehaviour
 
         if (footController.enabled)
         {
-            DestroyHandBallRpc();
+            DestroyHandBall();
             rightHandControl.enabled = false;
         }
         else
         {
-            SpawnHandBallRpc();
+            SpawnHandBall();
             rightHandControl.enabled = true;
         }
     }
 
-    private void SpawnHandBallRpc()
+    private void SpawnHandBall()
     {
         if (handBallPrefab == null)
         {
             Debug.LogError("HandBallPrefab or HandBallSpawnPosition is not set.");
             return;
         }
-        handBall = handBallPrefab;
-        // ç”Ÿæˆæ‰‹éƒ¨çƒï¼Œä½ç½®å’Œæ—‹è½¬åŸºäº handBallSpawnPosition çš„å®æ—¶ä¸–ç•Œåæ ‡
-        //handBall = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0],Quaternion.identity);
-        handBall.transform.position = ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0];
-        // å°†æ‰‹éƒ¨çƒç»‘å®šåˆ° ObiParticleAttachment
+
+        // Éú³ÉÊÖ²¿Çò£¬Î»ÖÃºÍĞı×ª»ùÓÚ handBallSpawnPosition µÄÊµÊ±ÊÀ½ç×ø±ê
+        handBall = Instantiate(handBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(rightHandControl)[0], Quaternion.identity);
+
+        // ½«ÊÖ²¿Çò°ó¶¨µ½ ObiParticleAttachment
         rightHandControl.target = handBall.transform;
 
-        // å°†æ‰‹éƒ¨çƒä¼ é€’ç»™ HandController
+        // ½«ÊÖ²¿Çò´«µİ¸ø HandController
         handController.SetControlObject(handBall);
     }
 
-    private void DestroyHandBallRpc()
+    private void DestroyHandBall()
     {
         if (handBall != null)
         {
-            handController.SetControlObject(null);
+            Destroy(handBall);
             handBall = null;
         }
     }
-
-
-    private void OnApplicationQuit()
-    {
-        if(NetworkManager.Singleton.IsListening && NetworkObject != null)
-        {
-            NetworkManager.Singleton.Shutdown();
-        }
-    }
 }
+

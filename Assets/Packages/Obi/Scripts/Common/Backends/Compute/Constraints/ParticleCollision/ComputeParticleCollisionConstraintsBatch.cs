@@ -11,7 +11,7 @@ namespace Obi
             m_ConstraintType = Oni.ConstraintType.ParticleCollision;
         }
 
-        public override void Initialize(float substepTime)
+        public override void Initialize(float stepTime, float substepTime, int steps, float timeLeft)
         {
             var shader = ((ComputeParticleCollisionConstraints)m_Constraints).constraintsShader;
             int initializeKernel = ((ComputeParticleCollisionConstraints)m_Constraints).initializeKernel;

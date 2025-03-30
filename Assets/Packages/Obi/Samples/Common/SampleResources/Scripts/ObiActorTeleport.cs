@@ -1,15 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Obi;
 
-public class ObiActorTeleport : MonoBehaviour
+namespace Obi.Samples
 {
-    public ObiActor actor;
-    public Transform target;
-
-    public void Teleport()
+    public class ObiActorTeleport : MonoBehaviour
     {
-        actor.Teleport(target.position, target.rotation);
+        public ObiActor actor;
+        public Transform target;
+
+        public void Teleport()
+        {
+            actor.Teleport(target.position, target.rotation);
+        }
     }
 }

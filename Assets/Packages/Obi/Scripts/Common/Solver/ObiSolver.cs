@@ -34,6 +34,7 @@ namespace Obi
     [AddComponentMenu("Physics/Obi/Obi Solver", 800)]
     [ExecuteInEditMode]
     [DisallowMultipleComponent]
+    [HelpURL("https://obi.virtualmethodstudio.com/manual/7.0/obisolver.html")]
     public sealed class ObiSolver : MonoBehaviour
     {
         static ProfilerMarker m_StateInterpolationPerfMarker = new ProfilerMarker("ApplyStateInterpolation");
@@ -277,6 +278,7 @@ namespace Obi
         public Oni.ConstraintParameters shapeMatchingConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
         public Oni.ConstraintParameters tetherConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
         public Oni.ConstraintParameters pinConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
+        public Oni.ConstraintParameters pinholeConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
         public Oni.ConstraintParameters stitchConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
         public Oni.ConstraintParameters densityConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Parallel, 1);
         public Oni.ConstraintParameters stretchShearConstraintParameters = new Oni.ConstraintParameters(true, Oni.ConstraintParameters.EvaluationOrder.Sequential, 1);
@@ -1151,7 +1153,12 @@ namespace Obi
 
             // Accumulate amount of time to simulate (duration of the frame - time already simulated)
             if (Application.isPlaying)
+            {
                 accumulatedTime += Time.deltaTime - Time.fixedDeltaTime * steps;
+
+                // clamp to a single timestep, in case the simulation is dropping time.
+                accumulatedTime = Mathf.Clamp(accumulatedTime, 0, Time.fixedDeltaTime);
+            }
             else
             {
                 // if in editor, we don't accumulate any simulation time
@@ -1181,6 +1188,13 @@ namespace Obi
             // Reset step counter to zero, now that
             // simulation tasks for this frame have been dispatched.
             steps = 0;
+        }
+
+        private void OnApplicationQuit()
+        {
+            // Make sure solvers finish their simulation before Unity automatically destroys collider world
+            // when closing app or exiting play mode.
+            OnDestroy();
         }
 
         private void OnDestroy()
@@ -1248,6 +1262,7 @@ namespace Obi
                 m_Constraints[(int)Oni.ConstraintType.Tether] = new ObiTetherConstraintsData();
                 m_Constraints[(int)Oni.ConstraintType.Skin] = new ObiSkinConstraintsData();
                 m_Constraints[(int)Oni.ConstraintType.Pin] = new ObiPinConstraintsData();
+                m_Constraints[(int)Oni.ConstraintType.Pinhole] = new ObiPinholeConstraintsData();
 
                 // Create the solver:
                 implementation = m_SimulationBackend.CreateSolver(this, 0);
@@ -1769,9 +1784,10 @@ namespace Obi
                 {
                     // interpolate physics state:
                     simulationHandle = implementation.ApplyInterpolation(simulationHandle, startPositions, startOrientations, Time.fixedDeltaTime, unsimulatedTime);
-                    simulationHandle?.Complete();
                 }
             }
+
+            simulationHandle?.Complete();
 
             // test bounds against all cameras to update visibility.
             UpdateVisibility();
@@ -1897,7 +1913,7 @@ namespace Obi
             // If we are in charge of this actor indeed, perform all steps necessary to release it.
             if (index >= 0)
             {
-                actor.UnloadBlueprint(this);
+                actor.UnloadBlueprint();
 
                 for (int i = 0; i < actor.solverIndices.count; ++i)
                     particleToActor[actor.solverIndices[i]] = null;
@@ -1946,7 +1962,7 @@ namespace Obi
                 freeGroupIDs.Push(actors.Count);
             actor.groupID = freeGroupIDs.Pop();
 
-            actor.LoadBlueprint(this);
+            actor.LoadBlueprint();
 
             implementation.ParticleCountChanged(this);
             OnParticleCountChanged?.Invoke(this);
@@ -1987,6 +2003,8 @@ namespace Obi
 
             implementation.SetConstraintGroupParameters(Oni.ConstraintType.Pin, ref pinConstraintParameters);
 
+            implementation.SetConstraintGroupParameters(Oni.ConstraintType.Pinhole, ref pinholeConstraintParameters);
+
             implementation.SetConstraintGroupParameters(Oni.ConstraintType.Stitch, ref stitchConstraintParameters);
 
             implementation.SetConstraintGroupParameters(Oni.ConstraintType.StretchShear, ref stretchShearConstraintParameters);
@@ -2024,6 +2042,7 @@ namespace Obi
                 case Oni.ConstraintType.ShapeMatching: return shapeMatchingConstraintParameters;
                 case Oni.ConstraintType.Tether: return tetherConstraintParameters;
                 case Oni.ConstraintType.Pin: return pinConstraintParameters;
+                case Oni.ConstraintType.Pinhole: return pinholeConstraintParameters;
                 case Oni.ConstraintType.Stitch: return stitchConstraintParameters;
                 case Oni.ConstraintType.Density: return densityConstraintParameters;
                 case Oni.ConstraintType.StretchShear: return stretchShearConstraintParameters;
@@ -2245,9 +2264,8 @@ namespace Obi
         /**
          * Updates solver bounds, then checks if they're visible from at least one camera. If so, sets isVisible to true, false otherwise.
          */
-                    private void UpdateVisibility()
+        private void UpdateVisibility()
         {
-
             using (m_UpdateVisibilityPerfMarker.Auto())
             {
                 using (m_GetSolverBoundsPerfMarker.Auto())

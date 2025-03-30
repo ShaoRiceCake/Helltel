@@ -42,7 +42,7 @@ void Project (uint3 id : SV_DispatchThreadID)
     omega_plus = omega + rest;  //delta Omega with - omega_0
     omega -= rest;              //delta Omega with + omega_0
 
-    if (dot(omega.xyz,omega.xyz) > dot(omega_plus.xyz,omega_plus.xyz))
+    if (dot(omega,omega) > dot(omega_plus,omega_plus))
         omega = omega_plus;
 
     // plasticity

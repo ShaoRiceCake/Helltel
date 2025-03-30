@@ -9,7 +9,7 @@ namespace Obi
 {
     public interface IBurstConstraintsImpl : IConstraints
     {
-        JobHandle Initialize(JobHandle inputDeps, float substepTime);
+        JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft);
         JobHandle Project(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft);
         void Dispose();
 
@@ -63,14 +63,14 @@ namespace Obi
             return count;
         }
 
-        public JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        public JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
         {
             // initialize all batches in parallel:
             if (batches.Count > 0)
             {
                 NativeArray<JobHandle> deps = new NativeArray<JobHandle>(batches.Count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                 for (int i = 0; i < batches.Count; ++i)
-                    deps[i] = batches[i].enabled ? batches[i].Initialize(inputDeps, substepTime) : inputDeps;
+                    deps[i] = batches[i].enabled ? batches[i].Initialize(inputDeps, stepTime, substepTime, steps, timeLeft) : inputDeps;
 
                 JobHandle result = JobHandle.CombineDependencies(deps);
                 deps.Dispose();

@@ -184,6 +184,7 @@ MonoBehaviour:
   groupID: 1
   m_CollisionMaterial: {fileID: 11400000, guid: 56297c6e785b44eb28e469b62cedc016, type: 2}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: c3715b25984ad42e5aa4ae9b9aa840cc, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1
@@ -1600,6 +1601,7 @@ MonoBehaviour:
   groupID: 2
   m_CollisionMaterial: {fileID: 11400000, guid: 56297c6e785b44eb28e469b62cedc016, type: 2}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: c3715b25984ad42e5aa4ae9b9aa840cc, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1
@@ -3256,6 +3258,7 @@ MonoBehaviour:
   groupID: 3
   m_CollisionMaterial: {fileID: 11400000, guid: 56297c6e785b44eb28e469b62cedc016, type: 2}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: c3715b25984ad42e5aa4ae9b9aa840cc, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1
@@ -5255,6 +5258,7 @@ MonoBehaviour:
   groupID: 4
   m_CollisionMaterial: {fileID: 11400000, guid: 56297c6e785b44eb28e469b62cedc016, type: 2}
   m_SurfaceCollisions: 0
+  m_MassScale: 1
   m_SoftbodyBlueprint: {fileID: 11400000, guid: c3715b25984ad42e5aa4ae9b9aa840cc, type: 2}
   m_SelfCollisions: 0
   centerBatch: -1
@@ -6802,6 +6806,11 @@ MonoBehaviour:
     iterations: 3
     SORFactor: 1
     enabled: 0
+  pinholeConstraintParameters:
+    evaluationOrder: 1
+    iterations: 1
+    SORFactor: 1
+    enabled: 1
   stitchConstraintParameters:
     evaluationOrder: 1
     iterations: 2

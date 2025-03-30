@@ -46,7 +46,7 @@ namespace Obi
         protected NativeArray<int> particleIndices;
         protected NativeArray<float> lambdas;
 
-        public virtual JobHandle Initialize(JobHandle inputDeps, float substepTime)
+        public virtual JobHandle Initialize(JobHandle inputDeps, float stepTime, float substepTime, int steps, float timeLeft)
         {
             if (lambdas.IsCreated)
             {
