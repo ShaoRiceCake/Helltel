@@ -7,15 +7,15 @@ using System;
 
 public class FSM : NetworkBehaviour
 {
+    [Header("最大生命值")] public float maxHealth = 15f;
+    [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
+    [Header("熵值")]
+    public float entropyValue;
     public GameObject[] players;
     public Pathlist path;
     public NavMeshAgent agent;
     protected IState state;
     protected Dictionary<AIState, IState> stateDic = new Dictionary<AIState, IState>();
-    private void Start()
-    {
-
-    }
 
     public override void OnNetworkSpawn()
     {

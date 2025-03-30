@@ -2,12 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
-public class MothFSM : FSM
+public class MothFSM : FSM,IHurt
 {
     [Header("当前目标玩家")] public List<GameObject> targets = new List<GameObject>();
     [Header("伤害")] public float damage = 15f;
-    [Header("最大生命值")]public float maxHealth = 15f;
-    [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
+
     [Header("进入孵化的碰撞距离")] public float distance;
     [Header("是否为领头蛾")] public bool IsLeader;
     [Header("羽衣蛾组")] public List<MothFSM> moths=new List<MothFSM>();
@@ -80,6 +79,11 @@ public class MothFSM : FSM
 
         }
         return point;
+    }
+
+    public void Hurt<T1, T2, T3>(Msg3T<T1, T2, T3> msg)
+    {
+        Debug.Log(msg.t1 + "===" + msg.t2 + "===" + msg.t3);
     }
 }
 /// <summary>
