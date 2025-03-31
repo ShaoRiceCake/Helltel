@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class PlayerControl_LeftFootControl : PlayerControl_FootControl
 {
     protected override void Start()
@@ -7,32 +5,35 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
         base.Start();
         controlHandler.onLiftLeftLeg.AddListener(OnLiftLeftLeg);
         controlHandler.onReleaseLeftLeg.AddListener(OnReleaseLeftLeg);
+        controlHandler.onLiftRightLeg.AddListener(OnOtherFootLifted);
+        controlHandler.onReleaseRightLeg.AddListener(OnOtherFootReleased);
     }
 
     protected override void UnsubscribeEvents()
     {
         controlHandler.onLiftLeftLeg.RemoveListener(OnLiftLeftLeg);
         controlHandler.onReleaseLeftLeg.RemoveListener(OnReleaseLeftLeg);
+        controlHandler.onLiftRightLeg.RemoveListener(OnOtherFootLifted);
+        controlHandler.onReleaseRightLeg.RemoveListener(OnOtherFootReleased);
     }
 
-    protected virtual void OnLiftLeftLeg() 
+    private void OnLiftLeftLeg() 
     {
-        IsFootUp = true;
-        UnfixObject();
-        SpringTool.isSpringEnabled = true;
-
+        TryLiftFoot();
     }
 
-    protected virtual void OnReleaseLeftLeg()
+    private void OnReleaseLeftLeg()
     {
-        IsFootUp = false;
-        SpringTool.isSpringEnabled = false;
-
+        ReleaseFoot();
     }
-
-    protected override void Update()
+    
+    private void OnOtherFootLifted()
     {
-        base.Update();
+        LockFoot();
     }
-
+    
+    private void OnOtherFootReleased()
+    {
+        UnlockFoot();
+    }
 }

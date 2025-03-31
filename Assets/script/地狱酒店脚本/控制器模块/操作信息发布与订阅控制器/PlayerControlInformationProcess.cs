@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 
 public class PlayerControlInformationProcess : MonoBehaviour
 {
@@ -12,8 +10,8 @@ public class PlayerControlInformationProcess : MonoBehaviour
         HandControl
     }
 
-    public ControlMode m_currentControlMode = ControlMode.LegControl;
-    private MouseControl m_mouseControl;
+    public ControlMode mCurrentControlMode = ControlMode.LegControl;
+    private MouseControl _mMouseControl;
 
     public UnityEvent onLiftLeftLeg;
     public UnityEvent onLiftRightLeg;
@@ -28,121 +26,134 @@ public class PlayerControlInformationProcess : MonoBehaviour
     public UnityEvent onCancelHandGrab;
 
     public UnityEvent onSwitchControlMode;
-    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // 固定时间步长相对运动
-    public UnityEvent<Vector2> onMouseMoveUpdate;     // 每帧相对运动
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // 鹿脤露篓脢卤录盲虏陆鲁陇脧脿露脭脭脣露炉
+    public UnityEvent<Vector2> onMouseMoveUpdate;     // 脙驴脰隆脧脿露脭脭脣露炉
     public UnityEvent onDefaultMode;
 
-    void Awake()
+    private void Awake()
     {
-        if (onLiftLeftLeg == null) onLiftLeftLeg = new UnityEvent();
-        if (onLiftRightLeg == null) onLiftRightLeg = new UnityEvent();
-        if (onReleaseLeftLeg == null) onReleaseLeftLeg = new UnityEvent();
-        if (onReleaseRightLeg == null) onReleaseRightLeg = new UnityEvent();
-        if (onCancelLegGrab == null) onCancelLegGrab = new UnityEvent();
+        onLiftLeftLeg ??= new UnityEvent();
+        onLiftRightLeg ??= new UnityEvent();
+        onReleaseLeftLeg ??= new UnityEvent();
+        onReleaseRightLeg ??= new UnityEvent();
+        onCancelLegGrab ??= new UnityEvent();
 
-        if (onLiftLeftHand == null) onLiftLeftHand = new UnityEvent();
-        if (onLiftRightHand == null) onLiftRightHand = new UnityEvent();
-        if (onReleaseLeftHand == null) onReleaseLeftHand = new UnityEvent();
-        if (onReleaseRightHand == null) onReleaseRightHand = new UnityEvent();
-        if (onCancelHandGrab == null) onCancelHandGrab = new UnityEvent();
+        onLiftLeftHand ??= new UnityEvent();
+        onLiftRightHand ??= new UnityEvent();
+        onReleaseLeftHand ??= new UnityEvent();
+        onReleaseRightHand ??= new UnityEvent();
+        onCancelHandGrab ??= new UnityEvent();
 
-        if (onSwitchControlMode == null) onSwitchControlMode = new UnityEvent();
-        if (onMouseMoveFixedUpdate == null) onMouseMoveFixedUpdate = new UnityEvent<Vector2>();
-        if (onMouseMoveUpdate == null) onMouseMoveUpdate = new UnityEvent<Vector2>();
-        if (onDefaultMode == null) onDefaultMode = new UnityEvent();
+        onSwitchControlMode ??= new UnityEvent();
+        onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
+        onMouseMoveUpdate ??= new UnityEvent<Vector2>();
+        onDefaultMode ??= new UnityEvent();
 
-        m_mouseControl = gameObject.AddComponent<MouseControl>();
+        _mMouseControl = gameObject.AddComponent<MouseControl>();
 
-        m_mouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
-        m_mouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
-        m_mouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
-        m_mouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
-        m_mouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
-        m_mouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
-        m_mouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
-        m_mouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
-        m_mouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
+        _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
+        _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
+        _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
+        _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
+        _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
+        _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
+        _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
+        _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
+        _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-        if (m_mouseControl != null)
-        {
-            m_mouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
-            m_mouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
-            m_mouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
-            m_mouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
-            m_mouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
-            m_mouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
-            m_mouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
-            m_mouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
-            m_mouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
-        }
+        if (_mMouseControl == null) return;
+        _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
+        _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
+        _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
+        _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
+        _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
+        _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
+        _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
+        _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
+        _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
     }
 
     private void OnLeftMouseDown()
     {
-        if (m_currentControlMode == ControlMode.LegControl)
+        switch (mCurrentControlMode)
         {
-            onLiftLeftLeg?.Invoke();
-        }
-        else if (m_currentControlMode == ControlMode.HandControl)
-        {
-            onLiftLeftHand?.Invoke();
+            case ControlMode.LegControl:
+                onLiftLeftLeg?.Invoke();
+                break;
+            case ControlMode.HandControl:
+                onLiftLeftHand?.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void OnRightMouseDown()
     {
-        if (m_currentControlMode == ControlMode.LegControl)
+        switch (mCurrentControlMode)
         {
-            onLiftRightLeg?.Invoke();
-        }
-        else if (m_currentControlMode == ControlMode.HandControl)
-        {
-            onLiftRightHand?.Invoke();
+            case ControlMode.LegControl:
+                onLiftRightLeg?.Invoke();
+                break;
+            case ControlMode.HandControl:
+                onLiftRightHand?.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void OnLeftMouseUp()
     {
-        if (m_currentControlMode == ControlMode.LegControl)
+        switch (mCurrentControlMode)
         {
-            onReleaseLeftLeg?.Invoke();
-        }
-        else if (m_currentControlMode == ControlMode.HandControl)
-        {
-            onReleaseLeftHand?.Invoke();
+            case ControlMode.LegControl:
+                onReleaseLeftLeg?.Invoke();
+                break;
+            case ControlMode.HandControl:
+                onReleaseLeftHand?.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void OnRightMouseUp()
     {
-        if (m_currentControlMode == ControlMode.LegControl)
+        switch (mCurrentControlMode)
         {
-            onReleaseRightLeg?.Invoke();
-        }
-        else if (m_currentControlMode == ControlMode.HandControl)
-        {
-            onReleaseRightHand?.Invoke();
+            case ControlMode.LegControl:
+                onReleaseRightLeg?.Invoke();
+                break;
+            case ControlMode.HandControl:
+                onReleaseRightHand?.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void OnBothMouseButtonsDown()
     {
-        if (m_currentControlMode == ControlMode.LegControl)
+        switch (mCurrentControlMode)
         {
-            onCancelLegGrab?.Invoke();
-        }
-        else if (m_currentControlMode == ControlMode.HandControl)
-        {
-            onCancelHandGrab?.Invoke();
+            case ControlMode.LegControl:
+                onCancelLegGrab?.Invoke();
+                break;
+            case ControlMode.HandControl:
+                onCancelHandGrab?.Invoke();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
     private void OnMiddleMouseDown()
     {
-        m_currentControlMode = (m_currentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
+        mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
         onSwitchControlMode?.Invoke();
     }
 
@@ -163,9 +174,9 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     public void SetSensitivity(float newSensitivity)
     {
-        if (m_mouseControl)
+        if (_mMouseControl)
         {
-            m_mouseControl.MouseSensitivity *= newSensitivity;
+            _mMouseControl.MouseSensitivity *= newSensitivity;
         }
     }
 }

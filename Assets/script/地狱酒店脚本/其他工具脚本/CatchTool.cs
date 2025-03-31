@@ -5,22 +5,17 @@ using System.Linq;
 
 public class CatchTool : MonoBehaviour
 {
-    [Header("Settings")]
-    public LayerMask floorLayer; 
-    public float catchRadiusMultiplier = 1f; 
-
     [Header("References")]
     public ObiParticleAttachment obiAttachment;
     public GameObject catchDetectCylinder; 
 
-    // 运行时状态
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
     private bool _isGrabbing;
     private GameObject _currentTarget;
     private Transform _catchAimTrans; 
     private GameObject _currentHighlightedObject;
-    private OutlineController _currentGrabbedOutline; // 当前被抓取对象的OutlineController
+    private OutlineController _currentGrabbedOutline; 
 
     // 属性封装
     public GameObject CatchBall
@@ -133,12 +128,11 @@ public class CatchTool : MonoBehaviour
     {
         if(!target) return;
         
-        // 获取并处理Outline
         _currentGrabbedOutline = target.GetComponent<OutlineController>();
         if (_currentGrabbedOutline)
         {
-            _currentGrabbedOutline.SetOutlineEnabled(false); // 关闭高亮
-            _currentGrabbedOutline.LockOutlineState(); // 锁定状态
+            _currentGrabbedOutline.SetOutlineEnabled(false); 
+            _currentGrabbedOutline.LockOutlineState();
         }
         
         _isGrabbing = true;
@@ -150,7 +144,6 @@ public class CatchTool : MonoBehaviour
     {
         if (!_isGrabbing) return;
         
-        // 解锁并恢复Outline状态
         if (_currentGrabbedOutline)
         {
             _currentGrabbedOutline.UnlockOutlineState();
