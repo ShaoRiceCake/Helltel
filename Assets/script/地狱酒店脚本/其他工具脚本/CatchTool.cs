@@ -15,9 +15,7 @@ public class CatchTool : MonoBehaviour
     private GameObject _currentTarget;
     private Transform _catchAimTrans; 
     private GameObject _currentHighlightedObject;
-    private OutlineController _currentGrabbedOutline; 
 
-    // 属性封装
     public GameObject CatchBall
     {
         get => _catchBall;
@@ -54,7 +52,7 @@ public class CatchTool : MonoBehaviour
     private void Update()
     {
         if(!_catchBall) return;
-        HighLightTarget();
+        
         UpdateTargetSelection();
         HandleInput();
     }
@@ -68,46 +66,27 @@ public class CatchTool : MonoBehaviour
     {
         if (!_sphereCollider) return;
 
-        if (preSelectedObjects.Count > 0)
+        var newTarget = preSelectedObjects.Count > 0
+            ? preSelectedObjects
+                .OrderBy(obj => Vector3.Distance(obj.transform.position, _catchAimTrans.position))
+                .FirstOrDefault()
+            : null;
+        
+        if (_currentTarget && _currentTarget != newTarget)
         {
-            _currentTarget = preSelectedObjects
-                .OrderBy(obj => Vector3.Distance(
-                    obj.transform.position, 
-                    _catchAimTrans.position))
-                .FirstOrDefault();
+            var interactiveObj = _currentTarget.GetComponent<InteractiveObjectController>();
+            if (interactiveObj)
+                interactiveObj.ChangeState(InteractiveState.Normal);
         }
-        else
-        {
-            _currentTarget = null;
-        }
-    }
 
-    private void HighLightTarget()
-    {
-        // 如果正在抓取或者新目标就是当前已高亮的物体，则不做任何操作
-        if (_isGrabbing || _currentTarget == _currentHighlightedObject) return;
-    
-        // 先取消旧物体的高亮
-        if (_currentHighlightedObject)
+        if (newTarget && newTarget != _currentTarget)
         {
-            var oldOutline = _currentHighlightedObject.GetComponent<OutlineController>();
-            if (oldOutline)
-                oldOutline.SetOutlineEnabled(false);
+            var interactiveObj = newTarget.GetComponent<InteractiveObjectController>();
+            if (interactiveObj)
+                interactiveObj.ChangeState(InteractiveState.Selected);
         }
-    
-        // 高亮新物体
-        if (_currentTarget)
-        {
-            var newOutline = _currentTarget.GetComponent<OutlineController>();
-            if (!newOutline) return;
-            
-            newOutline.SetOutlineEnabled(true);
-            _currentHighlightedObject = _currentTarget;
-        }
-        else
-        {
-            _currentHighlightedObject = null;
-        }
+
+        _currentTarget = newTarget;
     }
     
     private void HandleInput()
@@ -126,14 +105,11 @@ public class CatchTool : MonoBehaviour
 
     private void GrabObject(GameObject target)
     {
-        if(!target) return;
+        if (!target) return;
         
-        _currentGrabbedOutline = target.GetComponent<OutlineController>();
-        if (_currentGrabbedOutline)
-        {
-            _currentGrabbedOutline.SetOutlineEnabled(false); 
-            _currentGrabbedOutline.LockOutlineState();
-        }
+        var interactiveObj = target.GetComponent<InteractiveObjectController>();
+        if (interactiveObj)
+            interactiveObj.ChangeState(InteractiveState.Grabbed);
         
         _isGrabbing = true;
         obiAttachment.BindToTarget(target.transform);
@@ -144,10 +120,11 @@ public class CatchTool : MonoBehaviour
     {
         if (!_isGrabbing) return;
         
-        if (_currentGrabbedOutline)
+        if (_currentTarget)
         {
-            _currentGrabbedOutline.UnlockOutlineState();
-            _currentGrabbedOutline = null;
+            var interactiveObj = _currentTarget.GetComponent<InteractiveObjectController>();
+            if (interactiveObj)
+                interactiveObj.ChangeState(InteractiveState.Normal);
         }
         
         _isGrabbing = false;

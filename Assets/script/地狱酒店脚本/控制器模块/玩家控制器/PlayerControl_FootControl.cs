@@ -48,7 +48,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     protected virtual void OnDestroy()
     {
-        if (controlHandler != null)
+        if (ControlHandler != null)
         {
             UnsubscribeEvents();
         }
@@ -56,12 +56,12 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     private void SubscribeEvents()
     {
-        controlHandler.onMouseMoveFixedUpdate.AddListener(OnMouseMove);
+        ControlHandler.onMouseMoveFixedUpdate.AddListener(OnMouseMove);
     }
 
     protected virtual void UnsubscribeEvents()
     {
-        controlHandler.onMouseMoveFixedUpdate.RemoveListener(OnMouseMove);
+        ControlHandler.onMouseMoveFixedUpdate.RemoveListener(OnMouseMove);
     }
 
     private void OnMouseMove(Vector2 mouseDelta)

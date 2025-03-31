@@ -1,5 +1,6 @@
 using UnityEngine;
 using Obi;
+using UnityEngine.Serialization;
 using static PlayerControlInformationProcess;
 
 public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
@@ -10,7 +11,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float cylinderRadius = 10.0f;
     public float cylinderHalfHeight = 7.0f;
     public float mouseSensitivity = 10f;
-    public CatchTool  CatchTool;
+    public CatchTool  catchTool;
 
     protected GameObject HandBallPrefab;
     protected int CurrentPlayerHand;
@@ -22,7 +23,6 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     public int CurrentHand
     {
-        get => CurrentPlayerHand;
         set
         {
             if(value is < 0 or > 2)
@@ -45,7 +45,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         
         HandBallPrefab = ControlBallGenerator.GenerateControlBall();
         
-        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,CatchTool, HandBallPrefab, handControlAttachment);
+        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,catchTool, HandBallPrefab, handControlAttachment);
         
         SubscribeEvents();
     }
@@ -53,7 +53,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     protected virtual void OnDestroy()
     {
-        if (controlHandler != null)
+        if (ControlHandler != null)
         {
             UnsubscribeEvents();
         }
@@ -61,25 +61,25 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     private void SubscribeEvents()
     {
-        controlHandler.onLiftLeftHand.AddListener(OnLiftLeftHand);
-        controlHandler.onReleaseLeftHand.AddListener(OnReleaseLeftHand);
-        controlHandler.onLiftRightHand.AddListener(OnLiftRightHand);
-        controlHandler.onReleaseRightHand.AddListener(OnReleaseRightHand);
-        controlHandler.onCancelHandGrab.AddListener(OnCancelHandGrab);
-        controlHandler.onMouseMoveUpdate.AddListener(OnMouseMove);
+        ControlHandler.onLiftLeftHand.AddListener(OnLiftLeftHand);
+        ControlHandler.onReleaseLeftHand.AddListener(OnReleaseLeftHand);
+        ControlHandler.onLiftRightHand.AddListener(OnLiftRightHand);
+        ControlHandler.onReleaseRightHand.AddListener(OnReleaseRightHand);
+        ControlHandler.onCancelHandGrab.AddListener(OnCancelHandGrab);
+        ControlHandler.onMouseMoveUpdate.AddListener(OnMouseMove);
 
     }
 
     protected virtual void UnsubscribeEvents()
     {
-        controlHandler.onCancelHandGrab.RemoveListener(OnCancelHandGrab);
-        controlHandler.onMouseMoveUpdate.RemoveListener(OnMouseMove);
+        ControlHandler.onCancelHandGrab.RemoveListener(OnCancelHandGrab);
+        ControlHandler.onMouseMoveUpdate.RemoveListener(OnMouseMove);
 
     }
 
     protected virtual void Update()
     {
-        if(controlHandler.mCurrentControlMode == ControlMode.LegControl)
+        if(ControlHandler.mCurrentControlMode == ControlMode.LegControl)
         {
             CurrentHand = 0;
         }

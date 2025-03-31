@@ -3,18 +3,18 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
     protected override void Start()
     {
         base.Start();
-        controlHandler.onLiftLeftLeg.AddListener(OnLiftLeftLeg);
-        controlHandler.onReleaseLeftLeg.AddListener(OnReleaseLeftLeg);
-        controlHandler.onLiftRightLeg.AddListener(OnOtherFootLifted);
-        controlHandler.onReleaseRightLeg.AddListener(OnOtherFootReleased);
+        ControlHandler.onLiftLeftLeg.AddListener(OnLiftLeftLeg);
+        ControlHandler.onReleaseLeftLeg.AddListener(OnReleaseLeftLeg);
+        ControlHandler.onLiftRightLeg.AddListener(OnOtherFootLifted);
+        ControlHandler.onReleaseRightLeg.AddListener(OnOtherFootReleased);
     }
 
     protected override void UnsubscribeEvents()
     {
-        controlHandler.onLiftLeftLeg.RemoveListener(OnLiftLeftLeg);
-        controlHandler.onReleaseLeftLeg.RemoveListener(OnReleaseLeftLeg);
-        controlHandler.onLiftRightLeg.RemoveListener(OnOtherFootLifted);
-        controlHandler.onReleaseRightLeg.RemoveListener(OnOtherFootReleased);
+        ControlHandler.onLiftLeftLeg.RemoveListener(OnLiftLeftLeg);
+        ControlHandler.onReleaseLeftLeg.RemoveListener(OnReleaseLeftLeg);
+        ControlHandler.onLiftRightLeg.RemoveListener(OnOtherFootLifted);
+        ControlHandler.onReleaseRightLeg.RemoveListener(OnOtherFootReleased);
     }
 
     private void OnLiftLeftLeg() 

@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerControlInformationProcess))]
 public abstract class PlayerControl_BaseControl : MonoBehaviour
 {
-    protected PlayerControlInformationProcess controlHandler;
+    protected PlayerControlInformationProcess ControlHandler;
     public GameObject forwardObject;
 
-    virtual protected void Start()
+    protected virtual void Start()
     {
-        controlHandler = GetComponent<PlayerControlInformationProcess>();
+        ControlHandler = GetComponent<PlayerControlInformationProcess>();
 
-        NullCheckerTool.CheckNull(forwardObject, controlHandler);
+        NullCheckerTool.CheckNull(forwardObject, ControlHandler);
     }
 
 }
