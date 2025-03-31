@@ -3,72 +3,62 @@ using UnityEngine.Events;
 
 public class MouseControl : MonoBehaviour
 {
-    // 鼠标灵敏度
     public float MouseSensitivity
     {
-        get => m_mouseSensitivity;
+        get => _mMouseSensitivity;
         set
         {
-            if (value != m_mouseSensitivity)
+            if (Mathf.Approximately(value, _mMouseSensitivity)) return;
+            _mMouseSensitivity = value;
+            if (_mMouseSensitivity == 0)
             {
-                m_mouseSensitivity = value;
-                if (m_mouseSensitivity == 0)
-                {
-                    Debug.LogWarning("mouseSensitivity is zero!");
-                }
+                Debug.LogWarning("mouseSensitivity is zero!");
             }
         }
     }
 
-    // 鼠标输入启用与否
-    public bool EnableMouseControl
+    private bool EnableMouseControl { get; set; } = true;
+
+    private float _mMouseSensitivity = 1;
+
+    // 脢脗录镁露篓脪氓
+    public UnityEvent onLeftMouseDown;        
+    public UnityEvent onRightMouseDown;       
+    public UnityEvent onLeftMouseUp;          
+    public UnityEvent onRightMouseUp;       
+    public UnityEvent onMiddleMouseDown;      
+    public UnityEvent onMouseWheelUp;          
+    public UnityEvent onMouseWheelDown;      
+    public UnityEvent onBothMouseButtonsDown; 
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; 
+    public UnityEvent<Vector2> onMouseMoveUpdate;    
+    public UnityEvent onNoMouseButtonDown; 
+
+    private Vector2 _lastMousePosition;
+
+    private void Awake()
     {
-        get => m_enableMouseControl;
-        set => m_enableMouseControl = value;
+        onLeftMouseDown ??= new UnityEvent();
+        onRightMouseDown ??= new UnityEvent();
+        onLeftMouseUp ??= new UnityEvent();
+        onRightMouseUp ??= new UnityEvent();
+        onMiddleMouseDown ??= new UnityEvent();
+        onMouseWheelUp ??= new UnityEvent();
+        onMouseWheelDown ??= new UnityEvent();
+        onBothMouseButtonsDown ??= new UnityEvent();
+        onNoMouseButtonDown ??= new UnityEvent();
+        onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
+        onMouseMoveUpdate ??= new UnityEvent<Vector2>();
     }
 
-    private bool m_enableMouseControl = true;
-    private float m_mouseSensitivity = 1;
-
-    // 事件定义
-    public UnityEvent onLeftMouseDown;          // 鼠标左键按下
-    public UnityEvent onRightMouseDown;         // 鼠标右键按下
-    public UnityEvent onLeftMouseUp;          // 鼠标左键按下
-    public UnityEvent onRightMouseUp;         // 鼠标右键按下
-    public UnityEvent onMiddleMouseDown;        // 滚轮按下
-    public UnityEvent onMouseWheelUp;           // 滚轮向上滚动
-    public UnityEvent onMouseWheelDown;         // 滚轮向下滚动
-    public UnityEvent onBothMouseButtonsDown;   // 左右键同时按下
-    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // 固定时间步长相对运动
-    public UnityEvent<Vector2> onMouseMoveUpdate;     // 每帧相对运动
-    public UnityEvent onNoMouseButtonDown; // 鼠标无按键操作
-
-    private Vector2 lastMousePosition;
-
-    void Awake()
+    private void Update()
     {
-        // 初始化所有事件
-        if (onLeftMouseDown == null) onLeftMouseDown = new UnityEvent();
-        if (onRightMouseDown == null) onRightMouseDown = new UnityEvent();
-        if (onLeftMouseUp == null) onLeftMouseUp = new UnityEvent();
-        if (onRightMouseUp == null) onRightMouseUp = new UnityEvent();
-        if (onMiddleMouseDown == null) onMiddleMouseDown = new UnityEvent();
-        if (onMouseWheelUp == null) onMouseWheelUp = new UnityEvent();
-        if (onMouseWheelDown == null) onMouseWheelDown = new UnityEvent();
-        if (onBothMouseButtonsDown == null) onBothMouseButtonsDown = new UnityEvent();
-        if (onNoMouseButtonDown == null) onNoMouseButtonDown = new UnityEvent();
-        if (onMouseMoveFixedUpdate == null) onMouseMoveFixedUpdate = new UnityEvent<Vector2>();
-        if (onMouseMoveUpdate == null) onMouseMoveUpdate = new UnityEvent<Vector2>();
-    }
-
-    void Update()
-    {
-        if (!m_enableMouseControl)
+        if (!EnableMouseControl)
             return;
 
         HandleMouseButtons();
         HandleMouseWheel();
-        HandleMouseMovementUpdate(); // 每帧处理鼠标移动
+        HandleMouseMovementUpdate(); 
 
         if (!Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
@@ -78,85 +68,79 @@ public class MouseControl : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!m_enableMouseControl)
+        if (!EnableMouseControl)
             return;
 
-        HandleMouseMovementFixedUpdate(); // 固定时间步长处理鼠标移动
+        HandleMouseMovementFixedUpdate(); 
     }
 
-    void HandleMouseButtons()
+    private void HandleMouseButtons()
     {
-        // 鼠标左键按下且右键未按下
         if (Input.GetMouseButtonDown(0) && !Input.GetMouseButton(1))
         {
             onLeftMouseDown?.Invoke();
         }
 
-        // 鼠标右键按下且左键未按下
         if (Input.GetMouseButtonDown(1) && !Input.GetMouseButton(0))
         {
             onRightMouseDown?.Invoke();
         }
 
-        // 鼠标左键抬起且右键未按下
         if (Input.GetMouseButtonUp(0) && !Input.GetMouseButton(1))
         {
             onLeftMouseUp?.Invoke();
         }
 
-        // 鼠标右键抬起且左键未按下
         if (Input.GetMouseButtonUp(1) && !Input.GetMouseButton(0))
         {
             onRightMouseUp?.Invoke();
         }
 
-
-        // 滚轮按下
         if (Input.GetMouseButtonDown(2))
         {
             onMiddleMouseDown?.Invoke();
         }
 
-        // 左右键同时按下
         if (Input.GetMouseButton(0) && Input.GetMouseButton(1))
         {
             onBothMouseButtonsDown?.Invoke();
         }
     }
 
-    void HandleMouseWheel()
+    private void HandleMouseWheel()
     {
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        var scroll = Input.GetAxis("Mouse ScrollWheel");
 
-        if (scroll > 0)
+        switch (scroll)
         {
-            onMouseWheelUp?.Invoke();
-        }
-        else if (scroll < 0)
-        {
-            onMouseWheelDown?.Invoke();
+            case > 0:
+                onMouseWheelUp?.Invoke();
+                break;
+            case < 0:
+                onMouseWheelDown?.Invoke();
+                break;
         }
     }
 
-    void HandleMouseMovementFixedUpdate()
+    private void HandleMouseMovementFixedUpdate()
     {
-        Vector2 currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-        if (currentMousePosition != lastMousePosition)
+        var currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        if (currentMousePosition != _lastMousePosition)
         {
-            Vector2 mouseDelta = currentMousePosition * m_mouseSensitivity * Time.fixedDeltaTime;
+            var mouseDelta = currentMousePosition * (_mMouseSensitivity * Time.fixedDeltaTime);
             onMouseMoveFixedUpdate?.Invoke(mouseDelta);
         }
-        lastMousePosition = currentMousePosition;
+        _lastMousePosition = currentMousePosition;
     }
 
-    void HandleMouseMovementUpdate()
+    private void HandleMouseMovementUpdate()
     {
-        Vector2 currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-        if (currentMousePosition != lastMousePosition)
+        var currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+        if (currentMousePosition != _lastMousePosition)
         {
-            Vector2 mouseDelta = currentMousePosition * m_mouseSensitivity;
+            var mouseDelta = currentMousePosition * _mMouseSensitivity;
             onMouseMoveUpdate?.Invoke(mouseDelta);
         }
-        lastMousePosition = currentMousePosition;
+        _lastMousePosition = currentMousePosition;
     }
 }

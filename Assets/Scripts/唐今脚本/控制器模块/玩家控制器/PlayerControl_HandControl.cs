@@ -59,7 +59,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         }
     }
 
-    protected virtual void SubscribeEvents()
+    private void SubscribeEvents()
     {
         controlHandler.onLiftLeftHand.AddListener(OnLiftLeftHand);
         controlHandler.onReleaseLeftHand.AddListener(OnReleaseLeftHand);
@@ -79,7 +79,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     protected virtual void Update()
     {
-        if(controlHandler.m_currentControlMode == ControlMode.LegControl)
+        if(controlHandler.mCurrentControlMode == ControlMode.LegControl)
         {
             CurrentHand = 0;
         }
@@ -89,27 +89,27 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     {
         CurrentHand = 0;
     }
-    protected virtual void OnLiftLeftHand()
+    protected void OnLiftLeftHand()
     {
         CurrentHand = 1;
         _isMouseDown = true;
 
     }
 
-    protected virtual void OnReleaseLeftHand()
+    protected void OnReleaseLeftHand()
     {
         CurrentHand = 1;
         _isMouseDown = false;
 
     }
-    protected virtual void OnLiftRightHand()
+    protected void OnLiftRightHand()
     {
         CurrentHand = 2;
         _isMouseDown = true;
 
     }
 
-    protected virtual void OnReleaseRightHand()
+    protected void OnReleaseRightHand()
     {
         CurrentHand = 2;
         _isMouseDown = false;

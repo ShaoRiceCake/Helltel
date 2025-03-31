@@ -5,26 +5,35 @@ public class PlayerControl_RightFootControl : PlayerControl_FootControl
         base.Start();
         controlHandler.onLiftRightLeg.AddListener(OnLiftRightLeg);
         controlHandler.onReleaseRightLeg.AddListener(OnReleaseRightLeg);
+        controlHandler.onLiftLeftLeg.AddListener(OnOtherFootLifted);
+        controlHandler.onReleaseLeftLeg.AddListener(OnOtherFootReleased);
     }
 
     protected override void UnsubscribeEvents()
     {
         controlHandler.onLiftRightLeg.RemoveListener(OnLiftRightLeg);
         controlHandler.onReleaseRightLeg.RemoveListener(OnReleaseRightLeg);
+        controlHandler.onLiftLeftLeg.RemoveListener(OnOtherFootLifted);
+        controlHandler.onReleaseLeftLeg.RemoveListener(OnOtherFootReleased);
     }
 
-    protected virtual void OnLiftRightLeg() 
+    private void OnLiftRightLeg() 
     {
-        IsFootUp = true;
-        UnfixObject();
-        SpringTool.isSpringEnabled = true;
-
+        TryLiftFoot();
     }
 
-    protected virtual void OnReleaseRightLeg() 
+    private void OnReleaseRightLeg() 
     {
-        IsFootUp = false;
-        SpringTool.isSpringEnabled = false;
-
+        ReleaseFoot();
+    }
+    
+    private void OnOtherFootLifted()
+    {
+        LockFoot();
+    }
+    
+    private void OnOtherFootReleased()
+    {
+        UnlockFoot();
     }
 }
