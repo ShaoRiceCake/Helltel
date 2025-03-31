@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
@@ -59,7 +59,7 @@ public class GameManager : Singleton<GameManager>
         if (sceneName == "Game")
         {
             OnStartGame?.Invoke();
-            Debug.Log("ÓÎÏ·¿ªÊ¼");
+            Debug.Log("游戏开始");
         }
 
     }
