@@ -52,15 +52,15 @@ Shader "Hidden/OutlineEffect"
 			float4 _MainTex_ST;
 			sampler2D _OutlineSource;
 
-			struct v2f
+			struct v2_f
 			{
 				float4 position : SV_POSITION;
 				float2 uv : TEXCOORD0;
 			};
 
-			v2f vert(appdata_img v)
+			v2_f vert(appdata_img v)
 			{
-				v2f o;
+				v2_f o;
 				o.position = UnityObjectToClipPos(v.vertex);
 				o.uv = v.texcoord;
 
@@ -72,7 +72,7 @@ Shader "Hidden/OutlineEffect"
 			int _FlipY;
 			uniform float4 _MainTex_TexelSize;
 
-			half4 frag(v2f input) : COLOR
+			half4 frag(v2_f input) : COLOR
 			{
 				float2 uv = input.uv;
 				if (_FlipY == 1)
@@ -124,14 +124,14 @@ Shader "Hidden/OutlineEffect"
 			float4 _MainTex_ST;
 			sampler2D _OutlineSource;
 
-			struct v2f {
+			struct v2_f {
 			   float4 position : SV_POSITION;
 			   float2 uv : TEXCOORD0;
 			};
 			
-			v2f vert(appdata_img v)
+			v2_f vert(appdata_img v)
 			{
-			   	v2f o;
+			   	v2_f o;
 				o.position = UnityObjectToClipPos(v.vertex);
 				o.uv = v.texcoord;
 				
@@ -152,7 +152,7 @@ Shader "Hidden/OutlineEffect"
 			int _CornerOutlines;
 			uniform float4 _MainTex_TexelSize;
 
-			half4 frag (v2f input) : COLOR
+			half4 frag (v2_f input) : COLOR
 			{	
 				float2 uv = input.uv;
 				if (_FlipY == 1)

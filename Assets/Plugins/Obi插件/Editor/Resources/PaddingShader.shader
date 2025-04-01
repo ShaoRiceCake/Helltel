@@ -24,15 +24,15 @@
 				float2 uv : TEXCOORD0;
 			};
 
-			struct v2f
+			struct v2_f
 			{
 				float2 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
 			};
 
-			v2f vert (appdata v)
+			v2_f vert (appdata v)
 			{
-				v2f o;
+				v2_f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = v.uv;
 				return o;
@@ -43,7 +43,7 @@
             int _Padding;
             static const float2 offsets[8] = {float2(-1,0), float2(1,0), float2(0,1), float2(0,-1), float2(-1,1), float2(1,1), float2(1,-1), float2(-1,-1)};
 
-			fixed4 frag (v2f i) : SV_Target
+			fixed4 frag (v2_f i) : SV_Target
 			{
             
                 fixed4 sample = tex2D(_MainTex, i.uv);

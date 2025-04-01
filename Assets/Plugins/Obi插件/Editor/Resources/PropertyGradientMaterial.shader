@@ -24,7 +24,7 @@
 				float2 texcoord  : TEXCOORD0;
 			};
 
-            struct v2f {
+            struct v2_f {
                 float4 pos: POSITION;
                 fixed4 color    : COLOR;
 				float2 texcoord  : TEXCOORD0;
@@ -32,15 +32,15 @@
 
 			sampler2D _MainTex;
 
-            v2f vert(vin v) {
-                v2f o;
+            v2_f vert(vin v) {
+                v2_f o;
                 o.pos = UnityObjectToClipPos (v.vertex);
                 o.texcoord = v.texcoord;
 				o.color = v.color;
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target {
+            fixed4 frag(v2_f i) : SV_Target {
                 return i.color;
             }
 
@@ -67,7 +67,7 @@
                 float2 texcoord  : TEXCOORD0;
             };
 
-            struct v2f {
+            struct v2_f {
                 float4 pos: POSITION;
                 fixed4 color    : COLOR;
                 float2 texcoord  : TEXCOORD0;
@@ -75,15 +75,15 @@
 
             sampler2D _MainTex;
 
-            v2f vert(vin v) {
-                v2f o;
+            v2_f vert(vin v) {
+                v2_f o;
                 o.pos = UnityObjectToClipPos (v.vertex);
                 o.texcoord = v.texcoord;
                 o.color = v.color;
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target {
+            fixed4 frag(v2_f i) : SV_Target {
                 return i.color;
             }
 

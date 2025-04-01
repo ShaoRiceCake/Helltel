@@ -33,7 +33,7 @@
                     float4 t2 : TEXCOORD2; // ellipsoid t3 vector
                 };
 
-                struct v2f
+                struct v2_f
                 {
                 	float4 pos   : SV_POSITION;
                 	fixed4 color    : COLOR;
@@ -50,7 +50,7 @@
                     float depth : SV_Depth;
                 };
 
-                v2f vert(vin v)
+                v2_f vert(vin v)
                 { 
                 	float3x3 P, IP;
                 	BuildParameterSpaceMatrices(v.t0,v.t1,v.t2,P,IP);
@@ -60,7 +60,7 @@
                 	float3 eye;
                 	float radius = BuildEllipsoidBillboard(v.vertex,v.corner,P,IP,worldPos,view,eye);
 
-                	v2f o;
+                	v2_f o;
                 	o.pos = mul(UNITY_MATRIX_VP, float4(worldPos,v.vertex.w));
                 	o.mapping = float4(v.corner.xy,1/length(eye),radius); // A[1]
                 	o.viewRay = mul((float3x3)UNITY_MATRIX_V,view); 	  // A[0]
@@ -73,7 +73,7 @@
                 	return o;
                 }
 
-                fout frag(v2f i) 
+                fout frag(v2_f i) 
                 {
                     fout fo;
 
