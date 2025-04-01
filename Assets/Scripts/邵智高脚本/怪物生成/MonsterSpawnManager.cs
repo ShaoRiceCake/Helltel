@@ -1,0 +1,237 @@
+// MonsterSpawnSystem.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MonsterSpawnSystem : MonoBehaviour
+{
+    //============== 核心参数配置区 ==============
+    [Header("楼层配置")]
+    [Tooltip("当前楼层（通常为负数）")]
+    public int currentFloor = -1;
+
+    [Header("熵值公式参数")]
+    [Header("游戏基础熵值")]
+    public float baseEntropy = 50f;
+    [Header("每层变化的熵值")]
+    public float floorMultiplier = 15f;
+    [Header("每分钟增加的熵值")]
+    public float timeFactor = 0.3f;
+    [Header("每一块钱增加的熵值")]
+    public float moneyFactor = 0.05f;
+    [Header("每次死亡减少的熵值")]
+    public float deathFactorD = 1f;
+    [Header("通过死亡最多能减少多少熵值")]
+    public float deathFactorE = 9f;
+
+    [Header("基础客梯数")]
+    public int baseGuestElevatorCount = 8;
+    [Header("每层增加的客梯数")]
+    public int guestElevatorFloorMultiplier = 3;
+
+    [Header("生成设置")]
+    public float checkInterval = 30f;
+    //最大尝试次数
+    private int maxAttempts = 5;
+    [Header("可生成的怪物池")]
+    public List<GameObject> monsterPrefabs;
+
+    //============== 运行时状态 ==============
+    private List<Transform> activeGuestElevators = new(); // 可用客梯列表
+    private float floorTimeCounter;                      // 本层停留计时（本关持续的时间）
+    private float totalMoney;                            // 累计金钱
+    private int totalDeaths;                             // 死亡次数
+    private Dictionary<GameObject, int> spawnRecords = new(); // 生成记录
+    private List<FSM> activeMonsters = new();        // 存活怪物列表
+
+    //============== 初始化流程 ==============
+    void Start()
+    {
+        //InitializeElevators();
+        InitializeSpawnData();
+        StartCoroutine(SpawnRoutine());
+    }
+
+    /// <summary>
+    /// 客梯我还没做呢……之后再写
+    /// 初始化客梯梯系统
+    /// 1. 收集场景中的客梯
+    /// 2. 根据楼层规则筛选
+    /// </summary>
+    void InitializeGuestElevators()
+    {
+        // 收集所有标记的客梯
+        var allGuestElevators = GameObject.FindGameObjectsWithTag("GuestElevator");
+        foreach (var ge in allGuestElevators)
+        {
+            activeGuestElevators.Add(ge.transform);
+        }
+
+        // 计算允许的客梯数量
+        int maxGuestElevators = Mathf.Max(
+            baseGuestElevatorCount - (currentFloor * guestElevatorFloorMultiplier), 
+            1 // 保证至少1个客梯
+        );
+
+        // 随机移除多余的客梯
+        while (activeGuestElevators.Count > maxGuestElevators)
+        {
+            int index = Random.Range(0, activeGuestElevators.Count);
+            Destroy(activeGuestElevators[index].gameObject);
+            activeGuestElevators.RemoveAt(index);
+        }
+    }
+
+    /// <summary>
+    /// 初始化生成记录数据
+    /// </summary>
+    void InitializeSpawnData()
+    {
+        spawnRecords.Clear();
+        foreach (var prefab in monsterPrefabs)
+        {
+            spawnRecords[prefab] = 0;
+        }
+    }
+
+    //============== 核心生成逻辑 ==============
+    /// <summary>
+    /// 周期性生成检测协程
+    /// </summary>
+    IEnumerator SpawnRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(checkInterval);
+            AttemptSpawnProcess();
+        }
+    }
+
+    /// <summary>
+    /// 单次生成尝试流程
+    /// </summary>
+    void AttemptSpawnProcess()
+    {
+        float currentEntropy = CalculateCurrentEntropy();
+        float entropyLimit = CalculateEntropyLimit();
+        //获取随机排序的怪物生成列表（
+        var candidates = GetShuffledCandidates();
+
+        for (int i = 0; i < Mathf.Min(maxAttempts, candidates.Count); i++)
+        {
+            GameObject prefab = candidates[i];
+            FSM monster = prefab.GetComponent<FSM>();
+
+            if (CanSpawn(monster, currentEntropy, entropyLimit))
+            {
+                ExecuteSpawn(prefab, monster);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 生成条件检查
+    /// </summary>
+    
+    
+
+    bool CanSpawn(FSM monster, float currentEntropy, float limit)
+    {
+        /*注释这段是因为怪物基类里还没有这几个变量
+        // 检查生成次数限制
+        bool underSpawnLimit = monster.maxSpawnCount <= 0 || 
+                             spawnRecords[monster.gameObject] < monster.maxSpawnCount;
+
+        // 检查熵值限制
+        bool underEntropyLimit = (currentEntropy + monster.entropyValue) <= limit;
+
+        return underSpawnLimit && underEntropyLimit;
+        */
+        return false;//基类里还没有这几个变量后应删除这行
+    }
+    
+    /// <summary>
+    /// 执行生成操作
+    /// </summary>
+    void ExecuteSpawn(GameObject prefab, FSM monster)
+    {
+        if (activeGuestElevators.Count == 0)
+        {
+            Debug.LogWarning("没有可用电梯用于生成");
+            return;
+        }
+
+        // 随机选择电梯
+        Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
+        Vector3 spawnPoint = elevator.position + Vector3.up * 0.5f;
+
+        // 实例化并记录
+        var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
+        activeMonsters.Add(instance.GetComponent<FSM>());
+        spawnRecords[prefab]++;
+    }
+
+    //============== 工具方法 ==============
+    /// <summary>
+    /// 获取随机排序的候选列表
+    /// </summary>
+    List<GameObject> GetShuffledCandidates()
+    {
+        List<GameObject> list = new List<GameObject>(monsterPrefabs);
+        for (int i = 0; i < list.Count; i++)
+        {
+            int randomIndex = Random.Range(i, list.Count);
+            (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// 计算当前熵值上限
+    /// </summary>
+    float CalculateEntropyLimit()
+    {
+        float deathPenalty = Mathf.Max(totalDeaths * deathFactorD, deathFactorE);
+        return baseEntropy 
+            - currentFloor * floorMultiplier
+            + floorTimeCounter * timeFactor
+            + totalMoney * moneyFactor
+            - deathPenalty;
+    }
+
+    /// <summary>
+    /// 计算当前总熵值
+    /// </summary>
+    float CalculateCurrentEntropy()
+    {
+        float total = 0f;
+        foreach (var m in activeMonsters)
+        {
+            //这里是挨个相加每个怪物的熵值得出当前总熵值
+            //total += m.entropyValue;
+        }
+        return total;
+    }
+
+    //============== 事件接口 ==============
+    /// <summary>
+    /// 怪物被击败时调用
+    /// </summary>
+    public void RegisterMonsterDefeat(FSM monster)
+    {
+        activeMonsters.Remove(monster);
+        
+    }
+
+    /// <summary>
+    /// 玩家死亡时调用
+    /// </summary>
+    public void RegisterPlayerDeath()
+    {
+        totalDeaths++;
+        Debug.Log($"玩家死亡，当前死亡次数：{totalDeaths}");
+    }
+
+   
+}
