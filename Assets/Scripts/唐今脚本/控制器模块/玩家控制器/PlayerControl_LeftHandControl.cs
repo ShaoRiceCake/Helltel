@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class PlayerControl_LeftHandControl : PlayerControl_HandControl
 {
-
     protected override void UnsubscribeEvents()
     {
+        base.UnsubscribeEvents();
         controlHandler.onLiftLeftHand.RemoveListener(OnLiftLeftHand);
         controlHandler.onReleaseLeftHand.RemoveListener(OnReleaseLeftHand);
     }
@@ -13,21 +13,13 @@ public class PlayerControl_LeftHandControl : PlayerControl_HandControl
     {
         base.Update();
 
-        if (CurrentPlayerHand == 1 && !HandObject)
+        if (CurrentPlayerHand == 1 && !IsHandActive)
         {
-            HandObject = Instantiate(HandBallPrefab, ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0], Quaternion.identity);
-            handControlAttachment.target = HandObject.transform;
-            CatchTool.CatchBall = HandObject;
+            ActivateControlBall();
         }
-        else
+        else if (CurrentPlayerHand != 1 && IsHandActive)
         {
-            if (!HandObject || CurrentPlayerHand == 1) return;
-            
-            Destroy(HandObject);
-            CatchTool.CatchBall = null;
-            HandObject = null; 
-            handControlAttachment.target = null;
-
+            DeactivateControlBall();
         }
     }
 }

@@ -155,6 +155,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableOnStart: 1
   isLocked: 0
+--- !u!1 &212020995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 212020997}
+  - component: {fileID: 212020996}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &212020996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212020995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &212020997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 212020995}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &372900017
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -168,9 +212,17 @@ PrefabInstance:
       value: "Player_\u7B2C\u56DB\u7248\u6539+solver"
       objectReference: {fileID: 0}
     - target: {fileID: 2248784047823417042, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+      propertyPath: catchTool
+      value: 
+      objectReference: {fileID: 797235371}
+    - target: {fileID: 2248784047823417042, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
       propertyPath: cylinderRadius
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 2248784047823417042, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+      propertyPath: handBallPrefab
+      value: 
+      objectReference: {fileID: 1318237025092249892, guid: 0d0f4c6bd70b79a45b5d0c096cdbca07, type: 3}
     - target: {fileID: 2248784047823417042, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
       propertyPath: cylinderHalfHeight
       value: 10
@@ -216,9 +268,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3781955553675456172, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+      propertyPath: catchTool
+      value: 
+      objectReference: {fileID: 797235370}
+    - target: {fileID: 3781955553675456172, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
       propertyPath: cylinderRadius
       value: 12
       objectReference: {fileID: 0}
+    - target: {fileID: 3781955553675456172, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+      propertyPath: handBallPrefab
+      value: 
+      objectReference: {fileID: 1318237025092249892, guid: 0d0f4c6bd70b79a45b5d0c096cdbca07, type: 3}
     - target: {fileID: 3781955553675456172, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
       propertyPath: cylinderHalfHeight
       value: 10
@@ -305,50 +365,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disableOnStart: 1
   isLocked: 0
---- !u!1 &476574705
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 476574707}
-  - component: {fileID: 476574706}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &476574706
+--- !u!114 &797235370 stripped
 MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 6731277034964605059, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+  m_PrefabInstance: {fileID: 372900017}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476574705}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Script: {fileID: 11500000, guid: 7dd2595c6b23e744c9e4cf093b74e433, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &476574707
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+--- !u!114 &797235371 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6984354065310808373, guid: 95cc9c6df9ad16b478a337901247e38c, type: 3}
+  m_PrefabInstance: {fileID: 372900017}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476574705}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dd2595c6b23e744c9e4cf093b74e433, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &946212779
 GameObject:
   m_ObjectHideFlags: 0
@@ -752,5 +790,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 946212781}
   - {fileID: 3571351096803338166}
-  - {fileID: 476574707}
   - {fileID: 372900017}
+  - {fileID: 212020997}

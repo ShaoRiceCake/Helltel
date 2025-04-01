@@ -10,14 +10,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float cylinderRadius = 10.0f;
     public float cylinderHalfHeight = 7.0f;
     public float mouseSensitivity = 10f;
-    public CatchTool  CatchTool;
-
-    protected GameObject HandBallPrefab;
+    public CatchTool  catchTool;
+    public GameObject handBallPrefab;
+    
     protected int CurrentPlayerHand;
-    protected GameObject HandObject;
-        
     private bool _isMouseDown;
-    private ControlBallGenerator _controlBallGenerator;
+    protected bool IsHandActive;
 
 
     public int CurrentHand
@@ -41,11 +39,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     {
         base.Start();
         
-        _controlBallGenerator = gameObject.AddComponent<ControlBallGenerator>();
+        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,catchTool, handBallPrefab, handControlAttachment);
         
-        HandBallPrefab = ControlBallGenerator.GenerateControlBall();
-        
-        if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,CatchTool, HandBallPrefab, handControlAttachment);
+        handBallPrefab.SetActive(false); 
         
         SubscribeEvents();
     }
@@ -118,7 +114,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     private void OnMouseMove(Vector2 mouseDelta)
     {
-        if (CurrentPlayerHand == 0 || HandObject == null || handPrepareObj == null)
+        if (CurrentPlayerHand == 0 || handBallPrefab == null || handPrepareObj == null)
             return;
 
         var mouseX = mouseDelta.x * mouseSensitivity;
@@ -144,13 +140,13 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         var worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
         worldMovement.y = localMovement.y;
 
-        var newWorldPosition = HandObject.transform.position + worldMovement * Time.deltaTime;
+        var newWorldPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
 
         var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
 
         ApplyCylinderConstraint(ref newLocalPosition);
 
-        HandObject.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        handBallPrefab.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
     }
 
     private void ApplyCylinderConstraint(ref Vector3 position)
@@ -163,5 +159,27 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
             position.z = horizontal.y;
         }
         position.y = Mathf.Clamp(position.y, -cylinderHalfHeight, cylinderHalfHeight);
+    }
+    
+    protected void ActivateControlBall()
+    {
+        if (!handBallPrefab) return;
+    
+        handBallPrefab.SetActive(true);
+        handBallPrefab.transform.position = ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0];
+        handControlAttachment.enabled = true;
+        handControlAttachment.target = handBallPrefab.transform;
+        catchTool.CatchBall = handBallPrefab;
+        IsHandActive = true;
+    }
+    protected void DeactivateControlBall()
+    {
+        if (!handBallPrefab) return;
+    
+        handBallPrefab.SetActive(false);
+        handControlAttachment.enabled = false;
+        handControlAttachment.target = null;
+        catchTool.CatchBall = null;
+        IsHandActive = false;
     }
 }
