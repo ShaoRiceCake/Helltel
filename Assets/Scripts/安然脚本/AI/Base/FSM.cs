@@ -10,7 +10,9 @@ public class FSM : NetworkBehaviour
     [Header("最大生命值")] public float maxHealth = 15f;
     [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
     [Header("熵值")]
-    public float entropyValue;
+    public int entropyValue;
+    [Header("最大生成数")]
+    public int maxSpawnCount = 1;
     public GameObject[] players;
     public Pathlist path;
     public NavMeshAgent agent;

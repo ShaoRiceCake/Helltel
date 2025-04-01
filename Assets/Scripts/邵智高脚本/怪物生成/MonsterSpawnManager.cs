@@ -47,13 +47,12 @@ public class MonsterSpawnSystem : MonoBehaviour
     //============== 初始化流程 ==============
     void Start()
     {
-        //InitializeElevators();
+        InitializeGuestElevators();
         InitializeSpawnData();
         StartCoroutine(SpawnRoutine());
     }
 
     /// <summary>
-    /// 客梯我还没做呢……之后再写
     /// 初始化客梯梯系统
     /// 1. 收集场景中的客梯
     /// 2. 根据楼层规则筛选
@@ -138,7 +137,7 @@ public class MonsterSpawnSystem : MonoBehaviour
 
     bool CanSpawn(FSM monster, float currentEntropy, float limit)
     {
-        /*注释这段是因为怪物基类里还没有这几个变量
+        //注释这段是因为怪物基类里还没有这几个变量
         // 检查生成次数限制
         bool underSpawnLimit = monster.maxSpawnCount <= 0 || 
                              spawnRecords[monster.gameObject] < monster.maxSpawnCount;
@@ -147,8 +146,8 @@ public class MonsterSpawnSystem : MonoBehaviour
         bool underEntropyLimit = (currentEntropy + monster.entropyValue) <= limit;
 
         return underSpawnLimit && underEntropyLimit;
-        */
-        return false;//基类里还没有这几个变量后应删除这行
+        
+        //return false;//基类里还没有这几个变量后应删除这行
     }
     
     /// <summary>
@@ -209,7 +208,7 @@ public class MonsterSpawnSystem : MonoBehaviour
         foreach (var m in activeMonsters)
         {
             //这里是挨个相加每个怪物的熵值得出当前总熵值
-            //total += m.entropyValue;
+            total += m.entropyValue;
         }
         return total;
     }
