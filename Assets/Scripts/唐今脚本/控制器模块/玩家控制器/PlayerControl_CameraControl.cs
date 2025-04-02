@@ -10,14 +10,11 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     protected override void Start()
     {
-        forwardObject.SetActive(IsLocalPlayer);//根据是否本地玩家决定开启相机
+        /*forwardObject.SetActive(IsLocalPlayer);*///根据是否本地玩家决定开启相机
     }
 
     private void Update()
     {
-        if (!GameManager.instance.isGameing) return;
-        if (!IsLocalPlayer) return;
-
         // 水平旋转（左右）
         if (Input.GetKey(KeyCode.A))
         {

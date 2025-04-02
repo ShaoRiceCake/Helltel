@@ -36,29 +36,23 @@ public class MouseControl : NetworkBehaviour
 
     private Vector2 _lastMousePosition;
 
-    void Start()
+    void Awake()
     {
-        if (IsLocalPlayer)
-        {
-            onLeftMouseDown ??= new UnityEvent();
-            onRightMouseDown ??= new UnityEvent();
-            onLeftMouseUp ??= new UnityEvent();
-            onRightMouseUp ??= new UnityEvent();
-            onMiddleMouseDown ??= new UnityEvent();
-            onMouseWheelUp ??= new UnityEvent();
-            onMouseWheelDown ??= new UnityEvent();
-            onBothMouseButtonsDown ??= new UnityEvent();
-            onNoMouseButtonDown ??= new UnityEvent();
-            onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
-            onMouseMoveUpdate ??= new UnityEvent<Vector2>();
-        }
+        onLeftMouseDown ??= new UnityEvent();
+        onRightMouseDown ??= new UnityEvent();
+        onLeftMouseUp ??= new UnityEvent();
+        onRightMouseUp ??= new UnityEvent();
+        onMiddleMouseDown ??= new UnityEvent();
+        onMouseWheelUp ??= new UnityEvent();
+        onMouseWheelDown ??= new UnityEvent();
+        onBothMouseButtonsDown ??= new UnityEvent();
+        onNoMouseButtonDown ??= new UnityEvent();
+        onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
+        onMouseMoveUpdate ??= new UnityEvent<Vector2>();
     }
 
     private void Update()
     {
-        if (!GameManager.instance.isGameing) return;
-        if (!IsLocalPlayer) return;
-
         if (!EnableMouseControl)
             return;
 
@@ -74,9 +68,6 @@ public class MouseControl : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!GameManager.instance.isGameing) return;
-        if (!IsLocalPlayer) return;
-
         if (!EnableMouseControl)
             return;
 
