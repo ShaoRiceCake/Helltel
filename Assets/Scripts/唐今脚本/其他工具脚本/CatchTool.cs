@@ -2,8 +2,8 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
-
-public class CatchTool : MonoBehaviour
+using Unity.Netcode;
+public class CatchTool : NetworkBehaviour
 {
     [Header("References")]
     public ObiParticleAttachment obiAttachment;
@@ -53,7 +53,10 @@ public class CatchTool : MonoBehaviour
 
     private void Update()
     {
-        if(!_catchBall) return;
+        if (!GameManager.instance.isGameing) return;
+        if (!IsLocalPlayer) return;
+
+        if (!_catchBall) return;
         HighLightTarget();
         UpdateTargetSelection();
         HandleInput();

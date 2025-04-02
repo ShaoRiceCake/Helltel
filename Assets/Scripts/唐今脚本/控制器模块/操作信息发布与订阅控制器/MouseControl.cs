@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-
-public class MouseControl : MonoBehaviour
+using Unity.Netcode;
+public class MouseControl : NetworkBehaviour
 {
     public float MouseSensitivity
     {
@@ -36,23 +36,29 @@ public class MouseControl : MonoBehaviour
 
     private Vector2 _lastMousePosition;
 
-    private void Awake()
+    void Start()
     {
-        onLeftMouseDown ??= new UnityEvent();
-        onRightMouseDown ??= new UnityEvent();
-        onLeftMouseUp ??= new UnityEvent();
-        onRightMouseUp ??= new UnityEvent();
-        onMiddleMouseDown ??= new UnityEvent();
-        onMouseWheelUp ??= new UnityEvent();
-        onMouseWheelDown ??= new UnityEvent();
-        onBothMouseButtonsDown ??= new UnityEvent();
-        onNoMouseButtonDown ??= new UnityEvent();
-        onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
-        onMouseMoveUpdate ??= new UnityEvent<Vector2>();
+        if (IsLocalPlayer)
+        {
+            onLeftMouseDown ??= new UnityEvent();
+            onRightMouseDown ??= new UnityEvent();
+            onLeftMouseUp ??= new UnityEvent();
+            onRightMouseUp ??= new UnityEvent();
+            onMiddleMouseDown ??= new UnityEvent();
+            onMouseWheelUp ??= new UnityEvent();
+            onMouseWheelDown ??= new UnityEvent();
+            onBothMouseButtonsDown ??= new UnityEvent();
+            onNoMouseButtonDown ??= new UnityEvent();
+            onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
+            onMouseMoveUpdate ??= new UnityEvent<Vector2>();
+        }
     }
 
     private void Update()
     {
+        if (!GameManager.instance.isGameing) return;
+        if (!IsLocalPlayer) return;
+
         if (!EnableMouseControl)
             return;
 
@@ -68,6 +74,9 @@ public class MouseControl : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!GameManager.instance.isGameing) return;
+        if (!IsLocalPlayer) return;
+
         if (!EnableMouseControl)
             return;
 
