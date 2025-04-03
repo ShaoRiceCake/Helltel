@@ -26,8 +26,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
     public UnityEvent onCancelHandGrab;
 
     public UnityEvent onSwitchControlMode;
-    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // ¹Ì¶¨Ê±¼ä²½³¤Ïà¶ÔÔË¶¯
-    public UnityEvent<Vector2> onMouseMoveUpdate;     // Ã¿Ö¡Ïà¶ÔÔË¶¯
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; 
+    public UnityEvent<Vector2> onMouseMoveUpdate;   
     public UnityEvent onDefaultMode;
 
     void Start()
