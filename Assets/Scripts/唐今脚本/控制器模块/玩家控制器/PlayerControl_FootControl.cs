@@ -1,15 +1,18 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [RequireComponent(typeof(RaycastTool))]
 [RequireComponent(typeof(SpringTool))]
-[RequireComponent(typeof(Rigidbody))]
 public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 {
     public GameObject targetObject;
     public GameObject footObject;
 
     public float mouseSensitivity = 1f;
-    public float impulseCoefficient = 0.3f;
+    public float impulseCoefficient = 0.4f;
+        
+    public RaycastTool raycastTool;
+    public SpringTool springTool;
     
     protected enum FootState
     {
@@ -19,9 +22,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     }
     
     protected FootState CurrentState = FootState.Grounded;
-    
-    private RaycastTool _raycastTool;
-    private SpringTool _springTool;
+
     private Rigidbody _movingObj;
     
     protected override void Start()
@@ -32,16 +33,13 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         {
             if (gameObject != null) footObject = gameObject;
         }
-
-        _raycastTool = footObject.GetComponent<RaycastTool>();
-        _springTool = footObject.GetComponent<SpringTool>();
         _movingObj = footObject.GetComponent<Rigidbody>();
 
-        NullCheckerTool.CheckNull(_raycastTool, _springTool, _movingObj);
+        NullCheckerTool.CheckNull(raycastTool, springTool, _movingObj);
 
-        _springTool.SetTarget(targetObject.transform);
-        _springTool.SetControlledObject(footObject);
-        _raycastTool.rayLauncher = footObject;
+        springTool.SetTarget(targetObject.transform);
+        springTool.SetControlledObject(footObject);
+        raycastTool.rayLauncher = footObject;
 
         SubscribeEvents();
     }
@@ -84,7 +82,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     
     protected virtual void Update()
     {
-        var hitPos = _raycastTool.GetHitPoint();
+        var hitPos = raycastTool.GetHitPoint();
 
         if (CurrentState == FootState.Grounded && hitPos != Vector3.zero)
         {
@@ -125,7 +123,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         
         CurrentState = FootState.Lifted;
         UnfixObject();
-        _springTool.isSpringEnabled = true;
+        springTool.isSpringEnabled = true;
         return true;
     }
     
@@ -134,7 +132,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         if (CurrentState != FootState.Lifted) return;
         
         CurrentState = FootState.Grounded;
-        _springTool.isSpringEnabled = false;
+        springTool.isSpringEnabled = false;
     }
     
     protected void LockFoot()

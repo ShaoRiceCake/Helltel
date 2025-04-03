@@ -2,12 +2,13 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
     [Header("References")]
     public ObiParticleAttachment obiAttachment;
-    public GameObject catchDetectCylinder; 
+    public CatchDetectorTool catchDetectorTool; 
 
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
@@ -35,20 +36,13 @@ public class CatchTool : MonoBehaviour
 
     private void Start()
     {
-        if (catchDetectCylinder == null)
+        if (catchDetectorTool == null)
         {
             Debug.LogError("catchDetectCylinder未分配！");
             return;
         }
-
-        var detector = catchDetectCylinder.GetComponent<CatchDetectorTool>();
-        if (detector == null)
-        {
-            Debug.LogError("catchDetectCylinder上缺少CatchDetectorTool组件！");
-            return;
-        }
-    
-        detector.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
+        
+        catchDetectorTool.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
     }
 
     private void Update()
