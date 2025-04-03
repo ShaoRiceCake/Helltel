@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 using UnityEngine.Events;
-
-public class PlayerControlInformationProcess : MonoBehaviour
+using Unity.Netcode;
+public class PlayerControlInformationProcess : NetworkBehaviour
 {
     public enum ControlMode
     {
@@ -30,7 +30,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
     public UnityEvent<Vector2> onMouseMoveUpdate;     // Ã¿Ö¡Ïà¶ÔÔË¶¯
     public UnityEvent onDefaultMode;
 
-    private void Awake()
+    void Start()
     {
         onLiftLeftLeg ??= new UnityEvent();
         onLiftRightLeg ??= new UnityEvent();
@@ -62,7 +62,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
         _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         if (_mMouseControl == null) return;
         _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
@@ -74,6 +74,8 @@ public class PlayerControlInformationProcess : MonoBehaviour
         _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
         _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
         _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
+
+        base.OnDestroy();
     }
 
     private void OnLeftMouseDown()

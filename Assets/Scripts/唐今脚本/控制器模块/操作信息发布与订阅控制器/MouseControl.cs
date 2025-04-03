@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
-
-public class MouseControl : MonoBehaviour
+using Unity.Netcode;
+public class MouseControl : NetworkBehaviour
 {
     public float MouseSensitivity
     {
@@ -36,7 +36,7 @@ public class MouseControl : MonoBehaviour
 
     private Vector2 _lastMousePosition;
 
-    private void Awake()
+    void Awake()
     {
         onLeftMouseDown ??= new UnityEvent();
         onRightMouseDown ??= new UnityEvent();
