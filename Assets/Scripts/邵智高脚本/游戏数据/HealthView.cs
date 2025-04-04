@@ -3,15 +3,15 @@ using TMPro;
 using DG.Tweening; 
 
 /// <summary>
-/// 使用DOTween的金钱显示视图
+/// 使用DOTween的生命值显示视图
 /// </summary>
-public class MoneyView : MonoBehaviour
+public class HealthView : MonoBehaviour
 {
     [Header("组件绑定")]
     [SerializeField] private TextMeshProUGUI _moneyText;
     [SerializeField] private GameDataModel _data;
 
-    [Header("动画参数")]
+    [Header("动画参数")]//动画为实装
     [SerializeField] private float _punchScale = 1.2f;
     [SerializeField] private float _animDuration = 0.3f;
     [SerializeField] private Color _flashColor = Color.yellow;

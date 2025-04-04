@@ -15,6 +15,7 @@ public class GameDataModel : ScriptableObject
     private int _performance;
     private int _day = 1;
     private int _level = 0;
+    private Dictionary<string, PlayerRuntimeData> _players = new();
 
     // 公开事件
     public event Action<int> OnMoneyChanged;      // 金钱变化
@@ -22,6 +23,19 @@ public class GameDataModel : ScriptableObject
     public event Action<int> OnPerformancePassed;  // 绩效达标 
     public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 层级变化
+
+    // 玩家运行时数据类
+    public class PlayerRuntimeData
+    {
+        public int Health { get; private set; } = 100;
+        public event Action<int> OnHealthChanged;
+
+        public void ModifyHealth(int delta)
+        {
+            Health = Mathf.Clamp(Health + delta, 0, 100);
+            OnHealthChanged?.Invoke(Health);
+        }
+    }
 
     // 属性封装（数据访问入口）
     public int Money {
@@ -72,5 +86,18 @@ public class GameDataModel : ScriptableObject
         {
             OnPerformanceFailed?.Invoke();
         }
+    }
+    //玩家管理接口
+    public void RegisterPlayer(string playerId)
+    {
+        if (!_players.ContainsKey(playerId))
+        {
+            _players[playerId] = new PlayerRuntimeData();
+        }
+    }
+
+    public PlayerRuntimeData GetPlayerData(string playerId)
+    {
+        return _players.TryGetValue(playerId, out var data) ? data : null;
     }
 }
