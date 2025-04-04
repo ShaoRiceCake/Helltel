@@ -1,11 +1,15 @@
 using Obi;
 using UnityEngine;
+using System; // Added for Action delegate
 
 public class FluidParticleCounter : MonoBehaviour
 {
     public LayerMask triggerLayers;
     public ObiSolver solver;
     public ObiEmitter emitter;
+
+    // Define a public event that others can subscribe to
+    public event Action<int> OnParticleDestroyed;
 
     private void OnEnable()
     {
@@ -52,5 +56,7 @@ public class FluidParticleCounter : MonoBehaviour
     {
         yield return null; 
         emitter.DeactivateParticle(actorIndex);
+        
+        OnParticleDestroyed?.Invoke(actorIndex);
     }
 }
