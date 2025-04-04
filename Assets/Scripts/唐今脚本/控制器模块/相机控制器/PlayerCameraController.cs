@@ -1,5 +1,6 @@
 using UnityEngine;
 using Cinemachine;
+using System.Collections;
 
 [RequireComponent(typeof(CinemachineManager))]
 [RequireComponent(typeof(PlayerControlInformationProcess))]
@@ -18,13 +19,15 @@ public class PlayerCameraController : MonoBehaviour
     public KeyCode previousCameraKey = KeyCode.A;
     public KeyCode skipNextCameraKey = KeyCode.W;
     public KeyCode skipPreviousCameraKey = KeyCode.S;
+    public float inputCooldown = 0.2f; // 新增：输入冷却时间
 
     private CinemachineManager _cameraSwitcher;
-    private int _lastCameraIndex; // 用于记录上一个相机索引
+    private int _lastCameraIndex;
     private PlayerControlInformationProcess _controlHandler;
     private PlayerControl_HandControl _handControl;        
+    private bool _canInput = true; // 新增：输入控制标志
         
-    private const int BaseCameraCount = 4; // 基础身位相机数量
+    private const int BaseCameraCount = 4;
     private enum CameraType
     {
         Back = 0,
@@ -81,22 +84,35 @@ public class PlayerCameraController : MonoBehaviour
 
     private void HandleCameraInput()
     {
+        if (!_canInput) return; // 如果处于冷却时间则不处理输入
+
         if (Input.GetKeyDown(nextCameraKey))
         {
             SwitchToNextCamera(1);
+            StartCoroutine(InputCooldown());
         }
         else if (Input.GetKeyDown(previousCameraKey))
         {
             SwitchToNextCamera(-1);
+            StartCoroutine(InputCooldown());
         }
         else if (Input.GetKeyDown(skipNextCameraKey))
         {
             SwitchToNextCamera(2);
+            StartCoroutine(InputCooldown());
         }
         else if (Input.GetKeyDown(skipPreviousCameraKey))
         {
             SwitchToNextCamera(-2);
+            StartCoroutine(InputCooldown());
         }
+    }
+
+    private IEnumerator InputCooldown()
+    {
+        _canInput = false;
+        yield return new WaitForSeconds(inputCooldown);
+        _canInput = true;
     }
 
     private void SwitchToNextCamera(int step)
@@ -105,27 +121,21 @@ public class PlayerCameraController : MonoBehaviour
 
         switch (currentIndex)
         {
-            // 在手部摄像机状态下
             case >= (int)CameraType.HandLeft and <= (int)CameraType.HandFront:
             {
-                // 直接计算新的手部摄像机索引
                 var newIndex = currentIndex + step;
 
                 newIndex = newIndex switch
                 {
-                    // 处理循环逻辑
                     > (int)CameraType.HandFront => (int)CameraType.HandLeft,
                     < (int)CameraType.HandLeft => (int)CameraType.HandFront,
                     _ => newIndex
                 };
 
                 _cameraSwitcher.SetActiveCamera(newIndex);
-        
-                // 更新对应的基础身位索引
                 _lastCameraIndex = newIndex - (int)CameraType.HandLeft;
                 break;
             }
-            // 在基础身位摄像机状态下
             case < BaseCameraCount:
             {
                 var newIndex = CalculateNewIndex(currentIndex, step);
@@ -138,27 +148,17 @@ public class PlayerCameraController : MonoBehaviour
 
     private void SwitchHandCamera(int currentHandIndex, int step)
     {
-        // 计算基础身位索引 (0-3)
-        int baseStance = currentHandIndex - (int)CameraType.HandLeft;
-        int newBaseStance = CalculateNewIndex(baseStance, step);
-        
-        // 切换到新的手部摄像机
-        int newHandIndex = (int)CameraType.HandLeft + newBaseStance;
+        var baseStance = currentHandIndex - (int)CameraType.HandLeft;
+        var newBaseStance = CalculateNewIndex(baseStance, step);
+        var newHandIndex = (int)CameraType.HandLeft + newBaseStance;
         _cameraSwitcher.SetActiveCamera(newHandIndex);
-        
-        // 更新_lastCameraIndex为对应的基础身位
         _lastCameraIndex = newBaseStance;
     }
 
     private static int CalculateNewIndex(int currentIndex, int step)
     {
         var newIndex = (currentIndex + step) % BaseCameraCount;
-        
-        if (newIndex < 0)
-        {
-            newIndex += BaseCameraCount;
-        }
-
+        if (newIndex < 0) newIndex += BaseCameraCount;
         return newIndex;
     }
 

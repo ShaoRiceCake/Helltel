@@ -13,7 +13,6 @@ public class CinemachineManager : MonoBehaviour
 
     private void Start()
     {
-        // 验证输入
         if (virtualCameras == null || virtualCameras.Length == 0)
         {
             Debug.LogError("没有分配虚拟摄像头！");
@@ -26,26 +25,18 @@ public class CinemachineManager : MonoBehaviour
             defaultCameraIndex = 0;
         }
 
-        // 初始化摄像头状态
         _currentCameraIndex = defaultCameraIndex;
         SwitchCamera(_currentCameraIndex);
     }
-
-    private void Update()
-    {
-        Debug.Log("current cam: "+ _currentCameraIndex);
-    }
-
+    
     private void SwitchCamera(int newCameraIndex)
     {
-        // 确保索引有效
         if (newCameraIndex < 0 || newCameraIndex >= virtualCameras.Length)
         {
             Debug.LogError("无效的摄像头索引: " + newCameraIndex);
             return;
         }
 
-        // 禁用所有摄像头
         foreach (var cam in virtualCameras)
         {
             if (cam != null)
@@ -54,7 +45,6 @@ public class CinemachineManager : MonoBehaviour
             }
         }
 
-        // 启用选中的摄像头
         if (virtualCameras[newCameraIndex] != null)
         {
             virtualCameras[newCameraIndex].gameObject.SetActive(true);
