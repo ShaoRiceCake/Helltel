@@ -1,6 +1,7 @@
 //Model层核心数据
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 // 全局游戏数据模型
 [CreateAssetMenu(fileName = "GameData", menuName = "Helltel/Data/GameData")]
@@ -19,6 +20,7 @@ public class GameDataModel : ScriptableObject
 
     // 公开事件
     public event Action<int> OnMoneyChanged;      // 金钱变化
+    public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnDayChanged;        // 天数变化
     public event Action<int> OnPerformancePassed;  // 绩效达标 
     public event Action OnPerformanceFailed;      // 绩效失败
@@ -27,12 +29,13 @@ public class GameDataModel : ScriptableObject
     // 玩家运行时数据类
     public class PlayerRuntimeData
     {
-        public int Health { get; private set; } = 100;
+        public int Health { get; set; } = 100;
+        public int MaxHealth = 100;
         public event Action<int> OnHealthChanged;
 
         public void ModifyHealth(int delta)
         {
-            Health = Mathf.Clamp(Health + delta, 0, 100);
+            Health = Mathf.Clamp(Health + delta, 0, MaxHealth);
             OnHealthChanged?.Invoke(Health);
         }
     }
@@ -41,7 +44,7 @@ public class GameDataModel : ScriptableObject
     public int Money {
         get => _money;
         set {
-            _money = Mathf.Max(0, value);
+            _money =value;
             OnMoneyChanged?.Invoke(_money); // 触发UI更新
         }
     }
@@ -49,7 +52,8 @@ public class GameDataModel : ScriptableObject
     public int Performance {
         get => _performance;
         set {
-            _performance = Mathf.Max(0, value);
+            _performance = value;
+            OnPerformanceChanged?.Invoke(_performance);
             CheckPerformance(); // 数值变化时自动检查绩效
         }
     }

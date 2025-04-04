@@ -3,15 +3,15 @@ using TMPro;
 using DG.Tweening; 
 
 /// <summary>
-/// 使用DOTween的生命值显示视图
+/// 使用DOTween的金钱显示视图
 /// </summary>
-public class HealthView : MonoBehaviour
+public class PerformanceView : MonoBehaviour
 {
     [Header("组件绑定")]
-    [SerializeField] private TextMeshProUGUI _moneyText;
+    [SerializeField] private TMP_Text _performanceText;
     [SerializeField] private GameDataModel _data;
 
-    [Header("动画参数")]//动画为实装
+    [Header("动画参数")]
     [SerializeField] private float _punchScale = 1.2f;
     [SerializeField] private float _animDuration = 0.3f;
     [SerializeField] private Color _flashColor = Color.yellow;
@@ -23,17 +23,17 @@ public class HealthView : MonoBehaviour
        
         
         // 注册事件
-        _data.OnMoneyChanged += UpdateMoneyDisplay;
+        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
     }
 
     private void Start()
     {
-        UpdateMoneyDisplay(_data.Money);
+        UpdatePerformanceDisplay(_data.Performance);
     }
 
-    private void UpdateMoneyDisplay(int newValue)
+    private void UpdatePerformanceDisplay(int newValue)
     {
-        _moneyText.text = $"${newValue}";
+        _performanceText.text = $"${newValue}";
         //PlayMoneyAnimation();
     }
 
@@ -53,7 +53,7 @@ public class HealthView : MonoBehaviour
 
     private void OnDestroy()
     {
-        _data.OnMoneyChanged -= UpdateMoneyDisplay;
+        _data.OnPerformanceChanged -= UpdatePerformanceDisplay;
         _animSequence?.Kill();
     }
 }
