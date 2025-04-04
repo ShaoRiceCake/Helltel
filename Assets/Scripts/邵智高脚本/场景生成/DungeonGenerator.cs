@@ -7,7 +7,7 @@ using System.IO;
 using System.ComponentModel;
 using Unity.Collections;
 using System.Linq.Expressions;
-
+using Unity.Netcode;
 /// <summary>
 /// 地牢生成器核心类
 /// 实现基于连接点的程序化地牢生成系统
@@ -18,7 +18,7 @@ using System.Linq.Expressions;
 /// - 动态连接点管理
 /// </summary>
 public enum DungeonState{inActive,generatingMain,generatingBranches,cleanup,completed}
-public class DungeonGenerator : MonoBehaviour
+public class DungeonGenerator : NetworkBehaviour
 {
     const float ROOM_SCALE = 1.3f;
     [Header("电梯配置")]
@@ -92,12 +92,14 @@ public class DungeonGenerator : MonoBehaviour
     /// <summary>
     /// 初始化生成协程
     /// </summary>
-    void Start()
-    {
-        
-        // 启动地牢生成流程
-        StartCoroutine(DungeonBuild());
-    }
+    //void Start()
+    //{
+    //    if (IsHost)
+    //    {
+    //        // 启动地牢生成流程
+    //        StartCoroutine(DungeonBuild());
+    //    }
+    //}
 
     /// <summary>
     /// 地牢生成主协程
@@ -109,8 +111,9 @@ public class DungeonGenerator : MonoBehaviour
     /// 5. 生成分支路径
     /// 6. 执行最终清理
     /// </summary>
-    IEnumerator DungeonBuild()
+    public IEnumerator DungeonBuild()
     {
+        elevatorTile = GameObject.Find("电梯").transform;
         // 创建主路径父对象
         GameObject goContainer = new GameObject("Main Path");
         container = goContainer.transform;
@@ -189,6 +192,8 @@ public class DungeonGenerator : MonoBehaviour
         //CleanupBoxes();
         BlockedPassages();
         dungeonState = DungeonState.completed;
+
+        NetworkObject.Spawn();
     }
 
     /// <summary>

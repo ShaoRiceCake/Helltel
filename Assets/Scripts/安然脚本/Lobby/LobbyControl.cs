@@ -198,7 +198,6 @@ public class LobbyControl : NetworkBehaviour
     private void OnStartClick()
     {
         GameManager.instance.StartGame(_allPlayerInfo);
-        GameManager.instance.isGameing = true;
         GameManager.instance.LoadScene("Game");
     }
 

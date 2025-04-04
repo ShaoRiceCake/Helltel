@@ -6,12 +6,13 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     public float minXAngle = -35f; 
     public float maxXAngle = 35f; 
     public GameObject aimObject;
-
+    public GameObject virtualCamera;
     private readonly float _currentXRotation = 0f;
 
     protected override void Start()
     {
-        /*forwardObject.SetActive(IsLocalPlayer);*///根据是否本地玩家决定开启相机
+        virtualCamera.SetActive(IsLocalPlayer);
+        forwardObject.SetActive(IsLocalPlayer);//根据是否本地玩家决定开启相机
     }
 
     private void Update()
@@ -19,12 +20,12 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         // 水平旋转（左右）
         if (Input.GetKey(KeyCode.A))
         {
-            aimObject.transform.parent.Rotate(0, -rotationSpeed * Time.deltaTime, 0);
+            aimObject.transform.GetChild(0).Rotate(0, -rotationSpeed * Time.deltaTime, 0);
         }
 
         if (Input.GetKey(KeyCode.D))
         {
-            aimObject.transform.parent.Rotate(0, rotationSpeed * Time.deltaTime, 0);
+            aimObject.transform.GetChild(0).Rotate(0, rotationSpeed * Time.deltaTime, 0);
         }
 
         // // 垂直旋转（上下）

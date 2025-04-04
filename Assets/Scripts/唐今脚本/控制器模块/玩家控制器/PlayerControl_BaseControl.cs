@@ -12,5 +12,4 @@ public abstract class PlayerControl_BaseControl : NetworkBehaviour
 
         NullCheckerTool.CheckNull(forwardObject, controlHandler);
     }
-
 }
