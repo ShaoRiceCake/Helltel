@@ -9,21 +9,18 @@ public class GameController : MonoBehaviour
     [Header("数据引用")]
     [SerializeField] private GameDataModel _gameData;
 
-    // 依赖注入初始化
-    private void Awake()
-    {
-        // 持久化单例模式
-        if (FindObjectsOfType<GameController>().Length > 1)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        DontDestroyOnLoad(gameObject);
+    public static GameController Instance { get; private set; }
 
+    private void Awake() {
+        if (Instance == null) {
+            Instance = this;
+        } else {
+            Destroy(gameObject);
+        }
         _gameData.ResetData();
     }
 
-    // 外部接口：修改金钱
+    // 增加钱接口
     public void AddMoney(int amount)
     {
         if (amount < 0)
@@ -33,24 +30,41 @@ public class GameController : MonoBehaviour
         }
         
         _gameData.Money += amount;
-        _gameData.Performance += amount; // 绩效同步增加
     }
 
-    // 安全扣钱方法
-    public bool TryDeductMoney(int amount)
+    // 扣钱接口
+    public void DeductMoney(int amount)
     {
         if (_gameData.Money >= amount)
         {
             _gameData.Money -= amount;
-            return true;
         }
-        return false;
+        //暂定钱可以是负数
+        _gameData.Money -= amount;
     }
-
-    // 推进天数（原AdvanceDay）
+    //增加绩效接口
+    public void AddPerformance(int amount)
+    {
+        if (amount < 0)
+        {
+            Debug.LogError("请使用 DeductMoney 方法扣除绩效");
+            return;
+        }
+        _gameData.Performance += amount;
+    }
+    // 扣绩效接口
+    public void DeductPerformance(int amount)
+    {
+        if (_gameData.Performance >= amount)
+        {
+            _gameData.Performance -= amount;
+        }
+        //暂定绩效可以是负数
+        _gameData.Performance -= amount;
+    }
+    // 推进天数
     public void AdvanceDay()
     {
         _gameData.CurrentDay++;
-        // 自动绩效检查由Model内部处理
     }
 }

@@ -3,12 +3,12 @@ using TMPro;
 
 public class GoldGetShowTool : MonoBehaviour
 {
-    [Header("UI Settings")]
-    public TMP_Text counterText;
-    public string prefixText = "获取金币： "; 
+    //[Header("UI Settings")]
+    //public TMP_Text counterText;
+    //public string prefixText = "获取金币： "; 
 
     private FluidParticleCounter _particleCounter;
-    private int _destroyedParticleCount;
+    //private int _destroyedParticleCount;
 
     private void Awake()
     {
@@ -24,7 +24,7 @@ public class GoldGetShowTool : MonoBehaviour
 
     private void Start()
     {
-        UpdateCounterText();
+        //UpdateCounterText();
     }
 
     private void OnDestroy()
@@ -37,22 +37,22 @@ public class GoldGetShowTool : MonoBehaviour
 
     private void OnParticleDestroyed(int particleIndex)
     {
-        _destroyedParticleCount++;
-        
-        UpdateCounterText();
+        //_destroyedParticleCount++;
+        GameController.Instance.AddPerformance(1);
+        //UpdateCounterText();注释此行，因为Performance改变后会发送事件使UI会同步更新
     }
 
-    private void UpdateCounterText()
-    {
-        if (counterText != null)
-        {
-            counterText.text = prefixText + _destroyedParticleCount.ToString();
-        }
-    }
+    // private void UpdateCounterText()
+    // {
+    //     if (counterText != null)
+    //     {
+    //         counterText.text = prefixText + _destroyedParticleCount.ToString();
+    //     }
+    // }
 
-    public void ResetCounter()
-    {
-        _destroyedParticleCount = 0;
-        UpdateCounterText();
-    }
+    // public void ResetCounter()
+    // {
+    //     _destroyedParticleCount = 0;
+    //     //UpdateCounterText();
+    // }
 }

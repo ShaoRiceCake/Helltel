@@ -1,6 +1,7 @@
 //Model层核心数据
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 // 全局游戏数据模型
 [CreateAssetMenu(fileName = "GameData", menuName = "Helltel/Data/GameData")]
@@ -15,19 +16,35 @@ public class GameDataModel : ScriptableObject
     private int _performance;
     private int _day = 1;
     private int _level = 0;
+    private Dictionary<string, PlayerRuntimeData> _players = new();
 
     // 公开事件
     public event Action<int> OnMoneyChanged;      // 金钱变化
+    public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnDayChanged;        // 天数变化
     public event Action<int> OnPerformancePassed;  // 绩效达标 
     public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 层级变化
 
+    // 玩家运行时数据类
+    public class PlayerRuntimeData
+    {
+        public int Health { get; set; } = 100;
+        public int MaxHealth = 100;
+        public event Action<int> OnHealthChanged;
+
+        public void ModifyHealth(int delta)
+        {
+            Health = Mathf.Clamp(Health + delta, 0, MaxHealth);
+            OnHealthChanged?.Invoke(Health);
+        }
+    }
+
     // 属性封装（数据访问入口）
     public int Money {
         get => _money;
         set {
-            _money = Mathf.Max(0, value);
+            _money =value;
             OnMoneyChanged?.Invoke(_money); // 触发UI更新
         }
     }
@@ -35,7 +52,8 @@ public class GameDataModel : ScriptableObject
     public int Performance {
         get => _performance;
         set {
-            _performance = Mathf.Max(0, value);
+            _performance = value;
+            OnPerformanceChanged?.Invoke(_performance);
             CheckPerformance(); // 数值变化时自动检查绩效
         }
     }
@@ -72,5 +90,18 @@ public class GameDataModel : ScriptableObject
         {
             OnPerformanceFailed?.Invoke();
         }
+    }
+    //玩家管理接口
+    public void RegisterPlayer(string playerId)
+    {
+        if (!_players.ContainsKey(playerId))
+        {
+            _players[playerId] = new PlayerRuntimeData();
+        }
+    }
+
+    public PlayerRuntimeData GetPlayerData(string playerId)
+    {
+        return _players.TryGetValue(playerId, out var data) ? data : null;
     }
 }

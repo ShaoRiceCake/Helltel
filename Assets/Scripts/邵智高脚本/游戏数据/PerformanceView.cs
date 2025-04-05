@@ -5,10 +5,10 @@ using DG.Tweening;
 /// <summary>
 /// 使用DOTween的金钱显示视图
 /// </summary>
-public class MoneyView : MonoBehaviour
+public class PerformanceView : MonoBehaviour
 {
     [Header("组件绑定")]
-    [SerializeField] private TextMeshProUGUI _moneyText;
+    [SerializeField] private TMP_Text _performanceText;
     [SerializeField] private GameDataModel _data;
 
     [Header("动画参数")]
@@ -23,17 +23,17 @@ public class MoneyView : MonoBehaviour
        
         
         // 注册事件
-        _data.OnMoneyChanged += UpdateMoneyDisplay;
+        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
     }
 
     private void Start()
     {
-        UpdateMoneyDisplay(_data.Money);
+        UpdatePerformanceDisplay(_data.Performance);
     }
 
-    private void UpdateMoneyDisplay(int newValue)
+    private void UpdatePerformanceDisplay(int newValue)
     {
-        _moneyText.text = $"${newValue}";
+        _performanceText.text = $"${newValue}";
         //PlayMoneyAnimation();
     }
 
@@ -53,7 +53,7 @@ public class MoneyView : MonoBehaviour
 
     private void OnDestroy()
     {
-        _data.OnMoneyChanged -= UpdateMoneyDisplay;
+        _data.OnPerformanceChanged -= UpdatePerformanceDisplay;
         _animSequence?.Kill();
     }
 }
