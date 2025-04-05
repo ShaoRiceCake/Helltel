@@ -6,13 +6,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-//using Unity.Services.Relay;
-//using Unity.Services.Authentication;
-//using Unity.Services.Core;
-//using Unity.Services.Relay.Models;
+using Unity.Services.Relay;
+using Unity.Services.Authentication;
+using Unity.Services.Core;
+using Unity.Services.Relay.Models;
 using System.Threading.Tasks;
 using Unity.Networking.Transport.Relay;
 using System;
+using Unity.Sync.Relay.Lobby;
+using Unity.Sync.Relay.Model;
+using Unity.Sync.Relay.Transport.Netcode;
 
 public class NetworkRoom : MonoBehaviour
 {
@@ -23,78 +26,132 @@ public class NetworkRoom : MonoBehaviour
 
     public Button client;
 
+    public RelayTransportNetcode relayTransportNetcode;
+
+    string uid;
     private void Start()
     {
-        host.onClick.AddListener(BeHost); // 
-        client.onClick.AddListener(Login); 
+        relayTransportNetcode = NetworkManager.Singleton.GetComponentInChildren<RelayTransportNetcode>();
+
+        uid = Guid.NewGuid().ToString();
+        var props = new Dictionary<string, string>();
+        props.Add("icon", "unity");
+        relayTransportNetcode.SetPlayerData(uid, "Player-" + uid, props);
+        host.onClick.AddListener(OnStartHostButton);
+        client.onClick.AddListener(OnStartClientButton);
     }
-    #region 广域网同步
-    //private async void OnStartClientButtonClicked()
-    //{
 
-    //    GameManager.instance.SetJoinCode(inputIP.text);
+    public void OnStartHostButton()
+    {
+        NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayTransportNetcode;
 
-    //    try
-    //    {
-    //        Isjoin = await StartClientWithRelay(inputIP.text);
-    //    }
-    //    catch (RelayServiceException ex)
-    //    {
-    //        if (ex.Message.StartsWith("Bad"))
-    //        {
-    //            Debug.Log("房间代码无效！");
-    //        }
-    //        // 处理 Relay 服务器错误（例如无效代码或连接失败）
-    //        Debug.LogError("Relay Error: " + ex.Message);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        if (ex.Message.StartsWith("Value"))
-    //        {
-    //            Debug.Log("房间代码不可为空");
-    //        }
-    //        // 处理其他异常
-    //        Debug.LogError("General Error: " + ex.Message);
-    //    }
-
-    //}
-
-    //private async void OnStartHostButtonClicked()
-    //{
-    //    GameManager.instance.SetJoinCode(await StartHostWithRelay(MaxConnectPlayers));
-    //    GameManager.instance.LoadScene("Lobby");
-    //}
-
-    //public async Task<string> StartHostWithRelay(int maxConnections)
-    //{
-    //    await UnityServices.InitializeAsync();
-
-    //    if (!AuthenticationService.Instance.IsSignedIn)
-    //    {
-    //        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    //    }
-
-    //    Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-    //    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
-    //    var joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-
-    //    return NetworkManager.Singleton.StartHost() ? joinCode : null;
-    //}
+        if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
+        {
+            if (true)
+            {
+                StartCoroutine(LobbyService.AsyncCreateRoom(new CreateRoomRequest()
+                {
+                    Name = "Demo",
+                    Namespace = "Unity",
+                    MaxPlayers = 20,
+                    Visibility = LobbyRoomVisibility.Public,
+                    OwnerId = uid,
+                    CustomProperties = new Dictionary<string, string>()
+                    {
+                        {"a", "b"},
+                    }
+                }, (resp) =>
+                {
+                    if (resp.Code == (uint)RelayCode.OK)
+                    {
+                        Debug.Log("Create Room succeed.");
+                        if (resp.Status == LobbyRoomStatus.ServerAllocated)
+                        {
+                            relayTransportNetcode.SetRoomData(resp);
+                            StartHost();
+                            GameManager.instance.joinConde = resp.RoomCode;
+                            GameManager.instance.LoadScene("Lobby");
+                        }
+                        else
+                        {
+                            Debug.Log("Room Status Exception : " + resp.Status.ToString());
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Create Room Fail By Lobby Service");
+                    }
+                }));
 
 
-    //public async Task<bool> StartClientWithRelay(string joinCode)
-    //{
-    //    await UnityServices.InitializeAsync();
-    //    if (!AuthenticationService.Instance.IsSignedIn)
-    //    {
-    //        await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    //    }
+            }
+        }
+    }
 
-    //    var joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode: joinCode);
-    //    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
-    //    return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
-    //}
-    #endregion
+    private void StartHost()
+    {
+        NetworkManager.Singleton.StartHost();
+    }
+
+    public void OnStartClientButton()//以 client 身份加入游戏
+    {
+        NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayTransportNetcode;
+
+        if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
+        {
+            if (true)
+            {
+
+                StartCoroutine(LobbyService.AsyncListRoom(new ListRoomRequest()
+                {
+                    Namespace = "Unity",
+                    Start = 0,
+                    Count = 10,
+                }, (resp) =>
+                {
+                    if (resp.Code == (uint)RelayCode.OK)
+                    {
+                        Debug.Log("List Room succeed.");
+                        if (resp.Items.Count > 0)
+                        {
+                            foreach (var item in resp.Items)
+                            {
+                                if (item.Status == LobbyRoomStatus.Ready)
+                                {
+                                    StartCoroutine(LobbyService.AsyncQueryRoom(item.RoomUuid,
+                                        (_resp) =>
+                                        {
+                                            Debug.Log(item.RoomCode);
+                                            if (_resp.Code == (uint)RelayCode.OK && item.RoomCode == inputIP.text)
+                                            {
+                                                Debug.Log("Query Room succeed.");
+                                                relayTransportNetcode.SetRoomData(_resp);
+                                                GameManager.instance.joinConde = item.RoomCode;
+                                                StartClient();
+                                            }
+                                            else
+                                            {
+                                                Debug.Log("Query Room Fail By Lobby Service");
+                                            }
+                                        }));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("List Room Fail By Lobby Service");
+                    }
+                }));
+            }
+        }
+    }
+
+    private void StartClient()
+    {
+        NetworkManager.Singleton.StartClient();
+    }
 
     #region 本地测试
     public void Login()

@@ -114,8 +114,13 @@ public class DungeonGenerator : NetworkBehaviour
     public IEnumerator DungeonBuild()
     {
         elevatorTile = GameObject.Find("电梯").transform;
+
         // 创建主路径父对象
         GameObject goContainer = new GameObject("Main Path");
+        var net = goContainer.AddComponent<NetworkObject>();
+        net.Spawn();
+
+
         container = goContainer.transform;
         container.SetParent(transform);
         

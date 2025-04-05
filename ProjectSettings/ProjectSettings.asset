@@ -569,9 +569,10 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: OBI_ONI_SUPPORTED
-    Standalone: OBI_ONI_SUPPORTED
-    iPhone: OBI_ONI_SUPPORTED
+    Android: OBI_ONI_SUPPORTED;UNITY_UOS_SECURITY
+    Standalone: OBI_ONI_SUPPORTED;UNITY_UOS_SECURITY
+    WebGL: UNITY_UOS_SECURITY
+    iPhone: OBI_ONI_SUPPORTED;UNITY_UOS_SECURITY
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}
@@ -665,11 +666,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: a2719964-434a-425f-aba6-3ba17ad42e1b
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: "\u5730\u72F1\u9152\u5E971"
+  organizationId: pioneercore2025
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

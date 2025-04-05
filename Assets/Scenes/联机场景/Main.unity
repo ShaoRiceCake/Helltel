@@ -451,6 +451,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: StartCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 5551550874601686595, guid: af3f3eb75ba7c4144b8c24f48f863c93, type: 3}
+      propertyPath: relayTransportNetcode
+      value: 
+      objectReference: {fileID: 2123273648}
     - target: {fileID: 5786792243574867693, guid: af3f3eb75ba7c4144b8c24f48f863c93, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -546,7 +550,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2123273647}
   - component: {fileID: 2123273646}
-  - component: {fileID: 2123273645}
+  - component: {fileID: 2123273648}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: NetworkManager
@@ -554,35 +558,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2123273645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2123273644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ProtocolType: 0
-  m_UseWebSockets: 0
-  m_UseEncryption: 0
-  m_MaxPacketQueueSize: 128
-  m_MaxPayloadSize: 6144
-  m_HeartbeatTimeoutMS: 500
-  m_ConnectTimeoutMS: 1000
-  m_MaxConnectAttempts: 60
-  m_DisconnectTimeoutMS: 30000
-  ConnectionData:
-    Address: 127.0.0.1
-    Port: 7777
-    ServerListenAddress: 0.0.0.0
-  DebugSimulator:
-    PacketDelayMS: 0
-    PacketJitterMS: 0
-    PacketDropRate: 0
 --- !u!114 &2123273646
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -597,7 +572,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NetworkConfig:
     ProtocolVersion: 0
-    NetworkTransport: {fileID: 2123273645}
+    NetworkTransport: {fileID: 2123273648}
     PlayerPrefab: {fileID: 5110805748090747419, guid: 8317bd061497e8541925e0f7356a0743, type: 3}
     Prefabs:
       NetworkPrefabsLists:
@@ -635,6 +610,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2123273648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123273644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d2ef6bf6b4e6439f865997670133b17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RoomProfileUUID: 815d9ff6-d485-4023-9265-cc08bbed6d56
+  m_transportType: 0
+  HeartbeatTimeout: 15
+  DisableDisconnectRemoteClient: 0
+  DebugMode: 0
+  UtpQueueCapacity: 64
+  AutoReconnect: 0
+  MaxReconnectRetry: 10
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
