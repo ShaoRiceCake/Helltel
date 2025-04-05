@@ -19,6 +19,10 @@ public class GameController : MonoBehaviour
         }
         _gameData.ResetData();
     }
+    private void Start() {
+        _gameData.RegisterPlayer("p1");
+    }
+    
 
     // 增加钱接口
     public void AddMoney(int amount)

@@ -16,16 +16,17 @@ public class GameDataModel : ScriptableObject
     private int _performance;
     private int _day = 1;
     private int _level = 0;
-    //private Dictionary<string, PlayerRuntimeData> _players = new();
+    private Dictionary<string, PlayerData> _players = new();
 
     // 公开事件
     public event Action<int> OnMoneyChanged;      // 金钱变化
     public event Action<int> OnPerformanceChanged;// 绩效变化
-      public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
+    public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
     public event Action<int> OnDayChanged;        // 天数变化
     public event Action<int> OnPerformancePassed;  // 绩效达标 
     public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 层级变化
+    public event Action<string, int> OnPlayerHealthChanged; // 玩家ID, 新生命值
 
     // 属性封装（数据访问入口）
     public int Money {
@@ -78,31 +79,44 @@ public class GameDataModel : ScriptableObject
             OnPerformanceFailed?.Invoke();
         }
     }
-        // 玩家运行时数据类
-    // public class PlayerRuntimeData
-    // {
-    //     private int _health = 100;
-    //     private int _maxHealth = 100;
-    //     public event Action<int> OnHealthChanged;
+    //======= 玩家数据类 =======//
+    public class PlayerData
+    {
+        private int _health = 100;
+        private int _maxHealth = 100;
+        public int Health
+        {
+            get => _health;
+            set
+            {
+                int newVal = Mathf.Clamp(value, 0, _maxHealth);
+                if (newVal != _health)
+                {
+                    _health = newVal;
+                    OnHealthChanged?.Invoke(newVal);
+                }
+            }
+        }
 
-    //     public void ModifyHealth(int count)
-    //     {
-    //         _health = Mathf.Clamp(_health + count, 0, _maxHealth);
-    //         OnHealthChanged?.Invoke(_health);
-    //     }
-    // }
-    
-    // //玩家管理接口
-    // public void RegisterPlayer(string playerId)
-    // {
-    //     if (!_players.ContainsKey(playerId))
-    //     {
-    //         _players[playerId] = new PlayerRuntimeData();
-    //     }
-    // }
+        public event Action<int> OnHealthChanged;
+    }
 
-    // public PlayerRuntimeData GetPlayerData(string playerId)
-    // {
-    //     return _players.TryGetValue(playerId, out var data) ? data : null;
-    // }
+    //======= 玩家管理接口 =======//
+    public void RegisterPlayer(string id)
+    {
+        if (!_players.ContainsKey(id))
+        {
+            var player = new PlayerData();
+            // 给玩家的OnHealthChanged添加监听,当OnHealthChanged触发时触发另一个叫OnPlayerHealthChanged的事件，该事件会将玩家AI和生命值传递出去
+            player.OnHealthChanged += (health) => 
+                OnPlayerHealthChanged?.Invoke(id, health);
+            //将新玩家存入字典
+            _players[id] = player;
+        }
+        // 如果已经有这个ID，什么都不做（避免重复注册）
+    }
+    /// <summary>
+    /// 根据ID获取玩家数据（找不到返回null）
+    /// </summary>
+    public PlayerData GetPlayer(string id) => _players.TryGetValue(id, out var p) ? p : null;
 }
