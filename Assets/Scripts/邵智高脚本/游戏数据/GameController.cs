@@ -66,5 +66,6 @@ public class GameController : MonoBehaviour
     public void AdvanceDay()
     {
         _gameData.CurrentDay++;
+        
     }
 }
