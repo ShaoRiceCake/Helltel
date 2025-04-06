@@ -117,6 +117,7 @@ public class DungeonGenerator : NetworkBehaviour
 
         // 创建主路径父对象
         GameObject goContainer = new GameObject("Main Path");
+        
         var net = goContainer.AddComponent<NetworkObject>();
         net.Spawn();
 
@@ -171,6 +172,7 @@ public class DungeonGenerator : NetworkBehaviour
                 goContainer = new GameObject("Branch" + (b+1));
                 container = goContainer.transform;
                 container.SetParent(transform);
+                AddNetworkObject(goContainer);
 
                 // 随机选择分支起点
                 int connectorIndex = Random.Range(0, availableConnectors.Count);
@@ -221,7 +223,7 @@ public class DungeonGenerator : NetworkBehaviour
         
         // 初始化房间数据
         generatedTiles.Add(new Tile(tile.transform, null));
-
+        AddNetworkObject(tile);
         return tile.transform;
     }
 
@@ -238,6 +240,7 @@ public class DungeonGenerator : NetworkBehaviour
         // 随机选择房间类型
         int tileIndex = Random.Range(0, tilePrefabs.Length);
         GameObject tile = Instantiate(tilePrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
+        AddNetworkObject(tile);
         tile.transform.localScale = Vector3.one * ROOM_SCALE; 
         tile.name = tilePrefabs[tileIndex].name;
         
@@ -474,8 +477,9 @@ public class DungeonGenerator : NetworkBehaviour
             if(connector.isConnected == false){
                 Vector3 pos = connector.transform.position;
                 int wallIndex = Random.Range(0, blockedPrefabs.Length);
-                GameObject gowall = Instantiate(blockedPrefabs[wallIndex],pos,connector.transform.rotation,connector.transform)as GameObject;
+                GameObject gowall = Instantiate(blockedPrefabs[wallIndex],pos,connector.transform.rotation,connector.transform);   
                 gowall.name = blockedPrefabs[wallIndex].name;
+                AddNetworkObject(gowall);
             }
         }
     }
@@ -498,13 +502,22 @@ public class DungeonGenerator : NetworkBehaviour
             
             // 在from连接点生成门
             GameObject door = Instantiate(doorPrefab, from.transform.position, 
-                    from.transform.rotation, from.transform)as GameObject;
-            //door.transform.localScale = Vector3.one * ROOM_SCALE;
+                    from.transform.rotation, from.transform);
             
+            //door.transform.localScale = Vector3.one * ROOM_SCALE;
             // 标记已生成门
             from.hasDoor = to.hasDoor = true;
+            AddNetworkObject(door);
         }
     }
+
+    void AddNetworkObject(GameObject obj)
+    {
+        NetworkObject net = obj.GetComponent<NetworkObject>();
+        if(net == null) net = obj.AddComponent<NetworkObject>();
+        net.Spawn();
+    }
+    
 
 }
 
