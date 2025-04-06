@@ -1530,7 +1530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8722588181015194372}
   - component: {fileID: 3204734535156850530}
-  - component: {fileID: 4070068810443543113}
+  - component: {fileID: 9109619587156907830}
   - component: {fileID: 6273701268763333850}
   - component: {fileID: 7966969784971030153}
   - component: {fileID: 4417819733572421417}
@@ -1544,8 +1544,9 @@ GameObject:
   - component: {fileID: 5264491259693183575}
   - component: {fileID: 7390342581349793051}
   - component: {fileID: 982132752857214404}
+  - component: {fileID: 6294049283025068870}
   m_Layer: 0
-  m_Name: "Player_\u7B2C\u4E94\u7248+solver"
+  m_Name: NetworkPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1705,7 +1706,7 @@ MonoBehaviour:
     iterations: 1
     SORFactor: 1
     enabled: 0
---- !u!114 &4070068810443543113
+--- !u!114 &9109619587156907830
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2016,6 +2017,22 @@ MonoBehaviour:
   onNoMouseButtonDown:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6294049283025068870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5110805748090747419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 026a361ab5c7c164d9c0452ed0bf91e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerCam: {fileID: 5037151976245622753}
+  virtualCam: {fileID: 4120654508800353438}
+  NetworkMap: {fileID: 5816238570797794469, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+  colliderWorld: {fileID: 4553727583120459288}
 --- !u!1 &5186497101279086451
 GameObject:
   m_ObjectHideFlags: 0
