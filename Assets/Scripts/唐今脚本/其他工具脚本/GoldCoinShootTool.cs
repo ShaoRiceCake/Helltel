@@ -1,16 +1,17 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 public class GoldCoinShootTool : MonoBehaviour
 {
     [Header("Spawn Settings")]
-    public Transform spawnPoint;          // Spawn position
-    public GameObject spawnPrefab;        // Prefab to spawn
-    public float moveSpeed = 5f;          // Movement speed of spawned objects
-    public float lifetime = 3f;           // How long before destroying spawned objects
-    public float rotationSpeed = 180f;    // Rotation speed in degrees per second
-
+    public Transform spawnPoint;         
+    public GameObject spawnPrefab;       
+    public float moveSpeed = 5f;       
+    public float lifetime = 3f;           
+    public float rotationSpeed = 180f;    
     private FluidParticleCounter _particleCounter;
+    private ObjectPool<GameObject> _objectPool;
 
     private void Awake()
     {
@@ -21,6 +22,20 @@ public class GoldCoinShootTool : MonoBehaviour
             return;
         }
 
+        _objectPool = new ObjectPool<GameObject>(
+            createFunc: () => Instantiate(spawnPrefab),
+            actionOnGet: (obj) => {
+                obj.transform.position = spawnPoint.position;
+                obj.transform.rotation = Quaternion.identity;
+                obj.SetActive(true);
+            },
+            actionOnRelease: (obj) => obj.SetActive(false),
+            actionOnDestroy: Destroy,
+            collectionCheck: true,
+            defaultCapacity: 100,
+            maxSize: 500
+        );
+
         _particleCounter.OnParticleDestroyed += OnParticleDestroyed;
     }
 
@@ -30,6 +45,8 @@ public class GoldCoinShootTool : MonoBehaviour
         {
             _particleCounter.OnParticleDestroyed -= OnParticleDestroyed;
         }
+        
+        _objectPool?.Dispose();
     }
 
     private void OnParticleDestroyed(int particleIndex)
@@ -37,28 +54,26 @@ public class GoldCoinShootTool : MonoBehaviour
         StartCoroutine(SpawnAndMoveObject());
     }
 
-    private IEnumerator SpawnAndMoveObject()
+    private IEnumerator<GameObject> SpawnAndMoveObject()
     {
         if (!spawnPrefab || !spawnPoint) yield break;
 
-        var newObj = Instantiate(spawnPrefab, spawnPoint.position, Quaternion.identity);
+        var pooledObj = _objectPool.Get();
         
         var timer = 0f;
-        while (timer < lifetime && newObj)
+        while (timer < lifetime && pooledObj && pooledObj.activeInHierarchy)
         {
-            // Move upward
-            newObj.transform.Translate(Vector3.up * (moveSpeed * Time.deltaTime));
+            pooledObj.transform.Translate(Vector3.up * (moveSpeed * Time.deltaTime));
             
-            // Rotate around Y-axis (or any axis you prefer)
-            newObj.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+            pooledObj.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
             
             timer += Time.deltaTime;
             yield return null;
         }
 
-        if (newObj)
+        if (pooledObj && pooledObj.activeInHierarchy)
         {
-            Destroy(newObj);
+            _objectPool.Release(pooledObj);
         }
     }
 }
