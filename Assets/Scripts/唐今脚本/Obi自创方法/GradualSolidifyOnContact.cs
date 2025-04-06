@@ -4,207 +4,188 @@ using Obi;
 
 public class GradualSolidifyOnContact : MonoBehaviour
 {
-    public struct SolidData
+    private struct SolidData
     {
-        public Transform reference;
-        public Vector3 localPos;
+        public readonly Transform Reference;
+        public Vector3 LocalPos;
 
         public SolidData(Transform reference)
         {
-            this.reference = reference;
-            this.localPos = Vector3.zero;
+            this.Reference = reference;
+            this.LocalPos = Vector3.zero;
         }
     };
 
-    public struct DelayedSolidification
+    private struct DelayedSolidification
     {
-        public int particleIndex;
-        public int framesRemaining;
-        public SolidData solidData;
+        public int ParticleIndex;
+        public int FramesRemaining;
+        public SolidData SolidData;
     }
 
-    ObiSolver solver;
+    private ObiSolver _solver;
     public Color solidColor;
 
     [Tooltip("Number of frames to delay solidification when particles collide with already solidified particles")]
-    public int delayFrames = 0;
+    public int delayFrames;
 
-    public SolidData[] solids = new SolidData[0];
+    private SolidData[] _solids = Array.Empty<SolidData>();
 
-    private System.Collections.Generic.List<DelayedSolidification> delayedParticles =
+    private readonly System.Collections.Generic.List<DelayedSolidification> _delayedParticles =
         new System.Collections.Generic.List<DelayedSolidification>();
 
-    void Awake()
+    public void Awake()
     {
-        solver = GetComponent<ObiSolver>();
+        _solver = GetComponent<ObiSolver>();
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
-        solver.OnSimulationStart += Solver_OnBeginStep;
-        solver.OnCollision += Solver_OnCollision;
-        solver.OnParticleCollision += Solver_OnParticleCollision;
+        _solver.OnSimulationStart += Solver_OnBeginStep;
+        _solver.OnCollision += Solver_OnCollision;
+        _solver.OnParticleCollision += Solver_OnParticleCollision;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
-        solver.OnSimulationStart -= Solver_OnBeginStep;
-        solver.OnCollision -= Solver_OnCollision;
-        solver.OnParticleCollision -= Solver_OnParticleCollision;
+        _solver.OnSimulationStart -= Solver_OnBeginStep;
+        _solver.OnCollision -= Solver_OnCollision;
+        _solver.OnParticleCollision -= Solver_OnParticleCollision;
     }
 
-    void Solver_OnCollision(object sender, ObiNativeContactList e)
+    private void Solver_OnCollision(object sender, ObiNativeContactList e)
     {
         // Ensure solids array is large enough
-        if (solver.allocParticleCount > solids.Length)
+        if (_solver.allocParticleCount > _solids.Length)
         {
-            Array.Resize(ref solids, solver.allocParticleCount);
+            Array.Resize(ref _solids, _solver.allocParticleCount);
         }
 
         var colliderWorld = ObiColliderWorld.GetInstance();
         if (colliderWorld == null) return;
 
-        for (int i = 0; i < e.count; ++i)
+        for (var i = 0; i < e.count; ++i)
         {
-            if (e[i].distance < 0.001f)
-            {
-                var handle = colliderWorld.colliderHandles[e[i].bodyB];
-                if (handle == null || handle.owner == null) continue;
+            if (!(e[i].distance < 0.001f)) continue;
+            var handle = colliderWorld.colliderHandles[e[i].bodyB];
+            if (handle == null || !handle.owner) continue;
 
-                var col = handle.owner;
-                if (col != null && col.transform != null)
-                {
-                    int particleIndex = solver.simplices[e[i].bodyA];
-                    if (particleIndex >= 0 && particleIndex < solids.Length)
-                    {
-                        Solidify(particleIndex, new SolidData(col.transform));
-                    }
-                }
+            var col = handle.owner;
+            if (!col || !col.transform) continue;
+            var particleIndex = _solver.simplices[e[i].bodyA];
+            if (particleIndex >= 0 && particleIndex < _solids.Length)
+            {
+                Solidify(particleIndex, new SolidData(col.transform));
             }
         }
     }
 
-    void Solver_OnParticleCollision(object sender, ObiNativeContactList e)
+    private void Solver_OnParticleCollision(object sender, ObiNativeContactList e)
     {
-        // Ensure solids array is large enough
-        if (solver.allocParticleCount > solids.Length)
+        if (_solver.allocParticleCount > _solids.Length)
         {
-            Array.Resize(ref solids, solver.allocParticleCount);
+            Array.Resize(ref _solids, _solver.allocParticleCount);
         }
 
-        for (int i = 0; i < e.count; ++i)
+        for (var i = 0; i < e.count; ++i)
         {
-            if (e[i].distance < 0.001f)
+            if (!(e[i].distance < 0.001f)) continue;
+            var particleIndexA = _solver.simplices[e[i].bodyA];
+            var particleIndexB = _solver.simplices[e[i].bodyB];
+
+            if (particleIndexA < 0 || particleIndexA >= _solver.invMasses.count || 
+                particleIndexB < 0 || particleIndexB >= _solver.invMasses.count)
+                continue;
+
+            if (_solver.invMasses[particleIndexA] < 0.0001f && _solver.invMasses[particleIndexB] >= 0.0001f)
             {
-                int particleIndexA = solver.simplices[e[i].bodyA];
-                int particleIndexB = solver.simplices[e[i].bodyB];
-
-                if (particleIndexA < 0 || particleIndexA >= solver.invMasses.count || 
-                    particleIndexB < 0 || particleIndexB >= solver.invMasses.count)
-                    continue;
-
-                if (solver.invMasses[particleIndexA] < 0.0001f && solver.invMasses[particleIndexB] >= 0.0001f)
+                if (particleIndexA < _solids.Length)
                 {
-                    if (particleIndexA >= 0 && particleIndexA < solids.Length)
+                    if (delayFrames > 0)
                     {
-                        if (delayFrames > 0)
+                        _delayedParticles.Add(new DelayedSolidification()
                         {
-                            delayedParticles.Add(new DelayedSolidification()
-                            {
-                                particleIndex = particleIndexB,
-                                framesRemaining = delayFrames,
-                                solidData = solids[particleIndexA]
-                            });
-                        }
-                        else
-                        {
-                            Solidify(particleIndexB, solids[particleIndexA]);
-                        }
+                            ParticleIndex = particleIndexB,
+                            FramesRemaining = delayFrames,
+                            SolidData = _solids[particleIndexA]
+                        });
                     }
-                }
-
-                if (solver.invMasses[particleIndexB] < 0.0001f && solver.invMasses[particleIndexA] >= 0.0001f)
-                {
-                    if (particleIndexB >= 0 && particleIndexB < solids.Length)
+                    else
                     {
-                        if (delayFrames > 0)
-                        {
-                            delayedParticles.Add(new DelayedSolidification()
-                            {
-                                particleIndex = particleIndexA,
-                                framesRemaining = delayFrames,
-                                solidData = solids[particleIndexB]
-                            });
-                        }
-                        else
-                        {
-                            Solidify(particleIndexA, solids[particleIndexB]);
-                        }
+                        Solidify(particleIndexB, _solids[particleIndexA]);
                     }
                 }
             }
-        }
-    }
 
-    void Solver_OnBeginStep(ObiSolver s, float timeToSimulate, float substepTime)
-    {
-        // Ensure solids array is large enough
-        if (solver.allocParticleCount > solids.Length)
-        {
-            Array.Resize(ref solids, solver.allocParticleCount);
-        }
-
-        // Process delayed solidifications
-        for (int i = delayedParticles.Count - 1; i >= 0; i--)
-        {
-            var delayed = delayedParticles[i];
-            delayed.framesRemaining--;
-
-            if (delayed.framesRemaining <= 0)
+            if (!(_solver.invMasses[particleIndexB] < 0.0001f) ||
+                !(_solver.invMasses[particleIndexA] >= 0.0001f)) continue;
+            if (particleIndexB >= _solids.Length) continue;
+            if (delayFrames > 0)
             {
-                if (delayed.particleIndex >= 0 && delayed.particleIndex < solver.invMasses.count && 
-                    delayed.particleIndex < solids.Length)
+                _delayedParticles.Add(new DelayedSolidification()
                 {
-                    Solidify(delayed.particleIndex, delayed.solidData);
-                }
-                delayedParticles.RemoveAt(i);
+                    ParticleIndex = particleIndexA,
+                    FramesRemaining = delayFrames,
+                    SolidData = _solids[particleIndexB]
+                });
             }
             else
             {
-                delayedParticles[i] = delayed;
-            }
-        }
-
-        // Original behavior for already solidified particles
-        for (int i = 0; i < solids.Length; ++i)
-        {
-            if (i < solver.invMasses.count && solver.invMasses[i] < 0.0001f && 
-                solids[i].reference != null)
-            {
-                solver.positions[i] = solver.transform.InverseTransformPoint(
-                    solids[i].reference.TransformPoint(solids[i].localPos));
+                Solidify(particleIndexA, _solids[particleIndexB]);
             }
         }
     }
 
-    void Solidify(int particleIndex, SolidData solid)
+    private void Solver_OnBeginStep(ObiSolver s, float timeToSimulate, float substepTime)
     {
-        if (particleIndex < 0 || particleIndex >= solver.phases.count || 
-            particleIndex >= solids.Length || solid.reference == null)
+        if (_solver.allocParticleCount > _solids.Length)
+        {
+            Array.Resize(ref _solids, _solver.allocParticleCount);
+        }
+
+        for (var i = _delayedParticles.Count - 1; i >= 0; i--)
+        {
+            var delayed = _delayedParticles[i];
+            delayed.FramesRemaining--;
+
+            if (delayed.FramesRemaining <= 0)
+            {
+                if (delayed.ParticleIndex >= 0 && delayed.ParticleIndex < _solver.invMasses.count && 
+                    delayed.ParticleIndex < _solids.Length)
+                {
+                    Solidify(delayed.ParticleIndex, delayed.SolidData);
+                }
+                _delayedParticles.RemoveAt(i);
+            }
+            else
+            {
+                _delayedParticles[i] = delayed;
+            }
+        }
+
+        for (var i = 0; i < _solids.Length; ++i)
+        {
+            if (i < _solver.invMasses.count && _solver.invMasses[i] < 0.0001f && 
+                _solids[i].Reference)
+            {
+                _solver.positions[i] = _solver.transform.InverseTransformPoint(
+                    _solids[i].Reference.TransformPoint(_solids[i].LocalPos));
+            }
+        }
+    }
+
+    private void Solidify(int particleIndex, SolidData solid)
+    {
+        if (particleIndex < 0 || particleIndex >= _solver.phases.count || 
+            particleIndex >= _solids.Length || solid.Reference == null)
             return;
 
-        // remove the 'fluid' flag from the particle, turning it into a solid granule:
-        solver.phases[particleIndex] &= (int)(~ObiUtils.ParticleFlags.Fluid);
+        _solver.phases[particleIndex] &= (int)(~ObiUtils.ParticleFlags.Fluid);
+        _solver.invMasses[particleIndex] = 0;
+        _solver.colors[particleIndex] = solidColor;
 
-        // fix the particle in place (by giving it infinite mass):
-        solver.invMasses[particleIndex] = 0;
-
-        // and change its color:
-        solver.colors[particleIndex] = solidColor;
-
-        // set the solid data for this particle:
-        solid.localPos = solid.reference.InverseTransformPoint(
-            solver.transform.TransformPoint(solver.positions[particleIndex]));
-        solids[particleIndex] = solid;
+        solid.LocalPos = solid.Reference.InverseTransformPoint(
+            _solver.transform.TransformPoint(_solver.positions[particleIndex]));
+        _solids[particleIndex] = solid;
     }
 }

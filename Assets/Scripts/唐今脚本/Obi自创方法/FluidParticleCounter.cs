@@ -1,28 +1,42 @@
 using Obi;
 using UnityEngine;
-using System; // Added for Action delegate
+using System;
+using System.Collections.Generic; // Added for List
 
 public class FluidParticleCounter : MonoBehaviour
 {
+    [Tooltip("Layers that trigger particle deactivation")]
     public LayerMask triggerLayers;
+    
+    [Tooltip("The ObiSolver that handles the physics")]
     public ObiSolver solver;
-    public ObiEmitter emitter;
+    
+    [Tooltip("List of emitters whose particles should be tracked")]
+    public List<ObiEmitter> emitters = new List<ObiEmitter>();
 
     // Define a public event that others can subscribe to
     public event Action<int> OnParticleDestroyed;
 
     private void OnEnable()
     {
-        solver.OnCollision += OnSolverCollision;
+        if (solver != null)
+        {
+            solver.OnCollision += OnSolverCollision;
+        }
     }
 
     private void OnDisable()
     {
-        solver.OnCollision -= OnSolverCollision;
+        if (solver != null)
+        {
+            solver.OnCollision -= OnSolverCollision;
+        }
     }
 
     private void OnSolverCollision(object sender, ObiNativeContactList contacts)
     {
+        if (emitters.Count == 0) return;
+
         var colliderWorld = ObiColliderWorld.GetInstance();
 
         for (var i = 0; i < contacts.count; ++i)
@@ -34,15 +48,19 @@ public class FluidParticleCounter : MonoBehaviour
             
             var solverParticleIndex = solver.simplices[contacts[i].bodyA];
             
-            var actorIndex = FindActorIndex(solverParticleIndex);
-            if (actorIndex >= 0)
+            foreach (var emitter in emitters)
             {
-                StartCoroutine(DeactivateNextFrame(actorIndex));
+                if (!emitter) continue;
+                
+                var actorIndex = FindActorIndex(emitter, solverParticleIndex);
+                if (actorIndex < 0) continue;
+                StartCoroutine(DeactivateNextFrame(emitter, actorIndex));
+                break; // Particle can only belong to one emitter
             }
         }
     }
 
-    private int FindActorIndex(int solverParticleIndex)
+    private static int FindActorIndex(ObiEmitter emitter, int solverParticleIndex)
     {
         for (var i = 0; i < emitter.solverIndices.count; i++)
         {
@@ -51,12 +69,29 @@ public class FluidParticleCounter : MonoBehaviour
         }
         return -1;
     }
-
-    private System.Collections.IEnumerator DeactivateNextFrame(int actorIndex)
+    
+    private System.Collections.IEnumerator DeactivateNextFrame(ObiEmitter emitter, int actorIndex)
     {
         yield return null; 
         emitter.DeactivateParticle(actorIndex);
         
         OnParticleDestroyed?.Invoke(actorIndex);
+    }
+
+    // Helper methods to manage emitters
+    public void AddEmitter(ObiEmitter emitter)
+    {
+        if (emitter != null && !emitters.Contains(emitter))
+        {
+            emitters.Add(emitter);
+        }
+    }
+
+    public void RemoveEmitter(ObiEmitter emitter)
+    {
+        if (emitter != null && emitters.Contains(emitter))
+        {
+            emitters.Remove(emitter);
+        }
     }
 }
