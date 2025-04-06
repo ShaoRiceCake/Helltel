@@ -18,9 +18,12 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
         }
         _gameData.ResetData();
+        // 仅供测试，实际由网络模块调用
+        _gameData.RegisterNetworkPlayer("test_local");
+        NotifyLocalPlayerReady("test_local");
     }
     private void OnEnable() {
-        _gameData.RegisterPlayer("p1");
+        
     }
     
 
@@ -71,5 +74,14 @@ public class GameController : MonoBehaviour
     {
         _gameData.CurrentDay++;
         
+    }
+ 
+    //供网络模块调用
+    public void NotifyLocalPlayerReady(string playerId)
+    {
+        // 获取视图组件并绑定
+        var healthView = FindObjectOfType<HealthView>();
+        if(healthView != null)
+            healthView.BindLocalPlayer(playerId);
     }
 }
