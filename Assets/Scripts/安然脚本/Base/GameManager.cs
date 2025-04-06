@@ -59,6 +59,7 @@ public class GameManager : Singleton<GameManager>
         if (sceneName == "Game")
         {
             OnStartGame?.Invoke();
+            isGameing = true;
             Debug.Log("游戏开始");
         }
 

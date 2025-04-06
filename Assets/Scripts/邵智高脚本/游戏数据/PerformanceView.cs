@@ -9,6 +9,7 @@ public class PerformanceView : MonoBehaviour
 {
     [Header("组件绑定")]
     [SerializeField] private TMP_Text _performanceText;
+    [SerializeField] private TMP_Text _performanceTargetText;
     [SerializeField] private GameDataModel _data;
 
     [Header("动画参数")]
@@ -20,10 +21,9 @@ public class PerformanceView : MonoBehaviour
 
     private void Awake()
     {
-       
-        
         // 注册事件
         _data.OnPerformanceChanged += UpdatePerformanceDisplay;
+        _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
     }
 
     private void Start()
@@ -35,6 +35,10 @@ public class PerformanceView : MonoBehaviour
     {
         _performanceText.text = $"${newValue}";
         //PlayMoneyAnimation();
+    }
+    private void UpdatePerformanceTargetDisplay(int newValue)
+    {
+        _performanceTargetText.text = $"${newValue}";
     }
 
     // private void PlayMoneyAnimation()

@@ -19,6 +19,10 @@ public class GameController : MonoBehaviour
         }
         _gameData.ResetData();
     }
+    private void OnEnable() {
+        _gameData.RegisterPlayer("p1");
+    }
+    
 
     // 增加钱接口
     public void AddMoney(int amount)
@@ -66,5 +70,6 @@ public class GameController : MonoBehaviour
     public void AdvanceDay()
     {
         _gameData.CurrentDay++;
+        
     }
 }
