@@ -19,7 +19,7 @@ public class GameController : MonoBehaviour
         }
         _gameData.ResetData();
     }
-    private void Start() {
+    private void OnEnable() {
         _gameData.RegisterPlayer("p1");
     }
     
