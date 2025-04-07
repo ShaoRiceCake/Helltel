@@ -71,7 +71,25 @@ namespace Helltal.Gelercat
             return navPoints;
         }
 
-       
+        public NavPoint GetClosestNavPoint(Vector3 position)
+        {
+            NavPoint closest = null;
+            float minDist = float.MaxValue;
+
+            foreach (var nav in navPoints)
+            {
+                if (nav == null) continue;
+                float dist = Vector3.Distance(nav.transform.position, position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closest = nav;
+                }
+            }
+
+            return closest;
+        }
+
 
 
 #if UNITY_EDITOR
