@@ -10,7 +10,8 @@ public class HealthView : MonoBehaviour
     [Header("组件绑定")]
     [SerializeField] private TextMeshProUGUI _healthText;
     [SerializeField] private GameDataModel _data;
-    [SerializeField] private string _playerId;
+    
+    private string _localPlayerId; 
 
     private void Awake()
     {
@@ -19,13 +20,23 @@ public class HealthView : MonoBehaviour
 
     private void Start()
     {
-        _playerId = "p1";
-        UpdateHealth(_playerId,_data.GetPlayer(_playerId).Health);
+        //_playerId = "p1";
+        UpdateHealth(_localPlayerId,_data.GetPlayer(_localPlayerId).Health);
     }
+    public void BindLocalPlayer(string playerId)
+    {
+        _localPlayerId = playerId;
+        
+        // 立即显示初始值
+        var playerData = _data.GetPlayer(_localPlayerId);
+        if(playerData != null)
+            UpdateHealth(_localPlayerId, playerData.Health);
+    }
+ 
 
     private void UpdateHealth(string id, int health)
     {
-        if(id == _playerId)
+        if(id == _localPlayerId)
             _healthText.text = $"HP: {health}";
     }
 

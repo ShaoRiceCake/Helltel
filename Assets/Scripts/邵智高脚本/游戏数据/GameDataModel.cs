@@ -55,6 +55,7 @@ public class GameDataModel : ScriptableObject
             OnDayChanged?.Invoke(_day);
         }
     }
+    public int PlayerCount => _players.Count;
 
     // 初始化方法
     public void ResetData()
@@ -102,7 +103,8 @@ public class GameDataModel : ScriptableObject
     }
 
     //======= 玩家管理接口 =======//
-    public void RegisterPlayer(string id)
+    //所有玩家加入游戏后，游戏开始要为每个玩家注册，来储存对应ID的生命值
+    public void RegisterNetworkPlayer(string id)
     {
         if (!_players.ContainsKey(id))
         {
@@ -112,6 +114,8 @@ public class GameDataModel : ScriptableObject
                 OnPlayerHealthChanged?.Invoke(id, health);
             //将新玩家存入字典
             _players[id] = player;
+            // 触发初始值显示
+            player.Health = player.Health; // 强制触发事件
         }
         // 如果已经有这个ID，什么都不做（避免重复注册）
     }
