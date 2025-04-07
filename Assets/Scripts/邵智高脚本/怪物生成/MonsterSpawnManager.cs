@@ -158,11 +158,11 @@ public class MonsterSpawnSystem : MonoBehaviour
     {
         if (activeGuestElevators.Count == 0)
         {
-            Debug.LogWarning("没有可用电梯用于生成");
+            Debug.LogWarning("没有可用客梯用于生成");
             return;
         }
 
-        // 随机选择电梯
+        // 随机选择客梯
         Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
         Vector3 spawnPoint = elevator.position + Vector3.up * 0.5f;
 
@@ -209,7 +209,7 @@ public class MonsterSpawnSystem : MonoBehaviour
         foreach (var m in activeMonsters)
         {
             //这里是挨个相加每个怪物的熵值得出当前总熵值
-            //total += m.entropyValue;
+            total += m.entropyValue;
         }
         return total;
     }
