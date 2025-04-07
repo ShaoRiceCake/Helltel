@@ -5,6 +5,7 @@ using UnityEngine.AI;
 using Unity.Netcode;
 using System;
 using NPBehave;
+using UnityEngine.InputSystem;
 
 namespace Helltal.Gelercat
 {
@@ -27,7 +28,9 @@ namespace Helltal.Gelercat
         public GuestPresenter presenter;  // 表现层的api，动画用animator控制器控制
 
         /// TODO：AudioPresident
-    
+        public GuestSensor sensor;  // 
+
+
         public NetworkVariable<AIState> aiState = new NetworkVariable<AIState>(AIState.LIVE);
 
 
@@ -57,7 +60,7 @@ if (Application.isEditor)
 
         }
 
-        public void Start()
+        protected virtual void Start()
         {
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
             path = GameObject.Find("PathList").GetComponent<Pathlist>();
@@ -67,6 +70,12 @@ if (Application.isEditor)
             }
             players = GameObject.FindGameObjectsWithTag("Player");
             presenter = GetComponent<GuestPresenter>();
+
+            sensor = GetComponent<GuestSensor>();
+            if (sensor == null)
+            {
+                this.gameObject.AddComponent<GuestSensor>();
+            }
         }
 
 
