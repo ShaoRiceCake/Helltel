@@ -74,7 +74,8 @@ if (Application.isEditor)
             sensor = GetComponent<GuestSensor>();
             if (sensor == null)
             {
-                this.gameObject.AddComponent<GuestSensor>();
+                sensor = this.gameObject.AddComponent<GuestSensor>();
+
             }
         }
 
@@ -86,6 +87,15 @@ if (Application.isEditor)
             {
                 agent.SetDestination(target);
             }
+        }
+        void OnDrawGizmos()
+        {
+            if (agent == null) return;
+            Vector3 targetPosition = agent.destination;
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(transform.position, targetPosition);
+            Gizmos.DrawSphere(targetPosition, 0.5f);
+            
         }
     }
 }

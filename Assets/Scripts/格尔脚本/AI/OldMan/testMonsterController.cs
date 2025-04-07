@@ -25,7 +25,7 @@ namespace Helltal.Gelercat
         
 
             behaviorTree = CreateBehaviorTree();
-            // behaviorTree.Start();
+            behaviorTree.Start();
         }
 
         private Root CreateBehaviorTree()

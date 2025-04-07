@@ -24,14 +24,15 @@ namespace Helltal.Gelercat
 
         private void Update()
         {
-#if UNITY_EDITOR
-            if (!Application.isPlaying && AutoRegiest)
-            {
-                AutoRegisterWaypoints(); // 每帧刷新，确保追踪子物体变化
-            }
-#endif
-        }
 
+        }
+        void OnTransformChildrenChanged()
+        {
+            if (AutoRegiest)
+            {
+                AutoRegisterWaypoints(); // 当子物体发生变化时，自动注册
+            }
+        }
         public void AutoRegisterWaypoints()
         {
             var children = new List<Transform>();

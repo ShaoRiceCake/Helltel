@@ -34,6 +34,8 @@ namespace Helltal.Gelercat
 
         private void EnsureSensorSourceExists()
         {
+            // ƒ¨»œ’Ï≤‚∑∂Œß
+            detectionLayer = LayerMask.GetMask("Player");
             if (sensorSource == null)
             {
                 sensorSource = new GameObject("SensorSource");
@@ -44,6 +46,7 @@ namespace Helltal.Gelercat
 
         private void Scan()
         {
+       
             detectedTargets.Clear();
 
             Collider[] hits = Physics.OverlapSphere(sensorSource.transform.position, viewDistance, detectionLayer);
