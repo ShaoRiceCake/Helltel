@@ -25,8 +25,8 @@ public class NetworkSpawn : NetworkBehaviour
             if (IsHost && IsLocalPlayer)
             {
 
-                var obj = Instantiate(NetworkMap);
-                StartCoroutine(obj.GetComponent<DungeonGenerator>().DungeonBuild());
+                //var obj = Instantiate(NetworkMap);
+                //StartCoroutine(obj.GetComponent<DungeonGenerator>().DungeonBuild());
 
             }
 
