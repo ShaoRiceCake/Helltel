@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93d0a0d159da459986967b663da6fd0, type: 3}
+  m_Name: FluidPassCompute
+  m_EditorClassIdentifier: 
+  voxelSize: 0.06
+  isosurface: 0.07
+  descentIterations: 2
+  descentIsosurface: 0.242
+  descentSpeed: 0.709
+  smoothingIterations: 3
+  smoothingIntensity: 1
+  bevel: 1
+  materialType: 1
+  customFluidMaterial: {fileID: 0}
+  customUnderwaterMaterial: {fileID: 0}
+  reflectionCubemap: {fileID: 0}
+  smoothness: 0.9
+  metallic: 0
+  turbidity: {r: 0.33490568, g: 1, b: 0.78264886, a: 0}
+  thickness: 1
+  indexOfRefraction: 1.33
+  diffuseMap: {fileID: 0}
+  diffuseColor: {r: 1, g: 1, b: 1, a: 1}
+  normalMap: {fileID: 0}
+  normalMapIntensity: 1
+  normalMapVelocityRange: {x: 10, y: 0}
+  tiling: 1
+  noiseMap: {fileID: 0}
+  noiseMapIntensity: 0.1
+  noiseMapTiling: 0.1
+  advectTimescale: 1
+  advectJump: {x: 0, y: 0, z: 0, w: 0}
+  advectOffset: -0.5
+  triplanarBlend: 16
+  underwaterRendering: 0
+  renderParameters:
+    layer: 0
+    lightProbeUsage: 1
+    reflectionProbeUsage: 1
+    shadowCastingMode: 1
+    receiveShadows: 1
+    motionVectors: 0
+    renderingLayerMask: 4294967295
+  layer: 0

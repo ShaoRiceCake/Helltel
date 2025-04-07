@@ -26,8 +26,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
     public UnityEvent onCancelHandGrab;
 
     public UnityEvent onSwitchControlMode;
-    public UnityEvent<Vector2> onMouseMoveFixedUpdate; // ¹Ì¶¨Ê±¼ä²½³¤Ïà¶ÔÔË¶¯
-    public UnityEvent<Vector2> onMouseMoveUpdate;     // Ã¿Ö¡Ïà¶ÔÔË¶¯
+    public UnityEvent<Vector2> onMouseMoveFixedUpdate; 
+    public UnityEvent<Vector2> onMouseMoveUpdate;   
     public UnityEvent onDefaultMode;
 
     void Start()
@@ -49,31 +49,73 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         onMouseMoveUpdate ??= new UnityEvent<Vector2>();
         onDefaultMode ??= new UnityEvent();
 
-        _mMouseControl = gameObject.AddComponent<MouseControl>();
+        if (NetworkManager.Singleton)
+        {
+            if (IsLocalPlayer)
+            {
+                _mMouseControl = GetComponent<MouseControl>();
+                _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
+                _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
+                _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
+                _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
+                _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
+                _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
+                _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
+                _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
+                _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
 
-        _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
-        _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
-        _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
-        _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
-        _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
-        _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
-        _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
-        _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
-        _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
+            }
+        }
+        else
+        {
+            _mMouseControl = GetComponent<MouseControl>();
+            _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
+            _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
+            _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
+            _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
+            _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
+            _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
+            _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
+            _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
+            _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
+
+        }
+
+
+
     }
 
     public override void OnDestroy()
     {
-        if (_mMouseControl == null) return;
-        _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
-        _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
-        _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
-        _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
-        _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
-        _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
-        _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
-        _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
-        _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
+        if (NetworkManager.Singleton)
+        {
+            if (IsLocalPlayer)
+            {
+                if (_mMouseControl == null) return;
+                _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
+                _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
+                _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
+                _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
+                _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
+                _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
+                _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
+                _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
+                _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
+            }
+        }
+        else
+        {
+            if (_mMouseControl == null) return;
+            _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
+            _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
+            _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
+            _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
+            _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
+            _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
+            _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
+            _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
+            _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
+        }
 
         base.OnDestroy();
     }

@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5816238570797794469
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6104168369536445510}
+  - component: {fileID: 1749888415820453054}
+  - component: {fileID: 5420871367105433588}
+  m_Layer: 0
+  m_Name: Generator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6104168369536445510
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5816238570797794469}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1749888415820453054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5816238570797794469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3245538130
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &5420871367105433588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5816238570797794469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87a94e2cdac8242acf534b973b6104, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  elevatorTile: {fileID: 0}
+  startTile: {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
+  tilePrefabs:
+  - {fileID: 7190530939421546850, guid: 9c80dc5f4645cf74d9851cbd558a0f12, type: 3}
+  - {fileID: 6881580276718791791, guid: 8bdd27933c8f88c4daa5272f777a6935, type: 3}
+  - {fileID: 100115147929507902, guid: ce3843f051ac8c04e81f9475d66ba977, type: 3}
+  - {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
+  - {fileID: 6276907580013792170, guid: bcdee0a1391b358438dfbc05a609fbdd, type: 3}
+  - {fileID: 3800089055459983552, guid: f6273d317b83e5e4dbadbf392838b62b, type: 3}
+  - {fileID: 2065003035382943739, guid: 94976f29aecffa3459a3dbd0ea9939b3, type: 3}
+  - {fileID: 7711801737612265155, guid: 03382eeb7aea5f346bf5fa200f4d2e6a, type: 3}
+  - {fileID: 3085792305767753245, guid: 03da9269498df5c40869511a39593473, type: 3}
+  - {fileID: 4058601648260230325, guid: c7f5ff5b2ceefa64f9743fb72cd4c0a4, type: 3}
+  blockedPrefabs:
+  - {fileID: 2610976636490881824, guid: e4747030a16d4a44b8e5bf6089eeea8d, type: 3}
+  - {fileID: 8115512967877152173, guid: 1dda69844c4237643b761b4d5e62b532, type: 3}
+  doorPrefabs:
+  - {fileID: 4693191324333178762, guid: d0b58bc455ae1f74f8c8694a964a7935, type: 3}
+  - {fileID: 2424739538366229017, guid: 776880d4fe899df4eab9edb824c2a8f4, type: 3}
+  exitPrefabs:
+  - {fileID: 6551577643172991279, guid: ea8fc1f633e83ea4d82763558c6479e0, type: 3}
+  - {fileID: 1717768317796168926, guid: a22d74c84fe16b2478066d7d14b5aa79, type: 3}
+  - {fileID: 6146908721503945696, guid: 5ab258f7799ce344f98fe48166f8c16b, type: 3}
+  mainLength: 10
+  branchLenght: 12
+  branchNum: 10
+  doorPercent: 65
+  constructionDelay: 0
+  generatedTiles: []
+  availableConnectors: []
+  dungeonState: 0
