@@ -1,5 +1,7 @@
 using UnityEngine;
 using NPBehave;
+using System.Collections.Generic;
+using UnityEngine.AI;
 
 namespace Helltal.Gelercat
 {
@@ -16,22 +18,36 @@ namespace Helltal.Gelercat
         public GameObject moneybag;
 
         private Root behaviorTree;
-        private WayPoint currentTarget;
+        private NavPoint currentTarget;
+
+        private Dictionary<Transform, bool> visitDict = new Dictionary<Transform, bool>();
 
         protected override void Start()
         {
             base.Start();
 
-        
+            InitializeVisitDict();
 
             behaviorTree = CreateBehaviorTree();
             behaviorTree.Start();
         }
 
+        private void InitializeVisitDict()
+        {
+            visitDict.Clear();
+            foreach (var wp in navPointsManager.GetNavPoints())
+            {
+                if (wp?.GetTransform() != null && !visitDict.ContainsKey(wp.GetTransform()))
+                {
+                    visitDict.Add(wp.GetTransform(), false);
+                }
+            }
+        }
+
         private Root CreateBehaviorTree()
         {
             return new Root(
-                new Service(0.2f, UpdateTarget,
+                new Service(0.5f, UpdateTarget,
                     new Action(MoveToTarget)
                 )
             );
@@ -39,17 +55,23 @@ namespace Helltal.Gelercat
 
         private void UpdateTarget()
         {
-            // 到达当前目标或初始无目标时，切换目标
-            if (currentTarget == null || Vector3.Distance(transform.position, currentTarget.point.position) < 1f)
+            // 如果没有目标，或已经到达目标
+            if (currentTarget == null ||
+                visitDict.TryGetValue(currentTarget.GetTransform(), out bool visited) && visited ||
+                Vector3.Distance(transform.position, currentTarget.transform.position) < 0.1f)
             {
-                currentTarget = FindNearestUnvisitedWaypoint();
+                currentTarget = FindNextReachableWaypoint();
+
                 if (currentTarget == null)
                 {
-                    path.ResetAllCheck();  // 重置所有点
-                    currentTarget = FindNearestUnvisitedWaypoint();
+                    ResetVisitStatus();
+                    currentTarget = FindNextReachableWaypoint();
                 }
 
-                currentTarget.Check(true); // 标记已访问
+                if (currentTarget != null)
+                {
+                    visitDict[currentTarget.GetTransform()] = true;
+                }
             }
         }
 
@@ -57,37 +79,54 @@ namespace Helltal.Gelercat
         {
             if (currentTarget != null)
             {
-                NegativeTo(currentTarget.point.position);
+                NegativeTo(currentTarget.GetTransform().position);
             }
         }
 
-        private WayPoint FindNearestUnvisitedWaypoint()
+        private NavPoint FindNextReachableWaypoint()
         {
-            WayPoint nearest = null;
-            float shortestDistance = float.MaxValue;
+            NavPoint best = null;
+            float shortest = float.MaxValue;
 
-            foreach (var wp in path.waypoints)
+            foreach (var wp in navPointsManager.GetNavPoints())
             {
-                if (!wp.isCheck)
+                if (wp.GetTransform() == null || visitDict.TryGetValue(wp.GetTransform(), out bool visited) && visited)
+                    continue;
+
+                if (!IsReachable(wp.GetTransform().position))
                 {
-                    float distance = Vector3.Distance(transform.position, wp.point.position);
-                    if (distance < shortestDistance)
-                    {
-                        shortestDistance = distance;
-                        nearest = wp;
-                    }
+                    // 如果不可达，标记为已访问
+                    visitDict[wp.GetTransform()] = true; // 不可达也算访问了
+                    continue;
+                }
+
+                float dist = Vector3.Distance(transform.position, wp.GetTransform().position);
+                if (dist < shortest)
+                {
+                    shortest = dist;
+                    best = wp;
                 }
             }
 
-            return nearest;
+            return best;
         }
 
-        private void OnDestroy()
+        private void ResetVisitStatus()
         {
-            if (behaviorTree != null && behaviorTree.CurrentState == Node.State.ACTIVE)
+            Debug.Log("Reset Visit Status");
+            List<Transform> keys = new List<Transform>(visitDict.Keys);
+            foreach (var key in keys)
             {
-                behaviorTree.Stop();
+                visitDict[key] = false;
             }
         }
+
+        private bool IsReachable(Vector3 target)
+        {
+            NavMeshPath navPath = new NavMeshPath();
+            return NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, navPath) &&
+                   navPath.status == NavMeshPathStatus.PathComplete;
+        }
+
     }
 }

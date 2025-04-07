@@ -5,13 +5,7 @@ using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
-using Unity.Services.Relay;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
-using Unity.Services.Relay.Models;
-using System.Threading.Tasks;
-using Unity.Networking.Transport.Relay;
+
 using System;
 using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
@@ -93,7 +87,7 @@ public class NetworkRoom : MonoBehaviour
         NetworkManager.Singleton.StartHost();
     }
 
-    public void OnStartClientButton()//以 client 身份加入游戏
+    public void OnStartClientButton()//�? client �?份加入游�?
     {
         NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayTransportNetcode;
 
@@ -153,7 +147,7 @@ public class NetworkRoom : MonoBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
-    #region 本地测试
+    #region �?地测�?
     public void Login()
     {
         NetworkManager.Singleton.StartClient();
@@ -169,6 +163,6 @@ public class NetworkRoom : MonoBehaviour
         unityTransport.SetConnectionData("0.0.0.0", 7777);
         NetworkManager.Singleton.StartHost();
         GameManager.instance.LoadScene("Lobby");
-    }//主机启动
+    }//主机�?�?
     #endregion
 }

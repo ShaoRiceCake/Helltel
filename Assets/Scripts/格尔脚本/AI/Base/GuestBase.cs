@@ -21,7 +21,8 @@ namespace Helltal.Gelercat
 
         // 基础控件        
         public GameObject[] players;
-        public Pathlist path;  // 场景中的导航点列表
+        
+        public NavPointsManager navPointsManager;  // 导航点管理器
 
         public NavMeshAgent agent;  // 导航代理
 
@@ -63,8 +64,8 @@ if (Application.isEditor)
         protected virtual void Start()
         {
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
-            path = GameObject.Find("PathList").GetComponent<Pathlist>();
-            if (path == null)
+            navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
+            if (navPointsManager == null)
             {
                 Debug.LogError("请先在场景中添加导航点管理器");
             }
