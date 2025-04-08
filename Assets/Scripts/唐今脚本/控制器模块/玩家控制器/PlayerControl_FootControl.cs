@@ -7,7 +7,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 {
     [System.Serializable]
     public class FootLockEvent : UnityEvent<Vector3> {}
-    public FootLockEvent onFootLocked = new FootLockEvent();
+    public FootLockEvent onFootLocked = new();
 
     public GameObject targetObject;
     public GameObject footObject;
@@ -123,7 +123,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
             FixObject();
 
             if (_hasTriggeredLockEvent) return;
-            onFootLocked.Invoke(_movingObj.position);
+            onFootLocked?.Invoke(_movingObj.position);
             _hasTriggeredLockEvent = true;
         }
     }
@@ -158,7 +158,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Locked;
 
         if (_hasTriggeredLockEvent) return;
-        onFootLocked.Invoke(_movingObj.position);
+        onFootLocked?.Invoke(_movingObj.position);
         _hasTriggeredLockEvent = true;
     }
     

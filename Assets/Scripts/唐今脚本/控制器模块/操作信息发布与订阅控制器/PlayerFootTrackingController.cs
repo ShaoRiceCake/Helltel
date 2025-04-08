@@ -1,5 +1,6 @@
 using UnityEngine;
-using System;
+using System.Collections;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(PlayerControlInformationProcess))]
 public class PlayerFootTrackingController : MonoBehaviour
@@ -7,43 +8,55 @@ public class PlayerFootTrackingController : MonoBehaviour
     [Header("References")]
     public GameObject headObject;
     
+    [System.Serializable]
+    public class FootLockEvent : UnityEvent<FootRegion> {}
+    
     private PlayerControlInformationProcess _controlInfoProcess;
     private bool _trackingRightFoot;
     private bool _trackingLeftFoot;
-
+    private PlayerControl_RightFootControl _rightFoot;
+    private PlayerControl_LeftFootControl _leftFoot;
+    public FootLockEvent onFootLocked = new FootLockEvent();
     private void Start()
     {
         _controlInfoProcess = GetComponent<PlayerControlInformationProcess>();
         if (!_controlInfoProcess)
         {
             Debug.LogError("No player control info process found!");
+            return;
         }
+        StartCoroutine(DelayedSubscription());
     }
 
-    private void OnEnable()
+    private IEnumerator DelayedSubscription()
     {
-        if (_controlInfoProcess == null) return;
+        yield return null;
+
+        _rightFoot = GetComponent<PlayerControl_RightFootControl>();
+        _leftFoot = GetComponent<PlayerControl_LeftFootControl>();
+
+        if (!_rightFoot || !_leftFoot)
+        {
+            Debug.LogError("Missing foot controls! RightFoot: " + (_rightFoot) + 
+                         ", LeftFoot: " + (_leftFoot));
+            yield break;
+        }
+
         _controlInfoProcess.onLiftRightLeg.AddListener(StartTrackingRightFoot);
         _controlInfoProcess.onLiftLeftLeg.AddListener(StartTrackingLeftFoot);
-            
-        var rightFoot = GetComponent<PlayerControl_RightFootControl>();
-        var leftFoot = GetComponent<PlayerControl_LeftFootControl>();
-            
-        if (rightFoot != null) rightFoot.onFootLocked.AddListener(OnRightFootLocked);
-        if (leftFoot != null) leftFoot.onFootLocked.AddListener(OnLeftFootLocked);
+        _rightFoot.onFootLocked.AddListener(OnRightFootLocked);
+        _leftFoot.onFootLocked.AddListener(OnLeftFootLocked);
     }
 
     private void OnDisable()
     {
         if (_controlInfoProcess == null) return;
+        
         _controlInfoProcess.onLiftRightLeg.RemoveListener(StartTrackingRightFoot);
         _controlInfoProcess.onLiftLeftLeg.RemoveListener(StartTrackingLeftFoot);
-            
-        var rightFoot = GetComponent<PlayerControl_RightFootControl>();
-        var leftFoot = GetComponent<PlayerControl_LeftFootControl>();
-            
-        if (rightFoot != null) rightFoot.onFootLocked.RemoveListener(OnRightFootLocked);
-        if (leftFoot != null) leftFoot.onFootLocked.RemoveListener(OnLeftFootLocked);
+        
+        if (_rightFoot != null) _rightFoot.onFootLocked.RemoveListener(OnRightFootLocked);
+        if (_leftFoot != null) _leftFoot.onFootLocked.RemoveListener(OnLeftFootLocked);
     }
 
     private void StartTrackingRightFoot()
@@ -61,20 +74,20 @@ public class PlayerFootTrackingController : MonoBehaviour
     private void OnRightFootLocked(Vector3 footPosition)
     {
         if (!_trackingRightFoot) return;
-        LogFootPosition(footPosition, "Right");
+        LogFootPosition(footPosition);
         _trackingRightFoot = false;
     }
 
     private void OnLeftFootLocked(Vector3 footPosition)
     {
         if (!_trackingLeftFoot) return;
-        LogFootPosition(footPosition, "Left");
+        LogFootPosition(footPosition);
         _trackingLeftFoot = false;
     }
 
-    private void LogFootPosition(Vector3 footPosition, string footSide)
+    private void LogFootPosition(Vector3 footPosition)
     {
-        if (headObject == null)
+        if (!headObject)
         {
             Debug.LogError("Head object reference is missing!");
             return;
@@ -95,18 +108,15 @@ public class PlayerFootTrackingController : MonoBehaviour
         var rightDot = Vector3.Dot(relativePosition, headRight);
 
         var region = DetermineRegion(forwardDot, rightDot);
-        Debug.Log($"{footSide} foot locked in {region} region relative to head");
+        onFootLocked?.Invoke(region);
     }
 
-    private static string DetermineRegion(float forwardDot, float rightDot)
+    private static FootRegion DetermineRegion(float forwardDot, float rightDot)
     {
         if (Mathf.Abs(forwardDot) > Mathf.Abs(rightDot))
         {
-            return forwardDot > 0 ? "Front" : "Back";
+            return forwardDot > 0 ? FootRegion.Back : FootRegion.Front;
         }
-        else
-        {
-            return rightDot > 0 ? "Right" : "Left";
-        }
+        return rightDot > 0 ? FootRegion.Left : FootRegion.Right;
     }
 }
