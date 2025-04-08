@@ -100,10 +100,10 @@ public class DungeonGenerator : NetworkBehaviour
             randomque.Clear();
             if (IsHost)
             {
-                // 启动地牢生成流程
                 DungeonBuild();
             }
-
+            // 启动地牢生成流程
+            
         }
         //else
         //{
