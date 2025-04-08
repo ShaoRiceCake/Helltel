@@ -17,11 +17,14 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     private bool _isMouseDown;
     protected bool IsHandActive;
 
+    private Vector3 _targetPosition;
+    [SerializeField] private float smoothSpeed = 5f;
+    private Vector3 _smoothDampVelocity;
 
     public int CurrentHand
     {
         get => CurrentPlayerHand;
-        set
+        private set
         {
             if(value is < 0 or > 2)
             {
@@ -112,9 +115,6 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     }
 
-    private Vector3 _targetPosition; // 存储目标位置
-    [SerializeField] private float smoothSpeed = 5f; // 平滑移动速度，可在Inspector中调整
-
     private void OnMouseMove(Vector2 mouseDelta)
     {
         if (CurrentPlayerHand == 0 || handBallPrefab == null || handPrepareObj == null)
@@ -142,8 +142,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         var worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
         worldMovement.y = localMovement.y;
-
-        // 计算目标位置
+        
         _targetPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
 
         var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(_targetPosition);
@@ -152,10 +151,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         _targetPosition = handPrepareObj.transform.TransformPoint(newLocalPosition);
         
-        handBallPrefab.transform.position = Vector3.Lerp(
-            handBallPrefab.transform.position, 
-            _targetPosition, 
-            smoothSpeed * Time.deltaTime
+        // 使用SmoothDamp进行帧率无关的插值
+        handBallPrefab.transform.position = Vector3.SmoothDamp(
+            handBallPrefab.transform.position,
+            _targetPosition,
+            ref _smoothDampVelocity,
+            1/smoothSpeed 
         );
     }
     private void ApplyCylinderConstraint(ref Vector3 position)
