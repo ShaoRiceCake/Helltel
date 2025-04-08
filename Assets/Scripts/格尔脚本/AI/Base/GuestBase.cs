@@ -17,6 +17,7 @@ namespace Helltal.Gelercat
         [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
         [Header("熵值")] public float entropyValue = 0f;
 
+        public bool Debugging = false; // 是否开启调试模式
 
 
         // 基础控件        
@@ -80,7 +81,7 @@ if (Application.isEditor)
             }
         }
 
-
+        
 
         protected void NegativeTo(Vector3 target)
         {
@@ -97,6 +98,13 @@ if (Application.isEditor)
             Gizmos.DrawLine(transform.position, targetPosition);
             Gizmos.DrawSphere(targetPosition, 0.5f);
             
+        }
+
+
+        // interface IGetBehaviorTree
+        public virtual Root GetBehaviorTree()
+        {
+            return null;
         }
     }
 }

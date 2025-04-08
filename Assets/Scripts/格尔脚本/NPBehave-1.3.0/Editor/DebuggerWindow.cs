@@ -57,12 +57,12 @@ namespace NPBehave
 //            nodeTextStyle = new GUIStyle(EditorStyles.label);
 
             nodeCapsuleGray = (GUIStyle)"helpbox";
-            nodeCapsuleGray.normal.textColor = Color.black;
+            nodeCapsuleGray.normal.textColor = Color.white;
 
             nodeCapsuleFailed = new GUIStyle(nodeCapsuleGray);
             nodeCapsuleFailed.normal.textColor = Color.red;
             nodeCapsuleStopRequested = new GUIStyle(nodeCapsuleGray);
-            nodeCapsuleStopRequested.normal.textColor = new Color(0.7f, 0.7f, 0.0f);
+            nodeCapsuleStopRequested.normal.textColor = new Color(0.1f, 0.1f, 0.0f);
 
             defaultColor = EditorGUIUtility.isProSkin ? Color.white : Color.black;
         }
