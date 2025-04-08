@@ -19,15 +19,9 @@ public class NetworkSpawn : NetworkBehaviour
 
         GameManager.instance.OnStartGame.AddListener(() =>
         {
-
-
-
-            if (IsHost && IsLocalPlayer)
+            if (IsLocalPlayer)
             {
-
-                //var obj = Instantiate(NetworkMap);
-                //StartCoroutine(obj.GetComponent<DungeonGenerator>().DungeonBuild());
-
+                GameController.Instance.NotifyLocalPlayerReady(NetworkManager.Singleton.LocalClientId.ToString());
             }
 
             transform.position = GameObject.Find("Spawn1").transform.position;

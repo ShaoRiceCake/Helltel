@@ -105,11 +105,11 @@ public class DungeonGenerator : NetworkBehaviour
             // 启动地牢生成流程
             
         }
-        //else
-        //{
-        //    // 启动地牢生成流程
-        //    DungeonBuild();
-        //}
+        else
+        {
+            // 启动地牢生成流程
+            DungeonBuild();
+        }
     }
 
     /// <summary>
@@ -178,14 +178,21 @@ public class DungeonGenerator : NetworkBehaviour
                 container.SetParent(transform);
                 int connectorIndex;
                 // 随机选择分支起点
-                if (IsHost)
+                if (NetworkManager.Singleton)
                 {
-                    connectorIndex = Random.Range(0, availableConnectors.Count);
-                    GiveRandomClientRpc(connectorIndex);
+                    if (IsHost)
+                    {
+                        connectorIndex = Random.Range(0, availableConnectors.Count);
+                        GiveRandomClientRpc(connectorIndex);
+                    }
+                    else
+                    {
+                        connectorIndex = randomque.Dequeue();
+                    }
                 }
                 else
                 {
-                    connectorIndex = randomque.Dequeue();
+                    connectorIndex = Random.Range(0, availableConnectors.Count);
                 }
 
                 tileRoot = availableConnectors[connectorIndex].transform.parent.parent;
@@ -251,15 +258,21 @@ public class DungeonGenerator : NetworkBehaviour
     {
         // 随机选择房间类型
         int tileIndex;
-
-        if (IsHost)
+        if (NetworkManager.Singleton)
         {
-            tileIndex = Random.Range(0, tilePrefabs.Length);
-            GiveRandomClientRpc(tileIndex);
+            if (IsHost)
+            {
+                tileIndex = Random.Range(0, tilePrefabs.Length);
+                GiveRandomClientRpc(tileIndex);
+            }
+            else
+            {
+                tileIndex = randomque.Dequeue();
+            }
         }
         else
         {
-            tileIndex = randomque.Dequeue();
+            tileIndex = Random.Range(0, tilePrefabs.Length);
         }
         GameObject tile = Instantiate(tilePrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
         tile.transform.localScale = Vector3.one * ROOM_SCALE;
@@ -267,16 +280,23 @@ public class DungeonGenerator : NetworkBehaviour
         int yRotRandom;
         // 设置随机朝向
         float yRot;
-
-        if (IsHost)
+        if (NetworkManager.Singleton)
         {
-            yRotRandom = Random.Range(0, 4);
-            yRot = yRotRandom * 90f;
-            GiveRandomClientRpc(yRotRandom);
+            if (IsHost)
+            {
+                yRotRandom = Random.Range(0, 4);
+                yRot = yRotRandom * 90f;
+                GiveRandomClientRpc(yRotRandom);
+            }
+            else
+            {
+                yRot = randomque.Dequeue() * 90f;
+            }
         }
         else
         {
-            yRot = randomque.Dequeue() * 90f;
+            yRotRandom = Random.Range(0, 4);
+            yRot = yRotRandom * 90f;
         }
 
         tile.transform.Rotate(0, yRot, 0);
@@ -376,15 +396,21 @@ public class DungeonGenerator : NetworkBehaviour
         // 随机选择并标记
 
         int connectorRandom;
-
-        if (IsHost)
+        if (NetworkManager.Singleton)
         {
-            connectorRandom = Random.Range(0, connectors.Count);
-            GiveRandomClientRpc(connectorRandom);
+            if (IsHost)
+            {
+                connectorRandom = Random.Range(0, connectors.Count);
+                GiveRandomClientRpc(connectorRandom);
+            }
+            else
+            {
+                connectorRandom = randomque.Dequeue();
+            }
         }
         else
         {
-            connectorRandom = randomque.Dequeue();
+            connectorRandom = Random.Range(0, connectors.Count);
         }
 
         Connector selected = connectors[connectorRandom];
@@ -484,15 +510,21 @@ public class DungeonGenerator : NetworkBehaviour
                         else if (availableConnectors.Count > 0)
                         {
                             int availableIndex;
-
-                            if (IsHost)
+                            if (NetworkManager.Singleton)
                             {
-                                availableIndex = Random.Range(0, availableConnectors.Count);
-                                GiveRandomClientRpc(availableIndex);
+                                if (IsHost)
+                                {
+                                    availableIndex = Random.Range(0, availableConnectors.Count);
+                                    GiveRandomClientRpc(availableIndex);
+                                }
+                                else
+                                {
+                                    availableIndex = randomque.Dequeue();
+                                }
                             }
                             else
                             {
-                                availableIndex = randomque.Dequeue();
+                                availableIndex = Random.Range(0, availableConnectors.Count);
                             }
 
                             tileRoot = availableConnectors[availableIndex].transform.parent.parent;
@@ -513,15 +545,21 @@ public class DungeonGenerator : NetworkBehaviour
                     else if (availableConnectors.Count > 0)
                     {
                         int availableIndex;
-
-                        if (IsHost)
+                        if (NetworkManager.Singleton)
                         {
-                            availableIndex = Random.Range(0, availableConnectors.Count);
-                            GiveRandomClientRpc(availableIndex);
+                            if (IsHost)
+                            {
+                                availableIndex = Random.Range(0, availableConnectors.Count);
+                                GiveRandomClientRpc(availableIndex);
+                            }
+                            else
+                            {
+                                availableIndex = randomque.Dequeue();
+                            }
                         }
                         else
                         {
-                            availableIndex = randomque.Dequeue();
+                            availableIndex = Random.Range(0, availableConnectors.Count);
                         }
 
                         tileRoot = availableConnectors[availableIndex].transform.parent.parent;
@@ -551,15 +589,21 @@ public class DungeonGenerator : NetworkBehaviour
                 Vector3 pos = connector.transform.position;
 
                 int wallIndex;
-
-                if (IsHost)
+                if (NetworkManager.Singleton)
                 {
-                    wallIndex = Random.Range(0, blockedPrefabs.Length);
-                    GiveRandomClientRpc(wallIndex);
+                    if (IsHost)
+                    {
+                        wallIndex = Random.Range(0, blockedPrefabs.Length);
+                        GiveRandomClientRpc(wallIndex);
+                    }
+                    else
+                    {
+                        wallIndex = randomque.Dequeue();
+                    }
                 }
                 else
                 {
-                    wallIndex = randomque.Dequeue();
+                    wallIndex = Random.Range(0, blockedPrefabs.Length);
                 }
 
 
@@ -576,15 +620,21 @@ public class DungeonGenerator : NetworkBehaviour
         if (doorPercent <= 0) return;
 
         int doorPercentRandom;
-
-        if (IsHost)
+        if (NetworkManager.Singleton)
         {
-            doorPercentRandom = Random.Range(0, 100);
-            GiveRandomClientRpc(doorPercentRandom);
+            if (IsHost)
+            {
+                doorPercentRandom = Random.Range(0, 100);
+                GiveRandomClientRpc(doorPercentRandom);
+            }
+            else
+            {
+                doorPercentRandom = randomque.Dequeue();
+            }
         }
         else
         {
-            doorPercentRandom = randomque.Dequeue();
+            doorPercentRandom = Random.Range(0, 100);
         }
 
 
@@ -596,15 +646,21 @@ public class DungeonGenerator : NetworkBehaviour
 
             // 随机选择门预制体
             int doorIndex;
-
-            if (IsHost)
+            if (NetworkManager.Singleton)
             {
-                doorIndex = Random.Range(0, doorPrefabs.Length);
-                GiveRandomClientRpc(doorIndex);
+                if (IsHost)
+                {
+                    doorIndex = Random.Range(0, doorPrefabs.Length);
+                    GiveRandomClientRpc(doorIndex);
+                }
+                else
+                {
+                    doorIndex = randomque.Dequeue();
+                }
             }
             else
             {
-                doorIndex = randomque.Dequeue();
+                doorIndex = Random.Range(0, doorPrefabs.Length);
             }
 
             GameObject doorPrefab = doorPrefabs[doorIndex];
