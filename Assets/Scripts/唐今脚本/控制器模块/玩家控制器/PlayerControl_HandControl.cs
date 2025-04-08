@@ -112,6 +112,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     }
 
+    private Vector3 _targetPosition; // 存储目标位置
+    [SerializeField] private float smoothSpeed = 5f; // 平滑移动速度，可在Inspector中调整
+
     private void OnMouseMove(Vector2 mouseDelta)
     {
         if (CurrentPlayerHand == 0 || handBallPrefab == null || handPrepareObj == null)
@@ -119,7 +122,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         var mouseX = mouseDelta.x * mouseSensitivity;
         var mouseY = mouseDelta.y * mouseSensitivity;
-        
+    
         var localMovement = Vector3.zero;
 
         if (_isMouseDown)
@@ -140,15 +143,21 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         var worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
         worldMovement.y = localMovement.y;
 
-        var newWorldPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
+        // 计算目标位置
+        _targetPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
 
-        var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
+        var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(_targetPosition);
 
         ApplyCylinderConstraint(ref newLocalPosition);
 
-        handBallPrefab.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        _targetPosition = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        
+        handBallPrefab.transform.position = Vector3.Lerp(
+            handBallPrefab.transform.position, 
+            _targetPosition, 
+            smoothSpeed * Time.deltaTime
+        );
     }
-
     private void ApplyCylinderConstraint(ref Vector3 position)
     {
         var horizontal = new Vector2(position.x, position.z);
