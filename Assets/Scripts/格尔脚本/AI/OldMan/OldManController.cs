@@ -5,15 +5,18 @@ namespace Helltal.Gelercat
 {
     public class OldManController : GuestBase
     {
-        [Header("ÉËº¦Öµ")] public float baseDamage = 5f;
-        [Header("µÈ´ıÊ±¼ä")] public float waitingTimer = 180f;
-        [Header("¿ªĞÄÊ±¼ä")] public float happyTimer = 3f;
-        [Header("ºÚÎíÉú³É¼ä¸ôÊ±¼ä")] public float duration = 0.1f;
-        [Header("ºÚÎí»ù´¡°ë¾¶")] public float baseRadius = 0.1f;
-        [Header("ºÚÎíÔö¼Ó°ë¾¶")] public float increaseRadius = 0.1f;
+        [Header("ä¼¤å®³å€¼")] public float baseDamage = 5f;
+        [Header("ç­‰å¾…æ—¶é—´")] public float waitingTimer = 180f;
+        [Header("å¼€å¿ƒæ—¶é—´")] public float happyTimer = 3f;
+        [Header("é»‘é›¾ç”Ÿæˆé—´éš”æ—¶é—´")] public float duration = 0.1f;
+        [Header("é»‘é›¾åŸºç¡€åŠå¾„")] public float baseRadius = 0.1f;
+        [Header("é»‘é›¾å¢åŠ åŠå¾„")] public float increaseRadius = 0.1f;
 
-        [Header("Ç®±ÒÔ¤ÖÆÌå")] public GameObject moneybag;
-        [Header("ºÚÎí")] public GameObject blackFog;
+        [Header("é’±å¸é¢„åˆ¶ä½“")] public GameObject moneybag;
+        [Header("é»‘é›¾")] public GameObject blackFog;
+
+        [Header("å­¤ç‹¬åˆ°æ­»äº¡æœ€å°")] public float lonelyDeathMin = 120f; // 2åˆ†é’Ÿ
+        [Header("å­¤ç‹¬åˆ°æ­»äº¡æœ€å¤§")] public float lonelyDeathMax = 480f; // 8åˆ†é’Ÿ
 
         bool DEBUG_chatting = false;
 
@@ -23,7 +26,7 @@ namespace Helltal.Gelercat
 
         // debug
 
-        private float lonelyDuration;  // µ±Ç°¹Â¶À×´Ì¬³ÖĞøÊ±¼ä
+        private float lonelyDuration;  // å½“å‰å­¤ç‹¬çŠ¶æ€æŒç»­æ—¶é—´
         private float lonelyDeathThreshold;
         protected override void Start()
         {
@@ -46,21 +49,21 @@ namespace Helltal.Gelercat
                 )
             );
         }
-        // ===================== ×´Ì¬1£ºµÈ´ı =====================
+        // ===================== çŠ¶æ€1ï¼šç­‰å¾… =====================
         private Node BuildWaitBranch()
         {
             var branch = new Sequence(
                 new Action(() =>
                 {
                     lonelyDuration = 0f;
-                    lonelyDeathThreshold = UnityEngine.Random.Range(120f, 480f);
+                    lonelyDeathThreshold = UnityEngine.Random.Range(lonelyDeathMin, lonelyDeathMax); // éšæœºç”Ÿæˆæ­»äº¡é˜ˆå€¼
                     SetState("WAITING");
-                    // TODO£º´¥·¢±íÏÖ²ã¶¯×÷£ºÈç×øÏÂ¡¢ÕÅÍû¡¢ÇÃÂÖÒÎµÈ
+                    // TODOï¼šè§¦å‘è¡¨ç°å±‚åŠ¨ä½œï¼šå¦‚åä¸‹ã€å¼ æœ›ã€æ•²è½®æ¤…ç­‰
                 }),
                 new Wait(waitingTimer),
                 new Action(() =>
                 {
-                    // ×ªÎª¹Â¶À×´Ì¬
+                    // è½¬ä¸ºå­¤ç‹¬çŠ¶æ€
                     behaviorTree.Blackboard["Lonely"] = true;
                 })
             );
@@ -68,7 +71,7 @@ namespace Helltal.Gelercat
             return branch;
         }
 
-        // ===================== ×´Ì¬2£º¹Â¶À =====================
+        // ===================== çŠ¶æ€2ï¼šå­¤ç‹¬ =====================
         private Node BuildLonelyBranch()
         {
             return new BlackboardCondition("Lonely", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
@@ -76,16 +79,16 @@ namespace Helltal.Gelercat
                     new Action(() =>
                     {
                         SetState("LONELY");
-                        StartBlackFog(); // Æô¶¯ºÚÎíÊÓ¾õĞ§¹û
+                        StartBlackFog(); // å¯åŠ¨é»‘é›¾è§†è§‰æ•ˆæœ
                     }),
-                    new Service(0.1f, () =>
+                    new Service( duration , () =>
                     {
-                        lonelyDuration += 0.1f;
-                        ExpandBlackFog(0.1f); // ºÚÎíÀ©Õ¹Âß¼­
+                        lonelyDuration += duration; // å¢åŠ å­¤ç‹¬çŠ¶æ€æŒç»­æ—¶é—´
+                        ExpandBlackFog(duration); // é»‘é›¾æ‰©å±•é€»è¾‘
                     },
                         new Service(0.5f, () =>
                         {
-                            ApplyFogDamage(lonelyDuration); // Ã¿0.5ÃëÔì³ÉÒ»´ÎÉËº¦
+                            ApplyFogDamage(lonelyDuration); // æ¯0.5ç§’é€ æˆä¸€æ¬¡ä¼¤å®³
                         },
                             new WaitUntilStopped()
                         )
@@ -94,7 +97,7 @@ namespace Helltal.Gelercat
             );
         }
 
-        // ===================== ×´Ì¬3£º¸ßĞË =====================
+        // ===================== çŠ¶æ€3ï¼šé«˜å…´ =====================
         private Node BuildHappyBranch()
         {
             return new Condition(IsPlayerChatting, Stops.IMMEDIATE_RESTART,
@@ -103,12 +106,12 @@ namespace Helltal.Gelercat
                     {
                         if (behaviorTree.Blackboard.Get<bool>("Lonely"))
                         {
-                            // ´Ó¹Â¶À×´Ì¬½øÈë¸ßĞË×´Ì¬£¬´¥·¢½±Àø½áËã
+                            // ä»å­¤ç‹¬çŠ¶æ€è¿›å…¥é«˜å…´çŠ¶æ€ï¼Œè§¦å‘å¥–åŠ±ç»“ç®—
                             int coins = Mathf.FloorToInt(10 + lonelyDuration * lonelyDuration / 1000f + 0.3f * lonelyDuration);
                             DropCoinBag(coins);
                             StopBlackFog();
-                            // ÖØÖÃ±êÖ¾
-                            behaviorTree.Blackboard["Lonely"] = false; // ×èÖ¹×´Ì¬ÖØÈë
+                            // é‡ç½®æ ‡å¿—
+                            behaviorTree.Blackboard["Lonely"] = false; // é˜»æ­¢çŠ¶æ€é‡å…¥
                         }
                         SetState("HAPPY");
                     }),
@@ -117,48 +120,48 @@ namespace Helltal.Gelercat
                     {
                         if (!IsPlayerChatting())
                         {
-                            SetState("WAITING"); // ·µ»ØµÈ´ı×´Ì¬
+                            SetState("WAITING"); // è¿”å›ç­‰å¾…çŠ¶æ€
                         }
                     })
                 )
             );
         }
 
-        // ===================== ×´Ì¬4£ºËÀÍö =====================
+        // ===================== çŠ¶æ€4ï¼šæ­»äº¡ =====================
         private Node BuildDeathBranch()
         {
             return new Condition(() => behaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold,
                 new Action(() =>
                 {
                     SetState("DEAD");
-                    TriggerDeath(); // Æô¶¯±íÏÖ²ãµÄËÀÍö¶¯»­¡¢ÒôĞ§µÈ
-                    AmplifyFog();   // ºÚÎí¼ÓËÙ & ÉËº¦·­±¶
-                    behaviorTree.Blackboard["Lonely"] = false; // ×èÖ¹×´Ì¬ÖØÈë
+                    TriggerDeath(); // å¯åŠ¨è¡¨ç°å±‚çš„æ­»äº¡åŠ¨ç”»ã€éŸ³æ•ˆç­‰
+                    AmplifyFog();   // é»‘é›¾åŠ é€Ÿ & ä¼¤å®³ç¿»å€
+                    behaviorTree.Blackboard["Lonely"] = false; // é˜»æ­¢çŠ¶æ€é‡å…¥
                 })
             );
         }
 
-        // ===================== ÊµÏÖ½Ó¿Ú =====================
+        // ===================== å®ç°æ¥å£ =====================
 
-        // ÉèÖÃÀÏÈËµ±Ç°×´Ì¬£¨WAITING / LONELY / HAPPY / DEAD£©
+        // è®¾ç½®è€äººå½“å‰çŠ¶æ€ï¼ˆWAITING / LONELY / HAPPY / DEADï¼‰
         private void SetState(string state)
         {
 
-            if (Debugging) Debug.Log("ÀÏÈË×´Ì¬±äÎª£º" + state);
-            // TODO: ×´Ì¬ÇĞ»»Ê±´¥·¢±íÏÖ²ã¶¯»­/ÒôĞ§
+            if (Debugging) Debug.Log("è€äººçŠ¶æ€å˜ä¸ºï¼š" + state);
+            // TODO: çŠ¶æ€åˆ‡æ¢æ—¶è§¦å‘è¡¨ç°å±‚åŠ¨ç”»/éŸ³æ•ˆ
         }
 
-        // ÅĞ¶ÏÍæ¼ÒÊÇ·ñÕıÔÚ½øĞĞ×ã¹»ÒôÁ¿µÄÁÄÌì£¨true£ºÂú×ãÌõ¼ş£©
+        // åˆ¤æ–­ç©å®¶æ˜¯å¦æ­£åœ¨è¿›è¡Œè¶³å¤ŸéŸ³é‡çš„èŠå¤©ï¼ˆtrueï¼šæ»¡è¶³æ¡ä»¶ï¼‰
         private bool IsPlayerChatting()
         {
-            // TODO: ÊµÏÖ¶ÔÖ¸¶¨·Ö±´ãĞÖµµÄÉùÒô¼ì²â£¬ÇÒÍæ¼ÒÎ»ÓÚÀÏÈË10Ã×ÄÚ
+            // TODO: å®ç°å¯¹æŒ‡å®šåˆ†è´é˜ˆå€¼çš„å£°éŸ³æ£€æµ‹ï¼Œä¸”ç©å®¶ä½äºè€äºº10ç±³å†…
 
             // FOR Debug:
 
             if (Debugging){
                 if (DEBUG_chatting)
                 {
-                    Debug.Log("Íæ¼ÒÕıÔÚÁÄÌì");
+                    Debug.Log("ç©å®¶æ­£åœ¨èŠå¤©");
                     return true;
                 }
                 else
@@ -172,77 +175,78 @@ namespace Helltal.Gelercat
             return false;
         }
 
-        // ºÚÎíÆô¶¯
+        // é»‘é›¾å¯åŠ¨
         private void StartBlackFog()
         {
-            // TODO: Í¨Öª±íÏÖ²ãÉú³ÉºÚÎíÌØĞ§£¬ÉèÖÃ³õÊ¼°ë¾¶
-            if (Debugging) Debug.Log("ºÚÎíÆô¶¯");
+            // TODO: é€šçŸ¥è¡¨ç°å±‚ç”Ÿæˆé»‘é›¾ç‰¹æ•ˆï¼Œè®¾ç½®åˆå§‹åŠå¾„
+            if (Debugging) Debug.Log("é»‘é›¾å¯åŠ¨");
         }
 
-        // ºÚÎí³ÖĞøÀ©É¢Âß¼­
+        // é»‘é›¾æŒç»­æ‰©æ•£é€»è¾‘
         private void ExpandBlackFog(float deltaTime)
         {
-            // TODO: Ã¿0.1ÃëÀ©´óºÚÎí°ë¾¶£¨Ôö³¤ËÙÂÊ b£©
-            if (Debugging) Debug.Log("ºÚÎíÀ©É¢,deltaTime:" + deltaTime);
+            // TODO: æ¯0.1ç§’æ‰©å¤§é»‘é›¾åŠå¾„ï¼ˆå¢é•¿é€Ÿç‡ bï¼‰
+            if (Debugging) Debug.Log("é»‘é›¾æ‰©æ•£,deltaTime:" + deltaTime);
         }
 
-        // ºÚÎí¶ÔÍæ¼ÒÔì³ÉÉËº¦
+        // é»‘é›¾å¯¹ç©å®¶é€ æˆä¼¤å®³
         private void ApplyFogDamage(float timeLonely)
         {
-            // TODO: Ã¿0.5ÃëÔì³ÉÒ»´ÎÉËº¦£¨ÉËº¦ = »ù´¡Öµ + t·ÖÖÓ*c£©
-            if (Debugging) Debug.Log("ºÚÎíÉËº¦,Ê±¼ä:" + timeLonely);
+            // TODO: æ¯0.5ç§’é€ æˆä¸€æ¬¡ä¼¤å®³ï¼ˆä¼¤å®³ = åŸºç¡€å€¼ + tåˆ†é’Ÿ*cï¼‰
+            if (Debugging) Debug.Log("é»‘é›¾ä¼¤å®³,æ—¶é—´:" + timeLonely);
         }
 
-        // Í£Ö¹ºÚÎí£¨¸ßĞË×´Ì¬´¥·¢£©
+        // åœæ­¢é»‘é›¾ï¼ˆé«˜å…´çŠ¶æ€è§¦å‘ï¼‰
         private void StopBlackFog()
         {
-            // TODO: Ê¹ºÚÎíÖğ½¥ÏûÍË
-            if (Debugging) Debug.Log("ºÚÎíÍ£Ö¹");
+            // TODO: ä½¿é»‘é›¾é€æ¸æ¶ˆé€€
+            if (Debugging) Debug.Log("é»‘é›¾åœæ­¢");
         }
 
-        // ½øÈëËÀÍö×´Ì¬µÄÂß¼­
+        // è¿›å…¥æ­»äº¡çŠ¶æ€çš„é€»è¾‘
         private void TriggerDeath()
         {
-            // TODO: ²¥·ÅÈ«²ãÒôĞ§¡¢¶¯»­£¬ºÚÎí¼ÌĞøÀ©É¢ & ±¾²ãìØÖµÉÏÏŞ ¡Á1.5£¬´¥·¢¶îÍâ¿ÍÈËÉú³É
-            if (Debugging) Debug.Log("ÀÏÈËËÀÍö");
+            // TODO: æ’­æ”¾å…¨å±‚éŸ³æ•ˆã€åŠ¨ç”»ï¼Œé»‘é›¾ç»§ç»­æ‰©æ•£ & æœ¬å±‚ç†µå€¼ä¸Šé™ Ã—1.5ï¼Œè§¦å‘é¢å¤–å®¢äººç”Ÿæˆ
+            if (Debugging) Debug.Log("è€äººæ­»äº¡");
         }
 
-        // ¼ÓËÙºÚÎí£¨ËÀÍö×´Ì¬ÏÂ£©
+        // åŠ é€Ÿé»‘é›¾ï¼ˆæ­»äº¡çŠ¶æ€ä¸‹ï¼‰
         private void AmplifyFog()
         {
-            // TODO: ºÚÎíÀ©É¢ËÙ¶È *3£¬ÉËº¦·­±¶
-            if (Debugging) Debug.Log("ºÚÎí¼ÓËÙ");
+            // TODO: é»‘é›¾æ‰©æ•£é€Ÿåº¦ *3ï¼Œä¼¤å®³ç¿»å€
+            if (Debugging) Debug.Log("é»‘é›¾åŠ é€Ÿ");
         }
 
-        // µôÂä½±Àø
+        // æ‰è½å¥–åŠ±
         private void DropCoinBag(int amount)
         {
-            // TODO: Éú³ÉÒ»¸öÇ®´üÎïÌå£¬½ğ±ÒÊıÁ¿Îª amount
+            // TODO: ç”Ÿæˆä¸€ä¸ªé’±è¢‹ç‰©ä½“ï¼Œé‡‘å¸æ•°é‡ä¸º amount
 
+            Debug.Log("çˆ†é‡‘å¸:" + amount);
             GameObject coinBag = Instantiate(moneybag, transform.position, Quaternion.identity);
             MoneyPackage moneyPackage = coinBag.GetComponent<MoneyPackage>();
             if (moneyPackage != null)
             {
                 moneyPackage.Init(amount);
             }
-            // ¸øÇ®´üÒ»¸öËæ»úµÄÅ×ÎïÏß
-            // ¸øÇ®´üÒ»¸öËæ»úµÄÅ×ÎïÏß£¨ĞèÒª Rigidbody ×é¼ş£©
+            // ç»™é’±è¢‹ä¸€ä¸ªéšæœºçš„æŠ›ç‰©çº¿
+            // ç»™é’±è¢‹ä¸€ä¸ªéšæœºçš„æŠ›ç‰©çº¿ï¼ˆéœ€è¦ Rigidbody ç»„ä»¶ï¼‰
             Rigidbody rb = coinBag.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 Vector3 randomDir = new Vector3(
-                   UnityEngine.Random.Range(-1f, 1f),     // ×óÓÒ
-                    1f,                        // ÏòÉÏ£¨±£Ö¤Ò»¶¨Å×ÎïÏß£©
-                    UnityEngine.Random.Range(-1f, 1f)      // Ç°ºó
+                   UnityEngine.Random.Range(-1f, 1f),     // å·¦å³
+                    1f,                        // å‘ä¸Šï¼ˆä¿è¯ä¸€å®šæŠ›ç‰©çº¿ï¼‰
+                    UnityEngine.Random.Range(-1f, 1f)      // å‰å
                 ).normalized;
 
-                float force = UnityEngine.Random.Range(4f, 7f); // ¿Éµ÷µÄ±¬Õ¨Á¦¶È
+                float force = UnityEngine.Random.Range(4f, 7f); // å¯è°ƒçš„çˆ†ç‚¸åŠ›åº¦
                 rb.AddForce(randomDir * force, ForceMode.Impulse);
             }
 
         }
 
-        // OnDestroy Ê±ÇåÀíĞĞÎªÊ÷
+        // OnDestroy æ—¶æ¸…ç†è¡Œä¸ºæ ‘
         public override void OnDestroy()
         {
             if (behaviorTree != null && behaviorTree.CurrentState == Node.State.ACTIVE)
