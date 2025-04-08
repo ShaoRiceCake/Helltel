@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 // 全局游戏数据模型
 [CreateAssetMenu(fileName = "GameData", menuName = "Helltel/Data/GameData")]
