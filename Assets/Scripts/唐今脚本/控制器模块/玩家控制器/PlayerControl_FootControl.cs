@@ -1,10 +1,14 @@
 using UnityEngine;
-using UnityEngine.Serialization;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(RaycastTool))]
 [RequireComponent(typeof(SpringTool))]
 public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 {
+    [System.Serializable]
+    public class FootLockEvent : UnityEvent<Vector3> {}
+    public FootLockEvent onFootLocked = new FootLockEvent();
+
     public GameObject targetObject;
     public GameObject footObject;
 
@@ -22,12 +26,14 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
     }
     
     protected FootState CurrentState = FootState.Grounded;
+    private bool _hasTriggeredLockEvent;
 
     private Rigidbody _movingObj;
     
     protected override void Start()
     {
         base.Start();
+        _hasTriggeredLockEvent = false;
 
         if (!footObject)
         {
@@ -44,7 +50,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         SubscribeEvents();
     }
 
-    protected virtual void OnDestroy()
+    protected new virtual void OnDestroy()
     {
         if (controlHandler != null)
         {
@@ -110,10 +116,15 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         if (distance > 0.2)
         {
             _movingObj.velocity = direction.normalized * 15;
+            _hasTriggeredLockEvent = false;
         }
         else
         {
             FixObject();
+
+            if (_hasTriggeredLockEvent) return;
+            onFootLocked.Invoke(_movingObj.position);
+            _hasTriggeredLockEvent = true;
         }
     }
     
@@ -124,6 +135,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Lifted;
         UnfixObject();
         springTool.isSpringEnabled = true;
+        _hasTriggeredLockEvent = false;
         return true;
     }
     
@@ -133,22 +145,27 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         
         CurrentState = FootState.Grounded;
         springTool.isSpringEnabled = false;
+        _hasTriggeredLockEvent = false;
     }
     
     protected void LockFoot()
     {
         if (CurrentState == FootState.Lifted)
         {
-            ReleaseFoot(); 
+            ReleaseFoot();
         }
+        
         CurrentState = FootState.Locked;
+
+        if (_hasTriggeredLockEvent) return;
+        onFootLocked.Invoke(_movingObj.position);
+        _hasTriggeredLockEvent = true;
     }
     
     protected void UnlockFoot()
     {
-        if (CurrentState == FootState.Locked)
-        {
-            CurrentState = FootState.Grounded;
-        }
+        if (CurrentState != FootState.Locked) return;
+        CurrentState = FootState.Grounded;
+        _hasTriggeredLockEvent = false;
     }
 }
