@@ -11,25 +11,25 @@ namespace Helltal.Gelercat
 {
     public class GuestBase : NetworkBehaviour
     {
-        // Í¬²½transform£¬»ù´¡Êı¾İ
-        // »ù´¡ÊôĞÔ
-        [Header("×î´óÉúÃüÖµ")] public float maxHealth = 15f;
-        [Header("µ±Ç°ÉúÃüÖµ")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
-        [Header("ìØÖµ")] public float entropyValue = 0f;
+        // åŒæ­¥transformï¼ŒåŸºç¡€æ•°æ®
+        // åŸºç¡€å±æ€§
+        [Header("æœ€å¤§ç”Ÿå‘½å€¼")] public float maxHealth = 15f;
+        [Header("å½“å‰ç”Ÿå‘½å€¼")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
+        [Header("ç†µå€¼")] public float entropyValue = 0f;
 
-        public bool Debugging = false; // ÊÇ·ñ¿ªÆôµ÷ÊÔÄ£Ê½
+        public bool Debugging = false; // æ˜¯å¦å¼€å¯è°ƒè¯•æ¨¡å¼
 
 
-        // »ù´¡¿Ø¼ş        
+        // åŸºç¡€æ§ä»¶        
         public GameObject[] players;
         
-        public NavPointsManager navPointsManager;  // µ¼º½µã¹ÜÀíÆ÷
+        public NavPointsManager navPointsManager;  // å¯¼èˆªç‚¹ç®¡ç†å™¨
 
-        public NavMeshAgent agent;  // µ¼º½´úÀí
+        public NavMeshAgent agent;  // å¯¼èˆªä»£ç†
 
-        public GuestPresenter presenter;  // ±íÏÖ²ãµÄapi£¬¶¯»­ÓÃanimator¿ØÖÆÆ÷¿ØÖÆ
+        public GuestPresenter presenter;  // è¡¨ç°å±‚çš„apiï¼ŒåŠ¨ç”»ç”¨animatoræ§åˆ¶å™¨æ§åˆ¶
 
-        /// TODO£ºAudioPresident
+        /// TODOï¼šAudioPresident
         public GuestSensor sensor;  // 
 
 
@@ -68,7 +68,7 @@ if (Application.isEditor)
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
             if (navPointsManager == null)
             {
-                Debug.LogError("ÇëÏÈÔÚ³¡¾°ÖĞÌí¼Óµ¼º½µã¹ÜÀíÆ÷");
+                Debug.LogError("è¯·å…ˆåœ¨åœºæ™¯ä¸­æ·»åŠ å¯¼èˆªç‚¹ç®¡ç†å™¨");
             }
             players = GameObject.FindGameObjectsWithTag("Player");
             presenter = GetComponent<GuestPresenter>();
