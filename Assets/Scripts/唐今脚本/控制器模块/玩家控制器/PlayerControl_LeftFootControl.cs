@@ -7,6 +7,7 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
         controlHandler.onReleaseLeftLeg.AddListener(OnReleaseLeftLeg);
         controlHandler.onLiftRightLeg.AddListener(OnOtherFootLifted);
         controlHandler.onReleaseRightLeg.AddListener(OnOtherFootReleased);
+        controlHandler.onCameraControl.AddListener(OnCameraControl);
     }
 
     protected override void UnsubscribeEvents()
@@ -15,6 +16,7 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
         controlHandler.onReleaseLeftLeg.RemoveListener(OnReleaseLeftLeg);
         controlHandler.onLiftRightLeg.RemoveListener(OnOtherFootLifted);
         controlHandler.onReleaseRightLeg.RemoveListener(OnOtherFootReleased);
+        controlHandler.onCameraControl.RemoveListener(OnCameraControl);
     }
 
     private void OnLiftLeftLeg() 
@@ -35,5 +37,12 @@ public class PlayerControl_LeftFootControl : PlayerControl_FootControl
     private void OnOtherFootReleased()
     {
         UnlockFoot();
+    }
+    private void OnCameraControl()
+    {
+        if (CurrentState == FootState.Lifted)
+        {
+            ReleaseFoot();
+        }
     }
 }

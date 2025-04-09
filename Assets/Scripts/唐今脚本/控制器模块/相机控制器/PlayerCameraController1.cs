@@ -4,67 +4,46 @@ using System.Collections;
 
 [RequireComponent(typeof(CinemachineManager))]
 [RequireComponent(typeof(PlayerControlInformationProcess))]
-[RequireComponent(typeof(PlayerControl_HandControl))]
+[RequireComponent(typeof(PlayerFootTrackingController))]
 public class PlayerCameraController1 : MonoBehaviour
 {
+    [SerializeField] private PlayerFootTrackingController footTracker;
+    
     [Header("Camera Settings")]
     [Tooltip("所有需要管理的虚拟摄像头数组")]
     public CinemachineVirtualCameraBase[] virtualCameras;
 
     [Tooltip("初始默认激活的摄像头索引")]
     [Range(0, 3)] public int defaultCameraIndex;
-
-    [Header("Input Settings")]
-    public KeyCode nextCameraKey = KeyCode.D;
-    public KeyCode previousCameraKey = KeyCode.A;
-    public KeyCode skipNextCameraKey = KeyCode.W;
-    public KeyCode skipPreviousCameraKey = KeyCode.S;
-    public float inputCooldown = 0.2f;
-
-    [Header("Auto Camera Settings")]
-    [Tooltip("触发自动切换所需的鼠标移动距离")]
-    public float autoSwitchThreshold = 500f;
-    [Tooltip("鼠标移动灵敏度")]
-    public float mouseSensitivity = 1f;
-    [Tooltip("是否启用自动镜头切换")]
-    public bool autoCameraEnabled = true;
-
-    private CinemachineManager _cameraSwitcher;
-    private int _lastCameraIndex;
-    private PlayerControlInformationProcess _controlHandler;
-    private PlayerControl_HandControl _handControl;
-    private bool _canInput = true;
     
-    // 鼠标移动统计
-    private Vector2 _mouseMoveAccumulator;
-    private Vector2 _lastMousePosition;
-
-    private const int BaseCameraCount = 4;
+    private CinemachineManager _cameraSwitcher;
+    private PlayerControlInformationProcess _controlHandler;
+    private int _lastCameraIndex;
+    private bool _isFootLifted;
+    private bool _isSwitchingBaseCamera;
+    private Coroutine _switchCooldownCoroutine;
+    
     private enum CameraType
     {
         Back = 0,
         Left = 1,
         Front = 2,
         Right = 3,
-        LeftFootLeft = 4,
-        RightFootLeft = 5,
-        LeftFootBack = 6,
-        RightFootBack = 7,
-        LeftFootRight = 8,
-        RightFootRight = 9,
-        LeftFootFront = 10,
-        RightFootFront = 11,
-        HandLeft = 12,
-        HandBack = 13,
-        HandRight = 14,
-        HandFront = 15
+        LeftFootBack = 4,
+        RightFootBack = 5,
+        LeftFootLeft = 6,
+        RightFootLeft = 7,
+        LeftFootFront = 8,
+        RightFootFront = 9,
+        LeftFootRight = 10,
+        RightFootRight = 11
     }
 
     private void Awake()
     {
         _cameraSwitcher = GetComponent<CinemachineManager>();
         _controlHandler = GetComponent<PlayerControlInformationProcess>();
-        _handControl = GetComponent<PlayerControl_HandControl>();
+        footTracker = GetComponent<PlayerFootTrackingController>();
         _lastCameraIndex = defaultCameraIndex;
         
         if (_controlHandler == null)
@@ -77,179 +56,121 @@ public class PlayerCameraController1 : MonoBehaviour
         _controlHandler.onReleaseLeftLeg.AddListener(OnLeftFootReleased);
         _controlHandler.onLiftRightLeg.AddListener(OnRightFootLifted);
         _controlHandler.onReleaseRightLeg.AddListener(OnRightFootReleased);
-        
-        // 订阅鼠标移动事件
-        _controlHandler.onMouseMoveUpdate.AddListener(HandleMouseMovement);
     }
 
     private void OnDestroy()
     {
         if (_controlHandler == null) return;
+        
         _controlHandler.onLiftLeftLeg.RemoveListener(OnLeftFootLifted);
         _controlHandler.onReleaseLeftLeg.RemoveListener(OnLeftFootReleased);
         _controlHandler.onLiftRightLeg.RemoveListener(OnRightFootLifted);
         _controlHandler.onReleaseRightLeg.RemoveListener(OnRightFootReleased);
-        _controlHandler.onMouseMoveUpdate.RemoveListener(HandleMouseMovement);
-    }
-
-    private void HandleMouseMovement(Vector2 mouseDelta)
-    {
-        if (!autoCameraEnabled) return;
         
-        // 获取当前摄像机索引，只对基础摄像机(0-3)生效
-        var currentIndex = _cameraSwitcher.GetCurrentCamera();
-        if (currentIndex >= BaseCameraCount) return;
-
-        // 累加鼠标移动距离
-        _mouseMoveAccumulator += mouseDelta * mouseSensitivity;
-
-        // 检查是否达到阈值
-        CheckAutoCameraSwitch();
-    }
-
-    private void CheckAutoCameraSwitch()
-    {
-        // 获取绝对值最大的方向
-        var absX = Mathf.Abs(_mouseMoveAccumulator.x);
-        var absY = Mathf.Abs(_mouseMoveAccumulator.y);
-        
-        // 确定主要移动方向
-        var isHorizontalDominant = absX > absY;
-        
-        if (isHorizontalDominant)
+        if (footTracker != null)
         {
-            // 水平方向移动占主导
-            if (_mouseMoveAccumulator.x > autoSwitchThreshold)
-            {
-                // 向右移动 - 切换到Right
-                TrySwitchBaseCamera((int)CameraType.Right);
-                _mouseMoveAccumulator = Vector2.zero;
-            }
-            else if (_mouseMoveAccumulator.x < -autoSwitchThreshold)
-            {
-                // 向左移动 - 切换到Left
-                TrySwitchBaseCamera((int)CameraType.Left);
-                _mouseMoveAccumulator = Vector2.zero;
-            }
+            footTracker.onFootLocked.RemoveListener(OnFootLocked);
+        }
+
+        if (_switchCooldownCoroutine != null)
+        {
+            StopCoroutine(_switchCooldownCoroutine);
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (footTracker != null)
+        {
+            footTracker.onFootLocked.AddListener(OnFootLocked);
         }
         else
         {
-            // 垂直方向移动占主导
-            if (_mouseMoveAccumulator.y > autoSwitchThreshold)
-            {
-                // 向上移动 - 切换到Back
-                TrySwitchBaseCamera((int)CameraType.Back);
-                _mouseMoveAccumulator = Vector2.zero;
-            }
-            else if (_mouseMoveAccumulator.y < -autoSwitchThreshold)
-            {
-                // 向下移动 - 切换到Front
-                TrySwitchBaseCamera((int)CameraType.Front);
-                _mouseMoveAccumulator = Vector2.zero;
-            }
+            Debug.LogError("PlayerFootTrackingController not found");
+        }
+    }
+    
+    private void OnDisable()
+    {
+        if (footTracker != null)
+        {
+            footTracker.onFootLocked.RemoveListener(OnFootLocked);
+        }
+    }
+    
+    private void OnFootLocked(FootRegion region)
+    {
+        if (_isFootLifted || _isSwitchingBaseCamera) return;
+
+        switch (region)
+        {
+            case FootRegion.Front:
+                SwitchToBaseCamera(CameraType.Front);
+                break;
+            case FootRegion.Back:
+                SwitchToBaseCamera(CameraType.Back);
+                break;
+            case FootRegion.Left:
+                SwitchToBaseCamera(CameraType.Left);
+                break;
+            case FootRegion.Right:
+                SwitchToBaseCamera(CameraType.Right);
+                break;
         }
     }
 
-    private void TrySwitchBaseCamera(int newIndex)
+    private void SwitchToBaseCamera(CameraType cameraType)
     {
-        if (!_canInput) return;
-        
-        var currentIndex = _cameraSwitcher.GetCurrentCamera();
-        if (currentIndex >= BaseCameraCount || currentIndex == newIndex) return;
-        _lastCameraIndex = currentIndex;
+        var newIndex = (int)cameraType;
+        if (newIndex == _lastCameraIndex) return; 
+
+        _lastCameraIndex = newIndex;
         _cameraSwitcher.SetActiveCamera(newIndex);
-        StartCoroutine(InputCooldown());
-    }
-    private void Update()
-    {
-        HandleCameraInput();
-        HandleHandCamera();
-    }
-
-    private void HandleCameraInput()
-    {
-        if (!_canInput) return; // 如果处于冷却时间则不处理输入
-
-        if (Input.GetKeyDown(nextCameraKey))
+        
+        if (_switchCooldownCoroutine != null)
         {
-            SwitchToNextCamera(1);
-            StartCoroutine(InputCooldown());
+            StopCoroutine(_switchCooldownCoroutine);
         }
-        else if (Input.GetKeyDown(previousCameraKey))
-        {
-            SwitchToNextCamera(-1);
-            StartCoroutine(InputCooldown());
-        }
-        else if (Input.GetKeyDown(skipNextCameraKey))
-        {
-            SwitchToNextCamera(2);
-            StartCoroutine(InputCooldown());
-        }
-        else if (Input.GetKeyDown(skipPreviousCameraKey))
-        {
-            SwitchToNextCamera(-2);
-            StartCoroutine(InputCooldown());
-        }
+        _switchCooldownCoroutine = StartCoroutine(BaseCameraSwitchCooldown());
     }
 
-    private IEnumerator InputCooldown()
+    private IEnumerator BaseCameraSwitchCooldown()
     {
-        _canInput = false;
-        yield return new WaitForSeconds(inputCooldown);
-        _canInput = true;
+        _isSwitchingBaseCamera = true;
+        yield return new WaitForSeconds(3f);
+        _isSwitchingBaseCamera = false;
     }
 
-    private void SwitchToNextCamera(int step)
+    private void OnLeftFootLifted()
     {
-        var currentIndex = _cameraSwitcher.GetCurrentCamera();
-
-        switch (currentIndex)
-        {
-            case >= (int)CameraType.HandLeft and <= (int)CameraType.HandFront:
-            {
-                var newIndex = currentIndex + step;
-
-                newIndex = newIndex switch
-                {
-                    > (int)CameraType.HandFront => (int)CameraType.HandLeft,
-                    < (int)CameraType.HandLeft => (int)CameraType.HandFront,
-                    _ => newIndex
-                };
-
-                _cameraSwitcher.SetActiveCamera(newIndex);
-                _lastCameraIndex = newIndex - (int)CameraType.HandLeft;
-                break;
-            }
-            case < BaseCameraCount:
-            {
-                var newIndex = CalculateNewIndex(currentIndex, step);
-                _lastCameraIndex = currentIndex;
-                _cameraSwitcher.SetActiveCamera(newIndex);
-                break;
-            }
-        }
+        _isFootLifted = true;
+        var baseStance = GetCurrentBaseStance();
+        _cameraSwitcher.SetActiveCamera(GetFootCameraIndex(true, baseStance));
     }
 
-    private void SwitchHandCamera(int currentHandIndex, int step)
+    private void OnLeftFootReleased()
     {
-        var baseStance = currentHandIndex - (int)CameraType.HandLeft;
-        var newBaseStance = CalculateNewIndex(baseStance, step);
-        var newHandIndex = (int)CameraType.HandLeft + newBaseStance;
-        _cameraSwitcher.SetActiveCamera(newHandIndex);
-        _lastCameraIndex = newBaseStance;
+        _isFootLifted = false;
+        _cameraSwitcher.SetActiveCamera(_lastCameraIndex);
     }
 
-    private static int CalculateNewIndex(int currentIndex, int step)
+    private void OnRightFootLifted()
     {
-        var newIndex = (currentIndex + step) % BaseCameraCount;
-        if (newIndex < 0) newIndex += BaseCameraCount;
-        return newIndex;
+        _isFootLifted = true;
+        var baseStance = GetCurrentBaseStance();
+        _cameraSwitcher.SetActiveCamera(GetFootCameraIndex(false, baseStance));
+    }
+
+    private void OnRightFootReleased()
+    {
+        _isFootLifted = false;
+        _cameraSwitcher.SetActiveCamera(_lastCameraIndex);
     }
 
     private int GetCurrentBaseStance()
     {
         var currentCamera = _cameraSwitcher.GetCurrentCamera();
-        return currentCamera >= BaseCameraCount ? _lastCameraIndex : currentCamera;
+        return currentCamera is >= 0 and <= 3 ? currentCamera : _lastCameraIndex;
     }
 
     private static int GetFootCameraIndex(bool isLeftFoot, int baseStance)
@@ -262,59 +183,5 @@ public class PlayerCameraController1 : MonoBehaviour
             (int)CameraType.Front => isLeftFoot ? (int)CameraType.LeftFootFront : (int)CameraType.RightFootFront,
             _ => isLeftFoot ? (int)CameraType.LeftFootLeft : (int)CameraType.RightFootLeft
         };
-    }
-
-    private static int GetHandCameraIndex(int baseStance)
-    {
-        return baseStance switch
-        {
-            (int)CameraType.Left => (int)CameraType.HandLeft,
-            (int)CameraType.Back => (int)CameraType.HandBack,
-            (int)CameraType.Right => (int)CameraType.HandRight,
-            (int)CameraType.Front => (int)CameraType.HandFront,
-            _ => (int)CameraType.HandLeft
-        };
-    }
-
-    private void OnLeftFootLifted()
-    {
-        var baseStance = GetCurrentBaseStance();
-        _lastCameraIndex = baseStance;
-        _cameraSwitcher.SetActiveCamera(GetFootCameraIndex(true, baseStance));
-    }
-
-    private void OnLeftFootReleased()
-    {
-        _cameraSwitcher.SetActiveCamera(_lastCameraIndex);
-    }
-
-    private void OnRightFootLifted()
-    {
-        var baseStance = GetCurrentBaseStance();
-        _lastCameraIndex = baseStance;
-        _cameraSwitcher.SetActiveCamera(GetFootCameraIndex(false, baseStance));
-    }
-
-    private void OnRightFootReleased()
-    {
-        _cameraSwitcher.SetActiveCamera(_lastCameraIndex);
-    }
-    
-    private void HandleHandCamera()
-    {
-        var currentCamera = _cameraSwitcher.GetCurrentCamera();
-        var nowHand = _handControl.CurrentHand;
-
-        if (nowHand != 0)
-        {
-            if (currentCamera is >= BaseCameraCount and < (int)CameraType.HandLeft) return;
-            var baseStance = GetCurrentBaseStance();
-            _lastCameraIndex = baseStance;
-            _cameraSwitcher.SetActiveCamera(GetHandCameraIndex(baseStance));
-        }
-        else if (currentCamera >= (int)CameraType.HandLeft)
-        {
-            _cameraSwitcher.SetActiveCamera(_lastCameraIndex);
-        }
     }
 }

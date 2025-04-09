@@ -36,7 +36,7 @@ public class MouseControl : NetworkBehaviour
 
     private Vector2 _lastMousePosition;
 
-    void Awake()
+    private void Awake()
     {
         onLeftMouseDown ??= new UnityEvent();
         onRightMouseDown ??= new UnityEvent();
