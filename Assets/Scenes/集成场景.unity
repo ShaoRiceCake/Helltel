@@ -444,6 +444,7 @@ MonoBehaviour:
   drawAsLoop: 0
   drawNumbers: 1
   debugColour: {r: 1, g: 1, b: 1, a: 1}
+  gridCellSize: 10
 --- !u!114 &674203295 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4402896777849107525, guid: 88ea80cf1c0d7c440af941341a97dda9, type: 3}
@@ -472,9 +473,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: "Player\u2014\u7B2C\u516D\u7248\u6539"
       objectReference: {fileID: 0}
+    - target: {fileID: 2506025552200807396, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
+      propertyPath: near clip plane
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4023543591445285123, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2412489449
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037804451798777109, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
+      propertyPath: sphereCastRadius
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8176030336332505678, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1332,7 +1341,7 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 74117530}
   m_SourcePrefab: {fileID: 100100000, guid: 6a7ffd75cbef1004280dadaf98729615, type: 3}
---- !u!1 &1512024595
+--- !u!1 &1566167156
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1340,8 +1349,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1512024597}
-  - component: {fileID: 1512024596}
+  - component: {fileID: 1566167158}
+  - component: {fileID: 1566167157}
   m_Layer: 0
   m_Name: ComputeCollisionWorld
   m_TagString: Untagged
@@ -1349,25 +1358,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1512024596
+--- !u!114 &1566167157
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1512024595}
+  m_GameObject: {fileID: 1566167156}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1512024597
+--- !u!4 &1566167158
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1512024595}
+  m_GameObject: {fileID: 1566167156}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -2305,7 +2314,7 @@ SceneRoots:
   - {fileID: 288143086}
   - {fileID: 1223708523}
   - {fileID: 182760729}
-  - {fileID: 1512024597}
   - {fileID: 2058673642}
   - {fileID: 1086677334}
   - {fileID: 460556286}
+  - {fileID: 1566167158}
