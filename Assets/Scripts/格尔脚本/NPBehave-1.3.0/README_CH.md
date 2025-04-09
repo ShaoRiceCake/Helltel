@@ -1,25 +1,25 @@
-## 前言
-NPBahave是GitHub上开源的一个行为树，其代码简洁有力，与Unity耦合较低，[toc]适合拿来做双端行为树。`注意，由于时间关系，原文中的链接这里将不再提供引用。`
-## 开源链接
+## 鍓嶈█
+NPBahave鏄疓itHub涓婂紑婧愮殑涓€涓�琛屼负鏍戯紝鍏朵唬鐮佺畝娲佹湁鍔涳紝涓嶶nity鑰﹀悎杈冧綆锛孾toc]閫傚悎鎷挎潵鍋氬弻绔�琛屼负鏍戙€俙娉ㄦ剰锛岀敱浜庢椂闂村叧绯伙紝鍘熸枃涓�鐨勯摼鎺ヨ繖閲屽皢涓嶅啀鎻愪緵寮曠敤銆俙
+## 寮€婧愰摼鎺�
 [https://github.com/meniku/NPBehave](https://github.com/meniku/NPBehave)
-## 正文
+## 姝ｆ枃
 ![NPBehave Logo](http://labs.nkuebler.de/npbehave/images/np-behave.png)
-NPBehave致力于：
+NPBehave鑷村姏浜庯細
 
-- 轻量，快速，简洁
-- 事件驱动
-- 易于拓展
-- 一个用代码定义AI行为的框架，目前没有可视化编辑器支持（`本人将为其贡献一个`）
+- 杞婚噺锛屽揩閫燂紝绠€娲�
+- 浜嬩欢椹卞姩
+- 鏄撲簬鎷撳睍
+- 涓€涓�鐢ㄤ唬鐮佸畾涔堿I琛屼负鐨勬�嗘灦锛岀洰鍓嶆病鏈夊彲瑙嗗寲缂栬緫鍣ㄦ敮鎸侊紙`鏈�浜哄皢涓哄叾璐＄尞涓€涓猔锛�
 
-NPBehave基于功能强大且灵活的基于代码的方法，从behavior库定义行为树，并混合了虚幻引擎的一些很棒的行为树概念。与传统的行为树不同，事件驱动的行为树不需要每帧从根节点遍历。它们保持当前状态，只有在实际需要时才继续遍历。这使得它们的性能更高，使用起来也更简单。
+NPBehave鍩轰簬鍔熻兘寮哄ぇ涓旂伒娲荤殑鍩轰簬浠ｇ爜鐨勬柟娉曪紝浠巄ehavior搴撳畾涔夎�屼负鏍戯紝骞舵贩鍚堜簡铏氬够寮曟搸鐨勪竴浜涘緢妫掔殑琛屼负鏍戞�傚康銆備笌浼犵粺鐨勮�屼负鏍戜笉鍚岋紝浜嬩欢椹卞姩鐨勮�屼负鏍戜笉闇€瑕佹瘡甯т粠鏍硅妭鐐归亶鍘嗐€傚畠浠�淇濇寔褰撳墠鐘舵€侊紝鍙�鏈夊湪瀹為檯闇€瑕佹椂鎵嶇户缁�閬嶅巻銆傝繖浣垮緱瀹冧滑鐨勬€ц兘鏇撮珮锛屼娇鐢ㄨ捣鏉ヤ篃鏇寸畝鍗曘€�
 
-在NPBehave中，您将发现大多数节点类型来自传统的行为树，但也有一些类似于虚幻引擎中的节点类型。不过，添加您自己的自定义节点类型也相当容易。
+鍦∟PBehave涓�锛屾偍灏嗗彂鐜板ぇ澶氭暟鑺傜偣绫诲瀷鏉ヨ嚜浼犵粺鐨勮�屼负鏍戯紝浣嗕篃鏈変竴浜涚被浼间簬铏氬够寮曟搸涓�鐨勮妭鐐圭被鍨嬨€備笉杩囷紝娣诲姞鎮ㄨ嚜宸辩殑鑷�瀹氫箟鑺傜偣绫诲瀷涔熺浉褰撳�规槗銆�
 
-### 安装
-只需将NPBehave文件夹放入Unity项目中。还有一个Examples子文件夹，其中有一些您可能想要参考的示例场景。
+### 瀹夎��
+鍙�闇€灏哊PBehave鏂囦欢澶规斁鍏�Unity椤圭洰涓�銆傝繕鏈変竴涓狤xamples瀛愭枃浠跺す锛屽叾涓�鏈変竴浜涙偍鍙�鑳芥兂瑕佸弬鑰冪殑绀轰緥鍦烘櫙銆�
 
-### 例子：“Hello World” 行为树
-让我们开始一个例子
+### 渚嬪瓙锛氣€淗ello World鈥� 琛屼负鏍�
+璁╂垜浠�寮€濮嬩竴涓�渚嬪瓙
 ```csharp
 using NPBehave;
 
@@ -36,7 +36,7 @@ public class HelloWorld : MonoBehaviour
     }
 }
 ```
-当您运行此命令时，您将注意到“Hello World”将被一次又一次地打印出来。这是因为当遍历过树中的最后一个节点时，根节点将重新启动整个树。如果不需要这样，可以添加一个waituntilstop节点，如下所示:
+褰撴偍杩愯�屾�ゅ懡浠ゆ椂锛屾偍灏嗘敞鎰忓埌鈥淗ello World鈥濆皢琚�涓€娆″張涓€娆″湴鎵撳嵃鍑烘潵銆傝繖鏄�鍥犱负褰撻亶鍘嗚繃鏍戜腑鐨勬渶鍚庝竴涓�鑺傜偣鏃讹紝鏍硅妭鐐瑰皢閲嶆柊鍚�鍔ㄦ暣涓�鏍戙€傚�傛灉涓嶉渶瑕佽繖鏍凤紝鍙�浠ユ坊鍔犱竴涓獁aituntilstop鑺傜偣锛屽�備笅鎵€绀�:
 ```csharp
 // ...
 behaviorTree = new Root(
@@ -47,15 +47,15 @@ behaviorTree = new Root(
 );
 ///... 
 ```
-到目前为止，这个行为树中还没有任何事件驱动。在我们深入研究之前，您需要了解黑板（Blackboards）是什么。
+鍒扮洰鍓嶄负姝�锛岃繖涓�琛屼负鏍戜腑杩樻病鏈変换浣曚簨浠堕┍鍔ㄣ€傚湪鎴戜滑娣卞叆鐮旂┒涔嬪墠锛屾偍闇€瑕佷簡瑙ｉ粦鏉匡紙Blackboards锛夋槸浠€涔堛€�
 
-### Blackboards（黑板）
-在NPBehave中，就像在虚幻引擎中一样，我们有黑板。你可以把它们看作是你的AI的“记忆”。在NPBehave中，黑板是基于可以观察更改的字典。我们主要使用`Service`来存储和更新黑板中的值。我们使用`BlackboardCondition`或`BlackboardQuery`来观察黑板的变化，然后遍历bahaviour树。您也可以在其他任何地方访问或修改黑板的值(您也可以经常从Action节点访问它们)。
+### Blackboards锛堥粦鏉匡級
+鍦∟PBehave涓�锛屽氨鍍忓湪铏氬够寮曟搸涓�涓€鏍凤紝鎴戜滑鏈夐粦鏉裤€備綘鍙�浠ユ妸瀹冧滑鐪嬩綔鏄�浣犵殑AI鐨勨€滆�板繂鈥濄€傚湪NPBehave涓�锛岄粦鏉挎槸鍩轰簬鍙�浠ヨ�傚療鏇存敼鐨勫瓧鍏搞€傛垜浠�涓昏�佷娇鐢╜Service`鏉ュ瓨鍌ㄥ拰鏇存柊榛戞澘涓�鐨勫€笺€傛垜浠�浣跨敤`BlackboardCondition`鎴朻BlackboardQuery`鏉ヨ�傚療榛戞澘鐨勫彉鍖栵紝鐒跺悗閬嶅巻bahaviour鏍戙€傛偍涔熷彲浠ュ湪鍏朵粬浠讳綍鍦版柟璁块棶鎴栦慨鏀归粦鏉跨殑鍊�(鎮ㄤ篃鍙�浠ョ粡甯镐粠Action鑺傜偣璁块棶瀹冧滑)銆�
 
-当您实例化一个`根（Root）`时，黑板将自动创建，但是您也可以使用它的构造函数提供另一个实例(这对于`共享黑板（Shared Blackboards）`特别有用)
+褰撴偍瀹炰緥鍖栦竴涓猔鏍癸紙Root锛塦鏃讹紝榛戞澘灏嗚嚜鍔ㄥ垱寤猴紝浣嗘槸鎮ㄤ篃鍙�浠ヤ娇鐢ㄥ畠鐨勬瀯閫犲嚱鏁版彁渚涘彟涓€涓�瀹炰緥(杩欏�逛簬`鍏变韩榛戞澘锛圫hared Blackboards锛塦鐗瑰埆鏈夌敤)
 
-### 例子：一个事件驱动的行为树
-这有一个使用黑板的事件驱动的行为树例子
+### 渚嬪瓙锛氫竴涓�浜嬩欢椹卞姩鐨勮�屼负鏍�
+杩欐湁涓€涓�浣跨敤榛戞澘鐨勪簨浠堕┍鍔ㄧ殑琛屼负鏍戜緥瀛�
 ```csharp
 /// ...
 behaviorTree = new Root(
@@ -79,50 +79,50 @@ behaviorTree = new Root(
 behaviorTree.Start();
 //...
 ```
-这个示例将在每500毫秒交替打印“foo”和“bar”。我们使用一个`服务`装饰器节点在黑板上切换foo boolean值。我们使用BlackboardCondition装饰器节点根据这个boolean值来决定是否执行分支。BlackboardCondition还会根据这个值监视黑板的变化（依据黑板的当前值和我们提供的值做为判断基准），`Stops.IMMEDIATE_RESTART`作用是如果条件不再为真，则当前执行的分支将停止，如果条件再次为真，则立即重新启动。
+杩欎釜绀轰緥灏嗗湪姣�500姣�绉掍氦鏇挎墦鍗扳€渇oo鈥濆拰鈥渂ar鈥濄€傛垜浠�浣跨敤涓€涓猔鏈嶅姟`瑁呴グ鍣ㄨ妭鐐瑰湪榛戞澘涓婂垏鎹�foo boolean鍊笺€傛垜浠�浣跨敤BlackboardCondition瑁呴グ鍣ㄨ妭鐐规牴鎹�杩欎釜boolean鍊兼潵鍐冲畾鏄�鍚︽墽琛屽垎鏀�銆侭lackboardCondition杩樹細鏍规嵁杩欎釜鍊肩洃瑙嗛粦鏉跨殑鍙樺寲锛堜緷鎹�榛戞澘鐨勫綋鍓嶅€煎拰鎴戜滑鎻愪緵鐨勫€煎仛涓哄垽鏂�鍩哄噯锛夛紝`Stops.IMMEDIATE_RESTART`浣滅敤鏄�濡傛灉鏉′欢涓嶅啀涓虹湡锛屽垯褰撳墠鎵ц�岀殑鍒嗘敮灏嗗仠姝�锛屽�傛灉鏉′欢鍐嶆�′负鐪燂紝鍒欑珛鍗抽噸鏂板惎鍔ㄣ€�
 
-请注意，您应该将服务放在真正的方法中，而不是使用lambdas，这将使您的树更具可读性。更复杂的行为也是如此。
+璇锋敞鎰忥紝鎮ㄥ簲璇ュ皢鏈嶅姟鏀惧湪鐪熸�ｇ殑鏂规硶涓�锛岃€屼笉鏄�浣跨敤lambdas锛岃繖灏嗕娇鎮ㄧ殑鏍戞洿鍏峰彲璇绘€с€傛洿澶嶆潅鐨勮�屼负涔熸槸濡傛�ゃ€�
 
-### 终止原则
-一些装饰器(如BlackboardCondition、Condition或BlackboardQuery)有一个stopsOnChange参数，允许定义stop规则。该参数允许装饰器停止其父`组合（Composite）`中正在运行的子树。他是您用来掌控NPBehave中的事件驱动的主要工具。
+### 缁堟�㈠師鍒�
+涓€浜涜�呴グ鍣�(濡侭lackboardCondition銆丆ondition鎴朆lackboardQuery)鏈変竴涓猻topsOnChange鍙傛暟锛屽厑璁稿畾涔塻top瑙勫垯銆傝�ュ弬鏁板厑璁歌�呴グ鍣ㄥ仠姝㈠叾鐖禶缁勫悎锛圕omposite锛塦涓�姝ｅ湪杩愯�岀殑瀛愭爲銆備粬鏄�鎮ㄧ敤鏉ユ帉鎺�NPBehave涓�鐨勪簨浠堕┍鍔ㄧ殑涓昏�佸伐鍏枫€�
 
-较`低优先级`的节点是在其父`组合`中的当前节点之后定义的节点。
+杈僠浣庝紭鍏堢骇`鐨勮妭鐐规槸鍦ㄥ叾鐖禶缁勫悎`涓�鐨勫綋鍓嶈妭鐐逛箣鍚庡畾涔夌殑鑺傜偣銆�
 
-最有用和最常用的stop规则是SELF、IMMEDIATE_RESTARTt或LOWER_PRIORITY_IMMEDIATE_RESTART。
+鏈€鏈夌敤鍜屾渶甯哥敤鐨剆top瑙勫垯鏄疭ELF銆両MMEDIATE_RESTARTt鎴朙OWER_PRIORITY_IMMEDIATE_RESTART銆�
 
-不过，如果你对虚幻引擎的行为树形成了惯性思维，就要小心了。在NPBehave中，LOWER_PRIORITY和BOTH具有稍微不同的含义。IMMEDIATE_RESTART实际上匹配Unreal的Both，而LOWER_PRIORITY_IMMEDIATE_RESTART匹配Unreal的Lower Priority。
+涓嶈繃锛屽�傛灉浣犲�硅櫄骞诲紩鎿庣殑琛屼负鏍戝舰鎴愪簡鎯�鎬ф€濈淮锛屽氨瑕佸皬蹇冧簡銆傚湪NPBehave涓�锛孡OWER_PRIORITY鍜孊OTH鍏锋湁绋嶅井涓嶅悓鐨勫惈涔夈€侷MMEDIATE_RESTART瀹為檯涓婂尮閰峌nreal鐨凚oth锛岃€孡OWER_PRIORITY_IMMEDIATE_RESTART鍖归厤Unreal鐨凩ower Priority銆�
 
-作者提供了如下终止原则
+浣滆€呮彁渚涗簡濡備笅缁堟�㈠師鍒�
 
-- Stops.NONE：装饰器只会在启动时检查一次它的状态，并且永远不会停止任何正在运行的节点。
-- Stops.SELF：装饰器将在启动时检查一次它的条件状态，如果满足，它将继续观察黑板的变化。一旦不再满足该条件，它将终止自身，并让父组合继续处理它的下一个节点。
-- Stops.LOWER_PRIORITY：装饰器将在启动时检查它的状态，如果不满足，它将观察黑板的变化。一旦条件满足，它将停止比此结点优先级较低的节点，允许父组合继续处理下一个节点
-- Stops.BOTH：装饰器将同时停止:self和优先级较低的节点。
-- Stops.LOWER_PRIORITY_IMMEDIATE_RESTART：一旦启动，装饰器将检查它的状态，如果不满足，它将观察黑板的变化。一旦条件满足，它将停止优先级较低的节点，并命令父组合立即重启此装饰器。
-- Stops.IMMEDIATE_RESTART：一旦启动，装饰器将检查它的状态，如果不满足，它将观察黑板的变化。一旦条件满足，它将停止优先级较低的节点，并命令父组合立即重启装饰器。正如在这两种情况下，一旦不再满足条件，它也将停止自己。
+- Stops.NONE锛氳�呴グ鍣ㄥ彧浼氬湪鍚�鍔ㄦ椂妫€鏌ヤ竴娆″畠鐨勭姸鎬侊紝骞朵笖姘歌繙涓嶄細鍋滄��浠讳綍姝ｅ湪杩愯�岀殑鑺傜偣銆�
+- Stops.SELF锛氳�呴グ鍣ㄥ皢鍦ㄥ惎鍔ㄦ椂妫€鏌ヤ竴娆″畠鐨勬潯浠剁姸鎬侊紝濡傛灉婊¤冻锛屽畠灏嗙户缁�瑙傚療榛戞澘鐨勫彉鍖栥€備竴鏃︿笉鍐嶆弧瓒宠�ユ潯浠讹紝瀹冨皢缁堟�㈣嚜韬�锛屽苟璁╃埗缁勫悎缁х画澶勭悊瀹冪殑涓嬩竴涓�鑺傜偣銆�
+- Stops.LOWER_PRIORITY锛氳�呴グ鍣ㄥ皢鍦ㄥ惎鍔ㄦ椂妫€鏌ュ畠鐨勭姸鎬侊紝濡傛灉涓嶆弧瓒筹紝瀹冨皢瑙傚療榛戞澘鐨勫彉鍖栥€備竴鏃︽潯浠舵弧瓒筹紝瀹冨皢鍋滄�㈡瘮姝ょ粨鐐逛紭鍏堢骇杈冧綆鐨勮妭鐐癸紝鍏佽�哥埗缁勫悎缁х画澶勭悊涓嬩竴涓�鑺傜偣
+- Stops.BOTH锛氳�呴グ鍣ㄥ皢鍚屾椂鍋滄��:self鍜屼紭鍏堢骇杈冧綆鐨勮妭鐐广€�
+- Stops.LOWER_PRIORITY_IMMEDIATE_RESTART锛氫竴鏃﹀惎鍔�锛岃�呴グ鍣ㄥ皢妫€鏌ュ畠鐨勭姸鎬侊紝濡傛灉涓嶆弧瓒筹紝瀹冨皢瑙傚療榛戞澘鐨勫彉鍖栥€備竴鏃︽潯浠舵弧瓒筹紝瀹冨皢鍋滄��浼樺厛绾ц緝浣庣殑鑺傜偣锛屽苟鍛戒护鐖剁粍鍚堢珛鍗抽噸鍚�姝よ�呴グ鍣ㄣ€�
+- Stops.IMMEDIATE_RESTART锛氫竴鏃﹀惎鍔�锛岃�呴グ鍣ㄥ皢妫€鏌ュ畠鐨勭姸鎬侊紝濡傛灉涓嶆弧瓒筹紝瀹冨皢瑙傚療榛戞澘鐨勫彉鍖栥€備竴鏃︽潯浠舵弧瓒筹紝瀹冨皢鍋滄��浼樺厛绾ц緝浣庣殑鑺傜偣锛屽苟鍛戒护鐖剁粍鍚堢珛鍗抽噸鍚�瑁呴グ鍣ㄣ€傛�ｅ�傚湪杩欎袱绉嶆儏鍐典笅锛屼竴鏃︿笉鍐嶆弧瓒虫潯浠讹紝瀹冧篃灏嗗仠姝㈣嚜宸便€�
 
-### 黑板的替代品
+### 榛戞澘鐨勬浛浠ｅ搧
 
-在NPBehave中，您在一个MonoBehaviour中定义您的行为树，因为没有必要将所有内容都存储在黑板中。如果没有BlackboardDecorator或BlackboardQuery，则使用其他终止规则而不是Stops.NONE。你可能根本不需要它们出现在黑板上。您还可以使用普通的成员变量——它通常更干净、编写速度更快、性能更好。这意味着在这种情况下，您不会使用NPBehave的事件驱动特性，但这通常是不必要的。
+鍦∟PBehave涓�锛屾偍鍦ㄤ竴涓狹onoBehaviour涓�瀹氫箟鎮ㄧ殑琛屼负鏍戯紝鍥犱负娌℃湁蹇呰�佸皢鎵€鏈夊唴瀹归兘瀛樺偍鍦ㄩ粦鏉夸腑銆傚�傛灉娌℃湁BlackboardDecorator鎴朆lackboardQuery锛屽垯浣跨敤鍏朵粬缁堟�㈣�勫垯鑰屼笉鏄疭tops.NONE銆備綘鍙�鑳芥牴鏈�涓嶉渶瑕佸畠浠�鍑虹幇鍦ㄩ粦鏉夸笂銆傛偍杩樺彲浠ヤ娇鐢ㄦ櫘閫氱殑鎴愬憳鍙橀噺鈥斺€斿畠閫氬父鏇村共鍑€銆佺紪鍐欓€熷害鏇村揩銆佹€ц兘鏇村ソ銆傝繖鎰忓懗鐫€鍦ㄨ繖绉嶆儏鍐典笅锛屾偍涓嶄細浣跨敤NPBehave鐨勪簨浠堕┍鍔ㄧ壒鎬э紝浣嗚繖閫氬父鏄�涓嶅繀瑕佺殑銆�
 
-如果你想在不使用黑板的情况下使用stopsOnChange终止规则，NPBehave中存在两种替代方法:
+濡傛灉浣犳兂鍦ㄤ笉浣跨敤榛戞澘鐨勬儏鍐典笅浣跨敤stopsOnChange缁堟�㈣�勫垯锛孨PBehave涓�瀛樺湪涓ょ�嶆浛浠ｆ柟娉�:
 
-1. 使用常规条件装饰器。这个装饰器有一个可选的stopsOnChange `终止规则`参数。当提供除Stops.NONE之外的任何其他值，且给定查询函数的结果发生更改时，条件将频繁地检查条件并根据stop规则中断节点。请注意，此方法不是事件驱动的，它查询每一帧(或在提供的时间间隔内)，因此如果大量使用它们，可能会导致大量不必要的查询。然而，对于简单的情况，它通常是足够的，并且比Blackboard-Key、Service和BlackboardCondition的组合简单得多。
-2. 构建自己的事件驱动的装饰器。实际上非常简单，只需从ObservingDecorator扩展并重写isConditionMet()、startobservice()和stopobservation()方法。
+1. 浣跨敤甯歌�勬潯浠惰�呴グ鍣ㄣ€傝繖涓�瑁呴グ鍣ㄦ湁涓€涓�鍙�閫夌殑stopsOnChange `缁堟�㈣�勫垯`鍙傛暟銆傚綋鎻愪緵闄�Stops.NONE涔嬪�栫殑浠讳綍鍏朵粬鍊硷紝涓旂粰瀹氭煡璇㈠嚱鏁扮殑缁撴灉鍙戠敓鏇存敼鏃讹紝鏉′欢灏嗛�戠箒鍦版�€鏌ユ潯浠跺苟鏍规嵁stop瑙勫垯涓�鏂�鑺傜偣銆傝�锋敞鎰忥紝姝ゆ柟娉曚笉鏄�浜嬩欢椹卞姩鐨勶紝瀹冩煡璇㈡瘡涓€甯�(鎴栧湪鎻愪緵鐨勬椂闂撮棿闅斿唴)锛屽洜姝ゅ�傛灉澶ч噺浣跨敤瀹冧滑锛屽彲鑳戒細瀵艰嚧澶ч噺涓嶅繀瑕佺殑鏌ヨ��銆傜劧鑰岋紝瀵逛簬绠€鍗曠殑鎯呭喌锛屽畠閫氬父鏄�瓒冲�熺殑锛屽苟涓旀瘮Blackboard-Key銆丼ervice鍜孊lackboardCondition鐨勭粍鍚堢畝鍗曞緱澶氥€�
+2. 鏋勫缓鑷�宸辩殑浜嬩欢椹卞姩鐨勮�呴グ鍣ㄣ€傚疄闄呬笂闈炲父绠€鍗曪紝鍙�闇€浠嶰bservingDecorator鎵╁睍骞堕噸鍐檌sConditionMet()銆乻tartobservice()鍜宻topobservation()鏂规硶銆�
 
-### 节点执行结果
-在NPBehave中，节点可以成功也可以失败。与传统的行为树不同，节点执行时没有返回结果。相反，一旦节点执行完成（成功或失败），节点本身将告诉父节点。在创建自己的节点类型时，务必记住这一点。
+### 鑺傜偣鎵ц�岀粨鏋�
+鍦∟PBehave涓�锛岃妭鐐瑰彲浠ユ垚鍔熶篃鍙�浠ュけ璐ャ€備笌浼犵粺鐨勮�屼负鏍戜笉鍚岋紝鑺傜偣鎵ц�屾椂娌℃湁杩斿洖缁撴灉銆傜浉鍙嶏紝涓€鏃﹁妭鐐规墽琛屽畬鎴愶紙鎴愬姛鎴栧け璐ワ級锛岃妭鐐规湰韬�灏嗗憡璇夌埗鑺傜偣銆傚湪鍒涘缓鑷�宸辩殑鑺傜偣绫诲瀷鏃讹紝鍔″繀璁颁綇杩欎竴鐐广€�
 
-### 节点类型
-在NPBehave中，我们有四种不同的节点类型:
+### 鑺傜偣绫诲瀷
+鍦∟PBehave涓�锛屾垜浠�鏈夊洓绉嶄笉鍚岀殑鑺傜偣绫诲瀷:
 
-1. 根节点（Root）：根节点只有一个子节点可以启动或停止整个行为树。
-2. 组合节点（Composite）：有多个子节点，用于控制它们的哪个子节点被执行。顺序和结果也是由这种节点定义的。
-3. 装饰节点（Decorator）：始终`只有一个子节点`，用于修改子节点的结果或在执行子节点时执行其他操作(例如，更新黑板的Service)
-4. 任务节点（Task）：这些是做实际工作的整个行为树中的树叶。您最有可能为它们创建自定义类。您可以将操作与lambdas或函数一起使用——对于更复杂的任务，创建任务的新子类通常是更好的选择。如果你这样做了，一定要阅读黄金规则。
+1. 鏍硅妭鐐癸紙Root锛夛細鏍硅妭鐐瑰彧鏈変竴涓�瀛愯妭鐐瑰彲浠ュ惎鍔ㄦ垨鍋滄�㈡暣涓�琛屼负鏍戙€�
+2. 缁勫悎鑺傜偣锛圕omposite锛夛細鏈夊�氫釜瀛愯妭鐐癸紝鐢ㄤ簬鎺у埗瀹冧滑鐨勫摢涓�瀛愯妭鐐硅��鎵ц�屻€傞『搴忓拰缁撴灉涔熸槸鐢辫繖绉嶈妭鐐瑰畾涔夌殑銆�
+3. 瑁呴グ鑺傜偣锛圖ecorator锛夛細濮嬬粓`鍙�鏈変竴涓�瀛愯妭鐐筦锛岀敤浜庝慨鏀瑰瓙鑺傜偣鐨勭粨鏋滄垨鍦ㄦ墽琛屽瓙鑺傜偣鏃舵墽琛屽叾浠栨搷浣�(渚嬪�傦紝鏇存柊榛戞澘鐨凷ervice)
+4. 浠诲姟鑺傜偣锛圱ask锛夛細杩欎簺鏄�鍋氬疄闄呭伐浣滅殑鏁翠釜琛屼负鏍戜腑鐨勬爲鍙躲€傛偍鏈€鏈夊彲鑳戒负瀹冧滑鍒涘缓鑷�瀹氫箟绫汇€傛偍鍙�浠ュ皢鎿嶄綔涓巐ambdas鎴栧嚱鏁颁竴璧蜂娇鐢ㄢ€斺€斿�逛簬鏇村�嶆潅鐨勪换鍔★紝鍒涘缓浠诲姟鐨勬柊瀛愮被閫氬父鏄�鏇村ソ鐨勯€夋嫨銆傚�傛灉浣犺繖鏍峰仛浜嗭紝涓€瀹氳�侀槄璇婚粍閲戣�勫垯銆�
 
-### 终止树
-如果你的怪物被杀死了，或者你销毁了游戏对象，你应该停止树。你可以在你的脚本中加入如下内容:
+### 缁堟�㈡爲
+濡傛灉浣犵殑鎬�鐗╄��鏉€姝讳簡锛屾垨鑰呬綘閿€姣佷簡娓告垙瀵硅薄锛屼綘搴旇�ュ仠姝㈡爲銆備綘鍙�浠ュ湪浣犵殑鑴氭湰涓�鍔犲叆濡備笅鍐呭��:
 ```csharp
     // ...
     public void OnDestroy()
@@ -139,144 +139,144 @@ behaviorTree.Start();
     }
     // ...
 ```
-### 运行时Debugger
-可以使用调试器组件在运行时在检查器中调试行为树。
+### 杩愯�屾椂Debugger
+鍙�浠ヤ娇鐢ㄨ皟璇曞櫒缁勪欢鍦ㄨ繍琛屾椂鍦ㄦ�€鏌ュ櫒涓�璋冭瘯琛屼负鏍戙€�
 ![NPBehave Debugger](https://github.com/meniku/NPBehave/blob/master/README-Debugger.png)
 
-### 共享黑板
-您可以选择在AI的多个实例之间共享黑板。如果您想实现某种集群行为，这将非常有用。此外，您可以创建黑板层次结构，这允许您将共享黑板与非共享黑板组合起来。
-您可以使用UnityContext.GetSharedBlackboard(name)在任何地方访问共享的blackboard实例。
+### 鍏变韩榛戞澘
+鎮ㄥ彲浠ラ€夋嫨鍦ˋI鐨勫�氫釜瀹炰緥涔嬮棿鍏变韩榛戞澘銆傚�傛灉鎮ㄦ兂瀹炵幇鏌愮�嶉泦缇よ�屼负锛岃繖灏嗛潪甯告湁鐢ㄣ€傛�ゅ�栵紝鎮ㄥ彲浠ュ垱寤洪粦鏉垮眰娆＄粨鏋勶紝杩欏厑璁告偍灏嗗叡浜�榛戞澘涓庨潪鍏变韩榛戞澘缁勫悎璧锋潵銆�
+鎮ㄥ彲浠ヤ娇鐢║nityContext.GetSharedBlackboard(name)鍦ㄤ换浣曞湴鏂硅�块棶鍏变韩鐨刡lackboard瀹炰緥銆�
 
-### 拓展库
-请参考现有的节点实现了解如何创建自定义节点类型，但是在创建之前至少要阅读以下黄金规则。
+### 鎷撳睍搴�
+璇峰弬鑰冪幇鏈夌殑鑺傜偣瀹炵幇浜嗚В濡備綍鍒涘缓鑷�瀹氫箟鑺傜偣绫诲瀷锛屼絾鏄�鍦ㄥ垱寤轰箣鍓嶈嚦灏戣�侀槄璇讳互涓嬮粍閲戣�勫垯銆�
 
-#### 黄金法则
+#### 榛勯噾娉曞垯
 
-1. **每次调用DoStop()都必须导致调用Stopped(result)**。这是非常重要的!您需要确保在DoStop()中调用了Stopped()，因为NPBehave需要能够在运行时立即取消正在运行的分支。这也意味着你所有的子节点也将调用Stopped(),这反过来又使得它很容易编写可靠的decorator甚至composite节点:在DoStop()里你只需要调用active状态下的孩子Stop()函数,他们将轮流执行ChildStopped()。`最终会回溯到上层节点的Stopped()函数！`请查看现有的实现以供参考。
-2. **Stopped()是您做的最后一个调用**，在调用Stopped后不要修改任何状态或调用任何东西。这是因为Stopped将立即继续遍历其他节点上的树，如果不考虑这一点，将完全破坏行为树的状态。
-3. **每一个注册的时钟或黑板观察者最终都需要删除**。大多数时候你调用Stopped()之前立刻注销你的回调函数,不过可能会有例外,比如BlackboardCondition使观察者处于警惕状态直到父组合结点终止,它需要能够对黑板上值改变及时作出反应，即使节点本身并不活跃。
+1. **姣忔�¤皟鐢―oStop()閮藉繀椤诲�艰嚧璋冪敤Stopped(result)**銆傝繖鏄�闈炲父閲嶈�佺殑!鎮ㄩ渶瑕佺‘淇濆湪DoStop()涓�璋冪敤浜哠topped()锛屽洜涓篘PBehave闇€瑕佽兘澶熷湪杩愯�屾椂绔嬪嵆鍙栨秷姝ｅ湪杩愯�岀殑鍒嗘敮銆傝繖涔熸剰鍛崇潃浣犳墍鏈夌殑瀛愯妭鐐逛篃灏嗚皟鐢⊿topped(),杩欏弽杩囨潵鍙堜娇寰楀畠寰堝�规槗缂栧啓鍙�闈犵殑decorator鐢氳嚦composite鑺傜偣:鍦―oStop()閲屼綘鍙�闇€瑕佽皟鐢╝ctive鐘舵€佷笅鐨勫�╁瓙Stop()鍑芥暟,浠栦滑灏嗚疆娴佹墽琛孋hildStopped()銆俙鏈€缁堜細鍥炴函鍒颁笂灞傝妭鐐圭殑Stopped()鍑芥暟锛乣璇锋煡鐪嬬幇鏈夌殑瀹炵幇浠ヤ緵鍙傝€冦€�
+2. **Stopped()鏄�鎮ㄥ仛鐨勬渶鍚庝竴涓�璋冪敤**锛屽湪璋冪敤Stopped鍚庝笉瑕佷慨鏀逛换浣曠姸鎬佹垨璋冪敤浠讳綍涓滆タ銆傝繖鏄�鍥犱负Stopped灏嗙珛鍗崇户缁�閬嶅巻鍏朵粬鑺傜偣涓婄殑鏍戯紝濡傛灉涓嶈€冭檻杩欎竴鐐癸紝灏嗗畬鍏ㄧ牬鍧忚�屼负鏍戠殑鐘舵€併€�
+3. **姣忎竴涓�娉ㄥ唽鐨勬椂閽熸垨榛戞澘瑙傚療鑰呮渶缁堥兘闇€瑕佸垹闄�**銆傚ぇ澶氭暟鏃跺€欎綘璋冪敤Stopped()涔嬪墠绔嬪埢娉ㄩ攢浣犵殑鍥炶皟鍑芥暟,涓嶈繃鍙�鑳戒細鏈変緥澶�,姣斿�侭lackboardCondition浣胯�傚療鑰呭�勪簬璀︽儠鐘舵€佺洿鍒扮埗缁勫悎缁撶偣缁堟��,瀹冮渶瑕佽兘澶熷�归粦鏉夸笂鍊兼敼鍙樺強鏃朵綔鍑哄弽搴旓紝鍗充娇鑺傜偣鏈�韬�骞朵笉娲昏穬銆�
 
-### 实现任务
-对于任务，可以从任务类扩展并覆盖DoStart()和DoStop()方法。在DoStart()中，您启动您的逻辑，一旦您完成了，您将使用适当的结果调用Stopped(bool result)。您的节点可能被另一个节点取消，因此请确保实现DoStop()，进行适当的清理并在它之后立即调用Stopped(bool result)。
-对于一个相对简单的示例，请查看Wait Task.cs。
-正如黄金规则部分已经提到的，在NPBehave中，您必须在节点停止之后始终调用Stopped(bool result)。因此，目前不支持在多个帧上挂起取消操作，这将导致不可预测的行为。
+### 瀹炵幇浠诲姟
+瀵逛簬浠诲姟锛屽彲浠ヤ粠浠诲姟绫绘墿灞曞苟瑕嗙洊DoStart()鍜孌oStop()鏂规硶銆傚湪DoStart()涓�锛屾偍鍚�鍔ㄦ偍鐨勯€昏緫锛屼竴鏃︽偍瀹屾垚浜嗭紝鎮ㄥ皢浣跨敤閫傚綋鐨勭粨鏋滆皟鐢⊿topped(bool result)銆傛偍鐨勮妭鐐瑰彲鑳借��鍙︿竴涓�鑺傜偣鍙栨秷锛屽洜姝よ�风‘淇濆疄鐜癉oStop()锛岃繘琛岄€傚綋鐨勬竻鐞嗗苟鍦ㄥ畠涔嬪悗绔嬪嵆璋冪敤Stopped(bool result)銆�
+瀵逛簬涓€涓�鐩稿�圭畝鍗曠殑绀轰緥锛岃�锋煡鐪媁ait Task.cs銆�
+姝ｅ�傞粍閲戣�勫垯閮ㄥ垎宸茬粡鎻愬埌鐨勶紝鍦∟PBehave涓�锛屾偍蹇呴』鍦ㄨ妭鐐瑰仠姝�涔嬪悗濮嬬粓璋冪敤Stopped(bool result)銆傚洜姝わ紝鐩�鍓嶄笉鏀�鎸佸湪澶氫釜甯т笂鎸傝捣鍙栨秷鎿嶄綔锛岃繖灏嗗�艰嚧涓嶅彲棰勬祴鐨勮�屼负銆�
 
-### 实现观察装饰器
-编写装饰器要比编写任务复杂得多。然而，为了方便起见，存在一个特殊的基类。ObservingDecorator。这个类可用于简单地实现“条件”装饰器，这些装饰器可选地使用stopsOnChange 终止规则。
-您所要做的就是从它ObservingDecorator扩展并覆盖bool IsConditionMet()方法。如果希望支持stop - rules，还必须实现startobservice()和stopobserve()。对于一个简单的示例，请查看Condition Decorator.cs
+### 瀹炵幇瑙傚療瑁呴グ鍣�
+缂栧啓瑁呴グ鍣ㄨ�佹瘮缂栧啓浠诲姟澶嶆潅寰楀�氥€傜劧鑰岋紝涓轰簡鏂逛究璧疯�侊紝瀛樺湪涓€涓�鐗规畩鐨勫熀绫汇€侽bservingDecorator銆傝繖涓�绫诲彲鐢ㄤ簬绠€鍗曞湴瀹炵幇鈥滄潯浠垛€濊�呴グ鍣�锛岃繖浜涜�呴グ鍣ㄥ彲閫夊湴浣跨敤stopsOnChange 缁堟�㈣�勫垯銆�
+鎮ㄦ墍瑕佸仛鐨勫氨鏄�浠庡畠ObservingDecorator鎵╁睍骞惰�嗙洊bool IsConditionMet()鏂规硶銆傚�傛灉甯屾湜鏀�鎸乻top - rules锛岃繕蹇呴』瀹炵幇startobservice()鍜宻topobserve()銆傚�逛簬涓€涓�绠€鍗曠殑绀轰緥锛岃�锋煡鐪婥ondition Decorator.cs
 
-### 实现常规装饰器
-对于常规装饰器，可以从Decorator.cs扩展并覆盖DoStart()、DoStop()和DoChildStopped(Node child, bool result)方法。
-您可以通过访问Decoratee属性启动或停止已装饰节点，并在其上调用start()或stop()。
-如果您的decorator接收到DoStop()调用，它将负责相应地停止Decoratee，并且在这种情况下不会立即调用Stopped(bool result)。相反，它将在DoChildStopped(Node child, bool result)方法中执行该操作。请注意，DoChildStopped(Node child, bool result)并不一定意味着您的decorator停止了decoratee, decoratee本身也可能停止，在这种情况下，您不需要立即停止decoratee(如果您想实现诸如冷却等功能，这可能很有用)。要查明装饰器是否被停止，可以查询它的isstoprequired属性。
-对于非常基本的实现，请查看Failer Node.cs;对于稍微复杂一点的实现，请查看Repeater Node.cs。
-此外，您还可以实现DoParentCompositeStopped()方法，即使您的装饰器处于非活动状态，也可以调用该方法。如果您想为在装饰器stopped后仍保持活动的侦听器执行额外的清理工作，这是非常有用的。以ObservingDecorator为例。
+### 瀹炵幇甯歌�勮�呴グ鍣�
+瀵逛簬甯歌�勮�呴グ鍣�锛屽彲浠ヤ粠Decorator.cs鎵╁睍骞惰�嗙洊DoStart()銆丏oStop()鍜孌oChildStopped(Node child, bool result)鏂规硶銆�
+鎮ㄥ彲浠ラ€氳繃璁块棶Decoratee灞炴€у惎鍔ㄦ垨鍋滄�㈠凡瑁呴グ鑺傜偣锛屽苟鍦ㄥ叾涓婅皟鐢╯tart()鎴杝top()銆�
+濡傛灉鎮ㄧ殑decorator鎺ユ敹鍒癉oStop()璋冪敤锛屽畠灏嗚礋璐ｇ浉搴斿湴鍋滄��Decoratee锛屽苟涓斿湪杩欑�嶆儏鍐典笅涓嶄細绔嬪嵆璋冪敤Stopped(bool result)銆傜浉鍙嶏紝瀹冨皢鍦―oChildStopped(Node child, bool result)鏂规硶涓�鎵ц�岃�ユ搷浣溿€傝�锋敞鎰忥紝DoChildStopped(Node child, bool result)骞朵笉涓€瀹氭剰鍛崇潃鎮ㄧ殑decorator鍋滄��浜哾ecoratee, decoratee鏈�韬�涔熷彲鑳藉仠姝�锛屽湪杩欑�嶆儏鍐典笅锛屾偍涓嶉渶瑕佺珛鍗冲仠姝�decoratee(濡傛灉鎮ㄦ兂瀹炵幇璇稿�傚喎鍗寸瓑鍔熻兘锛岃繖鍙�鑳藉緢鏈夌敤)銆傝�佹煡鏄庤�呴グ鍣ㄦ槸鍚﹁��鍋滄��锛屽彲浠ユ煡璇㈠畠鐨刬sstoprequired灞炴€с€�
+瀵逛簬闈炲父鍩烘湰鐨勫疄鐜帮紝璇锋煡鐪婩ailer Node.cs;瀵逛簬绋嶅井澶嶆潅涓€鐐圭殑瀹炵幇锛岃�锋煡鐪婻epeater Node.cs銆�
+姝ゅ�栵紝鎮ㄨ繕鍙�浠ュ疄鐜癉oParentCompositeStopped()鏂规硶锛屽嵆浣挎偍鐨勮�呴グ鍣ㄥ�勪簬闈炴椿鍔ㄧ姸鎬侊紝涔熷彲浠ヨ皟鐢ㄨ�ユ柟娉曘€傚�傛灉鎮ㄦ兂涓哄湪瑁呴グ鍣╯topped鍚庝粛淇濇寔娲诲姩鐨勪睛鍚�鍣ㄦ墽琛岄�濆�栫殑娓呯悊宸ヤ綔锛岃繖鏄�闈炲父鏈夌敤鐨勩€備互ObservingDecorator涓轰緥銆�
 
-### 实现组合
-组合节点需要对库有更深入的理解，通常不需要实现新的节点。如果您真的需要一个新的组合，请在GitHub项目上创建一个票据，或者与我联系，我将尽力帮助您正确地完成它。
+### 瀹炵幇缁勫悎
+缁勫悎鑺傜偣闇€瑕佸�瑰簱鏈夋洿娣卞叆鐨勭悊瑙ｏ紝閫氬父涓嶉渶瑕佸疄鐜版柊鐨勮妭鐐广€傚�傛灉鎮ㄧ湡鐨勯渶瑕佷竴涓�鏂扮殑缁勫悎锛岃�峰湪GitHub椤圭洰涓婂垱寤轰竴涓�绁ㄦ嵁锛屾垨鑰呬笌鎴戣仈绯伙紝鎴戝皢灏藉姏甯�鍔╂偍姝ｇ‘鍦板畬鎴愬畠銆�
 
-### 结点状态
-很有可能你不需要访问它们，但了解它们仍然是件好事:
+### 缁撶偣鐘舵€�
+寰堟湁鍙�鑳戒綘涓嶉渶瑕佽�块棶瀹冧滑锛屼絾浜嗚В瀹冧滑浠嶇劧鏄�浠跺ソ浜�:
 
-- ACTIVE:节点已启动，但尚未停止。
-- STOP_REQUESTED:节点当前正在停止，但尚未调用Stopped()来通知父节点。
-- INACTIVE:节点已停止。
+- ACTIVE:鑺傜偣宸插惎鍔�锛屼絾灏氭湭鍋滄��銆�
+- STOP_REQUESTED:鑺傜偣褰撳墠姝ｅ湪鍋滄��锛屼絾灏氭湭璋冪敤Stopped()鏉ラ€氱煡鐖惰妭鐐广€�
+- INACTIVE:鑺傜偣宸插仠姝�銆�
 
-可以使用CurrentState属性检索当前状态
+鍙�浠ヤ娇鐢–urrentState灞炴€ф�€绱㈠綋鍓嶇姸鎬�
 
-### 时钟
-您可以使用节点中的时钟注册计时器，或者在每一帧上得到通知。使用RootNode.Clock访问时钟。查看`Wait Task.cs`以获得关于如何在时钟上注册计时器的示例。
-默认情况下，行为树将使用UnityContext指定的全局时钟。这个时钟每一帧都更新一次。在某些情况下，你可能想要拥有更多的控制权。例如，您可能想要限制或暂停对一组AI的更新。由于这个原因，您可以向根节点和Blackboard提供自己的受控时钟实例，这允许您精确地控制何时更新行为树。查看 Clock Throttling .cs。
+### 鏃堕挓
+鎮ㄥ彲浠ヤ娇鐢ㄨ妭鐐逛腑鐨勬椂閽熸敞鍐岃�℃椂鍣�锛屾垨鑰呭湪姣忎竴甯т笂寰楀埌閫氱煡銆備娇鐢≧ootNode.Clock璁块棶鏃堕挓銆傛煡鐪媊Wait Task.cs`浠ヨ幏寰楀叧浜庡�備綍鍦ㄦ椂閽熶笂娉ㄥ唽璁℃椂鍣ㄧ殑绀轰緥銆�
+榛樿�ゆ儏鍐典笅锛岃�屼负鏍戝皢浣跨敤UnityContext鎸囧畾鐨勫叏灞€鏃堕挓銆傝繖涓�鏃堕挓姣忎竴甯ч兘鏇存柊涓€娆°€傚湪鏌愪簺鎯呭喌涓嬶紝浣犲彲鑳芥兂瑕佹嫢鏈夋洿澶氱殑鎺у埗鏉冦€備緥濡傦紝鎮ㄥ彲鑳芥兂瑕侀檺鍒舵垨鏆傚仠瀵逛竴缁凙I鐨勬洿鏂般€傜敱浜庤繖涓�鍘熷洜锛屾偍鍙�浠ュ悜鏍硅妭鐐瑰拰Blackboard鎻愪緵鑷�宸辩殑鍙楁帶鏃堕挓瀹炰緥锛岃繖鍏佽�告偍绮剧‘鍦版帶鍒朵綍鏃舵洿鏂拌�屼负鏍戙€傛煡鐪� Clock Throttling .cs銆�
 
-## 结点类型汇总
+## 缁撶偣绫诲瀷姹囨€�
 ### Root
 
-- Root(Node mainNode):无休止地运行mainNode，不论任何情况
-- Root(Blackboard Blackboard, Node mainNode):使用给定的黑板，而不是实例化一个;无休止地运行给定的mainNode，不论任何情况
-- Root(Blackboard blackboard, Clock clock, Node mainNode):使用给定的黑板而不是实例化一个;使用给定的时钟，而不是使用UnityContext中的全局时钟;无休止地运行给定的mainNode，不论任何情况
+- Root(Node mainNode):鏃犱紤姝㈠湴杩愯�宮ainNode锛屼笉璁轰换浣曟儏鍐�
+- Root(Blackboard Blackboard, Node mainNode):浣跨敤缁欏畾鐨勯粦鏉匡紝鑰屼笉鏄�瀹炰緥鍖栦竴涓�;鏃犱紤姝㈠湴杩愯�岀粰瀹氱殑mainNode锛屼笉璁轰换浣曟儏鍐�
+- Root(Blackboard blackboard, Clock clock, Node mainNode):浣跨敤缁欏畾鐨勯粦鏉胯€屼笉鏄�瀹炰緥鍖栦竴涓�;浣跨敤缁欏畾鐨勬椂閽燂紝鑰屼笉鏄�浣跨敤UnityContext涓�鐨勫叏灞€鏃堕挓;鏃犱紤姝㈠湴杩愯�岀粰瀹氱殑mainNode锛屼笉璁轰换浣曟儏鍐�
 
-### 组合结点
+### 缁勫悎缁撶偣
 #### Selector
-- Selector(params Node[] children):按顺序运行子元素，直到其中一个子元素成功(如果其中一个子元素成功，则成功)。
+- Selector(params Node[] children):鎸夐『搴忚繍琛屽瓙鍏冪礌锛岀洿鍒板叾涓�涓€涓�瀛愬厓绱犳垚鍔�(濡傛灉鍏朵腑涓€涓�瀛愬厓绱犳垚鍔燂紝鍒欐垚鍔�)銆�
 #### Sequence
-- Sequence(params Node[] children):按顺序运行子节点，直到其中一个失败(如果所有子节点都没有失败，则成功)。
+- Sequence(params Node[] children):鎸夐『搴忚繍琛屽瓙鑺傜偣锛岀洿鍒板叾涓�涓€涓�澶辫触(濡傛灉鎵€鏈夊瓙鑺傜偣閮芥病鏈夊け璐ワ紝鍒欐垚鍔�)銆�
 #### Parallel
-- Parallel(Policy successPolicy, Policy failurePolicy, params Node[] children): 并行运行子节点。
-- 当failurePolocity为Polociy.ONE。当其中一个孩子失败时，并行就会停止，返回失败。
-- 当successPolicy为Policy.ONE。当其中一个孩子失败时，并行将停止，返回成功。
-- 如果并行没有因为Policy.ONE而停止。它会一直执行，直到所有的子节点都完成，然后如果所有的子节点都成功或者失败，它就会返回成功。
+- Parallel(Policy successPolicy, Policy failurePolicy, params Node[] children): 骞惰�岃繍琛屽瓙鑺傜偣銆�
+- 褰揻ailurePolocity涓篜olociy.ONE銆傚綋鍏朵腑涓€涓�瀛╁瓙澶辫触鏃讹紝骞惰�屽氨浼氬仠姝�锛岃繑鍥炲け璐ャ€�
+- 褰搒uccessPolicy涓篜olicy.ONE銆傚綋鍏朵腑涓€涓�瀛╁瓙澶辫触鏃讹紝骞惰�屽皢鍋滄��锛岃繑鍥炴垚鍔熴€�
+- 濡傛灉骞惰�屾病鏈夊洜涓篜olicy.ONE鑰屽仠姝�銆傚畠浼氫竴鐩存墽琛岋紝鐩村埌鎵€鏈夌殑瀛愯妭鐐归兘瀹屾垚锛岀劧鍚庡�傛灉鎵€鏈夌殑瀛愯妭鐐归兘鎴愬姛鎴栬€呭け璐ワ紝瀹冨氨浼氳繑鍥炴垚鍔熴€�
 #### RandomSelector
-- RandomSelector(params Node[] children):按随机顺序运行子进程，直到其中一个子进程成功(如果其中一个子进程成功，则成功)。注意，对于打断规则，最初的顺序定义了优先级。
+- RandomSelector(params Node[] children):鎸夐殢鏈洪『搴忚繍琛屽瓙杩涚▼锛岀洿鍒板叾涓�涓€涓�瀛愯繘绋嬫垚鍔�(濡傛灉鍏朵腑涓€涓�瀛愯繘绋嬫垚鍔燂紝鍒欐垚鍔�)銆傛敞鎰忥紝瀵逛簬鎵撴柇瑙勫垯锛屾渶鍒濈殑椤哄簭瀹氫箟浜嗕紭鍏堢骇銆�
 #### RandomSequence
-- RandomSequence(params Node[] children):以随机顺序运行子节点，直到其中一个失败(如果没有子节点失败，则成功)。注意，对于打断规则，最初的顺序定义了优先级。
-### 任务结点
+- RandomSequence(params Node[] children):浠ラ殢鏈洪『搴忚繍琛屽瓙鑺傜偣锛岀洿鍒板叾涓�涓€涓�澶辫触(濡傛灉娌℃湁瀛愯妭鐐瑰け璐ワ紝鍒欐垚鍔�)銆傛敞鎰忥紝瀵逛簬鎵撴柇瑙勫垯锛屾渶鍒濈殑椤哄簭瀹氫箟浜嗕紭鍏堢骇銆�
+### 浠诲姟缁撶偣
 #### Action
 
-- Action(System.Action action):(总是立即成功完成)
-- Action(System.Func<bool> singleFrameFunc): 可以成功或失败的操作(返回false to fail)
-- Action(Func<bool, Result> multiframeFunc):可以在多个帧上执行的操作(
-Result.BLOCKED——你的行动还没有准备好
-Result.PROGRESS——当你忙着这个行为的时候，
-Result.SUCCESS或Result.FAILED——成功或失败)。
-- Action(Func<Request, Result> multiframeFunc2): 与上面类似，但是Request会给你一个状态信息:
-Request.START表示它是您的操作或返回结果的第一个标记或者是Result.BLOCKED最后一个标记。
-Request.UPDATE表示您最后一次返回Request.PROGRESS;
-Request.CANCEL意味着您需要取消操作并返回结果。成功或者Result.FAILED。
+- Action(System.Action action):(鎬绘槸绔嬪嵆鎴愬姛瀹屾垚)
+- Action(System.Func<bool> singleFrameFunc): 鍙�浠ユ垚鍔熸垨澶辫触鐨勬搷浣�(杩斿洖false to fail)
+- Action(Func<bool, Result> multiframeFunc):鍙�浠ュ湪澶氫釜甯т笂鎵ц�岀殑鎿嶄綔(
+Result.BLOCKED鈥斺€斾綘鐨勮�屽姩杩樻病鏈夊噯澶囧ソ
+Result.PROGRESS鈥斺€斿綋浣犲繖鐫€杩欎釜琛屼负鐨勬椂鍊欙紝
+Result.SUCCESS鎴朢esult.FAILED鈥斺€旀垚鍔熸垨澶辫触)銆�
+- Action(Func<Request, Result> multiframeFunc2): 涓庝笂闈㈢被浼硷紝浣嗘槸Request浼氱粰浣犱竴涓�鐘舵€佷俊鎭�:
+Request.START琛ㄧず瀹冩槸鎮ㄧ殑鎿嶄綔鎴栬繑鍥炵粨鏋滅殑绗�涓€涓�鏍囪�版垨鑰呮槸Result.BLOCKED鏈€鍚庝竴涓�鏍囪�般€�
+Request.UPDATE琛ㄧず鎮ㄦ渶鍚庝竴娆¤繑鍥濺equest.PROGRESS;
+Request.CANCEL鎰忓懗鐫€鎮ㄩ渶瑕佸彇娑堟搷浣滃苟杩斿洖缁撴灉銆傛垚鍔熸垨鑰匯esult.FAILED銆�
 
 #### Wait
 
-- Wait(float seconds): 等待给定的秒，随机误差为0.05 *秒
-- Wait(float seconds, float randomVariance): 用给定的随机变量等待给定的秒数
+- Wait(float seconds): 绛夊緟缁欏畾鐨勭�掞紝闅忔満璇�宸�涓�0.05 *绉�
+- Wait(float seconds, float randomVariance): 鐢ㄧ粰瀹氱殑闅忔満鍙橀噺绛夊緟缁欏畾鐨勭�掓暟
 - Wait(string blackboardKey, float randomVariance = 0f): 
-- Wait(System.Func<float> function, float randomVariance = 0f): 等待在给定的blackboardKey中设置为float的秒数
+- Wait(System.Func<float> function, float randomVariance = 0f): 绛夊緟鍦ㄧ粰瀹氱殑blackboardKey涓�璁剧疆涓篺loat鐨勭�掓暟
 	
 #### WaitUntilStopped
 
-- WaitUntilStopped(bool sucessWhenStopped = false):等待被其他节点停止。它通常用于Selector的末尾，等待任何before头的同级BlackboardCondition、BlackboardQuery或Condition变为活动状态。
+- WaitUntilStopped(bool sucessWhenStopped = false):绛夊緟琚�鍏朵粬鑺傜偣鍋滄��銆傚畠閫氬父鐢ㄤ簬Selector鐨勬湯灏撅紝绛夊緟浠讳綍before澶寸殑鍚岀骇BlackboardCondition銆丅lackboardQuery鎴朇ondition鍙樹负娲诲姩鐘舵€併€�
 
-### 装饰器结点
+### 瑁呴グ鍣ㄧ粨鐐�
 #### BlackboardCondition
-- BlackboardCondition(string key, Operator operator, object value, Stops stopsOnChange, Node decoratee): 只有当黑板的键匹配op / value条件时，才执行decoratee节点。如果stopsOnChange不是NONE，则节点将根据stopsOnChange stop规则观察黑板上的变化并停止运行节点的执行。
-- BlackboardCondition(string key, Operator operator, Stops stopsOnChange, Node decoratee): 只有当黑板的键与op条件匹配时才执行decoratee节点(例如，对于一个只检查IS_SET的操作数操作符)。如果stopsOnChange不是NONE，则节点将根据stopsOnChange stop规则观察黑板上的变化并停止运行节点的执行。
+- BlackboardCondition(string key, Operator operator, object value, Stops stopsOnChange, Node decoratee): 鍙�鏈夊綋榛戞澘鐨勯敭鍖归厤op / value鏉′欢鏃讹紝鎵嶆墽琛宒ecoratee鑺傜偣銆傚�傛灉stopsOnChange涓嶆槸NONE锛屽垯鑺傜偣灏嗘牴鎹畇topsOnChange stop瑙勫垯瑙傚療榛戞澘涓婄殑鍙樺寲骞跺仠姝㈣繍琛岃妭鐐圭殑鎵ц�屻€�
+- BlackboardCondition(string key, Operator operator, Stops stopsOnChange, Node decoratee): 鍙�鏈夊綋榛戞澘鐨勯敭涓巓p鏉′欢鍖归厤鏃舵墠鎵ц�宒ecoratee鑺傜偣(渚嬪�傦紝瀵逛簬涓€涓�鍙�妫€鏌�IS_SET鐨勬搷浣滄暟鎿嶄綔绗�)銆傚�傛灉stopsOnChange涓嶆槸NONE锛屽垯鑺傜偣灏嗘牴鎹畇topsOnChange stop瑙勫垯瑙傚療榛戞澘涓婄殑鍙樺寲骞跺仠姝㈣繍琛岃妭鐐圭殑鎵ц�屻€�
 #### BlackboardQuery
-- BlackboardQuery(string[] keys, Stops stopsOnChange, System.Func<bool> query, Node decoratee):BlackboardCondition只允许检查一个键，而这个将观察多个黑板键，并在其中一个值发生变化时立即计算给定的查询函数，从而允许您在黑板上执行任意查询。它将根据stopsOnChange stop规则停止运行节点。
+- BlackboardQuery(string[] keys, Stops stopsOnChange, System.Func<bool> query, Node decoratee):BlackboardCondition鍙�鍏佽�告�€鏌ヤ竴涓�閿�锛岃€岃繖涓�灏嗚�傚療澶氫釜榛戞澘閿�锛屽苟鍦ㄥ叾涓�涓€涓�鍊煎彂鐢熷彉鍖栨椂绔嬪嵆璁＄畻缁欏畾鐨勬煡璇㈠嚱鏁帮紝浠庤€屽厑璁告偍鍦ㄩ粦鏉夸笂鎵ц�屼换鎰忔煡璇�銆傚畠灏嗘牴鎹畇topsOnChange stop瑙勫垯鍋滄�㈣繍琛岃妭鐐广€�
 #### Condition
-- Condition(Func<bool> condition, Node decoratee): 如果给定条件返回true，则执行decoratee节点
-- Condition(Func<bool> condition, Stops stopsOnChange, Node decoratee): 如果给定条件返回true，则执行decoratee节点。根据stopsOnChange stop规则重新评估每个帧的条件并停止运行节点。
-- Condition(Func<bool> condition, Stops stopsOnChange, float checkInterval, float randomVariance, Node decoratee): 如果给定条件返回true，则执行decoratee节点。在给定的校验间隔和随机方差处重新评估条件，并根据stopsOnChange stop规则停止运行节点。
+- Condition(Func<bool> condition, Node decoratee): 濡傛灉缁欏畾鏉′欢杩斿洖true锛屽垯鎵ц�宒ecoratee鑺傜偣
+- Condition(Func<bool> condition, Stops stopsOnChange, Node decoratee): 濡傛灉缁欏畾鏉′欢杩斿洖true锛屽垯鎵ц�宒ecoratee鑺傜偣銆傛牴鎹畇topsOnChange stop瑙勫垯閲嶆柊璇勪及姣忎釜甯х殑鏉′欢骞跺仠姝㈣繍琛岃妭鐐广€�
+- Condition(Func<bool> condition, Stops stopsOnChange, float checkInterval, float randomVariance, Node decoratee): 濡傛灉缁欏畾鏉′欢杩斿洖true锛屽垯鎵ц�宒ecoratee鑺傜偣銆傚湪缁欏畾鐨勬牎楠岄棿闅斿拰闅忔満鏂瑰樊澶勯噸鏂拌瘎浼版潯浠讹紝骞舵牴鎹畇topsOnChange stop瑙勫垯鍋滄�㈣繍琛岃妭鐐广€�
 #### Cooldown
-- Cooldown(float cooldownTime, Node decoratee):立即运行decoratee，但前提是最后一次执行至少没有超过cooldownTime
-- Cooldown(float cooldownTime, float randomVariation, Node decoratee): 立即运行decoratee，但前提是最后一次执行至少没有超过使用randomVariation进行的cooldownTime
-- Cooldown(float cooldownTime, bool startAfterDecoratee, bool resetOnFailiure, Node decoratee):  立即运行decoratee，但前提是最后一次执行至少没有超过使用randomVariation进行的cooldownTime，当resetOnFailure为真时，如果修饰节点失败，则重置冷却时间
-- Cooldown(float cooldownTime, float randomVariation, bool startAfterDecoratee, bool resetOnFailiure, Node decoratee)  立即运行decoratee，但前提是最后一次执行至少没有超过使用randomVariation进行的cooldownTime，当startAfterDecoratee为true时，将在decoratee完成后而不是启动时启动冷却计时器。当resetOnFailure为真时，如果修饰节点失败，则重置冷却时间。
+- Cooldown(float cooldownTime, Node decoratee):绔嬪嵆杩愯�宒ecoratee锛屼絾鍓嶆彁鏄�鏈€鍚庝竴娆℃墽琛岃嚦灏戞病鏈夎秴杩嘽ooldownTime
+- Cooldown(float cooldownTime, float randomVariation, Node decoratee): 绔嬪嵆杩愯�宒ecoratee锛屼絾鍓嶆彁鏄�鏈€鍚庝竴娆℃墽琛岃嚦灏戞病鏈夎秴杩囦娇鐢╮andomVariation杩涜�岀殑cooldownTime
+- Cooldown(float cooldownTime, bool startAfterDecoratee, bool resetOnFailiure, Node decoratee):  绔嬪嵆杩愯�宒ecoratee锛屼絾鍓嶆彁鏄�鏈€鍚庝竴娆℃墽琛岃嚦灏戞病鏈夎秴杩囦娇鐢╮andomVariation杩涜�岀殑cooldownTime锛屽綋resetOnFailure涓虹湡鏃讹紝濡傛灉淇�楗拌妭鐐瑰け璐ワ紝鍒欓噸缃�鍐峰嵈鏃堕棿
+- Cooldown(float cooldownTime, float randomVariation, bool startAfterDecoratee, bool resetOnFailiure, Node decoratee)  绔嬪嵆杩愯�宒ecoratee锛屼絾鍓嶆彁鏄�鏈€鍚庝竴娆℃墽琛岃嚦灏戞病鏈夎秴杩囦娇鐢╮andomVariation杩涜�岀殑cooldownTime锛屽綋startAfterDecoratee涓簍rue鏃讹紝灏嗗湪decoratee瀹屾垚鍚庤€屼笉鏄�鍚�鍔ㄦ椂鍚�鍔ㄥ喎鍗磋�℃椂鍣ㄣ€傚綋resetOnFailure涓虹湡鏃讹紝濡傛灉淇�楗拌妭鐐瑰け璐ワ紝鍒欓噸缃�鍐峰嵈鏃堕棿銆�
 #### Failer
-- Failer(Node decoratee): 总是失败，不管装饰者的结果如何。
+- Failer(Node decoratee): 鎬绘槸澶辫触锛屼笉绠¤�呴グ鑰呯殑缁撴灉濡備綍銆�
 #### Inverter
-- Inverter(Node decoratee): 如果decoratee成功，则逆变器失败;如果decoratee失败，则逆变器成功。
+- Inverter(Node decoratee): 濡傛灉decoratee鎴愬姛锛屽垯閫嗗彉鍣ㄥけ璐�;濡傛灉decoratee澶辫触锛屽垯閫嗗彉鍣ㄦ垚鍔熴€�
 #### Observer
-- Observer(Action onStart, Action<bool> onStop, Node decoratee): 一旦decoratee启动，运行给定的onStart lambda;一旦decoratee结束，运行onStop(bool result) lambda。它有点像一种特殊的服务，因为它不会直接干扰decoratee的执行。
+- Observer(Action onStart, Action<bool> onStop, Node decoratee): 涓€鏃�decoratee鍚�鍔�锛岃繍琛岀粰瀹氱殑onStart lambda;涓€鏃�decoratee缁撴潫锛岃繍琛宱nStop(bool result) lambda銆傚畠鏈夌偣鍍忎竴绉嶇壒娈婄殑鏈嶅姟锛屽洜涓哄畠涓嶄細鐩存帴骞叉壈decoratee鐨勬墽琛屻€�
 #### Random
-- Random(float probability, Node decoratee): 以给定的概率，0到1运行decoratee。
+- Random(float probability, Node decoratee): 浠ョ粰瀹氱殑姒傜巼锛�0鍒�1杩愯�宒ecoratee銆�
 #### Repeater
-- Repeater(Node decoratee): 无限重复给定的装饰，除非失败
-- Repeater(int loopCount, Node decoratee): 执行给定的decoratee循环次数(0表示decoratee永远不会运行)。如果decoratee停止，循环将中止，并且中继器失败。如果decoratee的所有执行都成功，那么中继器将会成功。
+- Repeater(Node decoratee): 鏃犻檺閲嶅�嶇粰瀹氱殑瑁呴グ锛岄櫎闈炲け璐�
+- Repeater(int loopCount, Node decoratee): 鎵ц�岀粰瀹氱殑decoratee寰�鐜�娆℃暟(0琛ㄧずdecoratee姘歌繙涓嶄細杩愯��)銆傚�傛灉decoratee鍋滄��锛屽惊鐜�灏嗕腑姝�锛屽苟涓斾腑缁у櫒澶辫触銆傚�傛灉decoratee鐨勬墍鏈夋墽琛岄兘鎴愬姛锛岄偅涔堜腑缁у櫒灏嗕細鎴愬姛銆�
 #### Service
-- Service(Action service, Node decoratee): 运行给定的服务函数，启动decoratee，然后每次运行服务。
-- Service(float interval, Action service, Node decoratee): 运行给定的服务函数，启动decoratee，然后按给定的间隔运行服务。
-- Service(float interval, float randomVariation, Action service, Node decoratee): 运行给定的服务函数，启动decoratee，然后在给定的时间间隔内以随机变量的方式运行服务。
+- Service(Action service, Node decoratee): 杩愯�岀粰瀹氱殑鏈嶅姟鍑芥暟锛屽惎鍔╠ecoratee锛岀劧鍚庢瘡娆¤繍琛屾湇鍔°€�
+- Service(float interval, Action service, Node decoratee): 杩愯�岀粰瀹氱殑鏈嶅姟鍑芥暟锛屽惎鍔╠ecoratee锛岀劧鍚庢寜缁欏畾鐨勯棿闅旇繍琛屾湇鍔°€�
+- Service(float interval, float randomVariation, Action service, Node decoratee): 杩愯�岀粰瀹氱殑鏈嶅姟鍑芥暟锛屽惎鍔╠ecoratee锛岀劧鍚庡湪缁欏畾鐨勬椂闂撮棿闅斿唴浠ラ殢鏈哄彉閲忕殑鏂瑰紡杩愯�屾湇鍔°€�
 #### Succeeder
-- Succeeder(Node decoratee): 永远要成功，不管装饰器是否成功
+- Succeeder(Node decoratee): 姘歌繙瑕佹垚鍔燂紝涓嶇�¤�呴グ鍣ㄦ槸鍚︽垚鍔�
 #### TimeMax
-- TimeMax(float limit, bool waitForChildButFailOnLimitReached, Node decoratee): 运行给定的decoratee。如果decoratee没有在限制时间内完成，则执行将失败。如果waitforchildbutfailonlimitarrived为true，它将等待decoratee完成，但仍然失败。
-- TimeMax(float limit, float randomVariation, bool waitForChildButFailOnLimitReached, Node decoratee):运行给定的decoratee。如果decoratee没有在限制和随机变化范围内完成，则执行将失败。如果waitforchildbutfailonlimitarrived为true，它将等待decoratee完成，但仍然失败。
+- TimeMax(float limit, bool waitForChildButFailOnLimitReached, Node decoratee): 杩愯�岀粰瀹氱殑decoratee銆傚�傛灉decoratee娌℃湁鍦ㄩ檺鍒舵椂闂村唴瀹屾垚锛屽垯鎵ц�屽皢澶辫触銆傚�傛灉waitforchildbutfailonlimitarrived涓簍rue锛屽畠灏嗙瓑寰卍ecoratee瀹屾垚锛屼絾浠嶇劧澶辫触銆�
+- TimeMax(float limit, float randomVariation, bool waitForChildButFailOnLimitReached, Node decoratee):杩愯�岀粰瀹氱殑decoratee銆傚�傛灉decoratee娌℃湁鍦ㄩ檺鍒跺拰闅忔満鍙樺寲鑼冨洿鍐呭畬鎴愶紝鍒欐墽琛屽皢澶辫触銆傚�傛灉waitforchildbutfailonlimitarrived涓簍rue锛屽畠灏嗙瓑寰卍ecoratee瀹屾垚锛屼絾浠嶇劧澶辫触銆�
 #### TimeMin
-- TimeMin(float limit, Node decoratee): 运行给定的decoratee。如果decoratee在达到限制时间之前成功完成，decorator将等待直到达到限制，然后根据decoratee的结果停止执行。如果被装饰者在达到限制时间之前失败，装饰者将立即停止。
-- TimeMin(float limit, bool waitOnFailure, Node decoratee): 运行给定的decoratee。如果decoratee在达到限制时间之前成功完成，decorator将等待直到达到限制，然后根据decoratee的结果停止执行。如果waitOnFailure为真，那么当decoratee失败时，decoratee也将等待。
-- TimeMin(float limit, float randomVariation, bool waitOnFailure, Node decoratee): 运行给定的decoratee。如果decoratee在达到随机变化时间限制之前成功完成，decorator将等待直到达到限制，然后根据decoratee的结果停止执行。如果waitOnFailure为真，那么当decoratee失败时，decoratee也将等待。
+- TimeMin(float limit, Node decoratee): 杩愯�岀粰瀹氱殑decoratee銆傚�傛灉decoratee鍦ㄨ揪鍒伴檺鍒舵椂闂翠箣鍓嶆垚鍔熷畬鎴愶紝decorator灏嗙瓑寰呯洿鍒拌揪鍒伴檺鍒讹紝鐒跺悗鏍规嵁decoratee鐨勭粨鏋滃仠姝㈡墽琛屻€傚�傛灉琚�瑁呴グ鑰呭湪杈惧埌闄愬埗鏃堕棿涔嬪墠澶辫触锛岃�呴グ鑰呭皢绔嬪嵆鍋滄��銆�
+- TimeMin(float limit, bool waitOnFailure, Node decoratee): 杩愯�岀粰瀹氱殑decoratee銆傚�傛灉decoratee鍦ㄨ揪鍒伴檺鍒舵椂闂翠箣鍓嶆垚鍔熷畬鎴愶紝decorator灏嗙瓑寰呯洿鍒拌揪鍒伴檺鍒讹紝鐒跺悗鏍规嵁decoratee鐨勭粨鏋滃仠姝㈡墽琛屻€傚�傛灉waitOnFailure涓虹湡锛岄偅涔堝綋decoratee澶辫触鏃讹紝decoratee涔熷皢绛夊緟銆�
+- TimeMin(float limit, float randomVariation, bool waitOnFailure, Node decoratee): 杩愯�岀粰瀹氱殑decoratee銆傚�傛灉decoratee鍦ㄨ揪鍒伴殢鏈哄彉鍖栨椂闂撮檺鍒朵箣鍓嶆垚鍔熷畬鎴愶紝decorator灏嗙瓑寰呯洿鍒拌揪鍒伴檺鍒讹紝鐒跺悗鏍规嵁decoratee鐨勭粨鏋滃仠姝㈡墽琛屻€傚�傛灉waitOnFailure涓虹湡锛岄偅涔堝綋decoratee澶辫触鏃讹紝decoratee涔熷皢绛夊緟銆�
 #### WaitForCondition
-- WaitForCondition(Func<bool> condition, Node decoratee): 延迟decoratee节点的执行，直到条件为真，检查每一帧
-- WaitForCondition(Func<bool> condition, float checkInterval, float randomVariance, Node decoratee): 延迟decoratee节点的执行，直到条件为真，使用给定的checkInterval和randomVariance进行检查
+- WaitForCondition(Func<bool> condition, Node decoratee): 寤惰繜decoratee鑺傜偣鐨勬墽琛岋紝鐩村埌鏉′欢涓虹湡锛屾�€鏌ユ瘡涓€甯�
+- WaitForCondition(Func<bool> condition, float checkInterval, float randomVariance, Node decoratee): 寤惰繜decoratee鑺傜偣鐨勬墽琛岋紝鐩村埌鏉′欢涓虹湡锛屼娇鐢ㄧ粰瀹氱殑checkInterval鍜宺andomVariance杩涜�屾�€鏌�
 
-## 后记
-本文档仅供参考，一切以代码为准！
+## 鍚庤��
+鏈�鏂囨。浠呬緵鍙傝€冿紝涓€鍒囦互浠ｇ爜涓哄噯锛�
 
