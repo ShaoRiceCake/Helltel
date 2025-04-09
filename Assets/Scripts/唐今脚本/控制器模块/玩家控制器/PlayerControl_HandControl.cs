@@ -17,11 +17,14 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     private bool _isMouseDown;
     protected bool IsHandActive;
 
+    private Vector3 _targetPosition;
+    [SerializeField] private float smoothSpeed = 5f;
+    private Vector3 _smoothDampVelocity;
 
     public int CurrentHand
     {
         get => CurrentPlayerHand;
-        set
+        private set
         {
             if(value is < 0 or > 2)
             {
@@ -119,7 +122,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         var mouseX = mouseDelta.x * mouseSensitivity;
         var mouseY = mouseDelta.y * mouseSensitivity;
-        
+    
         var localMovement = Vector3.zero;
 
         if (_isMouseDown)
@@ -139,16 +142,23 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         var worldMovement = forwardDirection * localMovement.z + rightDirection * localMovement.x;
         worldMovement.y = localMovement.y;
+        
+        _targetPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
 
-        var newWorldPosition = handBallPrefab.transform.position + worldMovement * Time.deltaTime;
-
-        var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(newWorldPosition);
+        var newLocalPosition = handPrepareObj.transform.InverseTransformPoint(_targetPosition);
 
         ApplyCylinderConstraint(ref newLocalPosition);
 
-        handBallPrefab.transform.position = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        _targetPosition = handPrepareObj.transform.TransformPoint(newLocalPosition);
+        
+        // 使用SmoothDamp进行帧率无关的插值
+        handBallPrefab.transform.position = Vector3.SmoothDamp(
+            handBallPrefab.transform.position,
+            _targetPosition,
+            ref _smoothDampVelocity,
+            1/smoothSpeed 
+        );
     }
-
     private void ApplyCylinderConstraint(ref Vector3 position)
     {
         var horizontal = new Vector2(position.x, position.z);

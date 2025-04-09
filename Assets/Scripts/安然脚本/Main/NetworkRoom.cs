@@ -5,7 +5,6 @@ using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-
 using System;
 using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
@@ -20,23 +19,42 @@ public class NetworkRoom : MonoBehaviour
 
     public Button client;
 
+    public GameObject loadingPanel;
+
+    public Button back_btn;
+
+    public TMP_Text title;
+
     public RelayTransportNetcode relayTransportNetcode;
+
+    void Loading(string str)
+    {
+        title.text = str;
+        back_btn.gameObject.SetActive(true);
+    }
 
     string uid;
     private void Start()
     {
         relayTransportNetcode = NetworkManager.Singleton.GetComponentInChildren<RelayTransportNetcode>();
-
+        loadingPanel.SetActive(false);
         uid = Guid.NewGuid().ToString();
         var props = new Dictionary<string, string>();
         props.Add("icon", "unity");
         relayTransportNetcode.SetPlayerData(uid, "Player-" + uid, props);
         host.onClick.AddListener(OnStartHostButton);
         client.onClick.AddListener(OnStartClientButton);
+        back_btn.onClick.AddListener(() =>
+        {
+            loadingPanel.SetActive(false);
+            back_btn.gameObject.SetActive(false);
+        });
     }
 
     public void OnStartHostButton()
     {
+        loadingPanel.SetActive(true);
+        title.text = "创建房间中...";
         NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayTransportNetcode;
 
         if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
@@ -68,11 +86,13 @@ public class NetworkRoom : MonoBehaviour
                         }
                         else
                         {
+                            Loading("创建房间失败，当前状态：" + resp.Status.ToString());
                             Debug.Log("Room Status Exception : " + resp.Status.ToString());
                         }
                     }
                     else
                     {
+                        Loading("创建房间失败：未进入服务器");
                         Debug.Log("Create Room Fail By Lobby Service");
                     }
                 }));
@@ -87,8 +107,10 @@ public class NetworkRoom : MonoBehaviour
         NetworkManager.Singleton.StartHost();
     }
 
-    public void OnStartClientButton()//�? client �?份加入游�?
+    public void OnStartClientButton()//以 client 身份加入游戏
     {
+        loadingPanel.SetActive(true);
+        title.text = "加入房间中...";
         NetworkManager.Singleton.NetworkConfig.NetworkTransport = relayTransportNetcode;
 
         if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
@@ -125,6 +147,16 @@ public class NetworkRoom : MonoBehaviour
                                             }
                                             else
                                             {
+                                                if(item.RoomCode != inputIP.text)
+                                                {
+                                                    Loading("房间代码错误");
+                                                }
+                                                if(_resp.Code != (uint)RelayCode.OK)
+                                                {
+                                                    Loading("房间失效");
+                                                }
+                                       
+
                                                 Debug.Log("Query Room Fail By Lobby Service");
                                             }
                                         }));
@@ -132,9 +164,15 @@ public class NetworkRoom : MonoBehaviour
                                 }
                             }
                         }
+                        else
+                        {
+                            Loading("当前服务器无房间");
+                        }
                     }
                     else
                     {
+                        Loading("房间失效");
+
                         Debug.Log("List Room Fail By Lobby Service");
                     }
                 }));
@@ -147,7 +185,7 @@ public class NetworkRoom : MonoBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
-    #region �?地测�?
+    #region 本地测试
     public void Login()
     {
         NetworkManager.Singleton.StartClient();
@@ -163,6 +201,6 @@ public class NetworkRoom : MonoBehaviour
         unityTransport.SetConnectionData("0.0.0.0", 7777);
         NetworkManager.Singleton.StartHost();
         GameManager.instance.LoadScene("Lobby");
-    }//主机�?�?
+    }//主机启动
     #endregion
 }
