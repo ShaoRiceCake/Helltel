@@ -36,23 +36,26 @@ namespace Helltal.Gelercat
             Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
             debugger.BehaviorTree = behaviorTree;
 #endif
+            behaviorTree.Blackboard["Dead"] = false; // 死亡标志
             behaviorTree.Start();
         }
         public override Root GetBehaviorTree()
         {
             return new Root(
-                new Selector(
-                    BuildDeathBranch(),
-                    BuildHappyBranch(),
-                    BuildLonelyBranch(),
-                    BuildWaitBranch()
-                )
+                new BlackboardCondition("Dead", Operator.IS_EQUAL, false, Stops.NONE,
+                    new Selector(
+                        BuildDeathBranch(),
+                        BuildHappyBranch(),
+                        BuildLonelyBranch(),
+                        BuildWaitBranch()
+                    )),
+                
             );
         }
         // ===================== 状态1：等待 =====================
         private Node BuildWaitBranch()
-        {
-            var branch = new Sequence(
+        {                 
+            var branch =  new Sequence(
                 new Action(() =>
                 {
                     lonelyDuration = 0f;
@@ -130,13 +133,16 @@ namespace Helltal.Gelercat
         // ===================== 状态4：死亡 =====================
         private Node BuildDeathBranch()
         {
-            return new Condition(() => behaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold,
+            return new Condition(() => behaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold, Stops.IMMEDIATE_RESTART,
                 new Action(() =>
                 {
                     SetState("DEAD");
                     TriggerDeath(); // 启动表现层的死亡动画、音效等
                     AmplifyFog();   // 黑雾加速 & 伤害翻倍
-                    behaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入
+                    behaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入                            
+                    behaviorTree.Blackboard["Dead"] = true;
+
+
                 })
             );
         }
@@ -186,7 +192,7 @@ namespace Helltal.Gelercat
         private void ExpandBlackFog(float deltaTime)
         {
             // TODO: 每0.1秒扩大黑雾半径（增长速率 b）
-            if (Debugging) Debug.Log("黑雾扩散,deltaTime:" + deltaTime);
+            // if (Debugging) Debug.Log("黑雾扩散,deltaTime:" + deltaTime);
         }
 
         // 黑雾对玩家造成伤害
