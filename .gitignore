@@ -1,36 +1,40 @@
-# 将此 .gitignore 文件放置在你的 Unity 项目根目录下
-#
-# 从此获取最新版本：https://github.com/github/gitignore/blob/master/Unity.gitignore
-#
+# 排除 Unity 自动生成的临时目录
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
-/[Uu]ser[Ss]ettings/
 
-# MemoryCaptures 文件夹可能会非常大
-# 它们也可能包含极其敏感的数据
+# 排除用户本地设置（按需调整）
+/[Uu]user[Ss]ettings/
+
+# 超大或敏感文件目录
 /[Mm]emoryCaptures/
 
-# 只有当对应的资源文件被忽略时，对应的 .meta 文件才应被忽略
-!/[Aa]ssets/**/*.meta
+# 强制包含 Unity 核心配置文件（必须同步！）
+!/[Pp]roject[Ss]ettings/
+!/[Pp]ackages/manifest.json
+!/[Pp]ackages/packages-lock.json
 
-# 如果你希望忽略 Asset Store Tools 插件，请取消注释下行
+# 强制包含 Assets 下的 .meta 文件（确保资源引用正确）
+!/[Aa]ssets/​**​/*.meta
+
+# 排除 AssetStoreTools 插件（按需取消注释）
 # /[Aa]ssets/AssetStoreTools*
 
-# 自动生成的 Jetbrains Rider 插件
+# 排除 JetBrains IDE 自动生成的文件
 /[Aa]ssets/Plugins/Editor/JetBrains*
 
-# Visual Studio 或 VSCode 缓存目录
+# 排除 IDE 缓存目录（但允许共享部分配置）
 .vs/
 .vscode/
+!.vscode/settings.json  # 如果需要共享基础 VSCode 配置
 
-# Gradle 缓存目录
+# 排除 Gradle 缓存
 .gradle/
 
-# 自动生成的 VS/MD/Consulo 解决方案和项目文件
+# 排除自动生成的解决方案文件
 ExportedObj/
 .consulo/
 *.csproj
@@ -48,25 +52,15 @@ ExportedObj/
 *.opendb
 *.VC.db
 
-# Unity3D 生成的 meta 文件
-*.pidb.meta
-*.pdb.meta
-*.mdb.meta
-
-# Unity3D 在崩溃报告时生成的文件
+# 排除 Unity 崩溃报告和构建产物
 sysinfo.txt
-
-# 构建产物
 *.apk
 *.aab
 *.unitypackage
 
-# Crashlytics 生成的文件
-crashlytics-build.properties
-
-# 已打包的 Addressables 文件
+# 排除 Addressables 打包缓存（按需调整）
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
 
-# 临时自动生成的 Android 资源
+# 排除临时 Android 资源
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
