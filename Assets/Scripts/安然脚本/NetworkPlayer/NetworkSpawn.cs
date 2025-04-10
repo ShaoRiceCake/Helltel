@@ -4,30 +4,26 @@ using UnityEngine;
 using Unity.Netcode;
 public class NetworkSpawn : NetworkBehaviour
 {
-    public GameObject playerCam;
-    public GameObject virtualCam;
+    [Header("联机镜像隐藏物体")]
+    public GameObject[] thirdDestory;
     public GameObject NetworkMap;
     public GameObject colliderWorld;
     public override void OnNetworkSpawn()
     {
         if (!IsLocalPlayer)
         {
-            Destroy(playerCam);
-            Destroy(virtualCam);
+            for(int i = 0; i < thirdDestory.Length; i++)
+            {
+                thirdDestory[i].SetActive(false);
+            }
             Destroy(colliderWorld);
         }
 
         GameManager.instance.OnStartGame.AddListener(() =>
         {
-
-
-
-            if (IsHost && IsLocalPlayer)
+            if (IsLocalPlayer)
             {
-
-                var obj = Instantiate(NetworkMap);
-                StartCoroutine(obj.GetComponent<DungeonGenerator>().DungeonBuild());
-
+                GameController.Instance.NotifyLocalPlayerReady(NetworkManager.Singleton.LocalClientId.ToString());
             }
 
             transform.position = GameObject.Find("Spawn1").transform.position;

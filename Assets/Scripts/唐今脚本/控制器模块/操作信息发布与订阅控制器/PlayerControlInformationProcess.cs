@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
+
 public class PlayerControlInformationProcess : NetworkBehaviour
 {
     public enum ControlMode
@@ -29,8 +30,13 @@ public class PlayerControlInformationProcess : NetworkBehaviour
     public UnityEvent<Vector2> onMouseMoveFixedUpdate; 
     public UnityEvent<Vector2> onMouseMoveUpdate;   
     public UnityEvent onDefaultMode;
+    public UnityEvent onCameraControl;
+    public UnityEvent onStopCameraControl;
 
-    void Start()
+
+    private bool _isCameraControlActive;
+
+    private void Start()
     {
         onLiftLeftLeg ??= new UnityEvent();
         onLiftRightLeg ??= new UnityEvent();
@@ -48,7 +54,9 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
         onMouseMoveUpdate ??= new UnityEvent<Vector2>();
         onDefaultMode ??= new UnityEvent();
-
+        onCameraControl ??= new UnityEvent(); 
+        onStopCameraControl ??= new UnityEvent(); 
+        
         if (NetworkManager.Singleton)
         {
             if (IsLocalPlayer)
@@ -63,7 +71,6 @@ public class PlayerControlInformationProcess : NetworkBehaviour
                 _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
                 _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
                 _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
-
             }
         }
         else
@@ -78,11 +85,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
             _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
             _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
             _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
-
         }
-
-
-
     }
 
     public override void OnDestroy()
@@ -120,8 +123,25 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         base.OnDestroy();
     }
 
+    
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            _isCameraControlActive = true;
+            onCameraControl?.Invoke();
+        }
+        else if (Input.GetKeyUp(KeyCode.Space))
+        {
+            onStopCameraControl?.Invoke();
+            _isCameraControlActive = false;
+        }
+    }
+
     private void OnLeftMouseDown()
     {
+        if (_isCameraControlActive) return;
+        
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
@@ -137,6 +157,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnRightMouseDown()
     {
+        if (_isCameraControlActive) return;
+        
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
@@ -152,6 +174,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnLeftMouseUp()
     {
+        if (_isCameraControlActive) return;
+        
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
@@ -167,6 +191,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnRightMouseUp()
     {
+        if (_isCameraControlActive) return;
+        
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
@@ -182,6 +208,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnBothMouseButtonsDown()
     {
+        if (_isCameraControlActive) return;
+        
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
@@ -197,6 +225,8 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnMiddleMouseDown()
     {
+        if (_isCameraControlActive) return;
+        
         mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
         onSwitchControlMode?.Invoke();
     }

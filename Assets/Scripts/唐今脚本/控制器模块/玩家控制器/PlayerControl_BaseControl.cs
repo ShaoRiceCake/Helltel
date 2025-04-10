@@ -3,7 +3,7 @@ using Unity.Netcode;
 [RequireComponent(typeof(PlayerControlInformationProcess))]
 public abstract class PlayerControl_BaseControl : NetworkBehaviour
 {
-    protected PlayerControlInformationProcess controlHandler;
+    public PlayerControlInformationProcess controlHandler;
     public GameObject forwardObject;
 
     virtual protected void Start()

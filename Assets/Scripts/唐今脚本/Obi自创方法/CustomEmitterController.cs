@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Obi;
 
@@ -6,32 +7,41 @@ public class CustomEmitterController : MonoBehaviour
 {
     private ObiEmitter _emitter;
     private bool _hasEmitted;
+    private bool _isFinished = false;
 
     private void Awake()
     {
         _emitter = GetComponent<ObiEmitter>();
+
+        if (!_emitter)
+        {
+            Debug.LogError("No ObiEmitter component found");
+        }
         
-        _emitter.emissionMethod = ObiEmitter.EmissionMethod.MANUAL;
+        _emitter.enabled = false;
     }
 
     private void Update()
     {
-        if (!Input.GetKeyDown(KeyCode.Space) || _hasEmitted) return;
+        if (_isFinished) return;
+        
+        var allEmitted = _emitter.activeParticleCount == _emitter.particleCount;
+
+        if (!allEmitted) return;
+        _emitter.emissionMethod = ObiEmitter.EmissionMethod.MANUAL;
+        _isFinished = true;
+    }
+
+    public void Emit()
+    {
+        if (_hasEmitted) return;
+        
         EmitAllParticles();
         _hasEmitted = true;
     }
 
     private void EmitAllParticles()
     {
-        if (!_emitter || !_emitter.isLoaded) return;
-
-        var particlesToEmit = _emitter.particleCount - _emitter.activeParticleCount;
-        
-        for (var i = 0; i < particlesToEmit; i++)
-        {
-            _emitter.EmitParticle(0);
-        }
-        
-        _emitter.SimulationStart(Time.deltaTime, Time.deltaTime);
+        _emitter.enabled = true;
     }
 }
