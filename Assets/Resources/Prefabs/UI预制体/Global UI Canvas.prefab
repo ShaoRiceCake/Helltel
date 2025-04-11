@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3210753911709528250}
   - component: {fileID: 6325972494946967053}
   m_Layer: 5
-  m_Name: Button
+  m_Name: "\u7EE7\u7EED\u6309\u94AE"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 1568091313522499373}
   - component: {fileID: 5792827707812747105}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: "\u5BBE\u5BA2\u7C3F\u6309\u94AE"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -337,11 +337,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d07680f6c4861f946bac03de4ea3826e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainMenu: {fileID: 0}
-  btnSettings: {fileID: 0}
-  btnContinue: {fileID: 0}
-  btnKill: {fileID: 0}
-  btnQuit: {fileID: 0}
+  btnContinue: {fileID: 6325972494946967053}
+  btnSettings: {fileID: 4947021812110141568}
+  btnGuestBook: {fileID: 5792827707812747105}
+  btnKillMe: {fileID: 6585850703661840372}
+  btnBackToMainMenu: {fileID: 4198921995197970998}
+  btnQuit: {fileID: 3890268782534323819}
 --- !u!1 &4293666816643535695
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,7 +356,7 @@ GameObject:
   - component: {fileID: 8664578935363995783}
   - component: {fileID: 6585850703661840372}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: "\u81EA\u6740"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -497,7 +498,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 545, y: 369}
+  m_AnchoredPosition: {x: 545, y: 390}
   m_SizeDelta: {x: 600, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7722362184888996116
@@ -610,7 +611,7 @@ GameObject:
   - component: {fileID: 5549377621019416601}
   - component: {fileID: 4947021812110141568}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: "\u8BBE\u7F6E\u6309\u94AE"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -917,7 +918,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u8FD4\u56DE"
+  m_text: "\u81EA\u6740"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb8bacd46357fb4418b3d529965e7b08, type: 2}
   m_sharedMaterial: {fileID: 2979193228837331801, guid: eb8bacd46357fb4418b3d529965e7b08, type: 2}
@@ -999,7 +1000,7 @@ GameObject:
   - component: {fileID: 4267416528042685390}
   - component: {fileID: 3890268782534323819}
   m_Layer: 5
-  m_Name: Button (4)
+  m_Name: "\u9000\u51FA\u6E38\u620F\u6309\u94AE"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1252,7 +1253,6 @@ GameObject:
   - component: {fileID: 3679837669774691547}
   - component: {fileID: 386708155269917917}
   - component: {fileID: 789235852706237186}
-  - component: {fileID: 8725297848373336545}
   - component: {fileID: 9210021123171393673}
   - component: {fileID: 5103182867850785256}
   m_Layer: 5
@@ -1330,18 +1330,6 @@ MonoBehaviour:
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
   m_PresetInfoIsWorld: 0
---- !u!114 &8725297848373336545
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7451769254959460341}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef1c7f8095cff1d49a411a154081cc23, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &9210021123171393673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1371,6 +1359,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef1c7f8095cff1d49a411a154081cc23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Menu: {fileID: 3088436299068218006}
+  Settings: {fileID: 1331444536907637944}
+  GuestBook: {fileID: 2302206386336763280}
+  isPaused: 0
 --- !u!1 &7457012772872531054
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,6 +1508,7 @@ GameObject:
   - component: {fileID: 1469168823432010296}
   - component: {fileID: 7123666457601110840}
   - component: {fileID: 8614343845948864325}
+  - component: {fileID: 2302206386336763280}
   m_Layer: 5
   m_Name: GuestBookPanel
   m_TagString: Untagged
@@ -1580,6 +1573,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2302206386336763280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7568326084596775758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec93ca7c111897d45b4a12a04b7e24a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7959182288327762180
 GameObject:
   m_ObjectHideFlags: 0
@@ -1668,10 +1673,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef2d1a07411bd844783c64536feaec97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  settingsPanel: {fileID: 0}
-  tabButtons: []
-  settingPanels: []
-  masterVolumeSlider: {fileID: 0}
+  btnGame: {fileID: 0}
+  btnQuality: {fileID: 0}
+  btnAuido: {fileID: 0}
+  btnControlls: {fileID: 0}
+  btnBack: {fileID: 0}
   qualityDropdown: {fileID: 0}
 --- !u!1 &8598008890890988648
 GameObject:
@@ -1738,7 +1744,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u81EA\u6740"
+  m_text: "\u8FD4\u56DE\u4E3B\u83DC\u5355"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eb8bacd46357fb4418b3d529965e7b08, type: 2}
   m_sharedMaterial: {fileID: 2979193228837331801, guid: eb8bacd46357fb4418b3d529965e7b08, type: 2}
@@ -1954,7 +1960,7 @@ GameObject:
   - component: {fileID: 5804444214360486990}
   - component: {fileID: 4198921995197970998}
   m_Layer: 5
-  m_Name: Button (5)
+  m_Name: "\u8FD4\u56DE\u4E3B\u83DC\u5355\u6309\u94AE"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

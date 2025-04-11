@@ -4,30 +4,30 @@ using UnityEngine.UI;
 public class MenuPanel : MonoBehaviour
 {
     private GlobalUIController globalUIController;
-    [Header("主菜单")]
-    public GameObject menu; // 菜单面板
     
-    
-    [Header("其他按钮")]
-    public Button btnContinue; // 继续游戏
-    public Button btnSettings; // 设置按钮
+    [Header("菜单界面按钮")]
+    public Button btnContinue;  // 继续游戏
+    public Button btnSettings;  // 设置按钮
     public Button btnGuestBook; //宾客簿
     public Button btnKillMe;    //自杀
-    public Button btnQuit;    // 退出游戏
+    public Button btnBackToMainMenu;    //返回主菜单
+    public Button btnQuit;      // 退出游戏
 
     
     private void Awake()
     {
-       
+        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
     }
 
     private void Start()
     {
-        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
+        
         // 绑定按钮事件
         btnContinue.onClick.AddListener(Continue);
         btnSettings.onClick.AddListener(OpenSettings);
         btnGuestBook.onClick.AddListener(OpenGuestBook);
+        btnKillMe.onClick.AddListener(KillMe);
+        btnBackToMainMenu.onClick.AddListener(BackToMainMenu);
         btnQuit.onClick.AddListener(QuitGame);
         
         
@@ -35,32 +35,40 @@ public class MenuPanel : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            
-        }
-    }
 
+    }
+    //继续
     private void Continue()
     {
-        GlobalUIController.Instance.TogglePause();
+        globalUIController.TogglePause(false);
+        globalUIController.CloseAllGlobalUI();
     }
 
     // 打开设置界面
     private void OpenSettings()
     {
-       
-   
+        globalUIController.CloseAllGlobalUI();
+        globalUIController.Settings.gameObject.SetActive(true);
     }
 
-
+    //打开宾客簿
     private void OpenGuestBook()
     {
-  
+        globalUIController.CloseAllGlobalUI();
+        globalUIController.GuestBook.gameObject.SetActive(true);
     }
-
+    //自杀
+    private void KillMe()
+    {
+        
+        //这里预留自杀逻辑
+    }
+    //返回主菜单
+    private void BackToMainMenu()
+    {
+        //这里预留返回主菜单逻辑
+    }
     //关闭游戏
-
     private void QuitGame()
     {
         #if UNITY_EDITOR
