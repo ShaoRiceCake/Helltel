@@ -117,7 +117,6 @@ public class NetworkRoom : MonoBehaviour
         {
             if (true)
             {
-
                 StartCoroutine(LobbyService.AsyncListRoom(new ListRoomRequest()
                 {
                     Namespace = "Unity",
@@ -183,6 +182,11 @@ public class NetworkRoom : MonoBehaviour
     private void StartClient()
     {
         NetworkManager.Singleton.StartClient();
+    }
+
+    private void Update()
+    {
+
     }
 
     #region 本地测试
