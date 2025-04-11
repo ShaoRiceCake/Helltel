@@ -5,18 +5,16 @@ namespace Helltal.Gelercat
 {
     public class OldManController : GuestBase
     {
-        [Header("伤害值")] public float baseDamage = 5f;
+
         [Header("等待时间")] public float waitingTimer = 180f;
         [Header("开心时间")] public float happyTimer = 3f;
         [Header("黑雾生成间隔时间")] public float duration = 0.1f;
-        [Header("黑雾基础半径")] public float baseRadius = 0.1f;
-        [Header("黑雾增加半径")] public float increaseRadius = 0.1f;
-
-        [Header("钱币预制体")] public GameObject moneybag;
-        [Header("黑雾")] public GameObject blackFog;
 
         [Header("孤独到死亡最小")] public float lonelyDeathMin = 120f; // 2分钟
         [Header("孤独到死亡最大")] public float lonelyDeathMax = 480f; // 8分钟
+
+        [Header("钱币预制体")] public GameObject moneybag;
+
 
         bool DEBUG_chatting = false;
 
@@ -28,6 +26,8 @@ namespace Helltal.Gelercat
 
         private float lonelyDuration;  // 当前孤独状态持续时间
         private float lonelyDeathThreshold;
+
+
         protected override void Start()
         {
             base.Start();
@@ -37,25 +37,30 @@ namespace Helltal.Gelercat
             debugger.BehaviorTree = behaviorTree;
 #endif
             behaviorTree.Blackboard["Dead"] = false; // 死亡标志
+            behaviorTree.Blackboard["Lonely"] = false; // 孤独标志
             behaviorTree.Start();
         }
         public override Root GetBehaviorTree()
         {
             return new Root(
-                new BlackboardCondition("Dead", Operator.IS_EQUAL, false, Stops.NONE,
-                    new Selector(
-                        BuildDeathBranch(),
-                        BuildHappyBranch(),
-                        BuildLonelyBranch(),
-                        BuildWaitBranch()
-                    )),
-                
+                new Selector(
+
+                    new BlackboardCondition("Dead", Operator.IS_EQUAL, false, Stops.NONE,
+                        new Selector(
+                            BuildDeathBranch(),
+                            BuildHappyBranch(),
+                            BuildLonelyBranch(),
+                            BuildWaitBranch()
+                        ))
+
+                )
+
             );
         }
         // ===================== 状态1：等待 =====================
         private Node BuildWaitBranch()
-        {                 
-            var branch =  new Sequence(
+        {
+            var branch = new Sequence(
                 new Action(() =>
                 {
                     lonelyDuration = 0f;
@@ -84,17 +89,18 @@ namespace Helltal.Gelercat
                         SetState("LONELY");
                         StartBlackFog(); // 启动黑雾视觉效果
                     }),
-                    new Service( duration , () =>
-                    {
-                        lonelyDuration += duration; // 增加孤独状态持续时间
-                        ExpandBlackFog(duration); // 黑雾扩展逻辑
-                    },
-                        new Service(0.5f, () =>
+                    new Service(duration, () =>
                         {
-                            ApplyFogDamage(lonelyDuration); // 每0.5秒造成一次伤害
+                            lonelyDuration += duration; // 增加孤独状态持续时间
+                            ExpandBlackFog(duration); // 黑雾扩展逻辑
                         },
-                            new WaitUntilStopped()
-                        )
+                    //     new Service(0.5f, () =>
+                    //     {
+                    //         ApplyFogDamage(lonelyDuration); // 每0.5秒造成一次伤害
+                    //     },
+                         // 伤害移动到黑雾逻辑中
+                    //  )
+                    new WaitUntilStopped()
                     )
                 )
             );
@@ -134,18 +140,24 @@ namespace Helltal.Gelercat
         private Node BuildDeathBranch()
         {
             return new Condition(() => behaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold, Stops.IMMEDIATE_RESTART,
-                new Action(() =>
-                {
-                    SetState("DEAD");
-                    TriggerDeath(); // 启动表现层的死亡动画、音效等
-                    AmplifyFog();   // 黑雾加速 & 伤害翻倍
-                    behaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入                            
-                    behaviorTree.Blackboard["Dead"] = true;
 
-
-                })
+                new Sequence(               
+                    new Action(() =>
+                    {
+                        SetState("DEAD");
+                        TriggerDeath(); // 启动表现层的死亡动画、音效等
+                        AmplifyFog();   // 黑雾加速 & 伤害翻倍
+                        behaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入                            
+                        behaviorTree.Blackboard["Dead"] = true;
+                    })
+                    // new Service()
+                )
             );
         }
+
+        // ===================== 状态5：死亡后 黑雾扩散 =====================
+
+
 
         // ===================== 实现接口 =====================
 
@@ -164,7 +176,8 @@ namespace Helltal.Gelercat
 
             // FOR Debug:
 
-            if (Debugging){
+            if (Debugging)
+            {
                 if (DEBUG_chatting)
                 {
                     Debug.Log("玩家正在聊天");
@@ -192,14 +205,15 @@ namespace Helltal.Gelercat
         private void ExpandBlackFog(float deltaTime)
         {
             // TODO: 每0.1秒扩大黑雾半径（增长速率 b）
+            if( Debugging) Debug.Log("黑雾扩散,deltaTime:" + deltaTime);
             // if (Debugging) Debug.Log("黑雾扩散,deltaTime:" + deltaTime);
         }
 
         // 黑雾对玩家造成伤害
-        private void ApplyFogDamage(float timeLonely)
+        private void ApplyFogDamage(float time)
         {
             // TODO: 每0.5秒造成一次伤害（伤害 = 基础值 + t分钟*c）
-            if (Debugging) Debug.Log("黑雾伤害,时间:" + timeLonely);
+            if (Debugging) Debug.Log("黑雾伤害,时间:" );
         }
 
         // 停止黑雾（高兴状态触发）
@@ -214,6 +228,8 @@ namespace Helltal.Gelercat
         {
             // TODO: 播放全层音效、动画，黑雾继续扩散 & 本层熵值上限 ×1.5，触发额外客人生成
             if (Debugging) Debug.Log("老人死亡");
+
+
         }
 
         // 加速黑雾（死亡状态下）
@@ -267,7 +283,13 @@ namespace Helltal.Gelercat
             if (Debugging)
             {
                 DEBUG_chatting = Input.GetKey(KeyCode.R);
+                Debug.Log("lonelyDuration:" + lonelyDuration);
+
             }
+
+            // timer
+
+
         }
     }
 }

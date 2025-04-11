@@ -450,8 +450,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61429af3e7e75b14baec1e4fd223668a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alwaysDrawPath: 1
-  drawAsLoop: 1
+  alwaysDrawPath: 0
+  drawAsLoop: 0
   drawNumbers: 1
   debugColour: {r: 1, g: 1, b: 1, a: 1}
   gridCellSize: 30
@@ -1588,7 +1588,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!195 &1380594069
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1746,15 +1746,15 @@ MonoBehaviour:
   aiState:
     m_InternalValue: 0
   baseDamage: 5
-  waitingTimer: 10
+  waitingTimer: 5
   happyTimer: 3
   duration: 0.1
   baseRadius: 0.1
   increaseRadius: 0.1
   moneybag: {fileID: 6478862569813391879, guid: 986289d73aaaaf94992adf2feac6784f, type: 3}
   blackFog: {fileID: 0}
-  lonelyDeathMin: 50
-  lonelyDeathMax: 60
+  lonelyDeathMin: 10
+  lonelyDeathMax: 11
 --- !u!4 &1395121438 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5796865201664423073, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
@@ -2293,8 +2293,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -1.0133915, y: -3.8211994, z: 2.337078}
-  m_LocalScale: {x: 2.927432, y: 1, z: 3.5591133}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 17.1, y: 5.841297, z: 20.789839}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 483254583}
   - {fileID: 1546724763}
@@ -2360,6 +2360,10 @@ PrefabInstance:
     - target: {fileID: 6440190606539038788, guid: f3fe46b7f0689cd4fb7f5588aa7187c6, type: 3}
       propertyPath: m_Name
       value: TestGuest
+      objectReference: {fileID: 0}
+    - target: {fileID: 6440190606539038788, guid: f3fe46b7f0689cd4fb7f5588aa7187c6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
