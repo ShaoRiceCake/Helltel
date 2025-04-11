@@ -32,12 +32,24 @@ public class GlobalUIController : MonoBehaviour
         GuestBook.gameObject.SetActive(false);
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause(true);
+            Menu.gameObject.SetActive(true);
+        }
+
+    }
+
     // 设置暂停/继续游戏
     public void TogglePause(bool isPaused)
     {
-        Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）
-        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked; // 控制鼠标锁定状态
+        //Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）由于我们是联机游戏，所以不暂停
+        //这里其实根本没锁住，需要和角色操控联动
+        Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
         Cursor.visible = isPaused; // 控制鼠标可见性
+        
     }
     public void CloseAllGlobalUI()
     {

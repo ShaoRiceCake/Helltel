@@ -35,6 +35,11 @@ public class MenuPanel : MonoBehaviour
 
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            globalUIController.TogglePause(true);
+            globalUIController.Menu.gameObject.SetActive(true);
+        }
 
     }
     //继续
