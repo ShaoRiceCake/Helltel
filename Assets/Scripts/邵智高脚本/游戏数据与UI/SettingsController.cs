@@ -2,9 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SettingsController : MonoBehaviour
+public class SettingsPanel : MonoBehaviour
 {
-    public static SettingsController Instance { get; private set; }
 
     [Header("设置主界面")]
     public GameObject settingsPanel;
@@ -23,16 +22,7 @@ public class SettingsController : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 保持跨场景
-            InitializeSettings();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        
     }
 
     private void InitializeSettings()
@@ -70,7 +60,7 @@ public class SettingsController : MonoBehaviour
     public void CloseSettings()
     {
         settingsPanel.SetActive(false);
-        MenuController.Instance.TogglePause(); // 返回主菜单
+        MenuPanel.Instance.TogglePause(); // 返回主菜单
     }
 
     // 应用音频设置

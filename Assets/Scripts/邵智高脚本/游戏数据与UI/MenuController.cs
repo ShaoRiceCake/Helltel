@@ -1,38 +1,33 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MenuController : MonoBehaviour
+public class MenuPanel : MonoBehaviour
 {
-    public static MenuController Instance { get; private set; }
-    
+    private GlobalUIController globalUIController;
     [Header("主菜单")]
-    public GameObject mainMenu; // 主菜单面板
-    public Button btnSettings; // 设置按钮
+    public GameObject menu; // 菜单面板
+    
     
     [Header("其他按钮")]
     public Button btnContinue; // 继续游戏
-    public Button btnKill;//自杀
+    public Button btnSettings; // 设置按钮
+    public Button btnGuestBook; //宾客簿
+    public Button btnKillMe;    //自杀
     public Button btnQuit;    // 退出游戏
 
-    private bool isPaused;
+    
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+       
     }
 
     private void Start()
     {
+        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
         // 绑定按钮事件
-        btnContinue.onClick.AddListener(TogglePause);
+        btnContinue.onClick.AddListener(Continue);
         btnSettings.onClick.AddListener(OpenSettings);
+        btnGuestBook.onClick.AddListener(OpenGuestBook);
         btnQuit.onClick.AddListener(QuitGame);
         
         
@@ -42,26 +37,29 @@ public class MenuController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            TogglePause();
+            
         }
     }
 
-    // 暂停/继续游戏
-    public void TogglePause()
+    private void Continue()
     {
-        isPaused =  !isPaused;
-        Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）
-        mainMenu.SetActive(isPaused);
-        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked; // 控制鼠标锁定状态
-        Cursor.visible = isPaused; // 控制鼠标可见性
+        GlobalUIController.Instance.TogglePause();
     }
 
     // 打开设置界面
     private void OpenSettings()
     {
-        SettingsController.Instance.ShowSettings();
-        mainMenu.SetActive(false);
+       
+   
     }
+
+
+    private void OpenGuestBook()
+    {
+  
+    }
+
+    //关闭游戏
 
     private void QuitGame()
     {
