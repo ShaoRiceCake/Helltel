@@ -24,8 +24,8 @@ public class MenuPanel : MonoBehaviour
         
         // 绑定按钮事件
         btnContinue.onClick.AddListener(Continue);
-        btnSettings.onClick.AddListener(OpenSettings);
-        btnGuestBook.onClick.AddListener(OpenGuestBook);
+        btnSettings.onClick.AddListener(globalUIController.OpenSettings);
+        btnGuestBook.onClick.AddListener(globalUIController.OpenGuestBook);
         btnKillMe.onClick.AddListener(KillMe);
         btnBackToMainMenu.onClick.AddListener(BackToMainMenu);
         btnQuit.onClick.AddListener(QuitGame);
@@ -35,33 +35,24 @@ public class MenuPanel : MonoBehaviour
 
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            globalUIController.TogglePause(true);
-            globalUIController.Menu.gameObject.SetActive(true);
-        }
+       
 
     }
     //继续
     private void Continue()
     {
-        globalUIController.TogglePause(false);
+        globalUIController.SetPause(false);
         globalUIController.CloseAllGlobalUI();
     }
 
-    // 打开设置界面
-    private void OpenSettings()
-    {
-        globalUIController.CloseAllGlobalUI();
-        globalUIController.Settings.gameObject.SetActive(true);
-    }
 
-    //打开宾客簿
-    private void OpenGuestBook()
-    {
-        globalUIController.CloseAllGlobalUI();
-        globalUIController.GuestBook.gameObject.SetActive(true);
-    }
+
+    // //打开宾客簿
+    // private void OpenGuestBook()
+    // {
+    //     globalUIController.CloseAllGlobalUI();
+    //     globalUIController.GuestBook.gameObject.SetActive(true);
+    // }
     //自杀
     private void KillMe()
     {

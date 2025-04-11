@@ -31,7 +31,7 @@ public class SettingsPanel : MonoBehaviour
         // btnQuality.onClick.AddListener(OpenSettings);
         // btnAuido.onClick.AddListener(OpenGuestBook);
         // btnControlls.onClick.AddListener(KillMe);
-        btnBack.onClick.AddListener(Back);
+        btnBack.onClick.AddListener(globalUIController.OpenMenu);
         
         
     }
@@ -59,11 +59,7 @@ public class SettingsPanel : MonoBehaviour
         //globalUIController.TogglePause(false);
         //globalUIController.CloseAllGlobalUI();
     }
-    private void Back()
-    {
-        globalUIController.CloseAllGlobalUI();
-        globalUIController.Menu.gameObject.SetActive(true);
-    }
+   
 
     private void InitializeSettings()
     {
