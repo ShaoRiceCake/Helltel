@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Cinemachine;
 using System.Collections;
@@ -116,6 +117,8 @@ public class PlayerCameraController1 : MonoBehaviour
             case FootRegion.Right:
                 SwitchToBaseCamera(CameraType.Right);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(region), region, null);
         }
     }
 

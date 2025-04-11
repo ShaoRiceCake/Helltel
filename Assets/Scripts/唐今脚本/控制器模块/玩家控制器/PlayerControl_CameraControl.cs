@@ -122,7 +122,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             0.01f, 
             0.3f 
         );
-        // print("nearClipPlane: " + controlledCamera.nearClipPlane);
     }
     private void EnableCameraControl()
     {
