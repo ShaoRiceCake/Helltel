@@ -119,13 +119,11 @@ public class GameManager : Singleton<GameManager>
         SceneManager.LoadScene("Main");
     }
 
-    [Rpc(SendTo.NotMe)]
+    [Rpc(SendTo.Server)]
     public void ClientExitRpc(ulong id)
     {
-        if (IsServer)
-        {
-            NetworkManager.Singleton.ConnectedClients[id].PlayerObject.GetComponent<NetworkObject>().Despawn();
-        }
+        NetworkManager.Singleton.DisconnectClient(id);
+
     }
 
     public void SetJoinCode(string code)
