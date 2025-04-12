@@ -19,8 +19,6 @@ namespace Helltal.Gelercat
         [Header("熵值")] public float entropyValue = 0f;
 
         public bool Debugging = false; // 是否开启调试模式
-
-
         // 基础控件        
         public GameObject[] players;
         
@@ -35,8 +33,24 @@ namespace Helltal.Gelercat
 
 
         public NetworkVariable<AIState> aiState = new NetworkVariable<AIState>(AIState.LIVE);
-
-
+        /// <summary>
+        /// 联机扣血
+        /// </summary>
+        /// <param name="damage"></param>
+        [Rpc(SendTo.Server)]
+        public void TakeDamageServerRpc(float damage)
+        {
+            curHealth.Value = damage;
+        }
+        /// <summary>
+        /// 联机切换状态
+        /// </summary>
+        /// <param name="newstate"></param>
+        [Rpc(SendTo.Server)]
+        public void StateChangeServerRpc(AIState newstate)
+        {
+            aiState.Value = newstate;
+        }
 
         public override void OnNetworkSpawn()
         {
@@ -46,25 +60,13 @@ namespace Helltal.Gelercat
 
         protected virtual void Init()
         {
-
-#if UNITY_EDITOR
-if (Application.isEditor)
-{
-    NetworkManager.Singleton.StartHost();
-}
-#endif
-
-
-            if (!IsHost) {
-                Debug.Log("is not Host"); 
-                return;
-            }
-            Debug.Log("is Host");
-
+            if (!IsHost && NetworkManager.Singleton) return;
         }
 
         protected virtual void Start()
         {
+            if (!IsHost && NetworkManager.Singleton) return;
+
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
             if (navPointsManager == null)
@@ -88,14 +90,10 @@ if (Application.isEditor)
             }
         }
 
-        
-
         protected void NegativeTo(Vector3 target)
         {
-            // if (IsHost)
-            {
-                agent.SetDestination(target);
-            }
+            if (!IsHost && NetworkManager.Singleton) return;
+            agent.SetDestination(target);
         }
         void OnDrawGizmos()
         {
@@ -106,8 +104,6 @@ if (Application.isEditor)
             Gizmos.DrawSphere(targetPosition, 0.5f);
             
         }
-
-
         // interface IGetBehaviorTree
         public virtual Root GetBehaviorTree()
         {

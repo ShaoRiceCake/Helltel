@@ -21,7 +21,8 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     [SerializeField] private bool avoidCollisions = true;
     [SerializeField] private LayerMask collisionLayers;
     [SerializeField] private float collisionOffset = 0.3f;
-
+    [SerializeField] private float sphereCastRadius = 0.3f; 
+    
     private float _currentX;
     private float _currentY;
     private float _currentDistance; 
@@ -66,26 +67,46 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             _targetDistance = Mathf.Clamp(_targetDistance - scroll * zoomSpeed, minDistance, maxDistance);
         }
         
-        // 平滑过渡到目标距离
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
     }
 
     private void LateUpdate()
     {
-        if (!controlledCamera || !target || !_isCameraControlActive) return;
+        if (!controlledCamera || !target) return;
         
-        _currentX += Input.GetAxis("Mouse X") * mouseSensitivity;
-        _currentY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        _currentY = Mathf.Clamp(_currentY, minVerticalAngle, maxVerticalAngle);
+        if (_isCameraControlActive)
+        {
+            _currentX += Input.GetAxis("Mouse X") * mouseSensitivity;
+            _currentY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+            _currentY = Mathf.Clamp(_currentY, minVerticalAngle, maxVerticalAngle);
+        }
 
-        var direction = new Vector3(0, 0, -_currentDistance); // 使用当前距离
+        UpdateCameraPosition();
+    }
+
+    private void UpdateCameraPosition()
+    {
+        var direction = new Vector3(0, 0, -_currentDistance);
         var rotation = Quaternion.Euler(_currentY, _currentX, 0);
         var desiredPosition = target.position + rotation * direction;
 
-        if (avoidCollisions && Physics.Linecast(target.position, desiredPosition, out var hit, collisionLayers))
+        if (avoidCollisions)
         {
-            desiredPosition = hit.point + hit.normal * collisionOffset;
-            _currentDistance = Vector3.Distance(target.position, desiredPosition);
+            var directionToCamera = desiredPosition - target.position;
+            var distanceToCamera = directionToCamera.magnitude;
+            var ray = new Ray(target.position, directionToCamera.normalized);
+
+            var isColliding = Physics.SphereCast(ray, sphereCastRadius, out var hit, distanceToCamera, collisionLayers);
+        
+            if (isColliding)
+            {
+                desiredPosition = hit.point + hit.normal * collisionOffset;
+                _currentDistance = Vector3.Distance(target.position, desiredPosition);
+            }
+            else
+            {
+                _currentDistance = Mathf.MoveTowards(_currentDistance, _targetDistance, Time.deltaTime * zoomSpeed);
+            }
         }
 
         controlledCamera.transform.position = Vector3.SmoothDamp(
@@ -93,10 +114,16 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             desiredPosition, 
             ref _smoothVelocity, 
             smoothTime);
-            
+        
         controlledCamera.transform.LookAt(target);
+        
+        controlledCamera.nearClipPlane = Mathf.Clamp(
+            _currentDistance * 0.1f, 
+            0.01f, 
+            0.3f 
+        );
+        // print("nearClipPlane: " + controlledCamera.nearClipPlane);
     }
-
     private void EnableCameraControl()
     {
         _isCameraControlActive = true;
