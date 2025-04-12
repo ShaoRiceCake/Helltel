@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Mono.Cecil;
 using UnityEngine;
+using UnityEngine.U2D;
 
 /// <summary>
 ///  黑雾控制器
@@ -66,7 +68,9 @@ public class BlackForgController : MonoBehaviour
 
     void Awake()
     {
-        
+        fogEffect.Stop(); // 确保粒子系统在开始时停止
+        var shape = fogEffect.shape;
+        shape.radius = 0f; // 设置初始半径为0
     }
     void Update()
     {
