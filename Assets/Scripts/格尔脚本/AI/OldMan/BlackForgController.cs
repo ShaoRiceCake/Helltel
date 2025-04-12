@@ -13,17 +13,17 @@ public class BlackForgController : MonoBehaviour
     public ParticleSystem fogEffect; // 黑雾粒子系统
     private List<Transform> players = new List<Transform>();
 
-    [Header("第一阶段黑雾伤害")] private float Stage1FogDamage = 0.5f; // 第一阶段黑雾伤害
-    [Header("第二阶段黑雾伤害")] private float Stage2FogDamage = 1.0f; // 第二阶段黑雾伤害
+    [Header("第一阶段黑雾伤害")] public float Stage1FogDamage = 0.5f; // 第一阶段黑雾伤害
+    [Header("第二阶段黑雾伤害")] public float Stage2FogDamage = 1.0f; // 第二阶段黑雾伤害
 
 
-    [Header("第一阶段黑雾扩散速度")] private float Stage1FogSpeed = 1.5f; // 第1阶段黑雾速度
-    [Header("第二阶段黑雾扩散速度")] private float Stage2FogSpeed = 2.0f; // 第2阶段黑雾速度
-    [Header("黑雾最大扩散范围")] private float fogExpandRange = 5f; // 黑雾最大扩散范围
+    [Header("第一阶段黑雾扩散速度")] public float Stage1FogSpeed = 1.5f; // 第1阶段黑雾速度
+    [Header("第二阶段黑雾扩散速度")] public float Stage2FogSpeed = 2.0f; // 第2阶段黑雾速度
+    [Header("黑雾最大扩散范围")] public float fogExpandRange = 5f; // 黑雾最大扩散范围
 
 
-    [Header("第一阶段黑雾伤害间隔")] private float Stage1FogDamageInterval = 0.5f; // 第一阶段黑雾伤害间隔
-    [Header("第二阶段黑雾伤害间隔")] private float Stage2FogDamageInterval = 0.5f; // 第二阶段黑雾伤害间隔
+    [Header("第一阶段黑雾伤害间隔")] public float Stage1FogDamageInterval = 0.5f; // 第一阶段黑雾伤害间隔
+    [Header("第二阶段黑雾伤害间隔")] public float Stage2FogDamageInterval = 0.5f; // 第二阶段黑雾伤害间隔
 
 
 
@@ -64,6 +64,10 @@ public class BlackForgController : MonoBehaviour
         fogEffect.Stop();
     }
 
+    void Awake()
+    {
+        
+    }
     void Update()
     {
         if (!isActive) return;

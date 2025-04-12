@@ -7,11 +7,12 @@ using System;
 namespace Helltal.Gelercat
 {
     /// <summary>
-    /// 表现层的api，动画用animator控制器控制
+    /// 鍦ㄨ繖灞傚悓姝ヨ〃鐜板眰鐨勯�昏緫
     /// </summary>
     [RequireComponent(typeof(Animator))]
     public class GuestPresenter : MonoBehaviour
     {
+
         private Animator animator;
 
         private void Awake()

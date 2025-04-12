@@ -6,6 +6,7 @@ using Unity.Netcode;
 using System;
 using NPBehave;
 using UnityEngine.InputSystem;
+using UnityEditor.SceneManagement;
 
 namespace Helltal.Gelercat
 {
@@ -71,8 +72,14 @@ if (Application.isEditor)
                 Debug.LogError("请先在场景中添加导航点管理器");
             }
             players = GameObject.FindGameObjectsWithTag("Player");
-            presenter = GetComponent<GuestPresenter>();
-
+            if(GetComponent<GuestPresenter>() == null)
+            {
+                presenter = this.gameObject.AddComponent<GuestPresenter>();
+            }
+            else
+            {
+                presenter = GetComponent<GuestPresenter>();
+            }
             sensor = GetComponent<GuestSensor>();
             if (sensor == null)
             {
