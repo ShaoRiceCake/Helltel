@@ -12,10 +12,10 @@ public class PerformanceView : MonoBehaviour
     [SerializeField] private TMP_Text _performanceTargetText;
     [SerializeField] private GameDataModel _data;
 
-    [Header("动画参数")]
-    [SerializeField] private float _punchScale = 1.2f;
-    [SerializeField] private float _animDuration = 0.3f;
-    [SerializeField] private Color _flashColor = Color.yellow;
+    // [Header("动画参数")]
+    // [SerializeField] private float _punchScale = 1.2f;
+    // [SerializeField] private float _animDuration = 0.3f;
+    // [SerializeField] private Color _flashColor = Color.yellow;
 
     private Sequence _animSequence;
 
