@@ -122,6 +122,23 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &58711108 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3227358816120936035, guid: 5b8ee1f9bad21b54e95fbd6980a050d9, type: 3}
+  m_PrefabInstance: {fileID: 734672566}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &58711125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 58711108}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2f315f0c0d43642ae4b3373de32277, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &74117523 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4324052814581948827, guid: 6a7ffd75cbef1004280dadaf98729615, type: 3}
@@ -321,50 +338,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7ec84ecd335aeac49b0abfb847f24670, type: 3}
---- !u!1 &283623577
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 283623579}
-  - component: {fileID: 283623578}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &283623578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283623577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &283623579
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283623577}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &288143086
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -435,6 +408,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2635041007379883445, guid: 7ec84ecd335aeac49b0abfb847f24670, type: 3}
   m_PrefabInstance: {fileID: 277446722}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &373126594
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373126596}
+  - component: {fileID: 373126595}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &373126595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373126594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &373126596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373126594}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &432747736 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2635041007379883445, guid: 7ec84ecd335aeac49b0abfb847f24670, type: 3}
@@ -517,18 +534,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: "Player\u2014\u7B2C\u516D\u7248\u6539"
       objectReference: {fileID: 0}
-    - target: {fileID: 2506025552200807396, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
-      propertyPath: near clip plane
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4023543591445285123, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 2412489449
-      objectReference: {fileID: 0}
-    - target: {fileID: 4037804451798777109, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
-      propertyPath: sphereCastRadius
-      value: 0.5
-      objectReference: {fileID: 0}
     - target: {fileID: 4023543591445285123, guid: 5b8ee1f9bad21b54e95fbd6980a050d9, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2412489449
@@ -573,10 +578,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2506025552200807396, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
+      propertyPath: near clip plane
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4023543591445285123, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2412489449
+      objectReference: {fileID: 0}
+    - target: {fileID: 4037804451798777109, guid: 1016a60535dba8340938887b7588e1d1, type: 3}
+      propertyPath: sphereCastRadius
+      value: 0.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3227358816120936035, guid: 5b8ee1f9bad21b54e95fbd6980a050d9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 58711125}
   m_SourcePrefab: {fileID: 100100000, guid: 5b8ee1f9bad21b54e95fbd6980a050d9, type: 3}
 --- !u!1001 &863597728
 PrefabInstance:
@@ -2325,4 +2345,4 @@ SceneRoots:
   - {fileID: 2058673642}
   - {fileID: 1086677334}
   - {fileID: 460556286}
-  - {fileID: 283623579}
+  - {fileID: 373126596}
