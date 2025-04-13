@@ -16,12 +16,12 @@ public class MenuPanel : MonoBehaviour
     
     private void Awake()
     {
-        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
+        
     }
 
     private void Start()
     {
-        
+        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
         // 绑定按钮事件
         btnContinue.onClick.AddListener(Continue);
         btnSettings.onClick.AddListener(globalUIController.OpenSettings);
