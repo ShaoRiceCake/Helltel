@@ -88,6 +88,7 @@ namespace Helltal.Gelercat
                 sensor = this.gameObject.AddComponent<GuestSensor>();
 
             }
+            
         }
 
         protected void NegativeTo(Vector3 target)

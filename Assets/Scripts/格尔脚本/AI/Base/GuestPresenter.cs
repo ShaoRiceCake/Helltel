@@ -18,6 +18,10 @@ namespace Helltal.Gelercat
         private void Awake()
         {
             animator = GetComponent<Animator>();
+            if(animator == null)
+            {
+                animator = gameObject.AddComponent<Animator>();
+            }
         }
 
         public void PlayAnimation(string animName)

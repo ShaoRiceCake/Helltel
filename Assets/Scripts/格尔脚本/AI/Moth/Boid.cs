@@ -15,9 +15,18 @@ public class Boid : MonoBehaviour
     public List<Boid> collisionRisks;   //距离过近的所有 Boid 的表(具有碰撞风险，需要处理)
     public Boid closest;                //最近的 Boid
 
+    
+    private Rigidbody rb;          //刚体组件
+
     //初始化Boid
     private void Awake()
     {
+        rb = GetComponent<Rigidbody>(); //获取刚体组件
+        if(rb == null)
+            rb = gameObject.AddComponent<Rigidbody>(); //添加刚体组件
+        rb.useGravity = false; //不使用重力
+        rb.isKinematic = true; //设置为运动学刚体
+
         //如果List变量boids未定义，则对其进行定义
         if (boids == null)
             boids = new List<Boid>();
