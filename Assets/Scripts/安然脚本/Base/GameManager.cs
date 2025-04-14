@@ -15,14 +15,14 @@ public class GameManager : Singleton<GameManager>
     private static bool isDontDestroyOnLoad;
 
     public Dictionary<ulong, PlayerInfo> AllPlayerInfos { get; private set; }
-
+    public Dictionary<ulong, NetworkSpawn> AllPlayers;
     public string joinConde;
 
     protected override void Awake()
     {
         base.Awake();
         AllPlayerInfos = new Dictionary<ulong, PlayerInfo>();
-
+        AllPlayers = new Dictionary<ulong, NetworkSpawn>();
         if (isDontDestroyOnLoad && GameObject.FindGameObjectsWithTag("NetworkManager").Length>1)
         {
             Destroy(GameObject.FindGameObjectsWithTag("NetworkManager")[1].gameObject);
