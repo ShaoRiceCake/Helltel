@@ -1,6 +1,8 @@
 // MonsterSpawnSystem.cs
 using System.Collections;
 using System.Collections.Generic;
+using Helltal.Gelercat;
+using NUnit.Framework;
 using UnityEngine;
 
 public class MonsterSpawnSystem : MonoBehaviour
@@ -42,7 +44,7 @@ public class MonsterSpawnSystem : MonoBehaviour
     private float totalMoney;                            // 累计金钱
     private int totalDeaths;                             // 死亡次数
     private Dictionary<GameObject, int> spawnRecords = new(); // 生成记录
-    private List<FSM> activeMonsters = new();        // 存活怪物列表
+    private List<GuestBase> activeMonsters = new();        // 存活怪物列表
 
     //============== 初始化流程 ==============
     void Start()
@@ -114,13 +116,14 @@ public class MonsterSpawnSystem : MonoBehaviour
     {
         float currentEntropy = CalculateCurrentEntropy();
         float entropyLimit = CalculateEntropyLimit();
+        Debug.Log(currentEntropy +"与"+entropyLimit);
         //获取随机排序的怪物生成列表（
         var candidates = GetShuffledCandidates();
 
         for (int i = 0; i < Mathf.Min(maxAttempts, candidates.Count); i++)
         {
             GameObject prefab = candidates[i];
-            FSM monster = prefab.GetComponent<FSM>();
+            GuestBase monster = prefab.GetComponent<GuestBase>();
 
             if (CanSpawn(monster, currentEntropy, entropyLimit))
             {
@@ -136,9 +139,9 @@ public class MonsterSpawnSystem : MonoBehaviour
     
     
 
-    bool CanSpawn(FSM monster, float currentEntropy, float limit)
+    bool CanSpawn(GuestBase monster, float currentEntropy, float limit)
     {
-        /*注释这段是因为怪物基类里还没有这几个变量
+        //注释这段是因为怪物基类里还没有这几个变量
         // 检查生成次数限制
         bool underSpawnLimit = monster.maxSpawnCount <= 0 || 
                              spawnRecords[monster.gameObject] < monster.maxSpawnCount;
@@ -147,28 +150,34 @@ public class MonsterSpawnSystem : MonoBehaviour
         bool underEntropyLimit = (currentEntropy + monster.entropyValue) <= limit;
 
         return underSpawnLimit && underEntropyLimit;
-        */
-        return false;//基类里还没有这几个变量后应删除这行
+        
+       
     }
     
     /// <summary>
     /// 执行生成操作
     /// </summary>
-    void ExecuteSpawn(GameObject prefab, FSM monster)
+    void ExecuteSpawn(GameObject prefab, GuestBase monster)
     {
-        if (activeGuestElevators.Count == 0)
-        {
-            Debug.LogWarning("没有可用客梯用于生成");
-            return;
-        }
+        // if (activeGuestElevators.Count == 0)
+        // {
+        //     Debug.LogWarning("没有可用客梯用于生成");
+        //     return;
+        // }
 
         // 随机选择客梯
-        Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
-        Vector3 spawnPoint = elevator.position + Vector3.up * 0.5f;
+        //Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
+        NavPointsManager navPointsManager = FindObjectOfType<NavPointsManager>();
+
+        List<NavPoint> navPoints = navPointsManager.GetNavPoints();
+        int randomIndex = Random.Range(0,navPoints.Count);
+        Transform randomNavPoint = navPoints[randomIndex].transform;
+        Debug.Log("生成"+prefab);
+        Vector3 spawnPoint = randomNavPoint.position + Vector3.up * 0.5f;
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
-        activeMonsters.Add(instance.GetComponent<FSM>());
+        activeMonsters.Add(instance.GetComponent<GuestBase>());
         spawnRecords[prefab]++;
     }
 
@@ -218,7 +227,7 @@ public class MonsterSpawnSystem : MonoBehaviour
     /// <summary>
     /// 怪物被击败时调用
     /// </summary>
-    public void RegisterMonsterDefeat(FSM monster)
+    public void RegisterMonsterDefeat(GuestBase monster)
     {
         activeMonsters.Remove(monster);
         
