@@ -278,7 +278,7 @@ namespace Helltal.Gelercat
 
 
             }
-
+            if(behaviorTree!=null){
             // timer
             if (behaviorTree.Blackboard.Get<bool>("Lonely"))
             {
@@ -288,7 +288,7 @@ namespace Helltal.Gelercat
                     // 触发死亡状态
                     behaviorTree.Blackboard["Dead"] = true;
                 }
-            }
+            }}
 
         }
         // gui 上现实lonelyDuration，方便调试
