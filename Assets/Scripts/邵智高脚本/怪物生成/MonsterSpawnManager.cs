@@ -1,6 +1,8 @@
 // MonsterSpawnSystem.cs
 using System.Collections;
 using System.Collections.Generic;
+using Helltal.Gelercat;
+using NUnit.Framework;
 using UnityEngine;
 
 public class MonsterSpawnSystem : MonoBehaviour
@@ -114,6 +116,7 @@ public class MonsterSpawnSystem : MonoBehaviour
     {
         float currentEntropy = CalculateCurrentEntropy();
         float entropyLimit = CalculateEntropyLimit();
+        Debug.Log(currentEntropy +"与"+entropyLimit);
         //获取随机排序的怪物生成列表（
         var candidates = GetShuffledCandidates();
 
@@ -156,15 +159,21 @@ public class MonsterSpawnSystem : MonoBehaviour
     /// </summary>
     void ExecuteSpawn(GameObject prefab, GuestBase monster)
     {
-        if (activeGuestElevators.Count == 0)
-        {
-            Debug.LogWarning("没有可用客梯用于生成");
-            return;
-        }
+        // if (activeGuestElevators.Count == 0)
+        // {
+        //     Debug.LogWarning("没有可用客梯用于生成");
+        //     return;
+        // }
 
         // 随机选择客梯
-        Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
-        Vector3 spawnPoint = elevator.position + Vector3.up * 0.5f;
+        //Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
+        NavPointsManager navPointsManager = FindObjectOfType<NavPointsManager>();
+
+        List<NavPoint> navPoints = navPointsManager.GetNavPoints();
+        int randomIndex = Random.Range(0,navPoints.Count);
+        Transform randomNavPoint = navPoints[randomIndex].transform;
+        Debug.Log("生成"+prefab);
+        Vector3 spawnPoint = randomNavPoint.position + Vector3.up * 0.5f;
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
