@@ -14,9 +14,11 @@ namespace Helltal.Gelercat
     {
         // 同步transform，基础数据
         // 基础属性
+        [Header("最大生成数")] public int maxSpawnCount = 100;
         [Header("最大生命值")] public float maxHealth = 15f;
         [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
         [Header("熵值")] public float entropyValue = 0f;
+        
 
         public bool Debugging = false; // 是否开启调试模式
         // 基础控件        

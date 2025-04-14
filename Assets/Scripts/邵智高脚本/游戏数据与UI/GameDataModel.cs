@@ -16,8 +16,9 @@ public class GameDataModel : ScriptableObject
     private int _money;
     private int _performance;
     private int _day = 1;
-    private int _level = 0;
+    private int _level = -1;
     private Dictionary<string, PlayerData> _players = new();
+    
 
     // 公开事件
     public event Action<int> OnMoneyChanged;      // 金钱变化
@@ -43,7 +44,7 @@ public class GameDataModel : ScriptableObject
         set {
             _performance = value;
             OnPerformanceChanged?.Invoke(_performance);
-            CheckPerformance(); // 数值变化时自动检查绩效
+            //CheckPerformance(); // 数值变化时自动检查绩效
         }
     }
 
@@ -65,22 +66,22 @@ public class GameDataModel : ScriptableObject
         Performance = 0;
         PerformanceTarget = _baseTarget;
         CurrentDay = 1;
-        _level = 0;
+        _level = -1;
     }
 
     // 内部绩效检查
-    private void CheckPerformance()
-    {
-        if (Performance >= PerformanceTarget)
-        {
-            PerformanceTarget = Mathf.FloorToInt(PerformanceTarget * _performanceGrowth);
-            OnPerformancePassed?.Invoke(PerformanceTarget);
-        }
-        else 
-        {
-            OnPerformanceFailed?.Invoke();
-        }
-    }
+    // private void CheckPerformance()
+    // {
+    //     if (Performance >= PerformanceTarget)
+    //     {
+    //         PerformanceTarget = Mathf.FloorToInt(PerformanceTarget * _performanceGrowth);
+    //         OnPerformancePassed?.Invoke(PerformanceTarget);
+    //     }
+    //     else 
+    //     {
+    //         OnPerformanceFailed?.Invoke();
+    //     }
+    // }
     //======= 玩家数据类 =======//
     public class PlayerData
     {
