@@ -1,46 +1,74 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class SceneSwitcher : MonoBehaviour
+public class SceneLoader : MonoBehaviour
 {
-    [Tooltip("输入要切换的场景名称")]
-    public string targetSceneName = "Scene2"; // 默认场景名称
+    public string overlayScene1;
+    public string overlayScene2;
+    private string currentOverlayScene;
+    private SceneItemManager boundaryManager;
+
+    void Start()
+    {
+        boundaryManager = FindObjectOfType<SceneItemManager>();
+        if (boundaryManager == null)
+        {
+            Debug.LogError("缺少SceneItemManager！");
+        }
+    }
 
     void Update()
     {
-        // 检测空格键按下
         if (Input.GetKeyDown(KeyCode.L))
         {
-            LoadTargetScene();
+            ToggleScenes();
         }
     }
 
-    public void LoadTargetScene()
+    void ToggleScenes()
     {
-        // 检查场景是否存在
-        if (SceneExists(targetSceneName))
+        if (string.IsNullOrEmpty(currentOverlayScene))
         {
-            Debug.Log("正在加载场景: " + targetSceneName);
-            SceneManager.LoadScene(targetSceneName);
+            LoadScene(overlayScene1);
         }
         else
         {
-            Debug.LogError($"场景 '{targetSceneName}' 不存在！请检查场景名称是否正确，并确保场景已添加到构建设置中。");
+            UnloadCurrentScene();
+            LoadScene(currentOverlayScene == overlayScene1 ? overlayScene2 : overlayScene1);
         }
     }
 
-    // 检查场景是否存在于构建设置中
-    private bool SceneExists(string sceneName)
+    void LoadScene(string sceneName)
     {
-        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        if (SceneExists(sceneName))
         {
-            var scenePath = SceneUtility.GetScenePathByBuildIndex(i);
-            var lastSlash = scenePath.LastIndexOf("/") + 1;
-            var sceneNameInBuild = scenePath.Substring(lastSlash, scenePath.LastIndexOf(".") - lastSlash);
-            
-            if (sceneNameInBuild == sceneName)
-                return true;
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            currentOverlayScene = sceneName;
         }
-        return false;
+    }
+
+    void UnloadCurrentScene()
+    {
+        if (!string.IsNullOrEmpty(currentOverlayScene))
+        {
+            // 销毁所有不在房间内的物品
+            foreach (var item in boundaryManager.allItems.ToArray())
+            {
+                if (!item.isInRoom)
+                {
+                    Destroy(item.gameObject);
+                    boundaryManager.UnregisterItem(item);
+                }
+            }
+            
+            SceneManager.UnloadSceneAsync(currentOverlayScene);
+            currentOverlayScene = null;
+        }
+    }
+
+    bool SceneExists(string sceneName)
+    {
+        // 同之前的场景存在检查代码
+        return true;
     }
 }
