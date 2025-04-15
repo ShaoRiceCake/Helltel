@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9025769673691886382}
   - component: {fileID: 2774862717538406847}
   - component: {fileID: 6999972676545484166}
+  - component: {fileID: 5855364537191105865}
   m_Layer: 0
   m_Name: OldMan
   m_TagString: Untagged
@@ -73,7 +74,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 872366321
+  GlobalObjectIdHash: 2517095638
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -155,6 +156,48 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5855364537191105865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 781970947012123368}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49e263039db153848a5d7580906a05cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TransitionStateInfoList:
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -1400846626
+    DestinationState: -973100250
+    TransitionDuration: 0.1
+    TriggerNameHash: -600410288
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -973100250
+    DestinationState: -1928513146
+    TransitionDuration: 0.25
+    TriggerNameHash: -1675096631
+    TransitionIndex: 0
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -973100250
+    DestinationState: -1469050112
+    TransitionDuration: 0.25
+    TriggerNameHash: 173732997
+    TransitionIndex: 1
+  - IsCrossFadeExit: 0
+    Layer: 0
+    OriginatingState: -2084644854
+    DestinationState: -1400846626
+    TransitionDuration: 0.25
+    TriggerNameHash: 1825552399
+    TransitionIndex: 0
+  m_Animator: {fileID: 6999972676545484166}
 --- !u!1001 &1171869125505626080
 PrefabInstance:
   m_ObjectHideFlags: 0
