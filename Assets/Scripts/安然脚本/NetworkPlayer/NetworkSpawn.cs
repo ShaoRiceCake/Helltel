@@ -11,12 +11,22 @@ using Unity.Sync.Relay.Model;
 using Unity.Sync.Relay.Transport.Netcode;
 public class NetworkSpawn : NetworkBehaviour
 {
+    
+    public NetworkVariable<float> _syncHealth = new NetworkVariable<float>();//生命
+    public NetworkVariable<float> _syncMoney = new NetworkVariable<float>();//钱数
+    public NetworkVariable<float> _syncPerformence = new NetworkVariable<float>();//绩效
     [Header("联机镜像隐藏物体")]
     public GameObject[] thirdDestory;
     public GameObject NetworkMap;
     public GameObject colliderWorld;
     public override void OnNetworkSpawn()
     {
+        if (IsServer)
+        {
+            TakeDamageRpc(100);
+        }
+
+
         if (!IsLocalPlayer)
         {
             for(int i = 0; i < thirdDestory.Length; i++)
@@ -28,15 +38,28 @@ public class NetworkSpawn : NetworkBehaviour
 
         GameManager.instance.OnStartGame.AddListener(() =>
         {
-            if (IsLocalPlayer)
-            {
-                GameController.Instance.NotifyLocalPlayerReady(NetworkManager.Singleton.LocalClientId.ToString());
-            }
-
+            GameManager.instance.AllPlayers.Add(OwnerClientId, this);
             transform.position = GameObject.Find("Spawn1").transform.position;
         });
         base.OnNetworkSpawn();
 
     }
-
+    [Rpc(SendTo.Server)]
+    public void TakeDamageRpc(float damage)
+    {
+        _syncHealth.Value += damage;
+        _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
+    }
+    [Rpc(SendTo.Server)]
+    public void TakeMoneyRpc(float money)
+    {
+        _syncHealth.Value += money;
+        _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
+    }
+    [Rpc(SendTo.Server)]
+    public void TakePerformenceRpc(float performence)
+    {
+        _syncHealth.Value += performence;
+        _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
+    }
 }

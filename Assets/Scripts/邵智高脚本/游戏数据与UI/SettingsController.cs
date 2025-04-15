@@ -2,86 +2,94 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SettingsController : MonoBehaviour
+public class SettingsPanel : MonoBehaviour
 {
-    public static SettingsController Instance { get; private set; }
+    private GlobalUIController globalUIController;
 
-    [Header("设置主界面")]
-    public GameObject settingsPanel;
+    [Header("设置界面按钮")]
+    public Button btnGame;         //游戏设置按钮
+    public Button btnQuality;      //图形设置按钮
+    public Button btnAuido;        //音频设置按钮
+    public Button btnControlls;    //控制设置按钮
+    public Button btnBack;         //返回按钮
+    [Header("各设置界面")]
+    public GameObject panelGame;   //游戏面板
+    public GameObject panelQuality;   //游戏面板
+    public GameObject panelAuido;   //游戏面板
+    public GameObject panelControlls;   //游戏面板
     
-    [Header("标签页按钮")]
-    public Button[] tabButtons;
-    
-    [Header("设置面板")]
-    public GameObject[] settingPanels;
+  
 
-    [Header("音频设置")]
-    public Slider masterVolumeSlider;
 
-    [Header("图形设置")]
-    public TMP_Dropdown qualityDropdown;
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 保持跨场景
-            InitializeSettings();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        
     }
+    private void Start()
+    {
+        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
+
+        // 绑定按钮事件
+        btnGame.onClick.AddListener(OpenGamePanel);
+        btnQuality.onClick.AddListener(OpenQualityPanel);
+        btnAuido.onClick.AddListener(OpenAudioPanel);
+        btnControlls.onClick.AddListener(OpenControllPanel);
+        btnBack.onClick.AddListener(globalUIController.OpenMenu);
+        //初始化
+        InitializeSettings();
+        
+        
+    }
+    private void CloseAllPanels()
+    {
+        panelGame.gameObject.SetActive(false);
+        panelQuality.gameObject.SetActive(false);
+        panelAuido.gameObject.SetActive(false);
+        panelControlls.gameObject.SetActive(false);
+    }
+    //打开游戏面板
+    private void OpenGamePanel()
+    {
+        CloseAllPanels();
+        panelGame.gameObject.SetActive(true);
+    }
+    //打开图形面板
+    private void OpenQualityPanel()
+    {
+        CloseAllPanels();
+        panelQuality.gameObject.SetActive(true);
+    }
+    //打开音频面板
+    private void OpenAudioPanel()
+    {
+        CloseAllPanels();
+        panelAuido.gameObject.SetActive(true);
+    }
+    //打开控制面板
+    private void OpenControllPanel()
+    {
+        CloseAllPanels();
+        panelControlls.gameObject.SetActive(true);
+    }
+   
 
     private void InitializeSettings()
     {
-        // 初始化标签页按钮
-        for (int i = 0; i < tabButtons.Length; i++)
-        {
-            int index = i;
-            tabButtons[i].onClick.AddListener(() => SwitchPanel(index));
-        }
-        
-        // 初始化画质选项
-        qualityDropdown.ClearOptions();
-        qualityDropdown.AddOptions(new System.Collections.Generic.List<string>(QualitySettings.names));
+        OpenGamePanel();
     }
 
-    // 显示设置界面
-    public void ShowSettings()
-    {
-        settingsPanel.SetActive(true);
-        SwitchPanel(0); // 默认显示第一个面板
-    }
 
-    // 切换设置面板
-    private void SwitchPanel(int index)
-    {
-        foreach (var panel in settingPanels)
-        {
-            panel.SetActive(false);
-        }
-        settingPanels[index].SetActive(true);
-    }
-
-    // 关闭设置界面
-    public void CloseSettings()
-    {
-        settingsPanel.SetActive(false);
-        MenuController.Instance.TogglePause(); // 返回主菜单
-    }
 
     // 应用音频设置
     public void ApplyAudioSettings()
     {
-        AudioListener.volume = masterVolumeSlider.value;
+        
     }
 
     // 应用图形设置
     public void ApplyGraphicsSettings()
     {
-        QualitySettings.SetQualityLevel(qualityDropdown.value);
+        
     }
 }

@@ -13,8 +13,12 @@ public class NavManager : MonoBehaviour
         _navMeshSurfaces = GetComponents<NavMeshSurface>(); 
     }
 
+    void Start()
+    {
+        NavMeshUpdate();
+    }
     // Update is called once per frame
-    void Update()
+    void NavMeshUpdate()
     {
         foreach(var surface in _navMeshSurfaces)
         {
