@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a40e6104e655e94aac732fe02a9304e, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: 
+  soundEffects:
+  - name: "\u73A9\u5BB6\u6293\u53D6"
+    clip: {fileID: 8300000, guid: 9dc837db2c95e8d4882f155bb05352c8, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+  - name: "\u73A9\u5BB6\u6293\u53D62"
+    clip: {fileID: 8300000, guid: 09592d5804e6c504c9eb8b187245c5e4, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+  - name: "\u73A9\u5BB6\u811A\u6B65"
+    clip: {fileID: 8300000, guid: ff98180a0ac038d48a596658f31710fb, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 0
+    randomClips: []
+  - name: "\u6CE1\u6CE1\u97F3"
+    clip: {fileID: 8300000, guid: 04230584e8e349d4789f5d5c3a45128a, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+  initialPoolSize: 10

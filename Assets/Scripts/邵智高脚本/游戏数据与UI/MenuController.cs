@@ -43,6 +43,7 @@ public class MenuPanel : MonoBehaviour
     {
         globalUIController.SetPause(false);
         globalUIController.CloseAllGlobalUI();
+        AudioManager.Instance.Play("泡泡音");
     }
 
 

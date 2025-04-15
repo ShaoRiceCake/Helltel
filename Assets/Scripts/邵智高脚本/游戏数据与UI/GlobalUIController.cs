@@ -97,6 +97,7 @@ public class GlobalUIController : MonoBehaviour
     {
         CloseAllGlobalUI();
         SetPause(false);
+        AudioManager.Instance.Play("泡泡音");
     }
     //打开菜单
     public void OpenMenu()
@@ -104,6 +105,7 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         SetPause(true);
         Menu.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
     }
     //打开设置
     public void OpenSettings()
@@ -111,6 +113,7 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         SetPause(true);
         Settings.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
     }
     //打开宾客簿
     public void OpenGuestBook()
@@ -118,6 +121,7 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         SetPause(true);
         GuestBook.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
     }
     
 }

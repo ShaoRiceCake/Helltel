@@ -245,57 +245,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8755436734168169655, guid: bbffac0c789843b47999157748115757, type: 3}
       propertyPath: m_Name
-      value: GameData
+      value: GameController
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8755436734168169655, guid: bbffac0c789843b47999157748115757, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 484301968}
+    - targetCorrespondingSourceObject: {fileID: 8755436734168169655, guid: bbffac0c789843b47999157748115757, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 484301969}
   m_SourcePrefab: {fileID: 100100000, guid: bbffac0c789843b47999157748115757, type: 3}
---- !u!1 &258984438
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 258984440}
-  - component: {fileID: 258984439}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &258984439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 258984438}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &258984440
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 258984438}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &277446722
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -488,11 +450,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61429af3e7e75b14baec1e4fd223668a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alwaysDrawPath: 1
+  alwaysDrawPath: 0
   drawAsLoop: 0
-  drawNumbers: 1
+  drawNumbers: 0
   debugColour: {r: 1, g: 1, b: 1, a: 1}
   gridCellSize: 10
+--- !u!1 &484301965 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8755436734168169655, guid: bbffac0c789843b47999157748115757, type: 3}
+  m_PrefabInstance: {fileID: 182760729}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &484301968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484301965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c31c4bf057a93440a47fbad9f9e7611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentFloor: -1
+  baseEntropy: 50
+  floorMultiplier: 15
+  timeFactor: 0.3
+  moneyFactor: 0.05
+  deathFactorD: 1
+  deathFactorE: 9
+  baseGuestElevatorCount: 8
+  guestElevatorFloorMultiplier: 3
+  checkInterval: 1
+  monsterPrefabs:
+  - {fileID: 781970947012123368, guid: 1937ab7ac48954d4eaacd545abe834bf, type: 3}
+--- !u!114 &484301969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484301965}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b99a3438ac07b214d83556e922233d0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  config: {fileID: 11400000, guid: 77a2af26df0ddcb408380949b8d8ac74, type: 2}
+  defaultMixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
 --- !u!114 &674203295 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4402896777849107525, guid: 88ea80cf1c0d7c440af941341a97dda9, type: 3}
@@ -1773,7 +1778,6 @@ MonoBehaviour:
   - {fileID: 100115147929507902, guid: ce3843f051ac8c04e81f9475d66ba977, type: 3}
   - {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
   - {fileID: 6276907580013792170, guid: bcdee0a1391b358438dfbc05a609fbdd, type: 3}
-  - {fileID: 3800089055459983552, guid: f6273d317b83e5e4dbadbf392838b62b, type: 3}
   - {fileID: 2065003035382943739, guid: 94976f29aecffa3459a3dbd0ea9939b3, type: 3}
   - {fileID: 7711801737612265155, guid: 03382eeb7aea5f346bf5fa200f4d2e6a, type: 3}
   - {fileID: 3085792305767753245, guid: 03da9269498df5c40869511a39593473, type: 3}
@@ -1789,8 +1793,8 @@ MonoBehaviour:
   - {fileID: 1717768317796168926, guid: a22d74c84fe16b2478066d7d14b5aa79, type: 3}
   - {fileID: 6146908721503945696, guid: 5ab258f7799ce344f98fe48166f8c16b, type: 3}
   mainLength: 10
-  branchLenght: 12
-  branchNum: 10
+  branchLenght: 14
+  branchNum: 2
   doorPercent: 65
   constructionDelay: 0
   generatedTiles: []
@@ -1875,6 +1879,50 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 0}
   m_BuildHeightMesh: 0
+--- !u!1 &1743452821
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1743452823}
+  - component: {fileID: 1743452822}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1743452822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743452821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1743452823
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1743452821}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1856486441 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8176030336332505678, guid: 5b8ee1f9bad21b54e95fbd6980a050d9, type: 3}
@@ -2663,4 +2711,4 @@ SceneRoots:
   - {fileID: 2058673642}
   - {fileID: 1086677334}
   - {fileID: 460556286}
-  - {fileID: 258984440}
+  - {fileID: 1743452823}
