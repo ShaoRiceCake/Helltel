@@ -43,5 +43,21 @@ namespace Helltal.Gelercat
         {
             animator.SetFloat(param, value);
         }
+
+        // tools 应该不用同步
+        public AnimatorStateInfo  GetCurrentAnimationState()
+        {
+            return animator.GetCurrentAnimatorStateInfo(0);
+        }
+
+        public float GetCurrentAnimationCliplength()
+        {
+            return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        }
+
+        public void SetAnimatiorSpeed(float speed)
+        {
+            animator.speed = speed;
+        }
     }
 }
