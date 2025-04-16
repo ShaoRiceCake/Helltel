@@ -12,6 +12,9 @@ namespace Helltal.Gelercat
 {
     public class GuestBase : NetworkBehaviour
     {
+        NetworkVariable<Vector3> _syncPos = new NetworkVariable<Vector3>();
+        NetworkVariable<Quaternion> _syncRot = new NetworkVariable<Quaternion>();
+
         // 同步transform，基础数据
         // 基础属性
         [Header("最大生成数")] public int maxSpawnCount = 100;
@@ -42,7 +45,7 @@ namespace Helltal.Gelercat
         [Rpc(SendTo.Server)]
         public void TakeDamageServerRpc(float damage)
         {
-            curHealth.Value = damage;
+            curHealth.Value += damage;
         }
         /// <summary>
         /// 联机切换状态
@@ -52,6 +55,27 @@ namespace Helltal.Gelercat
         public void StateChangeServerRpc(AIState newstate)
         {
             aiState.Value = newstate;
+        }
+
+        protected virtual void Update()
+        {
+            if (!IsHost)
+            {
+                transform.position = _syncPos.Value;
+                transform.rotation = _syncRot.Value;
+                return;
+            }
+            else
+            {
+                UpdateTransformRpc(transform.position, transform.rotation);
+            }
+        }
+
+        [Rpc(SendTo.Server)]
+        void UpdateTransformRpc(Vector3 pos , Quaternion rot)
+        {
+            _syncPos.Value = pos;
+            _syncRot.Value = rot;
         }
 
         public override void OnNetworkSpawn()

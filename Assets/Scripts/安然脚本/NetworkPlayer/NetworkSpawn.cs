@@ -15,6 +15,9 @@ public class NetworkSpawn : NetworkBehaviour
     public NetworkVariable<float> _syncHealth = new NetworkVariable<float>();//生命
     public NetworkVariable<float> _syncMoney = new NetworkVariable<float>();//钱数
     public NetworkVariable<float> _syncPerformence = new NetworkVariable<float>();//绩效
+    public TMP_Text health_text;
+
+    public PlayerInfo my_Info;
     [Header("联机镜像隐藏物体")]
     public GameObject[] thirdDestory;
     public GameObject NetworkMap;
@@ -38,7 +41,7 @@ public class NetworkSpawn : NetworkBehaviour
 
         GameManager.instance.OnStartGame.AddListener(() =>
         {
-            GameManager.instance.AllPlayers.Add(OwnerClientId, this);
+            my_Info = GameManager.instance.AllPlayerInfos[OwnerClientId];
             transform.position = GameObject.Find("Spawn1").transform.position;
         });
         base.OnNetworkSpawn();
@@ -49,6 +52,7 @@ public class NetworkSpawn : NetworkBehaviour
     {
         _syncHealth.Value += damage;
         _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
+        UpdateHealthViewRpc();
     }
     [Rpc(SendTo.Server)]
     public void TakeMoneyRpc(float money)
@@ -61,5 +65,10 @@ public class NetworkSpawn : NetworkBehaviour
     {
         _syncHealth.Value += performence;
         _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
+    }
+    [Rpc(SendTo.Owner)]
+    void UpdateHealthViewRpc()
+    {
+        health_text.text = $"HP:{_syncHealth.Value}";
     }
 }

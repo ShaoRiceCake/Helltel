@@ -30,6 +30,7 @@ namespace Helltal.Gelercat
 
         protected override void Start()
         {
+
             base.Start();
             behaviorTree = GetBehaviorTree();
 #if UNITY_EDITOR
@@ -270,8 +271,10 @@ namespace Helltal.Gelercat
         }
 
 
-        void Update()
+        protected override void Update()
         {
+            base.Update();
+
             if (Debugging)
             {
                 DEBUG_chatting = Input.GetKey(KeyCode.R);
