@@ -9,19 +9,16 @@ namespace Helltal.Gelercat
     /// <summary>
     /// 在这层同步表现层的逻辑
     /// </summary>
-    [RequireComponent(typeof(Animator))]
+
     public class GuestPresenter : MonoBehaviour
     {
 
-        private Animator animator;
+        public Animator animator;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
-            if(animator == null)
-            {
-                animator = gameObject.AddComponent<Animator>();
-            }
+            if (this.gameObject.GetComponent<Animator>() == null)
+                this.gameObject.AddComponent<Animator>(); //添加表现层组件
         }
 
         public void PlayAnimation(string animName)

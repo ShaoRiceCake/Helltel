@@ -11,7 +11,8 @@ public class cocoonController : MonoBehaviour
     // Start is called before the first frame update
     [Header("羽衣蛾预制体")] public GameObject mothPrefab; //羽衣蛾预制体
     [Header("触发后孵卵时间范围")] public Vector2 hatchTimeRange = new Vector2(5f, 10f); //触发后孵卵时间范围
-
+    [Header("所属虫群")] public MothGroupController mothGroup; //所属虫群
+    
     private GuestPresenter presenter; //表现层组件
     private Collider col; //碰撞体组件
 
@@ -62,7 +63,8 @@ public class cocoonController : MonoBehaviour
 
         presenter.SetAnimatiorSpeed(1f); //重置动画速度
 
-        Instantiate(mothPrefab, transform.position, Quaternion.identity); //生成羽衣蛾
+        GameObject moth = Instantiate(mothPrefab, transform.position, Quaternion.identity); //生成羽衣蛾
+        mothGroup.RegisterMoth(moth); //注册羽衣蛾到虫群
         Destroy(this.gameObject); //销毁茧
 
     } 

@@ -66,10 +66,67 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: b439414a510cd784dab90f4525e50708, type: 3}
       propertyPath: m_Name
-      value: "\u7FBD\u8863\u86FE\u98DE\u884C"
+      value: "\u7FBD\u8863\u86FE"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b439414a510cd784dab90f4525e50708, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7416903679022035960}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b439414a510cd784dab90f4525e50708, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4859658238501022201}
   m_SourcePrefab: {fileID: 100100000, guid: b439414a510cd784dab90f4525e50708, type: 3}
+--- !u!1 &2350225792822315920 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b439414a510cd784dab90f4525e50708, type: 3}
+  m_PrefabInstance: {fileID: 3196645588765488833}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7416903679022035960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2350225792822315920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3205154844
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &4859658238501022201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2350225792822315920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82a14bb81d5f4a440a2ba798ebca730e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxSpawnCount: 100
+  maxHealth: 15
+  curHealth:
+    m_InternalValue: 0
+  entropyValue: 0
+  Debugging: 0
+  players: []
+  navPointsManager: {fileID: 0}
+  agent: {fileID: 0}
+  presenter: {fileID: 0}
+  sensor: {fileID: 0}
+  aiState:
+    m_InternalValue: 0
