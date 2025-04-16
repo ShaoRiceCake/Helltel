@@ -65,7 +65,7 @@ public class PersistentObjDetection : MonoBehaviour
         foreach (var col in colliders)
         {
             if (col == triggerCollider || !col.enabled || !col.gameObject.activeInHierarchy) continue;
-            if (!col.CompareTag(targetTag)) continue; // 只处理指定标签的物体
+            if (!col.CompareTag(targetTag)) continue; 
 
             _objectsInside.Add(col);
             SetParentToBaseScene(col.transform);
@@ -121,7 +121,7 @@ public class PersistentObjDetection : MonoBehaviour
         return baseSceneParent;
     }
 
-    private Transform FindEcoSceneItem(Transform parent)
+    private static Transform FindEcoSceneItem(Transform parent)
     {
         return parent.name == "EcoSceneItem" ? parent : (from Transform child in parent select FindEcoSceneItem(child)).FirstOrDefault(result => result);
     }

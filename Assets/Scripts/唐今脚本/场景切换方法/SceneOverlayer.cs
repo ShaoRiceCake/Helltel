@@ -32,14 +32,12 @@ public class SceneOverlayer : MonoBehaviour
             SceneManager.LoadScene(scene2Name, LoadSceneMode.Additive);
             _currentLoadedScene = scene2Name;
             _isScene1Active = false;
-            Debug.Log("切换到场景2: " + scene2Name);
         }
         else
         {
             SceneManager.LoadScene(scene1Name, LoadSceneMode.Additive);
             _currentLoadedScene = scene1Name;
             _isScene1Active = true;
-            Debug.Log("切换到场景1: " + scene1Name);
         }
     }
 

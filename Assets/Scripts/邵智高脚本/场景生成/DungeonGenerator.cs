@@ -123,8 +123,7 @@ public class DungeonGenerator : NetworkBehaviour
     /// 6. 执行最终清理
     /// </summary>
     public void DungeonBuild()
-    {
-        elevatorTile = GameObject.Find("电梯").transform;
+    { 
         // 创建主路径父对象
         GameObject goContainer = new GameObject("Main Path");
         container = goContainer.transform;
