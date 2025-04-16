@@ -1,56 +1,81 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Audio;
-
 /// <summary>
-/// 音频系统核心管理类（单例模式）
-/// 功能包括：
-/// - 音效对象池管理
-/// - 全局音量控制
-/// - 3D/2D音效播放
-/// - 音频淡入淡出
-/// - 批量控制功能
+/// 音频管理器（单例模式）
+/// 核心功能：
+/// - 分层音量控制（Master为最高层级）
+/// - 音频源对象池管理
+/// - 动态随机化处理
 /// </summary>
 public class AudioManager : MonoBehaviour
 {
-    // 单例实例（私有设置，全局访问）
+    #region Singleton
     public static AudioManager Instance { get; private set; }
+    #endregion
 
-    [Header("基本配置")]
-    [Tooltip("音频配置文件引用")]
-    [SerializeField] private AudioConfig config;
+    #region Configuration
+    [Header("基础配置")]
+    [SerializeField, Tooltip("音频配置文件")] 
+    private AudioConfig config;
     
-    [Tooltip("默认音频混合组（当音效未指定时使用）")]
-    [SerializeField] private AudioMixerGroup defaultMixerGroup;
+    [SerializeField, Tooltip("默认音频混合组")] 
+    private AudioMixerGroup defaultMixerGroup;
+    //混响组件
+    [SerializeField] private AudioMixer audioMixer;
+    #endregion
 
-    // 运行时数据结构
-    private Dictionary<string, SoundEffect> soundEffects = new Dictionary<string, SoundEffect>(); // 音效查找字典
-    private List<AudioSource> audioSourcePool = new List<AudioSource>(); // AudioSource对象池
-    private float globalVolume = 1f; // 全局音量系数（0-1）
+    #region Volume Control
+    [System.Serializable]
+    public class SoundCategory
+    {
+        public AudioCategory type;
+        [Range(0, 1)] public float volume = 1f;
+    }
+    
+    [Header("音量分类"), SerializeField]
+    // 将数组改为List
+    private List<SoundCategory> categories = new List<SoundCategory>
+    {
+        new SoundCategory{ type = AudioCategory.Master },
+        new SoundCategory{ type = AudioCategory.Music },
+        new SoundCategory{ type = AudioCategory.SFX },
+        new SoundCategory{ type = AudioCategory.Voice }
+    };
+    #endregion
 
-    /// <summary>
-    /// 初始化单例和音频系统
-    /// </summary>
+    #region Runtime Data
+    private Dictionary<string, SoundEffect> soundEffects = new Dictionary<string, SoundEffect>();
+    private List<AudioSource> audioSourcePool = new List<AudioSource>();
+    #endregion
+
+    #region Initialization
     private void Awake()
     {
-        // 单例模式初始化
+        InitializeSingleton();
+        InitializeCategories();
+        InitializeAudioPool();
+        LoadAudioConfig();
+    }
+
+    /// <summary>
+    /// 初始化单例实例（跨场景持久化）
+    /// </summary>
+    private void InitializeSingleton()
+    {
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
-        DontDestroyOnLoad(gameObject); // 跨场景保持
-
-        InitializeAudioPool();  // 初始化对象池
-        LoadAudioConfig();     // 加载音频配置
+        DontDestroyOnLoad(gameObject);
     }
 
     /// <summary>
-    /// 初始化音频对象池
-    /// 根据配置创建初始数量的AudioSource组件
+    /// 初始化音频源对象池
     /// </summary>
     private void InitializeAudioPool()
     {
@@ -59,22 +84,32 @@ public class AudioManager : MonoBehaviour
             CreateNewAudioSource();
         }
     }
-
-    /// <summary>
-    /// 创建新的AudioSource并加入对象池
-    /// </summary>
-    /// <returns>新创建的AudioSource</returns>
-    private AudioSource CreateNewAudioSource()
+    // 新增分类初始化方法
+    private void InitializeCategories()
     {
-        AudioSource newSource = gameObject.AddComponent<AudioSource>();
-        newSource.playOnAwake = false; // 禁止自动播放
-        audioSourcePool.Add(newSource);
-        return newSource;
+        // 强制创建必要分类
+        var requiredCategories = new List<AudioCategory> {
+            AudioCategory.Master,
+            AudioCategory.Music,
+            AudioCategory.SFX,
+            AudioCategory.Voice
+        };
+
+        foreach(var catType in requiredCategories)
+        {
+            if(!categories.Any(c => c.type == catType))
+            {
+                categories.Add(new SoundCategory { 
+                    type = catType,
+                    volume = 1f 
+                });
+                Debug.LogWarning($"自动创建缺失分类: {catType}");
+            }
+        }
     }
 
     /// <summary>
-    /// 加载音频配置到字典
-    /// 将ScriptableObject中的配置转换为快速查找的字典结构
+    /// 加载音频配置到字典（自动过滤重复项）
     /// </summary>
     private void LoadAudioConfig()
     {
@@ -85,24 +120,24 @@ public class AudioManager : MonoBehaviour
                 Debug.LogWarning($"发现重复音效名称: {effect.name}");
                 continue;
             }
-            soundEffects[effect.name] = effect;
+            soundEffects.Add(effect.name, effect);
         }
     }
+    #endregion
 
+    #region Core Functionality
     /// <summary>
-    /// 播放指定音效
+    /// 播放音效
     /// </summary>
-    /// <param name="soundName">音效名称</param>
-    /// <param name="position">播放位置（3D音效有效）</param>
-    /// <param name="volumeMultiplier">音量系数（叠加在默认音量和全局音量上）</param>
+    /// <param name="soundName">音效配置名称</param>
+    /// <param name="position">3D音效播放位置</param>
+    /// <param name="dynamicVolume">动态音量系数（如距离衰减）</param>
     /// <param name="loop">是否循环播放</param>
-    /// <returns>用于控制的AudioSource实例</returns>
-    // 在原有方法基础上修改Play方法
+    /// <returns>可控制的AudioSource实例</returns>
     public AudioSource Play(string soundName, 
                           Vector3 position = default, 
-                          float volumeMultiplier = 1f, 
-                          bool loop = false,
-                          bool isCritical = false) // 新增关键音效标识
+                          float dynamicVolume = 1f,
+                          bool loop = false)
     {
         if (!soundEffects.TryGetValue(soundName, out SoundEffect effect))
         {
@@ -111,23 +146,107 @@ public class AudioManager : MonoBehaviour
         }
 
         AudioSource source = GetAvailableAudioSource() ?? CreateNewAudioSource();
-        
-        //随机选择音频剪辑（优先使用randomClips）
-        AudioClip selectedClip = effect.clip;
-        if (effect.randomClips.Count > 0)
-        {
-            int randomIndex = Random.Range(0, effect.randomClips.Count);
-            selectedClip = effect.randomClips[randomIndex];
-        }
-
-        // 配置参数时增加随机化处理
-        SetupAudioSource(source, effect, position, volumeMultiplier, loop, selectedClip);
+        ConfigureAudioSource(source, effect, position, dynamicVolume, loop);
         source.Play();
         return source;
     }
 
     /// <summary>
-    /// 从对象池中获取闲置的AudioSource
+    /// 配置音频源参数（整合所有设置逻辑）
+    /// </summary>
+    private void ConfigureAudioSource(AudioSource source,
+                                     SoundEffect effect,
+                                     Vector3 position,
+                                     float dynamicVolume,
+                                     bool loop)
+    {
+        // 选择音频剪辑（优先使用随机列表）
+        source.clip = SelectRandomClip(effect);
+        
+        // 分层音量计算（Master > Category > Default > Dynamic）
+        float masterVolume = GetCategoryVolume(AudioCategory.Master);
+        float categoryVolume = GetCategoryVolume(effect.category);
+        float baseVolume = effect.defaultVolume * masterVolume * categoryVolume;
+        source.volume = ApplyVolumeVariation(baseVolume * dynamicVolume, effect);
+
+        // 音调设置（包含随机变化）
+        source.pitch = CalculatePitch(effect);
+        
+        // 基础参数
+        source.loop = loop;
+        
+        // 空间音频配置
+        ConfigureSpatialAudio(source, effect, position);
+    }
+
+    /// <summary>
+    /// 随机选择音频剪辑（自动处理空列表）
+    /// </summary>
+    private AudioClip SelectRandomClip(SoundEffect effect)
+    {
+        if (effect.randomClips.Count > 0)
+        {
+            int index = Random.Range(0, effect.randomClips.Count);
+            return effect.randomClips[index];
+        }
+        return effect.clip;
+    }
+
+    /// <summary>
+    /// 应用音量倍率波动（±10%范围）
+    /// </summary>
+    private float ApplyVolumeVariation(float baseVolume, SoundEffect effect)
+    {
+        if (!effect.useVariation || Mathf.Approximately(baseVolume, 0f)) 
+            return baseVolume;
+
+        // 生成0.95-1.05的随机倍率
+        float multiplier = Random.Range(0.9f, 1.1f);
+        return Mathf.Clamp(baseVolume * multiplier, 0f, 1f);
+    }
+
+    /// <summary>
+    /// 计算音调（包含随机变化）
+    /// </summary>
+    private float CalculatePitch(SoundEffect effect)
+    {
+        if (!effect.useVariation) return 1f;
+        
+        // 生成0.95-1.05的随机倍率
+        float multiplier = Random.Range(0.9f, 1.1f);
+        return Mathf.Clamp(1f  * multiplier, 0.5f, 2f);
+    }
+
+    /// <summary>
+    /// 配置空间音频参数（3D音效专用）
+    /// </summary>
+    private void ConfigureSpatialAudio(AudioSource source, SoundEffect effect, Vector3 position)
+    {
+        source.spatialBlend = effect.is3D ? 1f : 0f;
+        source.outputAudioMixerGroup = effect.mixerGroup ?? defaultMixerGroup;
+
+        if (effect.is3D)
+        {
+            source.transform.position = position;
+            source.rolloffMode = AudioRolloffMode.Logarithmic;
+        }
+    }
+    #endregion
+
+    #region Utility Methods
+    /// <summary>
+    /// 创建新AudioSource并加入对象池
+    /// </summary>
+    private AudioSource CreateNewAudioSource()
+    {
+        AudioSource newSource = gameObject.AddComponent<AudioSource>();
+        newSource.playOnAwake = false;
+        audioSourcePool.Add(newSource);
+        return newSource;
+    }
+
+    /// <summary>
+    /// 获取闲置的AudioSource（自动扩容）
     /// </summary>
     private AudioSource GetAvailableAudioSource()
     {
@@ -135,69 +254,44 @@ public class AudioManager : MonoBehaviour
         {
             if (!source.isPlaying) return source;
         }
-        return null; // 所有源都在使用
+        return CreateNewAudioSource(); // 自动扩容
+    }
+
+    private float GetCategoryVolume(AudioCategory categoryType)
+    {
+        foreach (var category in categories)
+        {
+            if (category.type == categoryType)
+                return category.volume;
+        }
+        Debug.LogWarning($"未找到分类: {categoryType}");
+        return 1f;
+    }
+    #endregion
+
+    #region Public Controls
+    /// <summary>
+    /// 设置主音量
+    /// </summary>
+    public void SetMasterVolume(float volume)
+    {
+        SetCategoryVolume(AudioCategory.Master, volume);
     }
 
     /// <summary>
-    /// 配置AudioSource参数
+    /// 设置指定分类的音量
     /// </summary>
-    private void SetupAudioSource(AudioSource source, SoundEffect effect, 
-                                 Vector3 position, float volumeMultiplier, bool loop,AudioClip clip)
+    public void SetCategoryVolume(AudioCategory categoryType, float volume)
     {
-        // 基础设置
-        source.clip = clip;
-        float baseVolume = effect.defaultVolume;
-        //应用随机变化
-        if (effect.useVariation )
+        foreach (var category in categories)
         {
-            // 音量随机：±5% 变化
-            float volumeVariation = Random.Range(-0.1f, 0.1f);
-            source.volume = Mathf.Clamp(baseVolume + volumeVariation, 0f, 1f);
-
-            // 音调随机：±5% 变化（保持合理范围）
-            float pitchVariation = Random.Range(-0.1f, 0.1f);
-            source.pitch = Mathf.Clamp(1.0f + pitchVariation, 0.5f, 2.0f);
-        }
-        else
-        {
-            source.volume = baseVolume;
-            source.pitch = 1.0f; // 保持原始音调
-        }
-        source.volume = baseVolume * globalVolume * volumeMultiplier; // 三级音量控制
-        source.loop = loop;
-        
-        // 空间音频设置
-        source.spatialBlend = effect.is3D ? 1f : 0f; // 0=2D, 1=3D
-        source.outputAudioMixerGroup = effect.mixerGroup ?? defaultMixerGroup;
-
-        // 3D音效定位
-        if (effect.is3D)
-        {
-            source.transform.position = position;
-            source.rolloffMode = AudioRolloffMode.Logarithmic; // 使用对数衰减
-        }
-    }
-
-    /// <summary>
-    /// 设置全局音量（影响所有音效）
-    /// </summary>
-    /// <param name="volume">0-1之间的音量系数</param>
-    public void SetGlobalVolume(float volume)
-    {
-        globalVolume = Mathf.Clamp01(volume);
-        
-        // 实时更新所有正在播放的音效
-        foreach (var source in audioSourcePool)
-        {
-            if (source.isPlaying)
+            if (category.type == categoryType )
             {
-                string soundName = GetSoundName(source);
-                if (soundEffects.TryGetValue(soundName, out SoundEffect effect))
-                {
-                    source.volume = effect.defaultVolume * globalVolume;
-                }
+                category.volume = Mathf.Clamp01(volume);
+                return;
             }
         }
+        Debug.LogWarning($"尝试设置不存在的分类: {categoryType}");
     }
 
     /// <summary>
@@ -210,87 +304,25 @@ public class AudioManager : MonoBehaviour
             source.Stop();
         }
     }
-
     /// <summary>
-    /// 暂停所有音效播放
+    /// 切换3D音频功能
     /// </summary>
-    public void PauseAll()
+    public void Toggle3DAudio(bool enable)
     {
-        foreach (var source in audioSourcePool)
+        // 实现具体3D音频开关逻辑
+        foreach(var source in audioSourcePool)
         {
-            source.Pause();
+            source.spatialBlend = enable ? 1f : 0f;
         }
     }
-
     /// <summary>
-    /// 恢复所有暂停的音效
+    /// 控制混响效果开关
     /// </summary>
-    public void ResumeAll()
+    /// <param name="enable">true启用混响，false关闭</param>
+    public void ToggleReverb(bool enable)
     {
-        foreach (var source in audioSourcePool)
-        {
-            source.UnPause();
-        }
+        // 通过音频混合器控制（推荐）
+        audioMixer.SetFloat("ReverbMix", enable ? 0f : -80f); // 0dB启用，-80dB静音
     }
-
-    /// <summary>
-    /// 淡出音效
-    /// </summary>
-    /// <param name="source">目标音源</param>
-    /// <param name="duration">淡出时间（秒）</param>
-    public void FadeOut(AudioSource source, float duration)
-    {
-        StartCoroutine(FadeRoutine(source, 0, duration));
-    }
-
-    /// <summary>
-    /// 淡入音效
-    /// </summary>
-    public void FadeIn(AudioSource source, float duration)
-    {
-        StartCoroutine(FadeRoutine(source, 
-            soundEffects[GetSoundName(source)].defaultVolume * globalVolume, 
-            duration));
-    }
-
-    /// <summary>
-    /// 音量渐变协程
-    /// </summary>
-    private IEnumerator FadeRoutine(AudioSource source, float targetVolume, float duration)
-    {
-        float startVolume = source.volume;
-        float timer = 0;
-
-        while (timer < duration)
-        {
-            // 线性插值计算音量
-            source.volume = Mathf.Lerp(startVolume, targetVolume, timer / duration);
-            timer += Time.deltaTime;
-            yield return null;
-        }
-
-        source.volume = targetVolume;
-        
-        // 淡出完成后停止播放
-        if (Mathf.Approximately(targetVolume, 0)) 
-        {
-            source.Stop();
-        }
-    }
-
-    /// <summary>
-    /// 通过AudioSource反向查找音效名称
-    /// （注意：此方法效率较低，建议仅在必要时使用）
-    /// </summary>
-    private string GetSoundName(AudioSource source)
-    {
-        foreach (var pair in soundEffects)
-        {
-            if (pair.Value.clip == source.clip)
-            {
-                return pair.Key;
-            }
-        }
-        return "Unknown";
-    }
+    #endregion
 }

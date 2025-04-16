@@ -2,32 +2,44 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
+public enum AudioCategory
+{
+    Master,
+    Music,
+    SFX,
+    Voice
+}
 /// <summary>
-/// 单条音效数据结构（可序列化）
+/// 音效数据结构（包含基础配置和随机化设置）
 /// </summary>
 [System.Serializable]
 public class SoundEffect
 {
-    [Tooltip("音效标识名称（需唯一）")]
+    [Header("基础设置")]
+    [Tooltip("音效唯一标识符（区分大小写）")]
     public string name;
     
-    [Tooltip("音频文件引用")]
+    [Tooltip("默认音频剪辑（当随机列表为空时使用）")]
     public AudioClip clip;
     
-    [Tooltip("默认音量（0-1）")]
-    [Range(0, 1)] 
+    [Range(0, 1), Tooltip("基础音量（0-1）")]
     public float defaultVolume = 1f;
     
-    [Tooltip("是否启用3D音效")]
-    public bool is3D = true;
+    [Header("空间音频")]
+    [Tooltip("启用3D音效效果")]
+    public bool is3D = false;
     
     [Tooltip("指定音频混合组（可选）")]
     public AudioMixerGroup mixerGroup;
 
     [Header("随机化设置")]
-    [Tooltip("是否启用音调/音量随机变化")]
+    [Tooltip("启用音量/音调随机变化")]
     public bool useVariation = true;
     
-    [Tooltip("允许随机选择的音频剪辑列表（留空则使用单个clip）")]
+    [Tooltip("允许随机选择的音频剪辑列表")]
     public List<AudioClip> randomClips = new List<AudioClip>();
+
+    [Header("分类设置")]
+    [Tooltip("从下拉菜单中选择分类")]
+    public AudioCategory category = AudioCategory.SFX;
 }
