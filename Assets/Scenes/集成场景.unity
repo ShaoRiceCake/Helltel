@@ -1618,7 +1618,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba26d9247d6a92f44a536191fc195a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: "\u6D4B\u8BD5\u573A\u666F-AI\u91CD\u6784\u5EFA-\u683C\u5C14"
+  overlayScene1: 
+  overlayScene2: 
 --- !u!4 &1491581694
 Transform:
   m_ObjectHideFlags: 0
@@ -2516,7 +2517,6 @@ GameObject:
   - component: {fileID: 755490153839700797}
   - component: {fileID: 9071558642474533551}
   - component: {fileID: 9071558642474533553}
-  - component: {fileID: 9071558642474533552}
   m_Layer: 6
   m_Name: "\u7535\u68AF"
   m_TagString: Untagged
@@ -2588,19 +2588,6 @@ MonoBehaviour:
   filter: -65535
   m_SourceCollider: {fileID: 755490153839700797}
   m_DistanceField: {fileID: 0}
---- !u!114 &9071558642474533552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6551577644496534910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b8625462ab40854c91f4d338f5f24be, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  triggerCollider: {fileID: 9071558642474533553}
 --- !u!65 &9071558642474533553
 BoxCollider:
   m_ObjectHideFlags: 0
