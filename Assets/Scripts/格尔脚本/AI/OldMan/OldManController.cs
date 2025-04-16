@@ -39,7 +39,7 @@ namespace Helltal.Gelercat
             behaviorTree.Blackboard["Dead"] = false; // 死亡标志
             behaviorTree.Blackboard["Lonely"] = false; // 孤独标志
             behaviorTree.Blackboard["Happying"] = false; // 高兴标志
-            Debug.Log("presenter:" + presenter);
+            Debug.Log("presenter:" + presenter.isActiveAndEnabled);
             behaviorTree.Start();
         }
         public override Root GetBehaviorTree()
