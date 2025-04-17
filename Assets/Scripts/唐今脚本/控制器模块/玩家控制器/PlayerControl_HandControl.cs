@@ -87,6 +87,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     private void OnCancelHandGrab()
     {
         CurrentHand = 0;
+        
     }
     protected void OnLiftLeftHand()
     {

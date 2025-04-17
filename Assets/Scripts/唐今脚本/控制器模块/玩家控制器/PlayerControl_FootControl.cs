@@ -17,6 +17,8 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         
     public RaycastTool raycastTool;
     public SpringTool springTool;
+   
+    
     
     protected enum FootState
     {
@@ -146,7 +148,8 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Grounded;
         springTool.isSpringEnabled = false;
         _hasTriggeredLockEvent = false;
-        AudioManager.Instance.Play("玩家脚步");
+        AudioManager.Instance.Play("玩家脚步",footObject.transform.position);
+        
     }
     
     protected void LockFoot()
@@ -161,6 +164,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         if (_hasTriggeredLockEvent) return;
         onFootLocked?.Invoke(_movingObj.position);
         _hasTriggeredLockEvent = true;
+        
     }
     
     protected void UnlockFoot()
