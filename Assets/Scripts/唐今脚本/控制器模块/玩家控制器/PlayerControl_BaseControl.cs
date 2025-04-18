@@ -5,6 +5,7 @@ public abstract class PlayerControl_BaseControl : NetworkBehaviour
 {
     public PlayerControlInformationProcess controlHandler;
     public GameObject forwardObject;
+    
 
     virtual protected void Start()
     {

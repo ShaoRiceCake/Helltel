@@ -132,6 +132,8 @@ public class CatchTool : MonoBehaviour
         _isGrabbing = true;
         obiAttachment.BindToTarget(target.transform);
         obiAttachment.enabled = true;
+        AudioManager.Instance.Play("玩家抓取",_catchBall.transform.position,0.7f);
+
     }
 
     private void ReleaseObject()
@@ -147,5 +149,6 @@ public class CatchTool : MonoBehaviour
         _isGrabbing = false;
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
+        AudioManager.Instance.Play("玩家松手",_catchBall.transform.position,0.3f);
     }
 }
