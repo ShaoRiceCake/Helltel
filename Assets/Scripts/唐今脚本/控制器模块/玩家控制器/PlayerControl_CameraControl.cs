@@ -3,6 +3,12 @@ using UnityEngine.Rendering;
 
 public class PlayerControl_CameraControl : PlayerControl_BaseControl
 {
+    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+    private static readonly int Surface = Shader.PropertyToID("_Surface");
+    private static readonly int SrcBlend = Shader.PropertyToID("_SrcBlend");
+    private static readonly int DstBlend = Shader.PropertyToID("_DstBlend");
+    private static readonly int ZWrite = Shader.PropertyToID("_ZWrite");
+
     [Header("Camera Settings")]
     [SerializeField] private Camera controlledCamera;
     [SerializeField] private Transform target;
@@ -93,13 +99,13 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _materials = targetRenderer.materials;
         _originalAlphas = new float[_materials.Length];
             
-        for (int i = 0; i < _materials.Length; i++)
+        for (var i = 0; i < _materials.Length; i++)
         {
             // URP中获取原始透明度的方式
-            _originalAlphas[i] = _materials[i].GetColor("_BaseColor").a;
+            _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
                 
             // 确保材质初始状态正确
-            SetupURPMaterial(_materials[i], _originalAlphas[i]);
+            SetupUrpMaterial(_materials[i], _originalAlphas[i]);
         }
             
         _currentAlpha = maxAlpha;
@@ -123,31 +129,31 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     private void UpdateTransparency()
     {
-        if (targetRenderer == null || _materials == null) return;
+        if (!targetRenderer || _materials == null) return;
         
-        float distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
-        float targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
+        var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
+        var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
         
         _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
         
-        for (int i = 0; i < _materials.Length; i++)
+        for (var i = 0; i < _materials.Length; i++)
         {
             // URP Lit材质需要特殊处理
-            SetupURPMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
+            SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
         }
     }
 
-    private void SetupURPMaterial(Material material, float targetAlpha)
+    private static void SetupUrpMaterial(Material material, float targetAlpha)
     {
         // 1. 更改渲染模式（如果当前不是透明模式）
-        if (material.GetFloat("_Surface") != 1) // 1表示透明模式
+        if (!Mathf.Approximately(material.GetFloat(Surface), 1)) // 1表示透明模式
         {
-            material.SetFloat("_Surface", 1); // 设置为透明模式
+            material.SetFloat(Surface, 1); // 设置为透明模式
             material.SetOverrideTag("RenderType", "Transparent");
             material.renderQueue = (int)RenderQueue.Transparent;
-            material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt("_ZWrite", 0);
+            material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
+            material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
+            material.SetInt(ZWrite, 0);
             material.DisableKeyword("_ALPHATEST_ON");
             material.EnableKeyword("_ALPHABLEND_ON");
             material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
@@ -155,9 +161,9 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
 
         // 2. 设置基础颜色和透明度
-        Color baseColor = material.GetColor("_BaseColor");
+        var baseColor = material.GetColor(BaseColor);
         baseColor.a = targetAlpha;
-        material.SetColor("_BaseColor", baseColor);
+        material.SetColor(BaseColor, baseColor);
     }
 
     private void LateUpdate()
