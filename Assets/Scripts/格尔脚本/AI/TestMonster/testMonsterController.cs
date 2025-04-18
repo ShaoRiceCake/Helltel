@@ -33,20 +33,20 @@ namespace Helltal.Gelercat
                             currentTarget = GetClosestUnvisitedNavPoint();
                             if (currentTarget == null)
                             {
-                                Debug.Log("ÎÞÎ´·ÃÎÊµ¼º½µã£¬ÖØÖÃ×´Ì¬");
+                                Debug.Log("æ— æœªè®¿é—®å¯¼èˆªç‚¹ï¼Œé‡ç½®çŠ¶æ€");
                                 visitDict.Clear();
                                 currentTarget = GetClosestUnvisitedNavPoint();
                                 if (currentTarget == null)
                                 {
-                                    Debug.Log("ÖØÖÃºóÒÀÈ»ÎÞ¿ÉÓÃµ¼º½µã£¬AI½øÈëIdle×´Ì¬");
+                                    Debug.Log("é‡ç½®åŽä¾ç„¶æ— å¯ç”¨å¯¼èˆªç‚¹ï¼ŒAIè¿›å…¥IdleçŠ¶æ€");
                                     return false;
                                 }
                             }
 
                             if (!agent.SetDestination(currentTarget.transform.position))
                             {
-                                Debug.Log("ÎÞ·¨µ½´ïµ¼º½µã: " + currentTarget.name);
-                                visitDict[currentTarget] = true; // Ìø¹ý´Ëµã
+                                Debug.Log("æ— æ³•åˆ°è¾¾å¯¼èˆªç‚¹: " + currentTarget.name);
+                                visitDict[currentTarget] = true; // è·³è¿‡æ­¤ç‚¹
                                 return false;
                             }
 
@@ -55,7 +55,7 @@ namespace Helltal.Gelercat
                         }),
                         new WaitForCondition(() => ReachedTarget(currentTarget),
                             new Action(() => {
-                                Debug.Log("µ½´ïÄ¿±êµã: " + currentTarget.name);
+                                Debug.Log("åˆ°è¾¾ç›®æ ‡ç‚¹: " + currentTarget.name);
                                 visitDict[currentTarget] = true;
                                 patrolState = PatrolState.Idle;
                                 return true;
@@ -79,7 +79,7 @@ namespace Helltal.Gelercat
                 NavMeshPath path = new NavMeshPath();
                 if (!agent.CalculatePath(nav.transform.position, path) || path.status != NavMeshPathStatus.PathComplete)
                 {
-                    continue; // ÎÞ·¨µ½´ïÔòÌø¹ý
+                    continue; // æ— æ³•åˆ°è¾¾åˆ™è·³è¿‡
                 }
 
                 float dist = (nav.transform.position - pos).sqrMagnitude;

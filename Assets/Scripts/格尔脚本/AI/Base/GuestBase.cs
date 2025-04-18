@@ -114,12 +114,8 @@ namespace Helltal.Gelercat
             {
                 presenter = GetComponent<GuestPresenter>();
             }
-            sensor = GetComponent<GuestSensor>();
-            if (sensor == null)
-            {
-                sensor = this.gameObject.AddComponent<GuestSensor>();
 
-            }
+            curHealth.Value = maxHealth;
             
         }
 

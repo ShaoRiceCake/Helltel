@@ -4,6 +4,8 @@ using Helltal.Gelercat;
 using UnityEngine;
 using NPBehave;
 using UnityEngine.PlayerLoop;
+using UnityEditor.ShaderGraph.Drawing.Inspector.PropertyDrawers;
+using NUnit.Framework;
 
 /// <summary>
 /// 集群行为状态结构体
@@ -77,33 +79,87 @@ public class MothController : GuestBase, IHurtable
 
     protected override Root GetBehaviorTree()
     {
+        // return new Root(
+        //     // new Selector(
+        //     // // 死亡
+
+        //     // // 被抓住
+        //     // // 眩晕
+        //     // // 攻击
+        //     // // 集体行动
+
+
+        //     // )
+        //     new Selector(
+
+        //     )
+            
+        // );
+
         return new Root(
-            // new Selector(
-            // // 死亡
+            new Selector(
+                BuildDeadBranch(),
+                new Selector(
+                    BuildGroupMoveBranch()// 集体行动
+                )               
 
-            // // 被抓住
-            // // 眩晕
-            // // 攻击
-            // // 集体行动
-
-
-            // )
-            new Action(() =>
-            {
-
-
-                
-               new WaitUntilStopped();
-            })
+            )
         );
     }
 
     // //行为树实现
     // ====================== 
+    private Node BuildDeadBranch()
+    {
+        var branch = new Condition(isDied, Stops.NONE,
+            new Sequence(
+                new Action(() =>
+                {
+                    Debug.Log("开始死亡表现！");
+
+                }),
+                new Wait(5.0f), // 表现等待时间，比如动画时长
+                new Action(() =>
+                {
+                    Debug.Log("表现完成，执行销毁！");
+                    Destroy(gameObject);
+                }),
+                new WaitUntilStopped() // 防止Sequence结束后重新执行
+            ));
+        return branch;
+    }
+    
+    private Node BuildGroupMoveBranch()
+    {
+        var branch = new BlackboardCondition("UnderGroup", Operator.IS_EQUAL, true, Stops.SELF,
+            new Sequence(
+                new Action(() =>
+                {
+                    Debug.Log("开始虫群移动表现！");
+
+                }),
+                new Wait(0f), // 表现等待时间，比如动画时长
+                new Action(() =>
+                {
+                    Debug.Log("表现完成，执行销毁！");
+                    Destroy(gameObject);
+                }),
+                new WaitUntilStopped() // 防止Sequence结束后重新执行
+            ));
+        return branch;
+    }
 
 
-
-
+    private bool isDied()
+    {
+        Debug.Log(curHealth.Value);
+        if(curHealth.Value <= 0)
+        {
+            behaviorTree.Blackboard["Dead"] = true; // 死亡标志
+            return true;
+        }
+        return false;
+    }
 
     // 实现 IHurtable 接口
     public void TakeDamage(int damage)

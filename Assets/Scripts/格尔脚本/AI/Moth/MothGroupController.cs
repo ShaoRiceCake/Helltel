@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using NPBehave;
 using Helltal.Gelercat;
 using UnityEngine;
-
+using System.Collections.Generic;
+using Helltal;
 public class MothGroupController : GuestBase
 {
     private List<MothController> mothList = new List<MothController>(); //虫群列表
@@ -27,6 +27,20 @@ public class MothGroupController : GuestBase
     public float velocityLerpAmt = 0.25f; //线性插值法计算新速度的 乘数
     [Header("目标吸引")] 
     public float TargetAmt = 0.01f; //当 鼠标光标距离 过大时，与其间距的 乘数(影响新速度)
+
+
+    protected override void Start()
+    {
+        base.Start();
+        
+
+        if (sensor == null)
+        {
+                sensor = this.gameObject.AddComponent<GuestSensor>();
+
+        }     
+    }
+
    public void RegisterMoth(GameObject moth)
     {
         MothController mothController = moth.GetComponent<MothController>();
@@ -56,6 +70,22 @@ public class MothGroupController : GuestBase
         }
     }
 
+    protected override Root GetBehaviorTree()
+    {
+        return new Root(
+            new Selector(
+     
+                new Selector(
+                    new Repeater(
+                        new Patrol(agent, navPointsManager)
+                    )
+                )               
+
+            )
+        );
+    }
+
+    
     public List<MothController> GetMothList()
     {
         return mothList;
