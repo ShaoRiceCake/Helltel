@@ -44,7 +44,7 @@ namespace Helltal.Gelercat
             Debug.Log("presenter:" + presenter.isActiveAndEnabled);
             behaviorTree.Start();
         }
-        public override Root GetBehaviorTree()
+        protected override Root GetBehaviorTree()
         {
             return new Root(
                 new Selector(

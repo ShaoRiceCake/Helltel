@@ -7,9 +7,27 @@ public class MothGroupController : GuestBase
 {
     private List<MothController> mothList = new List<MothController>(); //虫群列表
 
+    [Header("集群行为参数")]
+    /// <summary>
+    ///  集群的影响范围
+    /// </summary>
+    public float nearDist = 30f; //判定为附近的虫子的最小范围值
+    [Header("虫群的碰撞范围")]
+    public float collisionDist = 5f; //判定为最近的虫子的最小范围值(具有碰撞风险)
 
-
-    public void RegisterMoth(GameObject moth)
+    
+    [Header("速度匹配系数")]
+    public float velocityMatchingAmt = 0.01f; //与 附近的虫子的平均速度 乘数(影响新速度)
+    [Header("虫群向心系数")]
+    public float flockCenteringAmt = 0.15f; //与 附近的虫子的平均三维间距 乘数(影响新速度)
+    [Header("虫群互斥系数")]
+    public float collisionAvoidanceAmt = -0.5f; //与 最近的虫子的平均三维间距 乘数(影响新速度)
+    [Header("插值系数，0偏向于当前速度，1偏向于目标速度")]
+    
+    public float velocityLerpAmt = 0.25f; //线性插值法计算新速度的 乘数
+    [Header("目标吸引")] 
+    public float TargetAmt = 0.01f; //当 鼠标光标距离 过大时，与其间距的 乘数(影响新速度)
+   public void RegisterMoth(GameObject moth)
     {
         MothController mothController = moth.GetComponent<MothController>();
         if (mothController == null)
@@ -36,5 +54,10 @@ public class MothGroupController : GuestBase
             mothList.Remove(mothController);
             mothController.belongToGroup = null; //设置所属虫群为空
         }
+    }
+
+    public List<MothController> GetMothList()
+    {
+        return mothList;
     }
 }

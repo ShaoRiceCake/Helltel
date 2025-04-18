@@ -64,7 +64,6 @@ public class cocoonController : MonoBehaviour
         presenter.SetAnimatiorSpeed(1f); //重置动画速度
 
         GameObject moth = Instantiate(mothPrefab, transform.position, Quaternion.identity); //生成羽衣蛾
-        mothGroup.RegisterMoth(moth); //注册羽衣蛾到虫群
         Destroy(this.gameObject); //销毁茧
 
     } 

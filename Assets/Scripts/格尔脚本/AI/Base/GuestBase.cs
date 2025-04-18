@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
-using System;
 using NPBehave;
-using UnityEngine.InputSystem;
-using UnityEditor.SceneManagement;
+
 
 namespace Helltal.Gelercat
 {
@@ -74,6 +71,11 @@ namespace Helltal.Gelercat
             }
         }
 
+        protected virtual void LateUpdate()
+        {
+
+        }
+
         [Rpc(SendTo.Server)]
         void UpdateTransformRpc(Vector3 pos , Quaternion rot)
         {
@@ -136,9 +138,11 @@ namespace Helltal.Gelercat
             
         }
         // interface IGetBehaviorTree
-        public virtual Root GetBehaviorTree()
+        protected virtual Root GetBehaviorTree()
         {
-            return null;
+            return new Root(
+                new WaitUntilStopped()
+            );
         }
     }
 }
