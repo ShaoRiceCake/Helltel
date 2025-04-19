@@ -1,30 +1,38 @@
 using UnityEngine;
 
-/// <summary>
-/// 道具基类
-/// </summary>
-public abstract class ItemBase : MonoBehaviour, IPersistable
+public interface IInteractable
 {
-    [Header("基础道具设置")]
-    [SerializeField] protected string itemName = "未命名道具";
-    [SerializeField] protected Sprite itemIcon;
-    [SerializeField] protected string itemDescription = "道具描述";
+    string ItemName { get; }
+    void OnHighlight(bool enable);
+    void Release();
+}
 
-    public virtual void UseItem()
+public interface IUsable
+{
+    void UseStart();
+    void UseEnd();
+}
+
+public enum HandType { None, Left, Right }
+
+public abstract class ItemBase : MonoBehaviour, IInteractable
+{
+    [SerializeField] protected string itemName;
+    protected bool isGrabbed;
+
+    public string ItemName => itemName;
+
+    public virtual void OnHighlight(bool enable)
     {
-        
     }
 
-    public virtual void DropItem()
+    public virtual void Grab()
     {
-        Destroy(gameObject);
+
     }
-    
-    /// <summary>
-    /// 获取道具信息
-    /// </summary>
-    public virtual string GetItemInfo()
+
+    public virtual void Release()
     {
-        return $"名称: {itemName}\n描述: {itemDescription}";
+
     }
 }
