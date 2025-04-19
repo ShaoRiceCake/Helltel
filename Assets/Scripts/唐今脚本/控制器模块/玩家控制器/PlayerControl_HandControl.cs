@@ -50,7 +50,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     }
 
 
-    protected virtual void OnDestroy()
+    public override void OnDestroy()
     {
         if (controlHandler != null)
         {
