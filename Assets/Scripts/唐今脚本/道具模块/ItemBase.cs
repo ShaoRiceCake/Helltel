@@ -1,10 +1,10 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public interface IInteractable
 {
     string ItemName { get; }
     void OnHighlight(bool enable);
-    void Release();
 }
 
 public interface IUsable
@@ -13,26 +13,23 @@ public interface IUsable
     void UseEnd();
 }
 
-public enum HandType { None, Left, Right }
+public interface IGrabbable
+{
+    UnityEvent OnGrabbed { get; set;}
+    UnityEvent OnReleased { get; set;}
+    bool IsGrabbed { get; set; }
+}
 
-public abstract class ItemBase : MonoBehaviour, IInteractable
+public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
 {
     [SerializeField] protected string itemName;
-    protected bool isGrabbed;
-
     public string ItemName => itemName;
 
     public virtual void OnHighlight(bool enable)
     {
     }
-
-    public virtual void Grab()
-    {
-
-    }
-
-    public virtual void Release()
-    {
-
-    }
+    
+    public abstract UnityEvent OnGrabbed { get; set; }
+    public abstract UnityEvent OnReleased { get; set; }
+    public abstract bool IsGrabbed { get; set; }
 }
