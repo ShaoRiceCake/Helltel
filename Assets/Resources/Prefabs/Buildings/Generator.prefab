@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5420871367105433588}
   - component: {fileID: 323091406950577307}
   - component: {fileID: 6911422506595817717}
+  - component: {fileID: 4907330735233366021}
   m_Layer: 0
   m_Name: Generator
   m_TagString: Untagged
@@ -47,8 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3312693658
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 2221856620
+  InScenePlacedSourceGlobalObjectIdHash: 757902631
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -142,3 +143,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d5b34acc4a5a4347a4f41c056fef0cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4907330735233366021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5816238570797794469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c31c4bf057a93440a47fbad9f9e7611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentFloor: -1
+  baseEntropy: 50
+  floorMultiplier: 15
+  timeFactor: 0.3
+  moneyFactor: 0.05
+  deathFactorD: 1
+  deathFactorE: 9
+  baseGuestElevatorCount: 8
+  guestElevatorFloorMultiplier: 3
+  checkInterval: 30
+  monsterPrefabs:
+  - {fileID: 781970947012123368, guid: 1937ab7ac48954d4eaacd545abe834bf, type: 3}

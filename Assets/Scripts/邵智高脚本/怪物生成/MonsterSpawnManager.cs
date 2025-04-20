@@ -173,7 +173,7 @@ public class MonsterSpawnSystem : MonoBehaviour
         int randomIndex = Random.Range(0,navPoints.Count);
         Transform randomNavPoint = navPoints[randomIndex].transform;
         Debug.Log("生成"+prefab);
-        Vector3 spawnPoint = randomNavPoint.position + Vector3.up * 0.5f;
+        Vector3 spawnPoint = randomNavPoint.position; 
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);

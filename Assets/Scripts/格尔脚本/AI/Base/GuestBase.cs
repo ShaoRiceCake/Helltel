@@ -91,7 +91,7 @@ namespace Helltal.Gelercat
 
         protected virtual void Start()
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
 
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();

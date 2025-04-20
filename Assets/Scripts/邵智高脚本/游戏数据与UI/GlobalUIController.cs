@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -84,7 +85,22 @@ public class GlobalUIController : MonoBehaviour
         //这里其实根本没锁住，需要和角色操控联动
         Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
         Cursor.visible = isPaused; // 控制鼠标可见性
-        FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
+
+        PlayerControlInformationProcess[] playersControlInformation = FindObjectsOfType<PlayerControlInformationProcess>();
+       
+        for (int i = 0; i < playersControlInformation.Length; i++)
+        {
+            if(playersControlInformation[i].IsLocalPlayer == true && NetworkManager.Singleton == true)
+            {
+                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+            }
+            else if(NetworkManager.Singleton == false)
+            {
+                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+            }
+        }
+        
+        //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
     }
     //关闭所有全局UI界面
     public void CloseAllGlobalUI()

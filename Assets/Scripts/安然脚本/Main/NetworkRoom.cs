@@ -52,9 +52,9 @@ public class NetworkRoom : MonoBehaviour
         relayTransportNetcode.SetPlayerData(uid, "Player-" + uid, props);
 
         // 绑定按钮事件
-        btn_Host.onClick.AddListener(OnStartHostButton);
+        btn_Host.onClick.AddListener(BeHost);
         btn_Client.onClick.AddListener(OpenJoinPanel);
-        btn_ConfirmJoinRoom.onClick.AddListener(OnStartClientButton);
+        btn_ConfirmJoinRoom.onClick.AddListener(Login);
         btn_ExitJoinRoom.onClick.AddListener(CloseJoinPanel);
         btn_Back.onClick.AddListener(() =>
         {
