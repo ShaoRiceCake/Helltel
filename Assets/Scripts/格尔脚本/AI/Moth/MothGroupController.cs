@@ -29,6 +29,8 @@ public class MothGroupController : GuestBase
     public float TargetAmt = 0.01f; //当 鼠标光标距离 过大时，与其间距的 乘数(影响新速度)
 
 
+    private Root behaviorTree;
+
     protected override void Start()
     {
         base.Start();
@@ -38,7 +40,9 @@ public class MothGroupController : GuestBase
         {
                 sensor = this.gameObject.AddComponent<GuestSensor>();
 
-        }     
+        }    
+        behaviorTree = GetBehaviorTree();
+        behaviorTree.Start();
     }
 
    public void RegisterMoth(GameObject moth)
@@ -78,7 +82,7 @@ public class MothGroupController : GuestBase
                 new Selector(
                     new Repeater(
                         new Patrol(agent, navPointsManager)
-                    )
+                    ) 
                 )               
 
             )

@@ -133,17 +133,6 @@ public class MothController : GuestBase, IHurtable
     {
         var branch = new BlackboardCondition("UnderGroup", Operator.IS_EQUAL, true, Stops.SELF,
             new Sequence(
-                new Action(() =>
-                {
-                    Debug.Log("开始虫群移动表现！");
-
-                }),
-                new Wait(0f), // 表现等待时间，比如动画时长
-                new Action(() =>
-                {
-                    Debug.Log("表现完成，执行销毁！");
-                    Destroy(gameObject);
-                }),
                 new WaitUntilStopped() // 防止Sequence结束后重新执行
             ));
         return branch;
@@ -152,12 +141,13 @@ public class MothController : GuestBase, IHurtable
 
     private bool isDied()
     {
-        Debug.Log(curHealth.Value);
         if(curHealth.Value <= 0)
         {
             behaviorTree.Blackboard["Dead"] = true; // 死亡标志
+            Debug.Log("判定死亡");
             return true;
         }
+        Debug.Log("判定没死");
         return false;
     }
 
