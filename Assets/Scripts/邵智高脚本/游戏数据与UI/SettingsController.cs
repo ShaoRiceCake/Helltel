@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Audio;
 using TMPro;
+
 
 public class SettingsPanel : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class SettingsPanel : MonoBehaviour
     public Button btnQuality;      //图形设置按钮
     public Button btnAuido;        //音频设置按钮
     public Button btnControlls;    //控制设置按钮
-    public Button btnBack;         //返回按钮
+    public Button btn_BackOfSettingPanel; //返回按钮
     [Header("各设置界面")]
     public GameObject panelGame;   //游戏面板
     public GameObject panelQuality;   //游戏面板
@@ -47,7 +47,7 @@ public class SettingsPanel : MonoBehaviour
         btnQuality.onClick.AddListener(OpenQualityPanel);
         btnAuido.onClick.AddListener(OpenAudioPanel);
         btnControlls.onClick.AddListener(OpenControllPanel);
-        btnBack.onClick.AddListener(globalUIController.OpenMenu);
+        btn_BackOfSettingPanel.onClick.AddListener(globalUIController.CloseSettings);
         //初始化
         InitializeSettings();
         //初始话音频设置
@@ -174,6 +174,7 @@ public class SettingsPanel : MonoBehaviour
         panelControlls.gameObject.SetActive(true);
         AudioManager.Instance.Play("泡泡音");
     }
+  
    
 
     private void InitializeSettings()
