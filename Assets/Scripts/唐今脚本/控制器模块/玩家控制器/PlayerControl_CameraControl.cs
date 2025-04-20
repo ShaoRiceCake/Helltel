@@ -1,7 +1,14 @@
 using UnityEngine;
+using UnityEngine.Rendering; 
 
 public class PlayerControl_CameraControl : PlayerControl_BaseControl
 {
+    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+    private static readonly int Surface = Shader.PropertyToID("_Surface");
+    private static readonly int SrcBlend = Shader.PropertyToID("_SrcBlend");
+    private static readonly int DstBlend = Shader.PropertyToID("_DstBlend");
+    private static readonly int ZWrite = Shader.PropertyToID("_ZWrite");
+
     [Header("Camera Settings")]
     [SerializeField] private Camera controlledCamera;
     [SerializeField] private Transform target;
@@ -21,8 +28,28 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     [SerializeField] private bool avoidCollisions = true;
     [SerializeField] private LayerMask collisionLayers;
     [SerializeField] private float collisionOffset = 0.3f;
-    [SerializeField] private float sphereCastRadius = 0.3f; 
-    
+    [SerializeField] private float sphereCastRadius = 0.3f;
+    [SerializeField] private float heightAdjustmentSpeed = 2.0f;
+    [SerializeField] private float minHeightAdjustment = 0.5f;
+    [SerializeField] private float maxHeightAdjustment = 2.0f;
+    [SerializeField] private float collisionDamping = 0.5f; // 碰撞阻尼系数
+    [SerializeField] private float lookAtHeightRatio = 0.5f; 
+    [SerializeField] private float lookAtSmoothTime = 0.2f; 
+
+    [Header("透明度设置")]
+    [SerializeField] private Renderer targetRenderer; // 要调整透明度的人物模型Renderer
+    [SerializeField] private float minAlpha = 0.3f; // 最小透明度值
+    [SerializeField] private float maxAlpha = 1.0f; // 最大透明度值
+    [SerializeField] private float fadeStartDistance = 3.0f; // 开始淡出的距离
+    [SerializeField] private float fadeEndDistance = 0.5f; // 完全淡出的距离
+    [SerializeField] private float fadeSmoothTime = 0.2f; // 淡出平滑时间
+
+    private Material[] _materials; // 存储所有材质
+    private float[] _originalAlphas; // 存储原始透明度
+    private float _currentAlpha;
+    private float _alphaVelocity;
+    private float _currentLookAtHeightOffset;
+    private float _lookAtHeightVelocity;
     private float _currentX;
     private float _currentY;
     private float _currentDistance; 
@@ -30,6 +57,11 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     private float _zoomVelocity; 
     private Vector3 _smoothVelocity = Vector3.zero;
     private bool _isCameraControlActive;
+    private float _originalHeightOffset;
+    private float _currentHeightOffset;
+    private float _targetHeightOffset;
+    private float _dampedDistance; 
+    private float _distanceVelocity; 
 
     protected override void Start()
     {
@@ -52,9 +84,29 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         _currentDistance = distance;
         _targetDistance = distance;
+        _dampedDistance = distance; // 初始化阻尼距离
         var angles = controlledCamera.transform.eulerAngles;
         _currentX = angles.y;
         _currentY = angles.x;
+        
+        _originalHeightOffset = controlledCamera.transform.position.y - target.position.y;
+        _currentHeightOffset = _originalHeightOffset;
+        _targetHeightOffset = _originalHeightOffset;
+        
+        _currentLookAtHeightOffset = 0f;
+
+        if (targetRenderer == null) return;
+        _materials = targetRenderer.materials;
+        _originalAlphas = new float[_materials.Length];
+            
+        for (var i = 0; i < _materials.Length; i++)
+        {
+            _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
+                
+            SetupUrpMaterial(_materials[i], _originalAlphas[i]);
+        }
+            
+        _currentAlpha = maxAlpha;
     }
 
     private void Update()
@@ -68,6 +120,45 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
         
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
+        
+        // 更新透明度
+         UpdateTransparency();
+    }
+
+    private void UpdateTransparency()
+    {
+        if (!targetRenderer || _materials == null) return;
+        
+        var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
+        var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
+        
+        _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
+        
+        for (var i = 0; i < _materials.Length; i++)
+        {
+            SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
+        }
+    }
+
+    private static void SetupUrpMaterial(Material material, float targetAlpha)
+    {
+        if (!Mathf.Approximately(material.GetFloat(Surface), 1))
+        {
+            material.SetFloat(Surface, 1); 
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.renderQueue = (int)RenderQueue.Transparent;
+            material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
+            material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
+            material.SetInt(ZWrite, 0);
+            material.DisableKeyword("_ALPHATEST_ON");
+            material.EnableKeyword("_ALPHABLEND_ON");
+            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            material.renderQueue = (int)RenderQueue.Transparent;
+        }
+
+        var baseColor = material.GetColor(BaseColor);
+        baseColor.a = targetAlpha;
+        material.SetColor(BaseColor, baseColor);
     }
 
     private void LateUpdate()
@@ -82,13 +173,16 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
 
         UpdateCameraPosition();
+        
+        _currentHeightOffset = Mathf.Lerp(_currentHeightOffset, _targetHeightOffset, Time.deltaTime * heightAdjustmentSpeed);
     }
 
     private void UpdateCameraPosition()
     {
-        var direction = new Vector3(0, 0, -_currentDistance);
+        var direction = new Vector3(0, 0, -_dampedDistance);
         var rotation = Quaternion.Euler(_currentY, _currentX, 0);
         var desiredPosition = target.position + rotation * direction;
+        desiredPosition.y += _currentHeightOffset;
 
         if (avoidCollisions)
         {
@@ -100,13 +194,42 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
             if (isColliding)
             {
-                desiredPosition = hit.point + hit.normal * collisionOffset;
-                _currentDistance = Vector3.Distance(target.position, desiredPosition);
+                var collisionPosition = hit.point + hit.normal * collisionOffset;
+                var actualDistance = Vector3.Distance(target.position, collisionPosition);
+                
+                _dampedDistance = Mathf.SmoothDamp(_dampedDistance, actualDistance, ref _distanceVelocity, collisionDamping);
+                
+                var distanceRatio = Mathf.InverseLerp(minDistance, _targetDistance, _dampedDistance);
+                _targetHeightOffset = Mathf.Lerp(maxHeightAdjustment, minHeightAdjustment, distanceRatio);
+                
+                collisionPosition.y = Mathf.Max(collisionPosition.y, target.position.y + minHeightAdjustment);
+                desiredPosition = collisionPosition;
+                
+                _currentDistance = Mathf.Lerp(_currentDistance, _dampedDistance, 0.1f);
+                
+                var targetLookAtOffset = (_currentHeightOffset - _originalHeightOffset) * lookAtHeightRatio;
+                _currentLookAtHeightOffset = Mathf.SmoothDamp(
+                    _currentLookAtHeightOffset, 
+                    targetLookAtOffset, 
+                    ref _lookAtHeightVelocity, 
+                    lookAtSmoothTime);
             }
             else
             {
-                _currentDistance = Mathf.MoveTowards(_currentDistance, _targetDistance, Time.deltaTime * zoomSpeed);
+                _dampedDistance = Mathf.SmoothDamp(_dampedDistance, _targetDistance, ref _distanceVelocity, collisionDamping);
+                _targetHeightOffset = _originalHeightOffset;
+                
+                _currentLookAtHeightOffset = Mathf.SmoothDamp(
+                    _currentLookAtHeightOffset, 
+                    0f, 
+                    ref _lookAtHeightVelocity, 
+                    lookAtSmoothTime);
             }
+        }
+        else
+        {
+            _dampedDistance = _currentDistance;
+            _currentLookAtHeightOffset = 0f;
         }
 
         controlledCamera.transform.position = Vector3.SmoothDamp(
@@ -115,10 +238,12 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             ref _smoothVelocity, 
             smoothTime);
         
-        controlledCamera.transform.LookAt(target);
+        var baseLookAtPosition = target.position;
+        var adjustedLookAtPosition = baseLookAtPosition + Vector3.up * _currentLookAtHeightOffset;
+        controlledCamera.transform.LookAt(adjustedLookAtPosition);
         
         controlledCamera.nearClipPlane = Mathf.Clamp(
-            _currentDistance * 0.1f, 
+            _dampedDistance * 0.1f, 
             0.01f, 
             0.3f 
         );
@@ -154,6 +279,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     {
         _currentDistance = Mathf.Clamp(newDistance, minDistance, maxDistance);
         _targetDistance = _currentDistance;
+        _dampedDistance = _currentDistance;
     }
 
     public void SetControlledCamera(Camera newCamera)
@@ -179,5 +305,35 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     public float GetCurrentY()
     {
         return _currentY;
-    }    
+    }
+    
+    // 新增方法：设置目标Renderer
+    public void SetTargetRenderer(Renderer newRenderer)
+    {
+        targetRenderer = newRenderer;
+        
+        // 重新初始化材质
+        if (targetRenderer == null) return;
+        _materials = targetRenderer.materials;
+        _originalAlphas = new float[_materials.Length];
+            
+        for (var i = 0; i < _materials.Length; i++)
+        {
+            _originalAlphas[i] = _materials[i].color.a;
+        }
+    }
+
+    // 新增方法：设置淡出距离范围
+    public void SetFadeDistance(float start, float end)
+    {
+        fadeStartDistance = Mathf.Max(start, end);
+        fadeEndDistance = Mathf.Min(start, end);
+    }
+
+    // 新增方法：设置透明度范围
+    public void SetAlphaRange(float min, float max)
+    {
+        minAlpha = Mathf.Clamp01(min);
+        maxAlpha = Mathf.Clamp01(max);
+    }
 }

@@ -1,30 +1,51 @@
 using UnityEngine;
+using UnityEngine.Events;
 
-/// <summary>
-/// 道具基类
-/// </summary>
-public abstract class ItemBase : MonoBehaviour, IPersistable
+public interface IInteractable
 {
-    [Header("基础道具设置")]
-    [SerializeField] protected string itemName = "未命名道具";
-    [SerializeField] protected Sprite itemIcon;
-    [SerializeField] protected string itemDescription = "道具描述";
+    string ItemName { get; }
+    EGraspingState CurrentState { get; }
+}
 
-    public virtual void UseItem()
-    {
-        
-    }
+public interface IUsable
+{
+    void UseStart();
+    void UseEnd();
+}
 
-    public virtual void DropItem()
+public interface IGrabbable
+{
+    UnityEvent OnGrabbed { get; set; }
+    UnityEvent OnReleased { get; set; }
+    void UpdateGraspingState(EGraspingState newState);
+}
+
+public enum EGraspingState
+{
+    OnCaught,
+    OnSelected,
+    NotSelected
+}
+
+public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable 
+{
+    [SerializeField] protected string itemName;
+    public string ItemName => itemName;
+    public abstract UnityEvent OnGrabbed { get; set; }
+    public abstract UnityEvent OnReleased { get; set; }
+    
+    protected EGraspingState currentState = EGraspingState.NotSelected;
+    public EGraspingState CurrentState => currentState;
+    
+    public virtual void UpdateGraspingState(EGraspingState newState)
     {
-        Destroy(gameObject);
+        if (currentState == newState) return;
+        currentState = newState;
+        Debug.Log($"{ItemName} state changed to: {currentState}");
     }
     
-    /// <summary>
-    /// 获取道具信息
-    /// </summary>
-    public virtual string GetItemInfo()
+    protected virtual void Update()
     {
-        return $"名称: {itemName}\n描述: {itemDescription}";
+        Debug.Log($"{ItemName} current state: {currentState}");
     }
 }

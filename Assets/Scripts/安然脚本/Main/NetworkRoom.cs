@@ -10,47 +10,72 @@ using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
 using Unity.Sync.Relay.Transport.Netcode;
 
+/// <summary>
+/// 网络房间管理器
+/// 功能：
+/// 1. 使用Relay服务创建/加入房间
+/// 2. 管理网络连接流程
+/// 3. 处理UI交互与状态显示
+/// 4. 本地开发测试支持
+/// </summary>
 public class NetworkRoom : MonoBehaviour
 {
+    [Header("UI 元素")]
+    public TMP_InputField inputIP;          // 房间代码输入框
+    public Button btn_Host;                     // 创建主机按钮
+    public Button btn_Client;                   // 加入客户端按钮
+    public GameObject loadingPanel;        // 加载提示面板
+    public GameObject joinPanel;           //加入房间面板
+    public Button btn_Back;                 // 返回按钮
+    public Button btn_ConfirmJoinRoom;     //加入房间的确认按钮
+    public Button btn_ExitJoinRoom;        //加入房间的退出按钮
+    public TMP_Text title;                  // 状态提示文本
 
-    public TMP_InputField inputIP;
+    [Header("网络组件")]
+    public RelayTransportNetcode relayTransportNetcode; // Relay网络传输组件
 
-    public Button host;
+    private string uid; // 玩家唯一标识
 
-    public Button client;
-
-    public GameObject loadingPanel;
-
-    public Button back_btn;
-
-    public TMP_Text title;
-
-    public RelayTransportNetcode relayTransportNetcode;
-
-    void Loading(string str)
-    {
-        title.text = str;
-        back_btn.gameObject.SetActive(true);
-    }
-
-    string uid;
     private void Start()
     {
+        // 初始化网络组件
         relayTransportNetcode = NetworkManager.Singleton.GetComponentInChildren<RelayTransportNetcode>();
         loadingPanel.SetActive(false);
+        joinPanel.SetActive(false);
+        
+        // 生成玩家唯一ID
         uid = Guid.NewGuid().ToString();
+        
+        // 设置玩家数据
         var props = new Dictionary<string, string>();
         props.Add("icon", "unity");
         relayTransportNetcode.SetPlayerData(uid, "Player-" + uid, props);
-        host.onClick.AddListener(OnStartHostButton);
-        client.onClick.AddListener(OnStartClientButton);
-        back_btn.onClick.AddListener(() =>
+
+        // 绑定按钮事件
+        btn_Host.onClick.AddListener(OnStartHostButton);
+        btn_Client.onClick.AddListener(OpenJoinPanel);
+        btn_ConfirmJoinRoom.onClick.AddListener(OnStartClientButton);
+        btn_ExitJoinRoom.onClick.AddListener(CloseJoinPanel);
+        btn_Back.onClick.AddListener(() =>
         {
             loadingPanel.SetActive(false);
-            back_btn.gameObject.SetActive(false);
+            btn_Back.gameObject.SetActive(false);
         });
     }
 
+    /// <summary>
+    /// 更新加载状态提示
+    /// </summary>
+    /// <param name="str">显示的状态文本</param>
+    void Loading(string str)
+    {
+        title.text = str;
+        btn_Back.gameObject.SetActive(true);
+    }
+
+    /// <summary>
+    /// 创建主机按钮点击事件
+    /// </summary>
     public void OnStartHostButton()
     {
         loadingPanel.SetActive(true);
@@ -59,55 +84,57 @@ public class NetworkRoom : MonoBehaviour
 
         if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
         {
-            if (true)
-            {
-                StartCoroutine(LobbyService.AsyncCreateRoom(new CreateRoomRequest()
+            // 发起创建房间请求
+            StartCoroutine(LobbyService.AsyncCreateRoom(
+                new CreateRoomRequest()
                 {
                     Name = "Demo",
                     Namespace = "Unity",
-                    MaxPlayers = 20,
+                    MaxPlayers = 20,            // 最大玩家数量
                     Visibility = LobbyRoomVisibility.Public,
                     OwnerId = uid,
-                    CustomProperties = new Dictionary<string, string>()
-                    {
-                        {"a", "b"},
-                    }
-                }, (resp) =>
+                    CustomProperties = new Dictionary<string, string>() { {"a", "b"} }
+                }, 
+                (resp) =>
                 {
                     if (resp.Code == (uint)RelayCode.OK)
                     {
-                        Debug.Log("Create Room succeed.");
+                        Debug.Log("房间创建成功");
                         if (resp.Status == LobbyRoomStatus.ServerAllocated)
                         {
+                            // 配置网络参数
                             relayTransportNetcode.SetRoomData(resp);
                             StartHost();
                             GameManager.instance.joinConde = resp.RoomCode;
-                            GameManager.instance.LoadScene("Lobby");
+                            GameManager.instance.LoadScene("Lobby"); // 加载大厅场景
                         }
                         else
                         {
-                            Loading("创建房间失败，当前状态：" + resp.Status.ToString());
-                            Debug.Log("Room Status Exception : " + resp.Status.ToString());
+                            Loading($"创建房间失败，当前状态：{resp.Status}");
+                            Debug.LogError($"房间状态异常：{resp.Status}");
                         }
                     }
                     else
                     {
-                        Loading("创建房间失败：未进入服务器");
-                        Debug.Log("Create Room Fail By Lobby Service");
+                        Loading("创建房间失败：未连接服务器");
+                        Debug.LogError("大厅服务创建房间失败");
                     }
                 }));
-
-
-            }
         }
     }
 
+    /// <summary>
+    /// 启动主机
+    /// </summary>
     private void StartHost()
     {
         NetworkManager.Singleton.StartHost();
     }
 
-    public void OnStartClientButton()//以 client 身份加入游戏
+    /// <summary>
+    /// 加入客户端按钮点击事件
+    /// </summary>
+    public void OnStartClientButton()
     {
         loadingPanel.SetActive(true);
         title.text = "加入房间中...";
@@ -115,31 +142,34 @@ public class NetworkRoom : MonoBehaviour
 
         if (NetworkManager.Singleton && !NetworkManager.Singleton.IsListening)
         {
-            if (true)
-            {
-                StartCoroutine(LobbyService.AsyncListRoom(new ListRoomRequest()
+            // 获取房间列表
+            StartCoroutine(LobbyService.AsyncListRoom(
+                new ListRoomRequest()
                 {
                     Namespace = "Unity",
-                    Start = 0,
-                    Count = 10,
-                }, (resp) =>
+                    Start = 0,   // 分页起始索引
+                    Count = 10,  // 每页数量
+                }, 
+                (resp) =>
                 {
                     if (resp.Code == (uint)RelayCode.OK)
                     {
-                        Debug.Log("List Room succeed.");
+                        Debug.Log("获取房间列表成功");
                         if (resp.Items.Count > 0)
                         {
                             foreach (var item in resp.Items)
                             {
                                 if (item.Status == LobbyRoomStatus.Ready)
                                 {
-                                    StartCoroutine(LobbyService.AsyncQueryRoom(item.RoomUuid,
+                                    // 查询具体房间信息
+                                    StartCoroutine(LobbyService.AsyncQueryRoom(
+                                        item.RoomUuid,
                                         (_resp) =>
                                         {
-                                            Debug.Log(item.RoomCode);
+                                            Debug.Log($"尝试加入房间：{item.RoomCode}");
                                             if (_resp.Code == (uint)RelayCode.OK && item.RoomCode == inputIP.text)
                                             {
-                                                Debug.Log("Query Room succeed.");
+                                                Debug.Log("房间查询成功");
                                                 relayTransportNetcode.SetRoomData(_resp);
                                                 GameManager.instance.joinConde = item.RoomCode;
                                                 StartClient();
@@ -152,11 +182,9 @@ public class NetworkRoom : MonoBehaviour
                                                 }
                                                 if(_resp.Code != (uint)RelayCode.OK)
                                                 {
-                                                    Loading("房间失效");
+                                                    Loading("房间已失效");
                                                 }
-                                       
-
-                                                Debug.Log("Query Room Fail By Lobby Service");
+                                                Debug.LogError("大厅服务查询房间失败");
                                             }
                                         }));
                                     break;
@@ -165,46 +193,62 @@ public class NetworkRoom : MonoBehaviour
                         }
                         else
                         {
-                            Loading("当前服务器无房间");
+                            Loading("当前没有可用房间");
                         }
                     }
                     else
                     {
-                        Loading("房间失效");
-
-                        Debug.Log("List Room Fail By Lobby Service");
+                        Loading("获取房间列表失败");
+                        Debug.LogError("大厅服务列表请求失败");
                     }
                 }));
-            }
         }
     }
 
+    /// <summary>
+    /// 启动客户端
+    /// </summary>
     private void StartClient()
     {
         NetworkManager.Singleton.StartClient();
     }
-
-    private void Update()
+    /// <summary>
+    /// 打开加入房间界面
+    /// </summary>
+    public void OpenJoinPanel()
     {
-
+        joinPanel.SetActive(true);
+    }
+    /// <summary>
+    /// 关闭加入房间界面
+    /// </summary>
+    public void CloseJoinPanel()
+    {
+        joinPanel.SetActive(false);
     }
 
-    #region 本地测试
+    private void Update() { }
+
+    #region 本地测试方法
+    /// <summary>
+    /// 本地直接连接
+    /// </summary>
     public void Login()
     {
         NetworkManager.Singleton.StartClient();
         UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        unityTransport.SetConnectionData("127.0.0.1" ,7777);
+        unityTransport.SetConnectionData("127.0.0.1", 7777); // 本地环回地址
+    }
 
-    }//登录
-
+    /// <summary>
+    /// 启动本地主机
+    /// </summary>
     public void BeHost()
     {
-
         UnityTransport unityTransport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-        unityTransport.SetConnectionData("0.0.0.0", 7777);
+        unityTransport.SetConnectionData("0.0.0.0", 7777); // 监听所有地址
         NetworkManager.Singleton.StartHost();
         GameManager.instance.LoadScene("Lobby");
-    }//主机启动
+    }
     #endregion
 }

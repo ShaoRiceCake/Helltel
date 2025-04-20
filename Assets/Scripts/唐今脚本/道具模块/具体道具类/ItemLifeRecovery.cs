@@ -1,0 +1,5 @@
+
+public class ItemLifeRecovery : ActiveItem
+{
+
+}

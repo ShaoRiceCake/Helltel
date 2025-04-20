@@ -17,7 +17,7 @@ public class StopPlayerControl : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            _playerControl._stopPlayerControl = !_playerControl._stopPlayerControl;
+            _playerControl.stopPlayerControl = !_playerControl.stopPlayerControl;
         }
     }
 
