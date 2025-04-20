@@ -33,19 +33,18 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     public string ItemName => itemName;
     public abstract UnityEvent OnGrabbed { get; set; }
     public abstract UnityEvent OnReleased { get; set; }
-    
-    protected EGraspingState currentState = EGraspingState.NotSelected;
-    public EGraspingState CurrentState => currentState;
-    
+
+    public EGraspingState CurrentState { get; private set; } = EGraspingState.NotSelected;
+
     public virtual void UpdateGraspingState(EGraspingState newState)
     {
-        if (currentState == newState) return;
-        currentState = newState;
-        Debug.Log($"{ItemName} state changed to: {currentState}");
+        if (CurrentState == newState) return;
+        CurrentState = newState;
+        Debug.Log($"{ItemName} state changed to: {CurrentState}");
     }
     
     protected virtual void Update()
     {
-        Debug.Log($"{ItemName} current state: {currentState}");
+        Debug.Log($"{ItemName} current state: {CurrentState}");
     }
 }
