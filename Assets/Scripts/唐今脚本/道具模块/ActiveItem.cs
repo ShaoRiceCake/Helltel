@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public class ActiveItem : ItemBase, IUsable
+public abstract class ActiveItem : ItemBase, IUsable
 {
-
     public virtual void UseStart()
     {
     }
@@ -17,7 +16,6 @@ public class ActiveItem : ItemBase, IUsable
         Destroy(gameObject);
     }
 
-    public override UnityEvent OnGrabbed { get; set; }
-    public override UnityEvent OnReleased { get; set; }
-    public override bool IsGrabbed { get; set; }
+    public override UnityEvent OnGrabbed { get; set; } = new UnityEvent();
+    public override UnityEvent OnReleased { get; set; } = new UnityEvent();
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
@@ -35,7 +34,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
     public UnityEvent onStopCameraControl;
     
     private bool _isCameraControlActive;
-    public bool _stopPlayerControl;
+    public bool stopPlayerControl;
 
     private void Start()
     {
@@ -60,33 +59,19 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         
         if (NetworkManager.Singleton)
         {
-            if (IsLocalPlayer)
-            {
-                _mMouseControl = GetComponent<MouseControl>();
-                _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
-                _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
-                _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
-                _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
-                _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
-                _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
-                _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
-                _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
-                _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
-            }
+            if (!IsLocalPlayer) return;
         }
-        else
-        {
-            _mMouseControl = GetComponent<MouseControl>();
-            _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
-            _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
-            _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
-            _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
-            _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
-            _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
-            _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
-            _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
-            _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
-        }
+
+        _mMouseControl = GetComponent<MouseControl>();
+        _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
+        _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
+        _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
+        _mMouseControl.onRightMouseUp.AddListener(OnRightMouseUp);
+        _mMouseControl.onBothMouseButtonsDown.AddListener(OnBothMouseButtonsDown);
+        _mMouseControl.onMiddleMouseDown.AddListener(OnMiddleMouseDown);
+        _mMouseControl.onMouseMoveFixedUpdate.AddListener(OnMouseMoveFixedUpdate);
+        _mMouseControl.onMouseMoveUpdate.AddListener(OnMouseMoveUpdate);
+        _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
     }
 
     public override void OnDestroy()
@@ -126,7 +111,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void Update()
     {
-        if (_stopPlayerControl) return;
+        if (stopPlayerControl) return;
         
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -142,7 +127,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnLeftMouseDown()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -159,7 +144,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnRightMouseDown()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -176,7 +161,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnLeftMouseUp()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -193,7 +178,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnRightMouseUp()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -210,7 +195,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnBothMouseButtonsDown()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -227,7 +212,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnMiddleMouseDown()
     {
-        if (_stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || _isCameraControlActive) return;
         
         mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
         onSwitchControlMode?.Invoke();
@@ -235,19 +220,19 @@ public class PlayerControlInformationProcess : NetworkBehaviour
 
     private void OnMouseMoveFixedUpdate(Vector2 mouseDelta)
     {
-        if (_stopPlayerControl) return;
+        if (stopPlayerControl) return;
         onMouseMoveFixedUpdate?.Invoke(mouseDelta);
     }
 
     private void OnMouseMoveUpdate(Vector2 mouseDelta)
     {
-        if (_stopPlayerControl) return;
+        if (stopPlayerControl) return;
         onMouseMoveUpdate?.Invoke(mouseDelta);
     }
 
     private void OnNoMouseButtonDown()
     {
-        if (_stopPlayerControl) return;
+        if (stopPlayerControl) return;
         onDefaultMode?.Invoke();
     }
 

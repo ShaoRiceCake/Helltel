@@ -101,10 +101,8 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             
         for (var i = 0; i < _materials.Length; i++)
         {
-            // URP中获取原始透明度的方式
             _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
                 
-            // 确保材质初始状态正确
             SetupUrpMaterial(_materials[i], _originalAlphas[i]);
         }
             
@@ -124,7 +122,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
         
         // 更新透明度
-        UpdateTransparency();
+         UpdateTransparency();
     }
 
     private void UpdateTransparency()
@@ -138,17 +136,15 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         for (var i = 0; i < _materials.Length; i++)
         {
-            // URP Lit材质需要特殊处理
             SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
         }
     }
 
     private static void SetupUrpMaterial(Material material, float targetAlpha)
     {
-        // 1. 更改渲染模式（如果当前不是透明模式）
-        if (!Mathf.Approximately(material.GetFloat(Surface), 1)) // 1表示透明模式
+        if (!Mathf.Approximately(material.GetFloat(Surface), 1))
         {
-            material.SetFloat(Surface, 1); // 设置为透明模式
+            material.SetFloat(Surface, 1); 
             material.SetOverrideTag("RenderType", "Transparent");
             material.renderQueue = (int)RenderQueue.Transparent;
             material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
@@ -160,7 +156,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             material.renderQueue = (int)RenderQueue.Transparent;
         }
 
-        // 2. 设置基础颜色和透明度
         var baseColor = material.GetColor(BaseColor);
         baseColor.a = targetAlpha;
         material.SetColor(BaseColor, baseColor);
@@ -212,7 +207,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
                 
                 _currentDistance = Mathf.Lerp(_currentDistance, _dampedDistance, 0.1f);
                 
-                // Calculate look-at height offset based on current height adjustment
                 var targetLookAtOffset = (_currentHeightOffset - _originalHeightOffset) * lookAtHeightRatio;
                 _currentLookAtHeightOffset = Mathf.SmoothDamp(
                     _currentLookAtHeightOffset, 
@@ -225,7 +219,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
                 _dampedDistance = Mathf.SmoothDamp(_dampedDistance, _targetDistance, ref _distanceVelocity, collisionDamping);
                 _targetHeightOffset = _originalHeightOffset;
                 
-                // Smoothly return look-at height to original position
                 _currentLookAtHeightOffset = Mathf.SmoothDamp(
                     _currentLookAtHeightOffset, 
                     0f, 
@@ -245,7 +238,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
             ref _smoothVelocity, 
             smoothTime);
         
-        // Improved LookAt with height adjustment
         var baseLookAtPosition = target.position;
         var adjustedLookAtPosition = baseLookAtPosition + Vector3.up * _currentLookAtHeightOffset;
         controlledCamera.transform.LookAt(adjustedLookAtPosition);

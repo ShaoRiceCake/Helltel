@@ -65,14 +65,14 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         controlHandler.onLiftRightHand.AddListener(OnLiftRightHand);
         controlHandler.onReleaseRightHand.AddListener(OnReleaseRightHand);
         controlHandler.onCancelHandGrab.AddListener(OnCancelHandGrab);
-        controlHandler.onMouseMoveUpdate.AddListener(OnMouseMove);
+        controlHandler.onMouseMoveFixedUpdate.AddListener(OnMouseMove);
 
     }
 
     protected virtual void UnsubscribeEvents()
     {
         controlHandler.onCancelHandGrab.RemoveListener(OnCancelHandGrab);
-        controlHandler.onMouseMoveUpdate.RemoveListener(OnMouseMove);
+        controlHandler.onMouseMoveFixedUpdate.RemoveListener(OnMouseMove);
 
     }
 
@@ -152,7 +152,6 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
         _targetPosition = handPrepareObj.transform.TransformPoint(newLocalPosition);
         
-        // 使用SmoothDamp进行帧率无关的插值
         handBallPrefab.transform.position = Vector3.SmoothDamp(
             handBallPrefab.transform.position,
             _targetPosition,
