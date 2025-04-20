@@ -21,17 +21,17 @@ public class HealthView : MonoBehaviour
     private void Start()
     {
         //_playerId = "p1";
-        UpdateHealth(_localPlayerId,_data.GetPlayer(_localPlayerId).Health);
+        //UpdateHealth(_localPlayerId,_data.GetPlayer(_localPlayerId).Health);
     }
-    public void BindLocalPlayer(string playerId)
-    {
-        _localPlayerId = playerId;
+    // public void BindLocalPlayer(string playerId)
+    // {
+    //     _localPlayerId = playerId;
         
-        // 立即显示初始值
-        var playerData = _data.GetPlayer(_localPlayerId);
-        if(playerData != null)
-            UpdateHealth(_localPlayerId, playerData.Health);
-    }
+    //     // 立即显示初始值
+    //     var playerData = _data.GetPlayer(_localPlayerId);
+    //     if(playerData != null)
+    //         UpdateHealth(_localPlayerId, playerData.Health);
+    // }
  
 
     private void UpdateHealth(string id, int health)

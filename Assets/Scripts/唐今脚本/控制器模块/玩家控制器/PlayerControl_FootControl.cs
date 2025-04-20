@@ -148,6 +148,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Grounded;
         springTool.isSpringEnabled = false;
         _hasTriggeredLockEvent = false;
+        
         AudioManager.Instance.Play("玩家脚步",footObject.transform.position);
         
     }

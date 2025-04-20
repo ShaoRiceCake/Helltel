@@ -84,6 +84,7 @@ public class GlobalUIController : MonoBehaviour
         //这里其实根本没锁住，需要和角色操控联动
         Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
         Cursor.visible = isPaused; // 控制鼠标可见性
+        FindAnyObjectByType<PlayerControlInformationProcess>()._stopPlayerControl = isPaused ? true:false;
     }
     //关闭所有全局UI界面
     public void CloseAllGlobalUI()
