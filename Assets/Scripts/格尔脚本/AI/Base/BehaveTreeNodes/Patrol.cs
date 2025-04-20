@@ -61,11 +61,9 @@ namespace Helltal.Gelercat
 
         private void OnUpdate()
         {
-            if (ReachedTarget(currentTarget))
+             if (ReachedTarget(currentTarget))
             {
                 visitDict[currentTarget] = true;
-                Debug.Log("到达导航点：" + currentTarget.name);
-
                 Clock.RemoveUpdateObserver(OnUpdate);
                 ChooseNextNavPoint();  // 自动选择下一个点继续巡逻
             }

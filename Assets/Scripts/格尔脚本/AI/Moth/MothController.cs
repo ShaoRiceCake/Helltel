@@ -53,17 +53,8 @@ public class MothController : GuestBase, IHurtable
         Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
         debugger.BehaviorTree = behaviorTree;
 #endif
-        if (behaviorTree != null)
-        {
-            if (Debugging) Debug.Log("BehaviorTree is not null!");
-            behaviorTree.Blackboard["UnderGroup"] = true; // 聚集状态标志
-            behaviorTree.Blackboard["Dead"] = false; // 死亡标志
-            behaviorTree.Blackboard["Attack"] = false;
-        }
-        else
-        {
-            if (Debugging) Debug.LogError("BehaviorTree is null!");
-        }
+
+         behaviorTree.Blackboard["UnderGroup"] = true; // 初始化黑板变量
         behaviorTree.Start();
     }
 
@@ -75,6 +66,8 @@ public class MothController : GuestBase, IHurtable
         rb.isKinematic = false; // 取消动力学 
         boidsState = new BoidsState(); // 初始化集群个体的状态记录
         BoidInitState(); // 初始化状态
+
+
     }
 
     protected override Root GetBehaviorTree()
@@ -206,7 +199,6 @@ public class MothController : GuestBase, IHurtable
         Vector3 dist;
         if (boidsState.collisionRisks.Count > 0) // 处理最近的虫子列表
         {
-            if(Debugging) Debug.Log("Collision Risks Count: " + boidsState.collisionRisks.Count);
             Vector3 collisionAveragePos = GetAveragePosition(boidsState.collisionRisks); // 获取最近虫子的平均位置
             dist = collisionAveragePos - this.transform.position; // 计算距离
             boidsState.newVelocity += dist * belongToGroup.collisionAvoidanceAmt; // 排斥性
@@ -305,4 +297,11 @@ public class MothController : GuestBase, IHurtable
     {
         return rb.velocity;
     }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        belongToGroup.UnregisterMoth(this.gameObject); 
+    }
+
 }

@@ -21,8 +21,6 @@ namespace Helltal.Gelercat
         
 
         public bool Debugging = false; // 是否开启单机调试模式
-        // 基础控件        
-        public GameObject[] players;
         
         public NavPointsManager navPointsManager;  // 导航点管理器
 
@@ -105,7 +103,7 @@ namespace Helltal.Gelercat
             {
                 Debug.LogError("请先在场景中添加导航点管理器");
             }
-            players = GameObject.FindGameObjectsWithTag("Player");
+            
             if(GetComponent<GuestPresenter>() == null)
             {
                 presenter = this.gameObject.AddComponent<GuestPresenter>();
