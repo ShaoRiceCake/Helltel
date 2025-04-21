@@ -14,7 +14,7 @@ namespace Helltal.Gelercat
 
             EditorGUILayout.Space(10);
 
-            if (GUILayout.Button("Ë¢ÐÂ NavPoints"))
+            if (GUILayout.Button("åˆ·æ–° NavPoints"))
             {
                 manager.RefreshAllNavPoints();
             }

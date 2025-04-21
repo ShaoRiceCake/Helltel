@@ -7,11 +7,11 @@ namespace Helltal.Gelercat
     public class GuestSensor : MonoBehaviour
     {
         [Header("Sensor Settings")]
-        public GameObject sensorSource; // ¿Éµ÷½ÚµÄ´«¸ĞÆ÷Ô´
-        public float viewAngle = 60f;   // ÊÓÒ°½Ç¶È£¨×¶ĞÎ£©
-        public float viewDistance = 10f; // Ì½²â¾àÀë
-        public LayerMask detectionLayer; // Òª¼ì²âµÄÉúÎï²ã¼¶£¨Íæ¼Ò¡¢ÉúÎïµÈ£©
-        public bool isDebug = true; // ÊÇ·ñÆôÓÃµ÷ÊÔÄ£Ê½
+        public GameObject sensorSource; // å¯è°ƒèŠ‚çš„ä¼ æ„Ÿå™¨æº
+        public float viewAngle = 60f;   // è§†é‡è§’åº¦ï¼ˆé”¥å½¢ï¼‰
+        public float viewDistance = 10f; // æ¢æµ‹è·ç¦»
+        public LayerMask detectionLayer; // è¦æ£€æµ‹çš„ç”Ÿç‰©å±‚çº§ï¼ˆç©å®¶ã€ç”Ÿç‰©ç­‰ï¼‰
+        public bool isDebug = true; // æ˜¯å¦å¯ç”¨è°ƒè¯•æ¨¡å¼
         [Header("Scan Result")]
         public List<Transform> detectedTargets = new List<Transform>();
 
@@ -34,13 +34,13 @@ namespace Helltal.Gelercat
 
         private void EnsureSensorSourceExists()
         {
-            // Ä¬ÈÏÕì²â·¶Î§
+            // é»˜è®¤ä¾¦æµ‹èŒƒå›´
             detectionLayer = LayerMask.GetMask("Player");
             if (sensorSource == null)
             {
                 sensorSource = new GameObject("SensorSource");
                 sensorSource.transform.SetParent(transform);
-                sensorSource.transform.localPosition = Vector3.zero; // µ÷Õû¸ß¶È
+                sensorSource.transform.localPosition = Vector3.zero; // è°ƒæ•´é«˜åº¦
             }
         }
 
@@ -63,7 +63,7 @@ namespace Helltal.Gelercat
             }
         }
 
-        // ¿ÉÊÓ»¯×¶ĞÎÊÓÒ°
+        // å¯è§†åŒ–é”¥å½¢è§†é‡
         private void OnDrawGizmos()
         {
             if (sensorSource == null) return;
@@ -74,7 +74,7 @@ namespace Helltal.Gelercat
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(origin, viewDistance);
 
-            // »­ÉÈĞÎ±ßÔµ
+            // ç”»æ‰‡å½¢è¾¹ç¼˜
             Vector3 left = Quaternion.Euler(0, -viewAngle / 2f, 0) * forward;
             Vector3 right = Quaternion.Euler(0, viewAngle / 2f, 0) * forward;
 
@@ -82,7 +82,7 @@ namespace Helltal.Gelercat
             Gizmos.DrawLine(origin, origin + left * viewDistance);
             Gizmos.DrawLine(origin, origin + right * viewDistance);
 
-            // »­×¶ÌåÌî³äÇøÓò£¨¿ÉÑ¡£©
+            // ç”»é”¥ä½“å¡«å……åŒºåŸŸï¼ˆå¯é€‰ï¼‰
             Gizmos.color = new Color(1, 1, 0, 0.1f);
             Gizmos.DrawRay(origin, left * viewDistance);
             Gizmos.DrawRay(origin, right * viewDistance);

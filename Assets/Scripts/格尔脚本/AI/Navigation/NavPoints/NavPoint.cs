@@ -7,7 +7,7 @@ public class NavPoint : MonoBehaviour
     public static event Action<NavPoint> OnNavPointDestroyed;
     public static event Action<NavPoint> OnNavPointMoved;
 
-    public string navPointID = Guid.NewGuid().ToString(); // Ψһ��ʶ��
+    public string navPointID = Guid.NewGuid().ToString(); // 唯一标识符
 
     private Vector3 lastPosition;
 

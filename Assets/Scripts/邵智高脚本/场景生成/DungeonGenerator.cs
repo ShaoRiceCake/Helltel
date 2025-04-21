@@ -8,6 +8,8 @@ using System.ComponentModel;
 using Unity.Collections;
 using System.Linq.Expressions;
 using Unity.Netcode;
+using UnityEngine.Events;
+
 /// <summary>
 /// 地牢生成器核心类
 /// 实现基于连接点的程序化地牢生成系统
@@ -18,6 +20,7 @@ using Unity.Netcode;
 /// - 动态连接点管理
 /// </summary>
 public enum DungeonState { inActive, generatingMain, generatingBranches, cleanup, completed }
+
 public class DungeonGenerator : NetworkBehaviour
 {
     const float ROOM_SCALE = 1.3f;
@@ -88,6 +91,9 @@ public class DungeonGenerator : NetworkBehaviour
     private DungeonState dungeonState = DungeonState.inActive;
 
     private int attempts, maxAttempts = 50;
+    // 生成完成事件
+    public static System.Action<DungeonGenerator> OnDungeonBuildCompleted;
+
 
     Queue<int> randomque = new Queue<int>();
     /// <summary>
@@ -221,6 +227,8 @@ public class DungeonGenerator : NetworkBehaviour
             StartSpawnClientRpc();
         }
 
+        // 触发生成完毕事件，广播通知其他组件进行同步
+        OnDungeonBuildCompleted?.Invoke(this);
     }
     /// <summary>
     /// 重置场景（重新生成地牢）

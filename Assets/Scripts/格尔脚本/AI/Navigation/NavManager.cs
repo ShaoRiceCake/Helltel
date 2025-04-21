@@ -12,7 +12,18 @@ public class NavManager : MonoBehaviour
     {
         _navMeshSurfaces = GetComponents<NavMeshSurface>(); 
     }
-
+    void OnEnable()
+    {
+        DungeonGenerator.OnDungeonBuildCompleted += HandleDungeonBuildCompleted;
+    }
+    void OnDisable()
+    {
+        DungeonGenerator.OnDungeonBuildCompleted -= HandleDungeonBuildCompleted;
+    }
+    void HandleDungeonBuildCompleted(DungeonGenerator generator)
+    {
+        NavMeshUpdate();
+    }
     void Start()
     {
         NavMeshUpdate();
