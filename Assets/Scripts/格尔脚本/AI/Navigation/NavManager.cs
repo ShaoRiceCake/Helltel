@@ -16,10 +16,12 @@ public class NavManager : MonoBehaviour
     void Start()
     {
         NavMeshUpdate();
+        
     }
     // Update is called once per frame
     void NavMeshUpdate()
     {
+        Debug.Log("NavMesh Update Called");
         foreach(var surface in _navMeshSurfaces)
         {
             if(surface.navMeshData != null)
@@ -31,5 +33,6 @@ public class NavManager : MonoBehaviour
                 surface.BuildNavMesh();
             }
         }
+        Debug.Log("NavMesh Update Complete!, surface count: " + _navMeshSurfaces.Length);
     }
 }
