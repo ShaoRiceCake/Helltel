@@ -29,11 +29,14 @@ public class NetworkRoom : MonoBehaviour
     public Button btn_Back;                 // 返回按钮
     public Button btn_ConfirmJoinRoom;     //加入房间的确认按钮
     public Button btn_ExitJoinRoom;        //加入房间的退出按钮
+    public Button btn_SettingOfMainMenu;        //主菜单的设置按钮
+    public Button btn_GuestBookOfMainMenu;      //主菜单里的客人图鉴按钮
     public TMP_Text title;                  // 状态提示文本
 
     [Header("网络组件")]
     public RelayTransportNetcode relayTransportNetcode; // Relay网络传输组件
-
+    [Header("其他组件")]
+    public GlobalUIController globalUIController; //全局UI脚本
     private string uid; // 玩家唯一标识
 
     private void Start()
@@ -61,6 +64,8 @@ public class NetworkRoom : MonoBehaviour
             loadingPanel.SetActive(false);
             btn_Back.gameObject.SetActive(false);
         });
+        btn_SettingOfMainMenu.onClick.AddListener(globalUIController.OpenSettings);
+        btn_GuestBookOfMainMenu.onClick.AddListener(globalUIController.OpenGuestBook);
     }
 
     /// <summary>

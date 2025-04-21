@@ -52,7 +52,6 @@ public class CatchTool : MonoBehaviour
 
     private void UpdatePreSelectedObjects(List<GameObject> detectedObjects)
     {
-        // Update previous selected items to NotSelected
         foreach (var item in preSelectedObjects.Select(obj => obj.GetComponent<ItemBase>()).Where(item => item))
         {
             item.UpdateGraspingState(EGraspingState.NotSelected);
@@ -64,13 +63,7 @@ public class CatchTool : MonoBehaviour
     private void UpdateTargetSelection()
     {
         if (!_sphereCollider) return;
-
-        // Update all items to NotSelected first
-        foreach (var item in preSelectedObjects.Select(obj => obj.GetComponent<ItemBase>()).Where(item => item))
-        {
-            item.UpdateGraspingState(EGraspingState.NotSelected);
-        }
-
+        
         if (preSelectedObjects.Count > 0)
         {
             _currentTarget = preSelectedObjects
@@ -92,7 +85,6 @@ public class CatchTool : MonoBehaviour
             _currentItem = null;
         }
     }
-
     private void UpdateItemStates()
     {
         if (_isGrabbing && _currentItem)

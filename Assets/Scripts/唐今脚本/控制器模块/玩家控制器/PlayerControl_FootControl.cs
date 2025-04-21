@@ -105,13 +105,17 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     private void FixObject()
     {
-        _movingObj.velocity = Vector3.zero;
-        _movingObj.angularVelocity = Vector3.zero;
-        _movingObj.isKinematic = true;
+        if (!_movingObj || !_movingObj.gameObject.activeInHierarchy)
+            return;
+
+        _movingObj.isKinematic = true;  
+
     }
 
     private void MoveToTargetPosition(Vector3 targetPosition)
     {
+        if (!_movingObj) return; 
+        
         var direction = targetPosition - _movingObj.position;
         var distance = direction.magnitude;
 
