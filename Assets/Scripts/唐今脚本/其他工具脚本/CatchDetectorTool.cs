@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using UnityEngine.Serialization;
 
 public class CatchDetectorTool : MonoBehaviour
 {
@@ -25,7 +24,7 @@ public class CatchDetectorTool : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         _frameCounter++;
         if (_frameCounter < 5) return;
@@ -41,7 +40,7 @@ public class CatchDetectorTool : MonoBehaviour
 
         foreach (var col in colliders)
         {
-            if (!col.CompareTag("Uncatchable") && col.gameObject.layer != LayerMask.NameToLayer("Floor"))
+            if (col.TryGetComponent(out IGrabbable _))
             {
                 detectedObjects.Add(col.gameObject);
             }
