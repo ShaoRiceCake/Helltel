@@ -17,8 +17,17 @@ public struct BoidsState
     public List<MothController> collisionRisks; // 距离过近的虫子列表(具有碰撞风险，需要处理)
 }
 
-
-public class MothController : GuestBase, IHurtable 
+public enum MothState
+{
+    UnderGroup, // 集体行动
+    PrepareAttack, // 准备攻击
+    Dash, // 冲刺
+    Attached, // 附着
+    Stunned, // 眩晕
+    Returning, // 返回
+    Dead, // 死亡
+}
+public class MothController : GuestBase, IHurtable
 {
     [Header("这个虫子属于哪个组")]
     public MothGroupController belongToGroup; // 所属的虫群
@@ -31,6 +40,14 @@ public class MothController : GuestBase, IHurtable
     public float maxVelocity = 30f; // 最大速度
     [Header("虫子最小速度")]
     public float minVelocity = 0f; // 最小速度
+
+    [Header("虫子攻击距离")]
+    public float attackDistance = 5f; // 攻击距离
+    [Header("虫子冲刺速度")]
+    public float dashSpeed = 10f; // 冲刺速度
+
+
+    private Vector3 dashTarget; // 冲刺目标位置
 
 
 
@@ -53,8 +70,7 @@ public class MothController : GuestBase, IHurtable
         Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
         debugger.BehaviorTree = behaviorTree;
 #endif
-
-         behaviorTree.Blackboard["UnderGroup"] = true; // 初始化黑板变量
+        SetMothState(MothState.UnderGroup);
         behaviorTree.Start();
     }
 
@@ -86,15 +102,17 @@ public class MothController : GuestBase, IHurtable
         //     new Selector(
 
         //     )
-            
+
         // );
 
         return new Root(
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
-                    BuildGroupMoveBranch()// 集体行动
-                )               
+                BuildGroupMoveBranch(),// 集体行动
+                BuildAttackBranch() // 攻击
+
+                )
 
             )
         );
@@ -104,14 +122,14 @@ public class MothController : GuestBase, IHurtable
     // ====================== 
     private Node BuildDeadBranch()
     {
-        var branch = new Condition(isDied, Stops.NONE,
+        var branch = new BlackboardCondition("State", Operator.IS_EQUAL, MothState.Dead, Stops.SELF,
             new Sequence(
                 new Action(() =>
                 {
                     Debug.Log("开始死亡表现！");
 
                 }),
-                new Wait(5.0f), // 表现等待时间，比如动画时长
+                new Wait(5.0f), // 表现等待时间，动画时长
                 new Action(() =>
                 {
                     Debug.Log("表现完成，执行销毁！");
@@ -121,27 +139,51 @@ public class MothController : GuestBase, IHurtable
             ));
         return branch;
     }
-    
+
     private Node BuildGroupMoveBranch()
     {
-        var branch = new BlackboardCondition("UnderGroup", Operator.IS_EQUAL, true, Stops.SELF,
+        var branch = new BlackboardCondition("State", Operator.IS_EQUAL, MothState.UnderGroup.ToString(), Stops.SELF,
             new Sequence(
                 new WaitUntilStopped() // 防止Sequence结束后重新执行
             ));
         return branch;
     }
 
+    // 判定死亡在接口里面实现
+    // private bool isDied()
+    // {
+    //     if (curHealth.Value <= 0)
+    //     {
+    //         behaviorTree.Blackboard["Dead"] = true; // 死亡标志
+    //         Debug.Log("判定死亡");
+    //         SetMothState(MothState.Dead); // 设置虫子状态为死亡
+    //         return true;
+    //     }
+    //     Debug.Log("判定没死");
+    //     return false;
+    // }
 
-    private bool isDied()
+    private Node BuildAttackBranch()
     {
-        if(curHealth.Value <= 0)
-        {
-            behaviorTree.Blackboard["Dead"] = true; // 死亡标志
-            Debug.Log("判定死亡");
-            return true;
-        }
-        Debug.Log("判定没死");
-        return false;
+        var branch = new Condition(TryAttack, Stops.SELF, // 进入攻击分支需要
+            new Sequence(
+                new Action(() =>
+                {
+                    Debug.Log("开始攻击表现！");
+                    Transform face = belongToGroup.CurTarget?.transform.Find("HeadTarget");
+                    if (face == null) return;
+                    dashTarget = face.position; // 获取目标位置
+                    SetMothState(MothState.Dash); // 设置虫子状态为冲刺
+                }),
+                new Wait(0.5f), // 前摇时间
+                new Action(() =>
+                {
+                    Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
+                    rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
+                })
+
+            ));
+        return branch;
     }
 
     // 实现 IHurtable 接口
@@ -149,6 +191,16 @@ public class MothController : GuestBase, IHurtable
     {
         // 处理伤害逻辑
         Debug.Log("Take Damage: " + damage);
+        if (damage >= curHealth.Value)
+        {
+            curHealth.Value = 0;
+            behaviorTree.Blackboard["Dead"] = true; // 死亡标志
+            SetMothState(MothState.Dead); // 设置虫子状态为死亡
+        }
+        else
+        {
+            curHealth.Value -= damage;
+        }
     }
 
     protected override void Update()
@@ -157,6 +209,11 @@ public class MothController : GuestBase, IHurtable
         if (behaviorTree.Blackboard["UnderGroup"].Equals(true))
         {
             BoidUpdateState(); // 更新状态
+        }
+
+        if (behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
+        {
+
         }
 
     }
@@ -169,13 +226,13 @@ public class MothController : GuestBase, IHurtable
         }
     }
 
-
+    // 虫子集群行为++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     private void BoidInitState()
     {
         boidsState.newVelocity = rb.velocity; // 下一帧中的速度
         boidsState.neighbors = new List<MothController>(); // 附近所有的虫子列表
         boidsState.collisionRisks = new List<MothController>(); // 距离过近的虫子列表(具有碰撞风险，需要处理)
-       
+
     }
     private void BoidResetState()
     {
@@ -228,9 +285,9 @@ public class MothController : GuestBase, IHurtable
             finalVelocity = finalVelocity.normalized * minVelocity;
 
         // 设置 Rigidbody 速度，交由物理引擎驱动移动
-    
- rb.velocity = finalVelocity; // 设置刚体速度
-    
+
+        rb.velocity = finalVelocity; // 设置刚体速度
+
         this.transform.LookAt(this.transform.position + finalVelocity); // 让虫子朝向移动的方向
     }
 
@@ -291,6 +348,54 @@ public class MothController : GuestBase, IHurtable
         averagePosition /= someBoids.Count;
         return averagePosition;
     }
+    //  虫子集群行为++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+    // 攻击相关================================================================================================
+
+    private bool TryAttack()
+    {
+        if (belongToGroup.CurTarget != null)
+        {
+            if (Vector3.Distance(this.transform.position, belongToGroup.CurTarget.transform.position) <= attackDistance)
+            {
+                return true; // 在攻击范围内
+            }
+        }
+
+        return false;
+    }
+    private void MonitorDashState()
+    {
+        // 判断是否飞过目标点（基于方向和位移）
+        Vector3 toTarget = dashTarget - transform.position;
+        float dot = Vector3.Dot(rb.velocity.normalized, toTarget.normalized);
+
+        // 如果dot小于0，说明虫子已经“飞过”目标点方向
+        if (dot < 0f || Vector3.Distance(transform.position, dashTarget) < 0.5f)
+        {
+            Debug.Log("冲刺超出目标，减速返回！");
+            StartCoroutine(HandleDashMiss());
+        }
+    }
+    private IEnumerator HandleDashMiss()
+    {
+        // 进入减速阶段，只执行一次
+        SetMothState(MothState.Stunned); // 或可设置成 MothState.Returning
+
+        // 设置阻力让它自动停下来
+        rb.drag = 5f;
+
+        yield return new WaitForSeconds(1.5f); // 给它一段停顿时间
+
+        // 恢复阻力 & 状态重置
+        rb.drag = 0f;
+        SetMothState(MothState.Returning); // 回到集体
+    }
+
+
+    // 攻击i相关 ================================================================================================
 
 
     public Vector3 GetRbVelocity()
@@ -301,7 +406,19 @@ public class MothController : GuestBase, IHurtable
     public override void OnDestroy()
     {
         base.OnDestroy();
-        belongToGroup.UnregisterMoth(this.gameObject); 
+        belongToGroup.UnregisterMoth(this.gameObject);
+    }
+    public void SetMothState(MothState state)
+    {
+        behaviorTree.Blackboard["State"] = state.ToString();
     }
 
+
+    private void OnDrawGizmos()
+    {
+        // 画出攻击距离，球
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(this.transform.position, attackDistance); // 画出攻击范围
+
+    }
 }

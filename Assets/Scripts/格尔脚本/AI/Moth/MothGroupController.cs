@@ -126,6 +126,7 @@ public class MothGroupController : GuestBase
                     if(EnemyList.Contains(target.gameObject))
                     {
                         CurTarget = target.gameObject;
+                        
                         return true;
                     }
                 }
@@ -138,4 +139,6 @@ public class MothGroupController : GuestBase
     {
         return mothList;
     }
+
+    
 }
