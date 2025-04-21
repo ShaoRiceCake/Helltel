@@ -1,6 +1,6 @@
 using UnityEngine;
-using UnityEngine.Rendering; 
-
+using UnityEngine.Rendering;
+using Unity.Netcode;
 public class PlayerControl_CameraControl : PlayerControl_BaseControl
 {
     private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
@@ -69,14 +69,26 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         if (controlHandler != null)
         {
-            controlHandler.onCameraControl.AddListener(EnableCameraControl);
-            controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
+            if (NetworkManager.Singleton)
+            {
+                if (IsLocalPlayer)
+                {
+                    controlHandler.onCameraControl.AddListener(EnableCameraControl);
+                    controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
+                }
+            }
+            else
+            {
+                controlHandler.onCameraControl.AddListener(EnableCameraControl);
+                controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
+            }
+
         }
 
         if (controlledCamera == null) controlledCamera = Camera.main;
         if (target == null)
         {
-            var player = GameObject.FindGameObjectWithTag("Player");
+            var player = transform;
             if (player != null) target = player.transform;
         }
 
@@ -111,6 +123,10 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     private void Update()
     {
+        if (!IsLocalPlayer && NetworkManager.Singleton) return;
+
+        if (!GameManager.instance.isGameing) return;
+
         if (!_isCameraControlActive) return;
         
         var scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -163,6 +179,11 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     private void LateUpdate()
     {
+        if (!IsLocalPlayer && NetworkManager.Singleton) return;
+
+        if (!GameManager.instance.isGameing) return;
+
+
         if (!controlledCamera || !target) return;
         
         if (_isCameraControlActive)
@@ -263,9 +284,22 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     {
         base.OnDestroy();
 
-        if (controlHandler == null) return;
-        controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
-        controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
+        if (NetworkManager.Singleton)
+        {
+            if (IsLocalPlayer)
+            {
+                if (controlHandler == null) return;
+                controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
+                controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
+            }
+
+        }
+        else
+        {
+            if (controlHandler == null) return;
+            controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
+            controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
+        }
     }
     
     public void SetZoomRange(float min, float max)

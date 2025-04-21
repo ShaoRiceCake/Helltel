@@ -87,6 +87,8 @@ namespace Helltal.Gelercat
         protected virtual void Init()
         {
             if (!IsHost && NetworkManager.Singleton) return;
+
+            TakeDamageServerRpc(maxSpawnCount);
         }
 
         protected virtual void Start()
