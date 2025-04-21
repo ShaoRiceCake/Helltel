@@ -18,7 +18,7 @@ public struct BoidsState
 }
 
 
-public class MothController : GuestBase, IHurtable
+public class MothController : GuestBase, IHurtable 
 {
     [Header("这个虫子属于哪个组")]
     public MothGroupController belongToGroup; // 所属的虫群

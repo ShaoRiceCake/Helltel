@@ -39,7 +39,7 @@ public class MothGroupController : GuestBase
     {
         base.Start();
 
-
+        sensor = this.gameObject.GetComponent<GuestSensor>();
         if (sensor == null)
         {
             sensor = this.gameObject.AddComponent<GuestSensor>();
@@ -91,7 +91,7 @@ public class MothGroupController : GuestBase
             new Selector(
             
                 BuildChaseingBranch(),//追击分支
-                    new Selector(
+                new Selector(
                     new Repeater(
                         new Cooldown(1f, 
                         new Patrol(agent, navPointsManager))
