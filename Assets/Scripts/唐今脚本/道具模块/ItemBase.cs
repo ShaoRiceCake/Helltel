@@ -40,11 +40,11 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     {
         if (CurrentState == newState) return;
         CurrentState = newState;
-        Debug.Log($"{ItemName} state changed to: {CurrentState}");
+        // Debug.Log($"{ItemName} state changed to: {CurrentState}");
     }
     
     protected virtual void Update()
     {
-        Debug.Log($"{ItemName} current state: {CurrentState}");
+        // Debug.Log($"{ItemName} current state: {CurrentState}");
     }
 }
