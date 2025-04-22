@@ -112,9 +112,9 @@ public class MothController : GuestBase, IHurtable
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
+                BuildAttachingBranch(), // 附着                
                 BuildAttackBranch(), // 攻击
                 BuildGroupMoveBranch()// 集体行动
-
                 )
 
             )
@@ -145,33 +145,21 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildGroupMoveBranch()
     {
-        var branch = 
+        var branch =
             new Sequence(
-                new Action(()=>{
+                new Action(() =>
+                {
                     SetMothState(MothState.UnderGroup); // 设置虫子状态为集体行动
                 }),
-                new WaitUntilStopped() // 防止Sequence结束后重新执行
+                new WaitUntilStopped() 
             );
         return branch;
     }
 
-    // 判定死亡在接口里面实现
-    // private bool isDied()
-    // {
-    //     if (curHealth.Value <= 0)
-    //     {
-    //         behaviorTree.Blackboard["Dead"] = true; // 死亡标志
-    //         Debug.Log("判定死亡");
-    //         SetMothState(MothState.Dead); // 设置虫子状态为死亡
-    //         return true;
-    //     }
-    //     Debug.Log("判定没死");
-    //     return false;
-    // }
 
     private Node BuildAttackBranch()
     {
-        var branch = new Condition(TryAttack, Stops.IMMEDIATE_RESTART, // 进入攻击分支需要
+        var branch = new Condition(TryAttack, Stops.LOWER_PRIORITY, 
             new Sequence(
                 new Action(() =>
                 {
@@ -188,11 +176,15 @@ public class MothController : GuestBase, IHurtable
                     rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
                     Debug.Log("冲刺！");
                 })
-
             ));
         return branch;
     }
-
+    private Node BuildAttachingBranch()
+    {
+        return new BlackboardCondition("State",Operator.IS_EQUAL,MothState.Attached.ToString(),Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+            new WaitUntilStopped()
+        );
+    }
     // 实现 IHurtable 接口
     public void TakeDamage(int damage)
     {
@@ -219,7 +211,6 @@ public class MothController : GuestBase, IHurtable
         }
         if (behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
         {
-
         }
 
     }
@@ -359,48 +350,41 @@ public class MothController : GuestBase, IHurtable
     // 攻击相关================================================================================================
 
     private bool TryAttack()
-    {
+    {   
+        if(!behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
+        {
+            return false; 
+        }
         Debug.Log("try attack!");
         if (belongToGroup.CurTarget != null)
         {
             Debug.Log("有目标！");
             if (Vector3.Distance(this.transform.position, belongToGroup.CurTarget.transform.position) <= attackDistance)
-            {Debug.Log("在攻击范围内！");
+            {
+                Debug.Log("在攻击范围内！");
                 return true; // 在攻击范围内
             }
         }
 
         return false;
     }
-    private void MonitorDashState()
-    {
-        // 判断是否飞过目标点（基于方向和位移）
-        Vector3 toTarget = dashTarget - transform.position;
-        float dot = Vector3.Dot(rb.velocity.normalized, toTarget.normalized);
 
-        // 如果dot小于0，说明虫子已经“飞过”目标点方向
-        if (dot < 0f || Vector3.Distance(transform.position, dashTarget) < 0.5f)
+    /// <summary>
+    /// 接触到玩家，附着在其身上
+    /// </summary>
+    /// <returns></returns>
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
         {
-            Debug.Log("冲刺超出目标，减速返回！");
-            StartCoroutine(HandleDashMiss());
+            Debug.Log("冲刺到玩家身上！");
+            // 这里可以添加附着的逻辑，比如设置父物体等
+            // this.transform.SetParent(collision.transform); // 附着在玩家身上
+            rb.velocity = Vector3.zero;
+            SetMothState(MothState.Attached);
         }
+
     }
-    private IEnumerator HandleDashMiss()
-    {
-        // 进入减速阶段，只执行一次
-        SetMothState(MothState.Stunned); // 或可设置成 MothState.Returning
-
-        // 设置阻力让它自动停下来
-        rb.drag = 5f;
-
-        yield return new WaitForSeconds(1.5f); // 给它一段停顿时间
-
-        // 恢复阻力 & 状态重置
-        rb.drag = 0f;
-        SetMothState(MothState.Returning); // 回到集体
-    }
-
-
     // 攻击i相关 ================================================================================================
 
 
@@ -425,7 +409,7 @@ public class MothController : GuestBase, IHurtable
         // 画出攻击距离，球
         Gizmos.color = Color.gray;
         Gizmos.DrawWireSphere(this.transform.position, attackDistance); // 画出攻击范围
-        if(behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString())&& dashTarget != null)
+        if (Application.isPlaying &&  behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()) && dashTarget != null )
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(dashTarget, 0.2f); // 画出冲刺目标范围
