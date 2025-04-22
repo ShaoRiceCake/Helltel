@@ -17,7 +17,8 @@ public class LoadingScreen : MonoBehaviour
     
     [Header("场景配置")]
     private string loadingSceneName = "Loading";
-    private float minDisplayTime = 100f;
+    private float minDisplayTime = 3f;
+
     [Header("两侧设置")]
     [SerializeField] RectTransform[] foreground;  // 两张无缝拼接的前景
     [SerializeField] RectTransform[] ironChain;  // 两张无缝拼接的前景
@@ -25,6 +26,10 @@ public class LoadingScreen : MonoBehaviour
     [Header("齿轮设置")]
     [SerializeField] Transform gearUI,gear1,gear2,gear3,gear4;                 // 齿轮Transform
     float gearRotationSpeed = 200f;  // 旋转速度（度/秒）
+    [Header("电梯设置")]
+    [SerializeField] Transform elevator;          // 电梯主体Transform
+    float shakeStrength = 0.4f; // 震动强度系数
+    float shakeDuration = 0.25f;  // 单次震动周期
 
     private float foregroundHeight,ironChainHeight;
 
@@ -74,6 +79,7 @@ public class LoadingScreen : MonoBehaviour
         StartGearRotation(gear2,false);
         StartGearRotation(gear3,true);
         StartGearRotation(gear4,false);
+        StartElevatorAnimation();
         StartBackgroundScroll();
     }
 
@@ -86,30 +92,22 @@ public class LoadingScreen : MonoBehaviour
         // 禁用自动激活，确保完全加载后再切换
         asyncLoad.allowSceneActivation = false;
 
-        // 加载监控循环
-        while (!asyncLoad.isDone)
+        // 第一阶段：等待加载至90%
+        while (asyncLoad.progress < 0.9f)
         {
-            /* 
-             * Unity的加载进度逻辑：
-             * - 0.0~0.9：实际加载进度
-             * - 0.9~1.0：等待allowSceneActivation激活
-             */
-            if (asyncLoad.progress >= 0.9f)
-            {
-                // 加载完成90%后自动激活场景
-                asyncLoad.allowSceneActivation = true;
-            }
-
             yield return null;
         }
 
-        // 计算实际加载耗时
-        float loadDuration = Time.realtimeSinceStartup - startTime;
-        ///float minDisplayTime = 1.5f; // 最小展示时间（秒）
+        // 第二阶段：计算强制等待时间
+        float elapsed = Time.realtimeSinceStartup - startTime;
+        float remainingWait = Mathf.Max(minDisplayTime - elapsed, 0);
+        yield return new WaitForSeconds(remainingWait); // 关键点：先等待再激活
         
-        // 若加载过快，等待补足时间。防止加载场景一闪而过
-        if (loadDuration < minDisplayTime) {
-            yield return new WaitForSeconds(minDisplayTime - loadDuration);
+        // 第三阶段：激活场景
+        asyncLoad.allowSceneActivation = true;
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
         }
 
         // 关键修复：设置新场景为活跃场景
@@ -199,6 +197,31 @@ public class LoadingScreen : MonoBehaviour
     {
         var otherImg = currentImg == ironChain[0] ? ironChain[1] : ironChain[0];
         currentImg.anchoredPosition = otherImg.anchoredPosition - new Vector2(0, ironChainHeight);
+    }
+    void StartElevatorAnimation()
+    {
+        if (elevator == null) return;
+
+        // 复合震动动画序列
+        Sequence elevatorSequence = DOTween.Sequence()
+            // 缩放动画：轻微放大后恢复
+            .Append(elevator.DOScale(1.01f * Vector3.one, shakeDuration * 0.2f).SetEase(Ease.OutQuad))
+            .Append(elevator.DOScale(Vector3.one, shakeDuration * 0.3f).SetEase(Ease.InQuad))
+            
+            // 位移动画：随机方向晃动
+            .Join(elevator.DOShakePosition(
+                duration: shakeDuration,
+                strength: new Vector3(shakeStrength * 4, shakeStrength * 2, 0),
+                vibrato: 10,
+                fadeOut: false
+            ).SetEase(Ease.Linear))
+            
+            // 无限循环
+            .SetLoops(-1)
+            .SetLink(gameObject);
+
+        // 添加随机性参数
+        elevatorSequence.timeScale = Random.Range(0.8f, 1.2f); // 速度随机变化
     }
 
     void OnDestroy()
