@@ -48,7 +48,7 @@ public class AudioManager : MonoBehaviour
 
     #region Runtime Data
     private Dictionary<string, SoundEffect> soundEffects = new Dictionary<string, SoundEffect>();
-    private List<AudioSource> audioSourcePool = new List<AudioSource>();
+    public List<AudioSource> audioSourcePool = new List<AudioSource>();
     #endregion
 
     #region Initialization
@@ -325,4 +325,5 @@ public class AudioManager : MonoBehaviour
         audioMixer.SetFloat("ReverbMix", enable ? 0f : -80f); // 0dB启用，-80dB静音
     }
     #endregion
+    
 }
