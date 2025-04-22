@@ -74,6 +74,9 @@ public class MothController : GuestBase, IHurtable
         behaviorTree.Start();
     }
 
+
+
+
     private void InitSettings()
     {
         if (rb == null)
@@ -109,8 +112,8 @@ public class MothController : GuestBase, IHurtable
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
-                BuildGroupMoveBranch(),// 集体行动
-                BuildAttackBranch() // 攻击
+                BuildAttackBranch(), // 攻击
+                BuildGroupMoveBranch()// 集体行动
 
                 )
 
@@ -142,10 +145,13 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildGroupMoveBranch()
     {
-        var branch = new BlackboardCondition("State", Operator.IS_EQUAL, MothState.UnderGroup.ToString(), Stops.SELF,
+        var branch = 
             new Sequence(
+                new Action(()=>{
+                    SetMothState(MothState.UnderGroup); // 设置虫子状态为集体行动
+                }),
                 new WaitUntilStopped() // 防止Sequence结束后重新执行
-            ));
+            );
         return branch;
     }
 
@@ -165,7 +171,7 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildAttackBranch()
     {
-        var branch = new Condition(TryAttack, Stops.SELF, // 进入攻击分支需要
+        var branch = new Condition(TryAttack, Stops.IMMEDIATE_RESTART, // 进入攻击分支需要
             new Sequence(
                 new Action(() =>
                 {
@@ -175,11 +181,12 @@ public class MothController : GuestBase, IHurtable
                     dashTarget = face.position; // 获取目标位置
                     SetMothState(MothState.Dash); // 设置虫子状态为冲刺
                 }),
-                new Wait(0.5f), // 前摇时间
+                new Wait(1f), // 前摇时间
                 new Action(() =>
                 {
                     Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
                     rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
+                    Debug.Log("冲刺！");
                 })
 
             ));
@@ -206,11 +213,10 @@ public class MothController : GuestBase, IHurtable
     protected override void Update()
     {
         base.Update();
-        if (behaviorTree.Blackboard["UnderGroup"].Equals(true))
+        if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
         {
             BoidUpdateState(); // 更新状态
         }
-
         if (behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
         {
 
@@ -220,7 +226,7 @@ public class MothController : GuestBase, IHurtable
     protected override void LateUpdate()
     {
         base.LateUpdate();
-        if (behaviorTree.Blackboard["UnderGroup"].Equals(true))
+        if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
         {
             BoidApplyState(); // 应用状态
         }
@@ -237,8 +243,6 @@ public class MothController : GuestBase, IHurtable
     private void BoidResetState()
     {
         boidsState.newVelocity = rb.velocity; // 下一帧中的速度
-
-
     }
 
     // 更新下一时刻 速度矢量 
@@ -356,10 +360,12 @@ public class MothController : GuestBase, IHurtable
 
     private bool TryAttack()
     {
+        Debug.Log("try attack!");
         if (belongToGroup.CurTarget != null)
         {
+            Debug.Log("有目标！");
             if (Vector3.Distance(this.transform.position, belongToGroup.CurTarget.transform.position) <= attackDistance)
-            {
+            {Debug.Log("在攻击范围内！");
                 return true; // 在攻击范围内
             }
         }
@@ -417,8 +423,16 @@ public class MothController : GuestBase, IHurtable
     private void OnDrawGizmos()
     {
         // 画出攻击距离，球
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.gray;
         Gizmos.DrawWireSphere(this.transform.position, attackDistance); // 画出攻击范围
+        if(behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString())&& dashTarget != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(dashTarget, 0.2f); // 画出冲刺目标范围
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(this.transform.position, dashTarget); // 画出冲刺目标
+
+        }
 
     }
 }

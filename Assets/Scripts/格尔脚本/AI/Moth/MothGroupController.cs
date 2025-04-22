@@ -54,6 +54,8 @@ public class MothGroupController : GuestBase
         behaviorTree.Start();
     }
 
+
+    
     public void RegisterMoth(GameObject moth)
     {
         MothController mothController = moth.GetComponent<MothController>();
@@ -92,11 +94,12 @@ public class MothGroupController : GuestBase
             
                 BuildChaseingBranch(),//追击分支
                 new Selector(
-                    new Repeater(
-                        new Cooldown(1f, 
-                        new Patrol(agent, navPointsManager))
+                    new Condition(IsNavAgentOnNavmesh,
+                        new Repeater(
+                            new Cooldown(1f, 
+                            new Patrol(agent, navPointsManager))
+                        ))
                     )
-                )
             )
         );
     }
@@ -109,7 +112,6 @@ public class MothGroupController : GuestBase
                 if (CurTarget != null)
                 {
                     agent.SetDestination(CurTarget.transform.position);
-                    if (Debugging) Debug.Log("虫子正在追击目标：" + CurTarget.name);
                 }
             })
         );
@@ -140,5 +142,10 @@ public class MothGroupController : GuestBase
         return mothList;
     }
 
+
+    private bool IsNavAgentOnNavmesh()
+    {
+        return agent.isOnNavMesh;
+    }
     
 }
