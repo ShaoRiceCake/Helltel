@@ -260,7 +260,8 @@ public class NetworkRoom : MonoBehaviour
         // LoadingScreen.SceneLoader.TargetSceneName = "Lobby";
         // // 加载加载场景（单例模式）
         // SceneManager.LoadScene("Loading", LoadSceneMode.Single);   
-        lSS_Manager.LoadScene("Lobby");
+        //SceneManager.LoadScene("Lobby");
+        GameManager.instance.LoadScene("Lobby");
     }
     #endregion
 }
