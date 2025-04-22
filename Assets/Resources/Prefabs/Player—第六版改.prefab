@@ -14536,7 +14536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2191583847
+  GlobalObjectIdHash: 2412489449
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -14606,6 +14606,7 @@ MonoBehaviour:
   onStopCameraControl:
     m_PersistentCalls:
       m_Calls: []
+  stopPlayerControl: 0
 --- !u!114 &5177564092779926453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14618,14 +14619,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dbb0f3f2421a9b42a5f7e2ce4f70a93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlHandler: {fileID: 0}
+  controlHandler: {fileID: 1934847304443140649}
   forwardObject: {fileID: 4584979608547521799}
   handPrepareObj: {fileID: 3955473898668401751}
   handControlAttachment: {fileID: 3153565272146633847}
   handMoveSpeed: 4
   cylinderRadius: 15
   cylinderHalfHeight: 12
-  mouseSensitivity: 50
+  mouseSensitivity: 200
   catchTool: {fileID: 7018274536276637347}
   handBallPrefab: {fileID: 6451425600538136123}
   smoothSpeed: 30
@@ -14641,14 +14642,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0f8c0ec0b036834386513a752b63297, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controlHandler: {fileID: 0}
+  controlHandler: {fileID: 1934847304443140649}
   forwardObject: {fileID: 4584979608547521799}
   handPrepareObj: {fileID: 3955473898668401751}
   handControlAttachment: {fileID: 7212359289107782096}
   handMoveSpeed: 4
   cylinderRadius: 15
   cylinderHalfHeight: 12
-  mouseSensitivity: 50
+  mouseSensitivity: 200
   catchTool: {fileID: 545060664867010515}
   handBallPrefab: {fileID: 9019645038864475817}
   smoothSpeed: 30
@@ -14883,6 +14884,19 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   collisionOffset: 0.3
+  sphereCastRadius: 0.3
+  heightAdjustmentSpeed: 2
+  minHeightAdjustment: 0.5
+  maxHeightAdjustment: 1.5
+  collisionDamping: 0.5
+  lookAtHeightRatio: 0.4
+  lookAtSmoothTime: 0.2
+  targetRenderer: {fileID: 3486739009016350184}
+  minAlpha: 0
+  maxAlpha: 1
+  fadeStartDistance: 3.5
+  fadeEndDistance: 2.5
+  fadeSmoothTime: 0.2
 --- !u!1 &3832775769934062511
 GameObject:
   m_ObjectHideFlags: 0
@@ -15231,13 +15245,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4584979608547521799}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.023014514, y: -0.7067887, z: 0.019234903, w: 0.7067885}
-  m_LocalPosition: {x: 7, y: 1.73, z: -0.44}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 9, y: 0, z: -0.15}
   m_LocalScale: {x: 1.562502, y: 1.5625006, z: 1.5625024}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8623193061530919884}
-  m_LocalEulerAnglesHint: {x: 3.424, y: -90.009, z: -0.307}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!20 &2506025552200807396
 Camera:
   m_ObjectHideFlags: 0
@@ -15271,7 +15285,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 80
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
