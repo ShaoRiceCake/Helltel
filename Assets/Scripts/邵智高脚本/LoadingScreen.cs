@@ -19,13 +19,15 @@ public class LoadingScreen : MonoBehaviour
     private string loadingSceneName = "Loading";
     private float minDisplayTime = 100f;
     [Header("两侧设置")]
-    [SerializeField] RectTransform[] images;  // 两张无缝拼接的图片
+    [SerializeField] RectTransform[] foreground;  // 两张无缝拼接的前景
+    [SerializeField] RectTransform[] ironChain;  // 两张无缝拼接的前景
     float scrollSpeed = 800f;
     [Header("齿轮设置")]
-    [SerializeField] Transform gear;                 // 齿轮Transform
+    [SerializeField] Transform gearUI,gear1,gear2,gear3,gear4;                 // 齿轮Transform
     float gearRotationSpeed = 200f;  // 旋转速度（度/秒）
 
-    private float imageHeight;
+    private float foregroundHeight,ironChainHeight;
+
     private Vector2 screenSize =new Vector2(1920,1080);
 
 
@@ -67,7 +69,11 @@ public class LoadingScreen : MonoBehaviour
     }
     void InitializeAnimations()
     {
-        StartGearRotation();
+        StartGearRotation(gearUI,true);
+        StartGearRotation(gear1,true);
+        StartGearRotation(gear2,false);
+        StartGearRotation(gear3,true);
+        StartGearRotation(gear4,false);
         StartBackgroundScroll();
     }
 
@@ -129,41 +135,70 @@ public class LoadingScreen : MonoBehaviour
             Debug.LogError("无法卸载场景: " + loadingSceneName);
         }
     }
-    void StartGearRotation()
+    void StartGearRotation(Transform image,bool isClockwise)
     {
-        if (gear == null) return;
+        if (image == null) return;
 
-        // 持续顺时针旋转
-        gear.DOLocalRotate(new Vector3(0, 0, -360), 360 / gearRotationSpeed, RotateMode.FastBeyond360)
+        if(isClockwise == true)
+        {
+            // 持续顺时针旋转
+            image.DOLocalRotate(new Vector3(0, 0, -360), 360 / gearRotationSpeed, RotateMode.FastBeyond360)
             .SetEase(Ease.Linear)
             .SetLoops(-1)
             .SetRelative();
+        }
+        else
+        {
+            // 持续顺时针旋转
+            image.DOLocalRotate(new Vector3(0, 0, 360), 360 / gearRotationSpeed, RotateMode.FastBeyond360)
+            .SetEase(Ease.Linear)
+            .SetLoops(-1)
+            .SetRelative();
+        }
+        
     }
 
     void StartBackgroundScroll()
     {
-        if (images.Length != 2) return;
+        if (foreground.Length != 2 ||ironChain.Length !=2) return;
 
-        imageHeight = images[0].rect.height;
+        foregroundHeight = foreground[0].rect.height;
+        ironChainHeight = ironChain[0].rect.height;
         
         // 设置初始位置
-        images[0].anchoredPosition = Vector2.zero;
-        images[1].anchoredPosition = new Vector2(0, -imageHeight);
-
-        foreach (var img in images)
+        foreground[0].anchoredPosition = Vector2.zero;
+        foreground[1].anchoredPosition = new Vector2(0, -foregroundHeight);
+        ironChain[0].anchoredPosition = Vector2.zero;
+        ironChain[1].anchoredPosition = new Vector2(0, -ironChainHeight);
+        
+        foreach (var img in foreground)
         {
-            img.DOLocalMoveY(imageHeight * 1, imageHeight / scrollSpeed)
+            img.DOLocalMoveY(foregroundHeight * 1, foregroundHeight / 800)
                 .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Restart)
-                .OnStepComplete(() => ResetBackgroundPosition(img))
+                .OnStepComplete(() => ResetForegroundPosition(img))
+                .SetRelative();
+        }
+        foreach (var img in ironChain)
+        {
+            img.DOLocalMoveY(ironChainHeight * 1, ironChainHeight / 200)
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Restart)
+                .OnStepComplete(() => ResetIronChainPosition(img))
                 .SetRelative();
         }
     }
 
-    void ResetBackgroundPosition(RectTransform currentImg)
+    
+    void ResetForegroundPosition(RectTransform currentImg)
     {
-        var otherImg = currentImg == images[0] ? images[1] : images[0];
-        currentImg.anchoredPosition = otherImg.anchoredPosition - new Vector2(0, imageHeight);
+        var otherImg = currentImg == foreground[0] ? foreground[1] : foreground[0];
+        currentImg.anchoredPosition = otherImg.anchoredPosition - new Vector2(0, foregroundHeight);
+    }
+    void ResetIronChainPosition(RectTransform currentImg)
+    {
+        var otherImg = currentImg == ironChain[0] ? ironChain[1] : ironChain[0];
+        currentImg.anchoredPosition = otherImg.anchoredPosition - new Vector2(0, ironChainHeight);
     }
 
     void OnDestroy()
