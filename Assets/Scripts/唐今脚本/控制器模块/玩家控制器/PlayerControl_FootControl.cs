@@ -178,4 +178,5 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Grounded;
         _hasTriggeredLockEvent = false;
     }
+    
 }
