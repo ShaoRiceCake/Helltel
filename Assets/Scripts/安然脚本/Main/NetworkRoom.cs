@@ -10,7 +10,7 @@ using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
 using Unity.Sync.Relay.Transport.Netcode;
 using UnityEngine.SceneManagement;
-
+using Michsky.LSS;
 /// <summary>
 /// 网络房间管理器
 /// 功能：
@@ -38,6 +38,7 @@ public class NetworkRoom : MonoBehaviour
     public RelayTransportNetcode relayTransportNetcode; // Relay网络传输组件
     [Header("其他组件")]
     public GlobalUIController globalUIController; //全局UI脚本
+    public LoadingScreenManager lSS_Manager;
     private string uid; // 玩家唯一标识
 
     private void Start()
@@ -255,11 +256,11 @@ public class NetworkRoom : MonoBehaviour
         unityTransport.SetConnectionData("0.0.0.0", 7777); // 监听所有地址
         NetworkManager.Singleton.StartHost();
         
-        // 设置目标场景名称
-        LoadingScreen.SceneLoader.TargetSceneName = "Lobby";
-        // 加载加载场景（单例模式）
-        SceneManager.LoadScene("Loading", LoadSceneMode.Single);   
-        //GameManager.instance.LoadScene("Lobby");
+        // // 设置目标场景名称
+        // LoadingScreen.SceneLoader.TargetSceneName = "Lobby";
+        // // 加载加载场景（单例模式）
+        // SceneManager.LoadScene("Loading", LoadSceneMode.Single);   
+        lSS_Manager.LoadScene("Lobby");
     }
     #endregion
 }

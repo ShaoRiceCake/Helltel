@@ -17,7 +17,7 @@ public class LoadingScreen : MonoBehaviour
     
     [Header("场景配置")]
     private string loadingSceneName = "Loading";
-    private float minDisplayTime = 3f;
+    private float minDisplayTime = 20f;
 
     [Header("两侧设置")]
     [SerializeField] RectTransform[] foreground;  // 两张无缝拼接的前景
@@ -39,14 +39,7 @@ public class LoadingScreen : MonoBehaviour
 
 
 
-    // 静态场景参数传递类（跨场景数据容器）
-    public static class SceneLoader 
-    {
-        /// <summary>
-        /// 要加载的目标场景名称
-        /// </summary>
-        public static string TargetSceneName { get; set; }
-    }
+ 
 
     private void Start()
     {
@@ -60,6 +53,8 @@ public class LoadingScreen : MonoBehaviour
         
         // 初始化参数
         InitializeAnimations();
+        AudioManager.Instance.Play("加载",loop:true);
+
         // imageHeight = images[0].rect.height;
         // //screenSize = GetComponentInParent<Canvas>().GetComponent<RectTransform>().sizeDelta;
         
@@ -69,8 +64,7 @@ public class LoadingScreen : MonoBehaviour
         // // 启动动画
         // StartScroll();
 
-        // 启动异步加载协程
-        StartCoroutine(LoadTargetScene(SceneLoader.TargetSceneName));
+       
     }
     void InitializeAnimations()
     {
@@ -82,7 +76,7 @@ public class LoadingScreen : MonoBehaviour
         StartElevatorAnimation();
         StartBackgroundScroll();
     }
-
+    //弃用
     private IEnumerator LoadTargetScene(string targetScene)
     {
         float startTime = Time.realtimeSinceStartup; // 记录加载开始时间
@@ -226,6 +220,7 @@ public class LoadingScreen : MonoBehaviour
 
     void OnDestroy()
     {
+        AudioManager.Instance.StopAll();
         DOTween.KillAll();
     }
 
