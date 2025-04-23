@@ -9,6 +9,7 @@ using System;
 using Unity.Sync.Relay.Lobby;
 using Unity.Sync.Relay.Model;
 using Unity.Sync.Relay.Transport.Netcode;
+using Obi;
 public class NetworkSpawn : NetworkBehaviour
 {
     
@@ -43,6 +44,7 @@ public class NetworkSpawn : NetworkBehaviour
         {
             my_Info = GameManager.instance.AllPlayerInfos[OwnerClientId];
             transform.position = GameObject.Find("Spawn1").transform.position;
+            GetComponent<ObiSolver>().enabled = true;
         });
         base.OnNetworkSpawn();
 
