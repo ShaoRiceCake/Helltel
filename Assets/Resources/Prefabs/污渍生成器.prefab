@@ -303,7 +303,6 @@ GameObject:
   - component: {fileID: 1793965242301647443}
   - component: {fileID: 1261687784009395639}
   - component: {fileID: 7209555874213587230}
-  - component: {fileID: 2595928419594891206}
   - component: {fileID: 6858721224616483967}
   - component: {fileID: 5664858978918853744}
   m_Layer: 0
@@ -395,37 +394,6 @@ MonoBehaviour:
     renderingLayerMask: 4294967295
   <particleColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
   <radiusScale>k__BackingField: 1
---- !u!114 &2595928419594891206
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7843042838784359023}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87b741a43af4845478fd8eff354a1510, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  foamGenerationRate: 50
-  foamPotential: 50
-  foamPotentialDiffusion: 0.95
-  velocityRange: {x: 2, y: 4}
-  vorticityRange: {x: 4, y: 8}
-  color: {r: 1, g: 1, b: 1, a: 1}
-  size: 0.02
-  sizeRandom: 0.2
-  lifetime: 5
-  lifetimeRandom: 0.2
-  buoyancy: 10
-  drag: 0.5
-  atmosphericDrag: 0.5
-  airAging: 2
-  isosurface: 0.02
-  pressure: 1
-  density: 0.3
-  smoothingRadius: 2.5
-  surfaceTension: 2
 --- !u!114 &6858721224616483967
 MonoBehaviour:
   m_ObjectHideFlags: 0

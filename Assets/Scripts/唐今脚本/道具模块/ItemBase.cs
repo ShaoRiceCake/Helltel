@@ -47,4 +47,6 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     {
         // Debug.Log($"{ItemName} current state: {CurrentState}");
     }
+
+    protected virtual void Awake(){}
 }
