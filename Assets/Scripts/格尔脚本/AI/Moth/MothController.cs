@@ -55,6 +55,8 @@ public class MothController : GuestBase, IHurtable
 
     private Root behaviorTree;
 
+
+
     public void Awake()
     {
         belongToGroup.RegisterMoth(this.gameObject); // 注册虫子到虫群
@@ -70,6 +72,7 @@ public class MothController : GuestBase, IHurtable
         Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
         debugger.BehaviorTree = behaviorTree;
 #endif
+        behaviorTree.Blackboard["getDamage"] = false; // 受伤标志
         SetMothState(MothState.UnderGroup);
         behaviorTree.Start();
     }
@@ -91,27 +94,11 @@ public class MothController : GuestBase, IHurtable
 
     protected override Root GetBehaviorTree()
     {
-        // return new Root(
-        //     // new Selector(
-        //     // // 死亡
-
-        //     // // 被抓住
-        //     // // 眩晕
-        //     // // 攻击
-        //     // // 集体行动
-
-
-        //     // )
-        //     new Selector(
-
-        //     )
-
-        // );
-
         return new Root(
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
+                BuildGetDamageBranch(), // 受伤表现
                 BuildAttachingBranch(), // 附着                
                 BuildAttackBranch(), // 攻击
                 BuildGroupMoveBranch()// 集体行动
@@ -129,6 +116,8 @@ public class MothController : GuestBase, IHurtable
             new Sequence(
                 new Action(() =>
                 {
+                    //给一个向后的速度， debug用
+                    rb.AddForce(Vector3.back * 10f, ForceMode.Impulse); // 向后弹起
                     Debug.Log("开始死亡表现！");
 
                 }),
@@ -151,7 +140,7 @@ public class MothController : GuestBase, IHurtable
                 {
                     SetMothState(MothState.UnderGroup); // 设置虫子状态为集体行动
                 }),
-                new WaitUntilStopped() 
+                new WaitUntilStopped()
             );
         return branch;
     }
@@ -159,49 +148,84 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildAttackBranch()
     {
-        var branch = new Condition(TryAttack, Stops.LOWER_PRIORITY, 
+        var branch = new Condition(TryAttack, Stops.LOWER_PRIORITY,
             new Sequence(
                 new Action(() =>
                 {
-                    Debug.Log("开始攻击表现！");
                     Transform face = belongToGroup.CurTarget?.transform.Find("HeadTarget");
                     if (face == null) return;
                     dashTarget = face.position; // 获取目标位置
-                    SetMothState(MothState.Dash); // 设置虫子状态为冲刺
                 }),
+                new Action(() =>
+                    { SetMothState(MothState.Dash); } // 设置虫子状态为冲刺
+                ),
                 new Wait(1f), // 前摇时间
                 new Action(() =>
                 {
                     Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
                     rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
-                    Debug.Log("冲刺！");
                 })
             ));
         return branch;
     }
+
     private Node BuildAttachingBranch()
     {
-        return new BlackboardCondition("State",Operator.IS_EQUAL,MothState.Attached.ToString(),Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
-            new WaitUntilStopped()
+        return new BlackboardCondition("State", Operator.IS_EQUAL, MothState.Attached.ToString(), Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+            new Service(
+                3.0f, // 每 1 秒执行一次
+                () =>
+                {
+                    if (belongToGroup.CurTarget != null)
+                    {
+                        Debug.Log("虫子附着在玩家身上, 每秒造成伤害");
+                    }
+                },
+                new WaitUntilStopped()
+            )
         );
     }
+
+    private Node BuildGetDamageBranch()
+    {
+        return new BlackboardCondition("getDamage", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY,
+            new Sequence(
+                new Action(() =>
+                {
+                    Debug.Log("受伤表现！");
+                    // 给一个向上的速度， debug用
+                    rb.AddForce(Vector3.up * 20f, ForceMode.Impulse); // 向上弹起
+
+                    behaviorTree.Blackboard["getDamage"] = false; // 重置受伤标志
+                }),
+                new Wait(1.0f), // 受伤表现等待时间
+                new Action(() =>
+                {
+                    Debug.Log("表现完成！");
+                })
+            ));
+    }
+
+
     // 实现 IHurtable 接口
     public void TakeDamage(int damage)
     {
         // 处理伤害逻辑
-        Debug.Log("Take Damage: " + damage);
         if (damage >= curHealth.Value)
         {
             curHealth.Value = 0;
-            behaviorTree.Blackboard["Dead"] = true; // 死亡标志
             SetMothState(MothState.Dead); // 设置虫子状态为死亡
         }
         else
         {
             curHealth.Value -= damage;
+            Debug.Log("虫子受伤了！当前血量：" + curHealth.Value);
+            behaviorTree.Blackboard["getDamage"] = true; // 受伤标志
         }
     }
 
+
+    private Vector3 AttachingAnchor;
     protected override void Update()
     {
         base.Update();
@@ -213,6 +237,16 @@ public class MothController : GuestBase, IHurtable
         {
         }
 
+        if (behaviorTree.Blackboard["State"].Equals(MothState.Attached.ToString()))
+        {
+            if (attachTarget != null)
+            {
+                // 使用目标 transform 计算附着位置与方向
+                this.transform.position = attachTarget.TransformPoint(localAttachOffset);
+                this.transform.rotation = attachTarget.rotation * localAttachRotation;
+            }
+        
+        }
     }
     protected override void LateUpdate()
     {
@@ -350,18 +384,15 @@ public class MothController : GuestBase, IHurtable
     // 攻击相关================================================================================================
 
     private bool TryAttack()
-    {   
-        if(!behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
+    {
+        if (!behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
         {
-            return false; 
+            return false;
         }
-        Debug.Log("try attack!");
         if (belongToGroup.CurTarget != null)
         {
-            Debug.Log("有目标！");
             if (Vector3.Distance(this.transform.position, belongToGroup.CurTarget.transform.position) <= attackDistance)
             {
-                Debug.Log("在攻击范围内！");
                 return true; // 在攻击范围内
             }
         }
@@ -373,18 +404,38 @@ public class MothController : GuestBase, IHurtable
     /// 接触到玩家，附着在其身上
     /// </summary>
     /// <returns></returns>
+
+    private Transform attachTarget; // 附着对象
+    private Vector3 localAttachOffset; // 相对于玩家的位置（局部空间）
+    private Quaternion localAttachRotation; // 附着时的相对朝向
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player") && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
         {
-            Debug.Log("冲刺到玩家身上！");
-            // 这里可以添加附着的逻辑，比如设置父物体等
-            // this.transform.SetParent(collision.transform); // 附着在玩家身上
+            Debug.Log("触发附着！");
+
+            ContactPoint contact = collision.contacts[0];
+            Vector3 worldAttachPoint = contact.point;
+            Vector3 normal = contact.normal;
+
+            // 计算向上的投影方向
+            Vector3 upDirection = Vector3.ProjectOnPlane(Vector3.up, normal).normalized;
+            Quaternion attachRotation = Quaternion.LookRotation(upDirection, normal);
+
+            // 保存附着信息
+            attachTarget = collision.transform;
+            localAttachOffset = attachTarget.InverseTransformPoint(worldAttachPoint);
+            localAttachRotation = Quaternion.Inverse(attachTarget.rotation) * attachRotation;
+
             rb.velocity = Vector3.zero;
+            rb.isKinematic = true;
+
             SetMothState(MothState.Attached);
         }
-
     }
+
+
     // 攻击i相关 ================================================================================================
 
 
@@ -409,7 +460,7 @@ public class MothController : GuestBase, IHurtable
         // 画出攻击距离，球
         Gizmos.color = Color.gray;
         Gizmos.DrawWireSphere(this.transform.position, attackDistance); // 画出攻击范围
-        if (Application.isPlaying &&  behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()) && dashTarget != null )
+        if (Application.isPlaying && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()) && dashTarget != null)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(dashTarget, 0.2f); // 画出冲刺目标范围

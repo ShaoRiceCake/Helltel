@@ -32,7 +32,7 @@ public class MothGroupController : GuestBase
     private Root behaviorTree;
 
     public GameObject CurTarget;
-    
+
     public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
 
     protected override void Start()
@@ -55,7 +55,7 @@ public class MothGroupController : GuestBase
     }
 
 
-    
+
     public void RegisterMoth(GameObject moth)
     {
         MothController mothController = moth.GetComponent<MothController>();
@@ -91,12 +91,12 @@ public class MothGroupController : GuestBase
     {
         return new Root(
             new Selector(
-            
+
                 BuildChaseingBranch(),//追击分支
                 new Selector(
                     new Condition(IsNavAgentOnNavmesh,
                         new Repeater(
-                            new Cooldown(1f, 
+                            new Cooldown(1f,
                             new Patrol(agent, navPointsManager))
                         ))
                     )
@@ -104,7 +104,7 @@ public class MothGroupController : GuestBase
         );
     }
     // 
-     private Node BuildChaseingBranch()
+    private Node BuildChaseingBranch()
     {
         return new Condition(IsEnemyCanSee, Stops.IMMEDIATE_RESTART,
             new Action(() =>
@@ -119,16 +119,16 @@ public class MothGroupController : GuestBase
 
     bool IsEnemyCanSee()
     {
-        if(sensor != null)
+        if (sensor != null)
         {
             if (sensor.detectedTargets.Count > 0)
             {
-                foreach(var target in sensor.detectedTargets)
+                foreach (var target in sensor.detectedTargets)
                 {
-                    if(EnemyList.Contains(target.gameObject))
+                    if (EnemyList.Contains(target.gameObject))
                     {
                         CurTarget = target.gameObject;
-                        
+
                         return true;
                     }
                 }
@@ -136,7 +136,7 @@ public class MothGroupController : GuestBase
         }
         return false;
     }
-    
+
     public List<MothController> GetMothList()
     {
         return mothList;
@@ -147,5 +147,32 @@ public class MothGroupController : GuestBase
     {
         return agent.isOnNavMesh;
     }
-    
+
+
+    private void OnGUI()
+    {
+
+        foreach (var moth in mothList)
+        {
+            if (moth == null) continue;
+
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(moth.transform.position + Vector3.up * 2.0f); // 把血条显示在虫子上方
+            if (screenPos.z > 0) // 屏幕前方
+            {
+                float health = moth.curHealth.Value;
+                float maxHealth = moth.maxHealth; 
+                string text = $"❤ {health}/{maxHealth}";
+
+                GUIStyle style = new GUIStyle(GUI.skin.label);
+                style.fontSize = 24;
+                style.normal.textColor = Color.red;
+                Vector2 size = style.CalcSize(new GUIContent(text));
+                GUI.Label(new Rect(screenPos.x - size.x / 2, Screen.height - screenPos.y - size.y / 2, size.x, size.y), text, style);
+            }
+        }
+    }
+
+
+
+
 }

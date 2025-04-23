@@ -40,7 +40,6 @@ namespace Helltal.Gelercat
         [Rpc(SendTo.Server)]
         public void TakeDamageServerRpc(float damage)
         {
-            if(Debugging) return;
             curHealth.Value += damage;
         }
         /// <summary>
@@ -50,13 +49,11 @@ namespace Helltal.Gelercat
         [Rpc(SendTo.Server)]
         public void StateChangeServerRpc(AIState newstate)
         {
-            if (Debugging) return;
             aiState.Value = newstate;
         }
 
         protected virtual void Update()
         {
-            if (Debugging) return;
             if (!IsHost)
             {
                 transform.position = _syncPos.Value;
@@ -83,19 +80,18 @@ namespace Helltal.Gelercat
 
         public override void OnNetworkSpawn()
         {
-            if (Debugging) return;
             base.OnNetworkSpawn();
             Init();
         }
 
         protected virtual void Init()
         {
-            if (!Debugging &&!IsHost && NetworkManager.Singleton) return;
+            if (!IsHost && NetworkManager.Singleton) return;
         }
 
         protected virtual void Start()
         {
-            if (!Debugging && !IsHost && NetworkManager.Singleton) return;
+            if ( !IsHost && NetworkManager.Singleton) return;
 
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
@@ -119,7 +115,7 @@ namespace Helltal.Gelercat
 
         protected void NegativeTo(Vector3 target)
         {
-            if (!Debugging && !IsHost && NetworkManager.Singleton) return;
+            if (!IsHost && NetworkManager.Singleton) return;
             agent.SetDestination(target);
         }
         void OnDrawGizmos()
