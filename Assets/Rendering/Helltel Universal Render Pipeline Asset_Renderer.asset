@@ -48,7 +48,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 582141719512853605}
   - {fileID: -5630482691206688485}
-  m_RendererFeatureMap: 65ac7f40cf2e14081bd1a3ecd281dcb1
+  - {fileID: 464464113556709669}
+  m_RendererFeatureMap: 65ac7f40cf2e14081bd1a3ecd281dcb125e17683a61b7206
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -90,6 +91,20 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
+--- !u!114 &464464113556709669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 999efdf2bf4646a45a834b3e7337f621, type: 3}
+  m_Name: OutlineFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  m_OutlineMaterial: {fileID: 2100000, guid: fc5f8a95041c8274d949eff27077ec5d, type: 2}
 --- !u!114 &582141719512853605
 MonoBehaviour:
   m_ObjectHideFlags: 0

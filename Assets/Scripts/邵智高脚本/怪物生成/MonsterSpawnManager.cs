@@ -183,9 +183,11 @@ public class MonsterSpawnSystem : NetworkBehaviour
 
         List<NavPoint> navPoints = navPointsManager.GetNavPoints();
         int randomIndex = Random.Range(0,navPoints.Count);
+
         Transform randomNavPoint = navPoints[randomIndex].transform;
-        Debug.Log("生成"+prefab);
+        Debug.Log("生成"+prefab+"在第"+randomIndex+"个navPoint处");
         Vector3 spawnPoint = randomNavPoint.position; 
+        Debug.Log("生成在"+spawnPoint);
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
