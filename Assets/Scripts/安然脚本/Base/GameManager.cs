@@ -56,7 +56,7 @@ public class GameManager : Singleton<GameManager>
 
     private void OnLoadEventComplete(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (sceneName == "Game")
+        if (sceneName == "联机电梯")
         {
             OnStartGame?.Invoke();
             isGameing = true;
