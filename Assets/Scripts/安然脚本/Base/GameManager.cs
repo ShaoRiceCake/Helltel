@@ -70,6 +70,16 @@ public class GameManager : Singleton<GameManager>
         NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
     }
 
+    public void LoadSceneAddtive(string sceneName)
+    {
+        NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+    }
+
+    public void UnLoadScene(string sceneName)
+    {
+        NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName(sceneName));
+    }
+
     public void StartGame(Dictionary<ulong, PlayerInfo> playerInfo)
     {
         AllPlayerInfos = playerInfo;
