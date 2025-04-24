@@ -1,12 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
-using System;
 using NPBehave;
-using UnityEngine.InputSystem;
-using UnityEditor.SceneManagement;
 
 namespace Helltal.Gelercat
 {

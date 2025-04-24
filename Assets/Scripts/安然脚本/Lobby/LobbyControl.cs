@@ -198,7 +198,7 @@ public class LobbyControl : NetworkBehaviour
     private void OnStartClick()
     {
         GameManager.instance.StartGame(_allPlayerInfo);
-        GameManager.instance.LoadScene("Game");
+        GameManager.instance.LoadScene("联机电梯");
     }
 
     private void OnExitClick()
