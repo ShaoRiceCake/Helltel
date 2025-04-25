@@ -31,7 +31,7 @@ public enum EItemState
     Grabbed         // 被抓取（玩家已抓取）
 }
 
-// 状态基类（保持不变）
+// 状态基类
 public abstract class ItemState
 {
     protected readonly ItemBase Item;
@@ -45,7 +45,7 @@ public abstract class ItemState
     public virtual void Update() { }
 }
 
-// 各具体状态类实现（保持不变）
+// 各具体状态类实现
 public class NotSelectedState : ItemState
 {
     public NotSelectedState(ItemBase item) : base(item) => stateType = EItemState.NotSelected;
@@ -161,11 +161,9 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
     private void PushState(EItemState newState)
     {
         if (_stateStack.Count > 0) _stateStack.Peek().Exit();
-        if (_stateDictionary.TryGetValue(newState, out var state))
-        {
-            _stateStack.Push(state);
-            state.Enter();
-        }
+        if (!_stateDictionary.TryGetValue(newState, out var state)) return;
+        _stateStack.Push(state);
+        state.Enter();
     }
 
     private void PopState()
