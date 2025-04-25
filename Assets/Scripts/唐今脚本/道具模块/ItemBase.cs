@@ -202,7 +202,8 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
     protected virtual void Update()
     {
         _stateStack.Peek().Update();
-        Debug.Log($"[ItemState] {itemName}: {CurrentState} | OwnerID: {_currentGrabbingPlayerId}, HandID: {_currentGrabbingToolId}");
+        // Debug.Log($"[ItemState] {itemName}: {CurrentState} | OwnerID: {_currentGrabbingPlayerId}, HandID: {_currentGrabbingToolId}");
+        // Debug.Log("IsGrabbed" + IsGrabbed);
     }
 
     public void ClearGrabPermission()
