@@ -43,9 +43,14 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     [SerializeField] private float fadeStartDistance = 3.0f; // 开始淡出的距离
     [SerializeField] private float fadeEndDistance = 0.5f; // 完全淡出的距离
     [SerializeField] private float fadeSmoothTime = 0.2f; // 淡出平滑时间
+    
+    [Header("Follow Mode")]
+    [SerializeField] private bool useLazyFollow = false; // 是否使用慵懒跟随模式
+    [SerializeField] [Range(0.01f, 1f)] private float lazyFollowFactor = 0.1f; // 慵懒跟随系数
+    [SerializeField] private bool scaleWithTime = true; // 是否随时间缩放
 
-    private Material[] _materials; // 存储所有材质
-    private float[] _originalAlphas; // 存储原始透明度
+    private Material[] _materials; 
+    private float[] _originalAlphas; 
     private float _currentAlpha;
     private float _alphaVelocity;
     private float _currentLookAtHeightOffset;
@@ -137,7 +142,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
         
-        // 更新透明度
          UpdateTransparency();
     }
 
@@ -247,10 +251,22 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
                     lookAtSmoothTime);
             }
         }
+        if (useLazyFollow)
+        {
+            var deltaFactor = scaleWithTime ? lazyFollowFactor * Time.deltaTime * 60f : lazyFollowFactor;
+            deltaFactor = Mathf.Clamp01(deltaFactor);
+            
+            var currentPos = controlledCamera.transform.position;
+            currentPos += (desiredPosition - currentPos) * deltaFactor;
+            controlledCamera.transform.position = currentPos;
+        }
         else
         {
-            _dampedDistance = _currentDistance;
-            _currentLookAtHeightOffset = 0f;
+            controlledCamera.transform.position = Vector3.SmoothDamp(
+                controlledCamera.transform.position, 
+                desiredPosition, 
+                ref _smoothVelocity, 
+                smoothTime);
         }
 
         controlledCamera.transform.position = Vector3.SmoothDamp(
