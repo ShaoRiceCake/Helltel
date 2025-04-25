@@ -2,6 +2,7 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class CatchTool : MonoBehaviour
     private bool _isGrabbing;
     private GameObject _currentTarget;
     private Transform _catchAimTrans;
-    private ItemBase _currentItem;
+    public int CatchToolInstanceId => GetInstanceID();
+    public ulong playerID;
 
     public GameObject CatchBall
     {
@@ -25,7 +27,6 @@ public class CatchTool : MonoBehaviour
             if (!_catchBall) return;
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
             _catchAimTrans =  _catchBall.transform;
-            NullCheckerTool.CheckNull(_catchBall, _sphereCollider, obiAttachment,_catchAimTrans);
         }
     }
 
@@ -47,16 +48,10 @@ public class CatchTool : MonoBehaviour
         if(!_catchBall) return;
         UpdateTargetSelection();
         HandleInput();
-        UpdateItemStates();
     }
 
     private void UpdatePreSelectedObjects(List<GameObject> detectedObjects)
     {
-        foreach (var item in preSelectedObjects.Select(obj => obj.GetComponent<ItemBase>()).Where(item => item))
-        {
-            item.UpdateGraspingState(EGraspingState.NotSelected);
-        }
-
         preSelectedObjects = detectedObjects;
     }
 
@@ -71,25 +66,10 @@ public class CatchTool : MonoBehaviour
                     obj.transform.position, 
                     _catchAimTrans.position))
                 .FirstOrDefault();
-
-            if (!_currentTarget) return;
-            _currentItem = _currentTarget.GetComponent<ItemBase>();
-            if (_currentItem && !_isGrabbing)
-            {
-                _currentItem.UpdateGraspingState(EGraspingState.OnSelected);
-            }
         }
         else
         {
             _currentTarget = null;
-            _currentItem = null;
-        }
-    }
-    private void UpdateItemStates()
-    {
-        if (_isGrabbing && _currentItem)
-        {
-            _currentItem.UpdateGraspingState(EGraspingState.OnCaught);
         }
     }
     
@@ -115,12 +95,6 @@ public class CatchTool : MonoBehaviour
         obiAttachment.BindToTarget(target.transform);
         obiAttachment.enabled = true;
         
-        _currentItem = target.GetComponent<ItemBase>();
-        if (_currentItem)
-        {
-            _currentItem.UpdateGraspingState(EGraspingState.OnCaught);
-            _currentItem.OnGrabbed?.Invoke();
-        }
         
         AudioManager.Instance.Play("玩家抓取",_catchBall.transform.position,0.7f);
     }
@@ -133,12 +107,6 @@ public class CatchTool : MonoBehaviour
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
         
-        if (_currentItem)
-        {
-            _currentItem.UpdateGraspingState(EGraspingState.NotSelected);
-            _currentItem.OnReleased?.Invoke();
-            _currentItem = null;
-        }
         
         AudioManager.Instance.Play("玩家松手",_catchBall.transform.position,0.3f);
     }

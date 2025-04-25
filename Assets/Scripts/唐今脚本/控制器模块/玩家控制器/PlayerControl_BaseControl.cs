@@ -5,12 +5,14 @@ public class PlayerControl_BaseControl : NetworkBehaviour
 {
     public PlayerControlInformationProcess controlHandler;
     public GameObject forwardObject;
-    
+    protected ulong ClientID;
 
-    virtual protected void Start()
+    protected virtual void Start()
     {
         controlHandler = GetComponent<PlayerControlInformationProcess>();
 
         NullCheckerTool.CheckNull(forwardObject, controlHandler);
+        
+        ClientID = NetworkManager.ServerClientId;
     }
 }

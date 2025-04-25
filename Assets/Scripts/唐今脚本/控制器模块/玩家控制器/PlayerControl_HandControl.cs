@@ -47,6 +47,8 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         handBallPrefab.SetActive(false); 
         
         SubscribeEvents();
+        
+        catchTool.playerID = ClientID;
     }
 
 
