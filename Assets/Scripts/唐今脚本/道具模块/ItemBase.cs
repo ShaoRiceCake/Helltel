@@ -138,15 +138,31 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
                 break;
 
             case EItemState.Selected:
-                if (newState == EItemState.NotSelected) PopState();
-                else if (newState == EItemState.ReadyToGrab) PushState(newState);
-                else return false;
+                switch (newState)
+                {
+                    case EItemState.NotSelected:
+                        PopState();
+                        break;
+                    case EItemState.ReadyToGrab:
+                        PushState(newState);
+                        break;
+                    default:
+                        return false;
+                }
                 break;
 
             case EItemState.ReadyToGrab:
-                if (newState == EItemState.Selected) PopState();
-                else if (newState == EItemState.Grabbed) PushState(newState);
-                else return false;
+                switch (newState)
+                {
+                    case EItemState.Selected:
+                        PopState();
+                        break;
+                    case EItemState.Grabbed:
+                        PushState(newState);
+                        break;
+                    default:
+                        return false;
+                }
                 break;
 
             case EItemState.Grabbed:
