@@ -2,7 +2,6 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
@@ -15,7 +14,7 @@ public class CatchTool : MonoBehaviour
     private bool _isGrabbing;
     private GameObject _currentTarget;
     private Transform _catchAimTrans;
-    public int CatchToolInstanceId => GetInstanceID();
+    private int CatchToolInstanceId => GetInstanceID();
     public ulong playerID;
 
     public GameObject CatchBall
@@ -23,10 +22,20 @@ public class CatchTool : MonoBehaviour
         get => _catchBall;
         set
         {
+            if (_catchBall != value && _currentTarget)
+            {
+                if (_currentTarget.TryGetComponent<ItemBase>(out var item))
+                {
+                    item.RequestStateChange(EItemState.Selected);
+                }
+                _currentTarget = null;
+            }
+
             _catchBall = value;
             if (!_catchBall) return;
+        
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
-            _catchAimTrans =  _catchBall.transform;
+            _catchAimTrans = _catchBall.transform;
         }
     }
 
@@ -52,25 +61,54 @@ public class CatchTool : MonoBehaviour
 
     private void UpdatePreSelectedObjects(List<GameObject> detectedObjects)
     {
+        foreach (var obj in preSelectedObjects.Except(detectedObjects))
+        {
+            if (obj && obj.TryGetComponent<ItemBase>(out var item) && 
+                !item.IsGrabbed) 
+            {
+                item.RequestStateChange(EItemState.NotSelected);
+            }
+        }
+
+        foreach (var obj in detectedObjects)
+        {
+            if (obj && obj.TryGetComponent<ItemBase>(out var item) && 
+                item.IsNotSelected) 
+            {
+                item.RequestStateChange(EItemState.Selected);
+            }
+        }
+
         preSelectedObjects = detectedObjects;
     }
-
+    
     private void UpdateTargetSelection()
     {
         if (!_sphereCollider) return;
         
+        GameObject newTarget = null;
+        
         if (preSelectedObjects.Count > 0)
         {
-            _currentTarget = preSelectedObjects
+            newTarget = preSelectedObjects
                 .OrderBy(obj => Vector3.Distance(
                     obj.transform.position, 
                     _catchAimTrans.position))
                 .FirstOrDefault();
         }
-        else
+
+        if (_currentTarget == newTarget) return;
+        if (_currentTarget && _currentTarget.TryGetComponent<ItemBase>(out var prevItem))
         {
-            _currentTarget = null;
+            prevItem.RequestStateChange(EItemState.Selected);
         }
+
+        if (newTarget && newTarget.TryGetComponent<ItemBase>(out var newItem))
+        {
+            newItem.RequestStateChange(EItemState.ReadyToGrab);
+        }
+
+        _currentTarget = newTarget;
     }
     
     private void HandleInput()
@@ -90,24 +128,27 @@ public class CatchTool : MonoBehaviour
     private void GrabObject(GameObject target)
     {
         if(!target) return;
-        
+
+        if (!target.TryGetComponent<ItemBase>(out var item)) return;
+        if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
         _isGrabbing = true;
         obiAttachment.BindToTarget(target.transform);
         obiAttachment.enabled = true;
-        
-        
-        AudioManager.Instance.Play("玩家抓取",_catchBall.transform.position,0.7f);
+                
+        AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
     }
 
     private void ReleaseObject()
     {
         if (!_isGrabbing) return;
-        
+
+        if (!obiAttachment.target ||
+            !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item)) return;
+        if (!item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID)) return;
         _isGrabbing = false;
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
-        
-        
-        AudioManager.Instance.Play("玩家松手",_catchBall.transform.position,0.3f);
+                
+        AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
     }
 }
