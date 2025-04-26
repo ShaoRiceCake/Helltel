@@ -17,6 +17,10 @@ public class CatchTool : MonoBehaviour
     private int CatchToolInstanceId => GetInstanceID();
     public ulong playerID;
 
+    private float pressTime;
+    private bool isPressingE;
+    private const float LONG_PRESS_THRESHOLD = 0.5f; // 长按时间阈值
+    
     public GameObject CatchBall
     {
         get => _catchBall;
@@ -113,15 +117,53 @@ public class CatchTool : MonoBehaviour
     
     private void HandleInput()
     {
-        if (!Input.GetKeyDown(KeyCode.E)) return;
-        
-        if (_currentTarget && !_isGrabbing)
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            GrabObject(_currentTarget);
+            pressTime = Time.time;
+            isPressingE = true;
+        }
+
+        if (!Input.GetKeyUp(KeyCode.E)) return;
+        if (isPressingE)
+        {
+            var pressDuration = Time.time - pressTime;
+            
+            if (pressDuration >= LONG_PRESS_THRESHOLD && _isGrabbing)
+            {
+                TryUseItem();
+            }
+            else
+            {
+                if (_currentTarget && !_isGrabbing)
+                {
+                    GrabObject(_currentTarget);
+                }
+                else if (_isGrabbing)
+                {
+                    ReleaseObject();
+                }
+            }
+        }
+        isPressingE = false;
+    }
+
+    private void TryUseItem()
+    {
+        if (!_isGrabbing || !obiAttachment.target) return;
+    
+        var item = obiAttachment.target.gameObject.GetComponent<ItemBase>();
+        if (!item) return;
+    
+        // 尝试获取IUsable接口
+        if (item is IUsable usableItem)
+        {
+            // 如果是可使用的道具
+            usableItem.OnUseStart?.Invoke();
+            // usableItem.OnUseEnd?.Invoke();
         }
         else
         {
-            ReleaseObject();
+            Debug.Log($"[CatchTool] 这个道具({item.ItemName})不能被使用");
         }
     }
 

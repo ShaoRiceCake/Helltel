@@ -15,7 +15,9 @@ public class HealthView : MonoBehaviour
 
     private void Awake()
     {
-        _data.OnPlayerHealthChanged += UpdateHealth;
+        // _data.OnPlayerHealthChanged += UpdateHealth;
+        
+        EventBus<HealthChangedEvent>.Subscribe(OnHealthChanged, this);
     }
 
     private void Start()
@@ -39,12 +41,20 @@ public class HealthView : MonoBehaviour
         if(id == _localPlayerId)
             _healthText.text = $"HP: {health}";
     }
-
-
-
+    
+    private void OnHealthChanged(HealthChangedEvent evt)
+    {
+        // 更新UI显示
+        if (_healthText != null)
+        {
+            _healthText.text = $"{evt.CurrentHealth}";
+        }
+    }
     private void OnDestroy()
     {
         _data.OnPlayerHealthChanged -= UpdateHealth;
+        
+        EventBus<HealthChangedEvent>.UnsubscribeAll(this);
         //_animSequence?.Kill();
     }
 }

@@ -11,8 +11,8 @@ public interface IInteractable
 
 public interface IUsable
 {
-    void UseStart();
-    void UseEnd();
+    UnityEvent OnUseStart { get; set; }
+    UnityEvent OnUseEnd { get; set; }
 }
 
 public interface IGrabbable
