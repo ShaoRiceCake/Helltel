@@ -88,12 +88,14 @@ namespace Helltal.Gelercat
         {
             if (!IsHost && NetworkManager.Singleton) return;
         }
-
-        protected virtual void Start()
-        {
+        /// <summary>
+        /// 在这里写组件初始化逻辑 
+        /// </summary>
+        protected virtual void Awake()
+        {   
             if ( !IsHost && NetworkManager.Singleton) return;
-
             agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
+            Debug.Log(agent);
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
             if (navPointsManager == null)
             {
@@ -108,10 +110,13 @@ namespace Helltal.Gelercat
             {
                 presenter = GetComponent<GuestPresenter>();
             }
-
+        }
+        protected virtual void Start()
+        {
             curHealth.Value = maxHealth;
             
         }
+
 
         protected void NegativeTo(Vector3 target)
         {

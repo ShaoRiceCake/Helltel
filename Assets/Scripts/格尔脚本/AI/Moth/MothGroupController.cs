@@ -34,17 +34,12 @@ public class MothGroupController : GuestBase
     public GameObject CurTarget;
 
     public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
+    public GameObject attachingMoth; //当前附着的虫子
 
     protected override void Start()
     {
         base.Start();
 
-        sensor = this.gameObject.GetComponent<GuestSensor>();
-        if (sensor == null)
-        {
-            sensor = this.gameObject.AddComponent<GuestSensor>();
-
-        }
         behaviorTree = GetBehaviorTree();
 
 #if UNITY_EDITOR
@@ -54,7 +49,15 @@ public class MothGroupController : GuestBase
         behaviorTree.Start();
     }
 
-
+    protected override void Awake()
+    {
+        base.Awake();
+        sensor = this.gameObject.GetComponent<GuestSensor>();
+        if (sensor == null)
+        {
+            sensor = this.gameObject.AddComponent<GuestSensor>();
+        }
+    }
 
     public void RegisterMoth(GameObject moth)
     {

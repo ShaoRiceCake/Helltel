@@ -28,7 +28,10 @@ namespace Helltal.Gelercat
         private float lonelyDuration;  // 当前孤独状态持续时间
         private float lonelyDeathThreshold;
 
-
+        protected override void Awake()
+        {
+            base.Awake();
+        }
         protected override void Start()
         {
 
