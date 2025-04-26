@@ -12,14 +12,27 @@ public class NavManager : MonoBehaviour
     {
         _navMeshSurfaces = GetComponents<NavMeshSurface>(); 
     }
-
+    void OnEnable()
+    {
+        DungeonGenerator.OnDungeonBuildCompleted += HandleDungeonBuildCompleted;
+    }
+    void OnDisable()
+    {
+        DungeonGenerator.OnDungeonBuildCompleted -= HandleDungeonBuildCompleted;
+    }
+    void HandleDungeonBuildCompleted(DungeonGenerator generator)
+    {
+        NavMeshUpdate();
+    }
     void Start()
     {
         NavMeshUpdate();
+        
     }
     // Update is called once per frame
     void NavMeshUpdate()
     {
+        Debug.Log("NavMesh Update Called");
         foreach(var surface in _navMeshSurfaces)
         {
             if(surface.navMeshData != null)
@@ -31,5 +44,6 @@ public class NavManager : MonoBehaviour
                 surface.BuildNavMesh();
             }
         }
+        Debug.Log("NavMesh Update Complete!, surface count: " + _navMeshSurfaces.Length);
     }
 }

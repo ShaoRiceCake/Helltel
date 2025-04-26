@@ -17,6 +17,8 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         
     public RaycastTool raycastTool;
     public SpringTool springTool;
+   
+    
     
     protected enum FootState
     {
@@ -103,13 +105,17 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
 
     private void FixObject()
     {
-        _movingObj.velocity = Vector3.zero;
-        _movingObj.angularVelocity = Vector3.zero;
-        _movingObj.isKinematic = true;
+        if (!_movingObj || !_movingObj.gameObject.activeInHierarchy)
+            return;
+
+        _movingObj.isKinematic = true;  
+
     }
 
     private void MoveToTargetPosition(Vector3 targetPosition)
     {
+        if (!_movingObj) return; 
+        
         var direction = targetPosition - _movingObj.position;
         var distance = direction.magnitude;
 
@@ -146,6 +152,9 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Grounded;
         springTool.isSpringEnabled = false;
         _hasTriggeredLockEvent = false;
+        
+        AudioManager.Instance.Play("玩家脚步",footObject.transform.position);
+        
     }
     
     protected void LockFoot()
@@ -160,6 +169,7 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         if (_hasTriggeredLockEvent) return;
         onFootLocked?.Invoke(_movingObj.position);
         _hasTriggeredLockEvent = true;
+        
     }
     
     protected void UnlockFoot()
@@ -168,4 +178,5 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         CurrentState = FootState.Grounded;
         _hasTriggeredLockEvent = false;
     }
+    
 }

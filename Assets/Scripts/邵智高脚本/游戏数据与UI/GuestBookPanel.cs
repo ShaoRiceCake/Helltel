@@ -1,18 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GuestBookPanel : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private GlobalUIController globalUIController;
 
-    // Update is called once per frame
-    void Update()
+    [Header("设置界面按钮")]
+    public Button btn_BackOfGuestBookPanel; //返回按钮
+    private void Start()
     {
+        globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
+
+        // 绑定按钮事件
+        btn_BackOfGuestBookPanel.onClick.AddListener(globalUIController.CloseGuestBook);
+
+        
         
     }
 }

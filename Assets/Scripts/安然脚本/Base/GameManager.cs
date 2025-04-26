@@ -56,7 +56,7 @@ public class GameManager : Singleton<GameManager>
 
     private void OnLoadEventComplete(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
-        if (sceneName == "Game")
+        if (sceneName == "联机电梯")
         {
             OnStartGame?.Invoke();
             isGameing = true;
@@ -68,6 +68,16 @@ public class GameManager : Singleton<GameManager>
     public void LoadScene(string sceneName)
     {
         NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+    }
+
+    public void LoadSceneAddtive(string sceneName)
+    {
+        NetworkManager.SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+    }
+
+    public void UnLoadScene(string sceneName)
+    {
+        NetworkManager.SceneManager.UnloadScene(SceneManager.GetSceneByName(sceneName));
     }
 
     public void StartGame(Dictionary<ulong, PlayerInfo> playerInfo)

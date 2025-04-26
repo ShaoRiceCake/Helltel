@@ -106,23 +106,23 @@ public class GameDataModel : ScriptableObject
 
     //======= 玩家管理接口 =======//
     //所有玩家加入游戏后，游戏开始要为每个玩家注册，来储存对应ID的生命值
-    public void RegisterNetworkPlayer(string id)
-    {
-        if (!_players.ContainsKey(id))
-        {
-            var player = new PlayerData();
-            // 给玩家的OnHealthChanged添加监听,当OnHealthChanged触发时触发另一个叫OnPlayerHealthChanged的事件，该事件会将玩家AI和生命值传递出去
-            player.OnHealthChanged += (health) => 
-                OnPlayerHealthChanged?.Invoke(id, health);
-            //将新玩家存入字典
-            _players[id] = player;
-            // 触发初始值显示
-            player.Health = player.Health; // 强制触发事件
-        }
-        // 如果已经有这个ID，什么都不做（避免重复注册）
-    }
-    /// <summary>
-    /// 根据ID获取玩家数据（找不到返回null）
-    /// </summary>
-    public PlayerData GetPlayer(string id) => _players.TryGetValue(id, out var p) ? p : null;
+    // public void RegisterNetworkPlayer(string id)
+    // {
+    //     if (!_players.ContainsKey(id))
+    //     {
+    //         var player = new PlayerData();
+    //         // 给玩家的OnHealthChanged添加监听,当OnHealthChanged触发时触发另一个叫OnPlayerHealthChanged的事件，该事件会将玩家AI和生命值传递出去
+    //         player.OnHealthChanged += (health) => 
+    //             OnPlayerHealthChanged?.Invoke(id, health);
+    //         //将新玩家存入字典
+    //         _players[id] = player;
+    //         // 触发初始值显示
+    //         player.Health = player.Health; // 强制触发事件
+    //     }
+    //     // 如果已经有这个ID，什么都不做（避免重复注册）
+    // }
+    // /// <summary>
+    // /// 根据ID获取玩家数据（找不到返回null）
+    // /// </summary>
+    // public PlayerData GetPlayer(string id) => _players.TryGetValue(id, out var p) ? p : null;
 }

@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +11,7 @@ public class GlobalUIController : MonoBehaviour
     public MenuPanel Menu;
     public SettingsPanel Settings;
     public GuestBookPanel GuestBook;
+    public GameManager gameManager;
 
     // // 属性访问（无需基类）
     // public MenuPanel Menu => _menu;
@@ -42,19 +44,23 @@ public class GlobalUIController : MonoBehaviour
     private void HandleEscapeInput()
     {
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
-        
-        if (!IsInGameScene())
-        {
-            // 非游戏场景不响应ESC
-            return;
-        }
+
 
         //根据当前界面状态处理
         //当处于设置或宾客簿界面时
         if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
         {
-            // 从二级界面返回菜单
-            OpenMenu();
+            if(gameManager.isGameing == true )
+            {
+                // 从二级界面返回菜单
+                OpenMenu();
+            }
+            else
+            {
+                CloseAllGlobalUI();
+                AudioManager.Instance.Play("泡泡音");
+            }
+            
         }
         //当处于菜单界面时
         else if (Menu.gameObject.activeSelf)
@@ -66,24 +72,40 @@ public class GlobalUIController : MonoBehaviour
         //当处于游戏场景且未打开UI界面
         else
         {
-            // 打开菜单
-            OpenMenu();
+            if(gameManager.isGameing == true )
+            {
+                // 打开菜单
+                OpenMenu();
+            }
         }
     }
-    private bool IsInGameScene()
-    {
-        return true;
-        // 请根据实际项目替换场景判断逻辑（示例：场景名为"Gameplay"）
-        //return SceneManager.GetActiveScene().name == "Gameplay";
-    }
+   
 
     // 设置暂停/继续游戏
     public void SetPause(bool isPaused)
     {
         //Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）由于我们是联机游戏，所以不暂停
-        //这里其实根本没锁住，需要和角色操控联动
+        
         Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
         Cursor.visible = isPaused; // 控制鼠标可见性
+
+        PlayerControlInformationProcess[] playersControlInformation = FindObjectsOfType<PlayerControlInformationProcess>();
+       
+        for (int i = 0; i < playersControlInformation.Length; i++)
+        {
+            if(playersControlInformation[i].IsLocalPlayer == true && NetworkManager.Singleton == true)
+            {
+                Debug.Log("现在在联机且是本地玩家");
+                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+            }
+            else if(NetworkManager.Singleton == false)
+            {
+                Debug.Log("现在不在联机");
+                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+            }
+        }
+        
+        //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
     }
     //关闭所有全局UI界面
     public void CloseAllGlobalUI()
@@ -96,28 +118,62 @@ public class GlobalUIController : MonoBehaviour
     public void ReturnGame()
     {
         CloseAllGlobalUI();
-        SetPause(false);
+        if(gameManager.isGameing == true)
+        {
+            SetPause(false);
+        }
+        AudioManager.Instance.Play("泡泡音");
     }
     //打开菜单
     public void OpenMenu()
     {
         CloseAllGlobalUI();
-        SetPause(true);
+        if(gameManager.isGameing == true)
+        {
+            SetPause(true);
+        }
         Menu.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
     }
     //打开设置
     public void OpenSettings()
     {
         CloseAllGlobalUI();
-        SetPause(true);
         Settings.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
+    }
+    //关闭设置
+    public void CloseSettings()
+    {
+        if(gameManager.isGameing == true)
+        {
+            OpenMenu();
+        }
+        else
+        {
+            CloseAllGlobalUI();
+            AudioManager.Instance.Play("泡泡音");
+        }
     }
     //打开宾客簿
     public void OpenGuestBook()
     {
         CloseAllGlobalUI();
-        SetPause(true);
         GuestBook.gameObject.SetActive(true);
+        AudioManager.Instance.Play("泡泡音");
+    }
+    //关闭宾客簿
+    public void CloseGuestBook()
+    {
+        if(gameManager.isGameing == true)
+        {
+            OpenMenu();
+        }
+        else
+        {
+            CloseAllGlobalUI();
+            AudioManager.Instance.Play("泡泡音");
+        }
     }
     
 }

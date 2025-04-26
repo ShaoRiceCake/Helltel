@@ -19,7 +19,7 @@
 
 //         public Color debugColour = Color.white;
 
-//         // Êµ¼Ê¹ÜÀí NavPoint µÄÁĞ±í
+//         // å®é™…ç®¡ç† NavPoint çš„åˆ—è¡¨
 //         private List<NavPoint> navPoints = new List<NavPoint>();
 
 //         private void OnEnable()
@@ -28,7 +28,7 @@
 //             NavPoint.OnNavPointDestroyed += UnregisterNavPoint;
 //             NavPoint.OnNavPointMoved += UpdateNavPoint;
 
-//             RefreshAllNavPoints(); // ³õÊ¼»¯²éÕÒÏÖÓĞµÄ NavPoints
+//             RefreshAllNavPoints(); // åˆå§‹åŒ–æŸ¥æ‰¾ç°æœ‰çš„ NavPoints
 //         }
 
 //         private void OnDisable()
@@ -62,7 +62,7 @@
 
 //         private void UpdateNavPoint(NavPoint nav)
 //         {
-//             // ±£³Ö navPoints ÊÇ×îĞÂÎ»ÖÃµÄ£¬Ö»ÔÚÎ´À´ĞèÒªÅÅĞò»òÆäËûÂß¼­Ê±Ê¹ÓÃ
+//             // ä¿æŒ navPoints æ˜¯æœ€æ–°ä½ç½®çš„ï¼Œåªåœ¨æœªæ¥éœ€è¦æ’åºæˆ–å…¶ä»–é€»è¾‘æ—¶ä½¿ç”¨
 //         }
 
 
@@ -72,11 +72,11 @@
 //         }
 
 //         /// <summary>
-//         /// »ñÈ¡ÀëÖ¸¶¨Î»ÖÃ×î½üµÄ NavPoint
+//         /// è·å–ç¦»æŒ‡å®šä½ç½®æœ€è¿‘çš„ NavPoint
 //         /// </summary>
-//         /// <param name="position"> Ä¿±êµã </param>
+//         /// <param name="position"> ç›®æ ‡ç‚¹ </param>
 //         /// <returns></returns>
-//         /// <remarks> ¸Ã·½·¨»á±éÀúËùÓĞ NavPoint£¬ĞÔÄÜ½ÏµÍ£¬½÷É÷Ê¹ÓÃ </remarks>
+//         /// <remarks> è¯¥æ–¹æ³•ä¼šéå†æ‰€æœ‰ NavPointï¼Œæ€§èƒ½è¾ƒä½ï¼Œè°¨æ…ä½¿ç”¨ </remarks>
 //         public NavPoint GetClosestNavPoint(Vector3 position)
 //         {
 //             NavPoint closest = null;
@@ -134,7 +134,7 @@
 //                 }
 //             }
 
-//             // »æÖÆ±Õ»·
+//             // ç»˜åˆ¶é—­ç¯
 //             if (drawAsLoop && navPoints.Count > 1)
 //             {
 //                 Gizmos.color = debugColour;
@@ -146,7 +146,7 @@
 // }
 
 
-// ÓÅ»¯ĞÔÄÜ
+// ä¼˜åŒ–æ€§èƒ½
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -169,17 +169,17 @@ namespace Helltal.Gelercat
 
         public Color debugColour = Color.white;
 
-        // Êµ¼Ê¹ÜÀí NavPoint µÄÁĞ±í
+        // å®é™…ç®¡ç† NavPoint çš„åˆ—è¡¨
         private List<NavPoint> navPoints = new List<NavPoint>();
 
 
         /// <summary>
-        /// ¶ş¼¶»º´æ£¬»ùÓÚ NavPoint µÄÎ»ÖÃ»®·ÖµÄÍø¸ñ£¬ÓÃÓÚ¿ìËÙ²éÕÒ NavPoints
+        /// äºŒçº§ç¼“å­˜ï¼ŒåŸºäº NavPoint çš„ä½ç½®åˆ’åˆ†çš„ç½‘æ ¼ï¼Œç”¨äºå¿«é€ŸæŸ¥æ‰¾ NavPoints
         /// </summary>
         [SerializeField] private float gridCellSize = 10f;
 
 
-        // »ùÓÚ BoundingBox ¶ş¼¶»º´æ
+        // åŸºäº BoundingBox äºŒçº§ç¼“å­˜
         private Dictionary<Vector2Int, List<NavPoint>> navGrid = new Dictionary<Vector2Int, List<NavPoint>>();
 
         private void OnEnable()
@@ -188,7 +188,7 @@ namespace Helltal.Gelercat
             NavPoint.OnNavPointDestroyed += UnregisterNavPoint;
             NavPoint.OnNavPointMoved += UpdateNavPoint;
 
-            RefreshAllNavPoints(); // ³õÊ¼»¯²éÕÒÏÖÓĞµÄ NavPoints
+            RefreshAllNavPoints(); // åˆå§‹åŒ–æŸ¥æ‰¾ç°æœ‰çš„ NavPoints
         }
 
         private void OnDisable()
@@ -201,7 +201,7 @@ namespace Helltal.Gelercat
         public void RefreshAllNavPoints()
         {
             navPoints.Clear();
-            navGrid.Clear(); // Çå¿ÕÍø¸ñ»º´æ
+            navGrid.Clear(); // æ¸…ç©ºç½‘æ ¼ç¼“å­˜
             foreach (var nav in FindObjectsOfType<NavPoint>())
             {
                 RegisterNavPoint(nav);
@@ -232,24 +232,24 @@ namespace Helltal.Gelercat
                 navGrid[key].Remove(nav);
                 if (navGrid[key].Count == 0)
                 {
-                    navGrid.Remove(key); // ÇåÀí¿ÕµÄÍø¸ñ
+                    navGrid.Remove(key); // æ¸…ç†ç©ºçš„ç½‘æ ¼
                 }
             }
-            // ´ÓÖ÷ÁĞ±íÖĞÒÆ³ı
+            // ä»ä¸»åˆ—è¡¨ä¸­ç§»é™¤
             navPoints.Remove(nav);
 
         }
 
         private void UpdateNavPoint(NavPoint nav)
         {
-            // ±£³Ö navPoints ÊÇ×îĞÂÎ»ÖÃµÄ£¬Ö»ÔÚÎ´À´ĞèÒªÅÅĞò»òÆäËûÂß¼­Ê±Ê¹ÓÃ
+            // ä¿æŒ navPoints æ˜¯æœ€æ–°ä½ç½®çš„ï¼Œåªåœ¨æœªæ¥éœ€è¦æ’åºæˆ–å…¶ä»–é€»è¾‘æ—¶ä½¿ç”¨
         }
 
         private Vector2Int GetGridKey(Vector3 position)
         {
             return new Vector2Int(
                 Mathf.FloorToInt(position.x / gridCellSize),
-                Mathf.FloorToInt(position.z / gridCellSize)  // ×¢ÒâÊ¹ÓÃ x-z Æ½Ãæ
+                Mathf.FloorToInt(position.z / gridCellSize)  // æ³¨æ„ä½¿ç”¨ x-z å¹³é¢
             );
         }
 
@@ -259,9 +259,9 @@ namespace Helltal.Gelercat
         }
 
         /// <summary>
-        /// »ñÈ¡ÀëÖ¸¶¨Î»ÖÃ×î½üµÄ NavPoint
+        /// è·å–ç¦»æŒ‡å®šä½ç½®æœ€è¿‘çš„ NavPoint
         /// </summary>
-        /// <param name="position"> Ä¿±êµã </param>
+        /// <param name="position"> ç›®æ ‡ç‚¹ </param>
         /// <returns></returns>
         /// <remarks>  </remarks>
 
@@ -331,7 +331,7 @@ namespace Helltal.Gelercat
 
                 if (nav == null)
                 {
-                    // ´ÓÁĞ±íÖĞÒÆ³ıÒÑÏú»ÙµÄ NavPoint£¬±£³ÖÁĞ±í¸É¾»
+                    // ä»åˆ—è¡¨ä¸­ç§»é™¤å·²é”€æ¯çš„ NavPointï¼Œä¿æŒåˆ—è¡¨å¹²å‡€
                     navPoints.RemoveAt(i);
                     continue;
                 }
@@ -352,7 +352,7 @@ namespace Helltal.Gelercat
                 }
             }
 
-            // ±Õ»·Ïß»æÖÆ
+            // é—­ç¯çº¿ç»˜åˆ¶
             if (drawAsLoop && navPoints.Count > 1)
             {
                 if (navPoints[navPoints.Count - 1] != null && navPoints[0] != null)
@@ -370,23 +370,23 @@ namespace Helltal.Gelercat
 
             HashSet<Vector2Int> drawnCells = new HashSet<Vector2Int>();
 
-            Gizmos.color = new Color(debugColour.r, debugColour.g, debugColour.b, 0.3f); // °ëÍ¸Ã÷
+            Gizmos.color = new Color(debugColour.r, debugColour.g, debugColour.b, 0.3f); // åŠé€æ˜
 
             foreach (var nav in navPoints)
             {
                 if (nav == null) continue;
 
                 Vector2Int key = GetGridKey(nav.transform.position);
-                if (drawnCells.Contains(key)) continue; // ²»ÖØ¸´»­
+                if (drawnCells.Contains(key)) continue; // ä¸é‡å¤ç”»
                 drawnCells.Add(key);
 
                 Vector3 center = new Vector3(
                     (key.x + 0.5f) * gridCellSize,
-                    nav.transform.position.y,  // ±£³ÖÔÚ NavPoint ¸ß¶È
+                    nav.transform.position.y,  // ä¿æŒåœ¨ NavPoint é«˜åº¦
                     (key.y + 0.5f) * gridCellSize
                 );
 
-                Vector3 size = new Vector3(gridCellSize, 0.1f, gridCellSize); // ±âÆ½Á¢·½Ìå
+                Vector3 size = new Vector3(gridCellSize, 0.1f, gridCellSize); // æ‰å¹³ç«‹æ–¹ä½“
                 Gizmos.DrawWireCube(center, size);
 
                 if (drawNumbers)

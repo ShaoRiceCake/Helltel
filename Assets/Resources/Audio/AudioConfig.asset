@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a40e6104e655e94aac732fe02a9304e, type: 3}
+  m_Name: AudioConfig
+  m_EditorClassIdentifier: 
+  soundEffects:
+  - name: "\u73A9\u5BB6\u6293\u53D6"
+    clip: {fileID: 8300000, guid: 9dc837db2c95e8d4882f155bb05352c8, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+    category: 2
+  - name: "\u73A9\u5BB6\u677E\u624B"
+    clip: {fileID: 8300000, guid: 09592d5804e6c504c9eb8b187245c5e4, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+    category: 2
+  - name: "\u73A9\u5BB6\u811A\u6B65"
+    clip: {fileID: 8300000, guid: a54dad84d9aa80d49a6cd0a2c40dd966, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 0
+    randomClips:
+    - {fileID: 8300000, guid: a54dad84d9aa80d49a6cd0a2c40dd966, type: 3}
+    - {fileID: 8300000, guid: bd46269e4614d1f45821304a1ba5ae4e, type: 3}
+    - {fileID: 8300000, guid: d721aa3c46217d34580673994f8e8e9c, type: 3}
+    - {fileID: 8300000, guid: 0465a3c9af4964d4888c850b630bcfdc, type: 3}
+    - {fileID: 8300000, guid: 04ea5820cc083064bab509194d4bc3b7, type: 3}
+    category: 2
+  - name: "\u6CE1\u6CE1\u97F3"
+    clip: {fileID: 8300000, guid: 04230584e8e349d4789f5d5c3a45128a, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: 935b7d0314117044081e9f7edcad67da, type: 2}
+    useVariation: 1
+    randomClips: []
+    category: 2
+  - name: "\u52A0\u8F7D"
+    clip: {fileID: 8300000, guid: ede838d788d10fc41b2aee2bdc6a5c69, type: 3}
+    defaultVolume: 1
+    is3D: 1
+    mixerGroup: {fileID: 24300002, guid: bba3b052609ad464fbe7aa8ee9b221dc, type: 2}
+    useVariation: 0
+    randomClips: []
+    category: 1
+  initialPoolSize: 10

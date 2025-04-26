@@ -1,9 +1,7 @@
-
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
 using NPBehave;
-
 
 namespace Helltal.Gelercat
 {
@@ -87,6 +85,8 @@ namespace Helltal.Gelercat
         protected virtual void Init()
         {
             if (!IsHost && NetworkManager.Singleton) return;
+
+            TakeDamageServerRpc(maxSpawnCount);
         }
         /// <summary>
         /// 在这里写组件初始化逻辑 

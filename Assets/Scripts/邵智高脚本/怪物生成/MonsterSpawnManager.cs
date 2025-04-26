@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using Helltal.Gelercat;
 using NUnit.Framework;
 using UnityEngine;
-
-public class MonsterSpawnSystem : MonoBehaviour
+using Unity.Netcode;
+public class MonsterSpawnSystem : NetworkBehaviour
 {
     //============== 核心参数配置区 ==============
     [Header("楼层配置")]
@@ -49,9 +49,21 @@ public class MonsterSpawnSystem : MonoBehaviour
     //============== 初始化流程 ==============
     void Start()
     {
-        //InitializeElevators();
-        InitializeSpawnData();
-        StartCoroutine(SpawnRoutine());
+        if (NetworkManager.Singleton)
+        {
+            if (IsHost)
+            {
+                //InitializeElevators();
+                InitializeSpawnData();
+                StartCoroutine(SpawnRoutine());
+            }
+        }
+        else
+        {
+            InitializeSpawnData();
+            StartCoroutine(SpawnRoutine());
+        }
+
     }
 
     /// <summary>
@@ -171,12 +183,19 @@ public class MonsterSpawnSystem : MonoBehaviour
 
         List<NavPoint> navPoints = navPointsManager.GetNavPoints();
         int randomIndex = Random.Range(0,navPoints.Count);
+
         Transform randomNavPoint = navPoints[randomIndex].transform;
-        Debug.Log("生成"+prefab);
-        Vector3 spawnPoint = randomNavPoint.position + Vector3.up * 0.5f;
+        Debug.Log("生成"+prefab+"在第"+randomIndex+"个navPoint处");
+        Vector3 spawnPoint = randomNavPoint.position; 
+        Debug.Log("生成在"+spawnPoint);
 
         // 实例化并记录
         var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
+        if (NetworkManager.Singleton)
+        {
+            instance.GetComponent<NetworkObject>().Spawn();
+        }
+
         activeMonsters.Add(instance.GetComponent<GuestBase>());
         spawnRecords[prefab]++;
     }

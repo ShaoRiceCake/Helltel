@@ -2,7 +2,6 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Serialization;
 
 public class CatchTool : MonoBehaviour
 {
@@ -14,21 +13,33 @@ public class CatchTool : MonoBehaviour
     private GameObject _catchBall;
     private bool _isGrabbing;
     private GameObject _currentTarget;
-    private Transform _catchAimTrans; 
-    private GameObject _currentHighlightedObject;
-    private OutlineController _currentGrabbedOutline; 
+    private Transform _catchAimTrans;
+    private int CatchToolInstanceId => GetInstanceID();
+    public ulong playerID;
 
-    // 属性封装
+    private float pressTime;
+    private bool isPressingE;
+    private const float LONG_PRESS_THRESHOLD = 0.5f; // 长按时间阈值
+    
     public GameObject CatchBall
     {
         get => _catchBall;
         set
         {
+            if (_catchBall != value && _currentTarget)
+            {
+                if (_currentTarget.TryGetComponent<ItemBase>(out var item))
+                {
+                    item.RequestStateChange(EItemState.Selected);
+                }
+                _currentTarget = null;
+            }
+
             _catchBall = value;
             if (!_catchBall) return;
+        
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
-            _catchAimTrans =  _catchBall.transform;
-            NullCheckerTool.CheckNull(_catchBall, _sphereCollider, obiAttachment,_catchAimTrans);
+            _catchAimTrans = _catchBall.transform;
         }
     }
 
@@ -48,104 +59,138 @@ public class CatchTool : MonoBehaviour
     private void Update()
     {
         if(!_catchBall) return;
-        HighLightTarget();
         UpdateTargetSelection();
         HandleInput();
     }
 
     private void UpdatePreSelectedObjects(List<GameObject> detectedObjects)
     {
+        foreach (var obj in preSelectedObjects.Except(detectedObjects))
+        {
+            if (obj && obj.TryGetComponent<ItemBase>(out var item) && 
+                !item.IsGrabbed) 
+            {
+                item.RequestStateChange(EItemState.NotSelected);
+            }
+        }
+
+        foreach (var obj in detectedObjects)
+        {
+            if (obj && obj.TryGetComponent<ItemBase>(out var item) && 
+                item.IsNotSelected) 
+            {
+                item.RequestStateChange(EItemState.Selected);
+            }
+        }
+
         preSelectedObjects = detectedObjects;
     }
-
+    
     private void UpdateTargetSelection()
     {
         if (!_sphereCollider) return;
-
+        
+        GameObject newTarget = null;
+        
         if (preSelectedObjects.Count > 0)
         {
-            _currentTarget = preSelectedObjects
+            newTarget = preSelectedObjects
                 .OrderBy(obj => Vector3.Distance(
                     obj.transform.position, 
                     _catchAimTrans.position))
                 .FirstOrDefault();
         }
-        else
-        {
-            _currentTarget = null;
-        }
-    }
 
-    private void HighLightTarget()
-    {
-        // 如果正在抓取或者新目标就是当前已高亮的物体，则不做任何操作
-        if (_isGrabbing || _currentTarget == _currentHighlightedObject) return;
-    
-        // 先取消旧物体的高亮
-        if (_currentHighlightedObject)
+        if (_currentTarget == newTarget) return;
+        if (_currentTarget && _currentTarget.TryGetComponent<ItemBase>(out var prevItem))
         {
-            var oldOutline = _currentHighlightedObject.GetComponent<OutlineController>();
-            if (oldOutline)
-                oldOutline.SetOutlineEnabled(false);
+            prevItem.RequestStateChange(EItemState.Selected);
         }
-    
-        // 高亮新物体
-        if (_currentTarget)
+
+        if (newTarget && newTarget.TryGetComponent<ItemBase>(out var newItem))
         {
-            var newOutline = _currentTarget.GetComponent<OutlineController>();
-            if (!newOutline) return;
-            
-            newOutline.SetOutlineEnabled(true);
-            _currentHighlightedObject = _currentTarget;
+            newItem.RequestStateChange(EItemState.ReadyToGrab);
         }
-        else
-        {
-            _currentHighlightedObject = null;
-        }
+
+        _currentTarget = newTarget;
     }
     
     private void HandleInput()
     {
-        if (!Input.GetKeyDown(KeyCode.E)) return;
-        
-        if (_currentTarget && !_isGrabbing)
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            GrabObject(_currentTarget);
+            pressTime = Time.time;
+            isPressingE = true;
+        }
+
+        if (!Input.GetKeyUp(KeyCode.E)) return;
+        if (isPressingE)
+        {
+            var pressDuration = Time.time - pressTime;
+            
+            if (pressDuration >= LONG_PRESS_THRESHOLD && _isGrabbing)
+            {
+                TryUseItem();
+            }
+            else
+            {
+                if (_currentTarget && !_isGrabbing)
+                {
+                    GrabObject(_currentTarget);
+                }
+                else if (_isGrabbing)
+                {
+                    ReleaseObject();
+                }
+            }
+        }
+        isPressingE = false;
+    }
+
+    private void TryUseItem()
+    {
+        if (!_isGrabbing || !obiAttachment.target) return;
+    
+        var item = obiAttachment.target.gameObject.GetComponent<ItemBase>();
+        if (!item) return;
+    
+        // 尝试获取IUsable接口
+        if (item is IUsable usableItem)
+        {
+            // 如果是可使用的道具
+            usableItem.OnUseStart?.Invoke();
+            // usableItem.OnUseEnd?.Invoke();
         }
         else
         {
-            ReleaseObject();
+            Debug.Log($"[CatchTool] 这个道具({item.ItemName})不能被使用");
         }
     }
 
     private void GrabObject(GameObject target)
     {
         if(!target) return;
-        
-        _currentGrabbedOutline = target.GetComponent<OutlineController>();
-        if (_currentGrabbedOutline)
-        {
-            _currentGrabbedOutline.SetOutlineEnabled(false); 
-            _currentGrabbedOutline.LockOutlineState();
-        }
-        
+
+        if (!target.TryGetComponent<ItemBase>(out var item)) return;
+        if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
         _isGrabbing = true;
         obiAttachment.BindToTarget(target.transform);
         obiAttachment.enabled = true;
+                
+        AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
     }
 
     private void ReleaseObject()
     {
         if (!_isGrabbing) return;
-        
-        if (_currentGrabbedOutline)
-        {
-            _currentGrabbedOutline.UnlockOutlineState();
-            _currentGrabbedOutline = null;
-        }
-        
+
+        if (!obiAttachment.target ||
+            !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item)) return;
+        if (!item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID)) return;
         _isGrabbing = false;
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
+                
+        AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
     }
 }

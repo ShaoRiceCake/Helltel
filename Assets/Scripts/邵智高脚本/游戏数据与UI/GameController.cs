@@ -19,8 +19,8 @@ public class GameController : MonoBehaviour
         }
         _gameData.ResetData();
         // 仅供测试，实际由网络模块调用
-        _gameData.RegisterNetworkPlayer("test_local");
-        NotifyLocalPlayerReady("test_local");
+        // _gameData.RegisterNetworkPlayer("test_local");
+        // NotifyLocalPlayerReady("test_local");
     }
     private void OnEnable() {
         
@@ -77,13 +77,13 @@ public class GameController : MonoBehaviour
     }
  
     //供网络模块调用
-    public void NotifyLocalPlayerReady(string playerId)
-    {
-        // 获取视图组件并绑定
-        var healthView = FindObjectOfType<HealthView>();
-        if(healthView != null)
-            healthView.BindLocalPlayer(playerId);
-    }
+    // public void NotifyLocalPlayerReady(string playerId)
+    // {
+    //     // 获取视图组件并绑定
+    //     var healthView = FindObjectOfType<HealthView>();
+    //     if(healthView != null)
+    //         healthView.BindLocalPlayer(playerId);
+    // }
 
     //离开服务层
     public void LeaveServiceFloor()

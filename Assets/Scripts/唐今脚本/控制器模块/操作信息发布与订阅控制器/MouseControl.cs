@@ -53,6 +53,10 @@ public class MouseControl : NetworkBehaviour
 
     private void Update()
     {
+        if (!IsLocalPlayer && NetworkManager.Singleton) return;
+
+        if (!GameManager.instance.isGameing) return;
+
         if (!EnableMouseControl)
             return;
 

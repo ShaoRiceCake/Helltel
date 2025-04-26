@@ -90,6 +90,16 @@ public class NetworkHello : MonoBehaviour
 
     }
 
+    public void SetOtherVolume(int value)
+    {
+        RtcEngine.AdjustPlaybackSignalVolume(value);
+    }
+
+    public void MyVolume(int value)
+    {
+        RtcEngine.AdjustRecordingSignalVolume(value);
+
+    }
 
     private void Update()
     {
