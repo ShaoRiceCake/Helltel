@@ -1,11 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 using Helltal.Gelercat;
 using UnityEngine;
 using NPBehave;
-using UnityEngine.PlayerLoop;
-using UnityEditor.ShaderGraph.Drawing.Inspector.PropertyDrawers;
-using NUnit.Framework;
+using UnityEngine.Events;
 
 /// <summary>
 /// 集群行为状态结构体
@@ -23,11 +20,9 @@ public enum MothState
     PrepareAttack, // 准备攻击
     Dash, // 冲刺
     Attached, // 附着
-    Stunned, // 眩晕
-    Returning, // 返回
     Dead, // 死亡
 }
-public class MothController : GuestBase, IHurtable
+public class MothController : GuestBase, IHurtable, IGrabbable
 {
     [Header("这个虫子属于哪个组")]
     public MothGroupController belongToGroup; // 所属的虫群
@@ -77,6 +72,7 @@ public class MothController : GuestBase, IHurtable
 #endif
         behaviorTree.Blackboard["getDamage"] = false; // 受伤标志
         behaviorTree.Blackboard["Stunning"] = false;  // 眩晕
+        behaviorTree.Blackboard["isGrabbed"] = false; // 抓取状态
         SetMothState(MothState.UnderGroup);
         behaviorTree.Start();
     }
@@ -184,8 +180,8 @@ public class MothController : GuestBase, IHurtable
                     if (belongToGroup.CurTarget != null)
                     {
                         Debug.Log("虫子附着在玩家身上, 每秒造成伤害");
-                        
-                        
+
+
                     }
                 },
                 new WaitUntilStopped()
@@ -288,10 +284,7 @@ public class MothController : GuestBase, IHurtable
         boidsState.collisionRisks = new List<MothController>(); // 距离过近的虫子列表(具有碰撞风险，需要处理)
 
     }
-    private void BoidResetState()
-    {
-        boidsState.newVelocity = rb.velocity; // 下一帧中的速度
-    }
+
 
     // 更新下一时刻 速度矢量 
     private void BoidUpdateState()
@@ -459,18 +452,27 @@ public class MothController : GuestBase, IHurtable
 
                 SetMothState(MothState.Attached);
             }
-            else 
+            else
             {
                 Debug.Log("已经附着，造成伤害后眩晕");
                 // take damage;
-                
-                rb.AddForce(Vector3.back*5f,ForceMode.Impulse);
+
+                rb.AddForce(Vector3.back * 2f, ForceMode.Impulse);
                 behaviorTree.Blackboard["Stunning"] = true;
-                
+
             }
 
     }
 
+    private void DetachFromTarget()
+    {
+        if (attachTarget != null)
+        {
+            this.transform.SetParent(null); // 解除父子关系
+            rb.isKinematic = false;          // 恢复物理
+            attachTarget = null;             // 清除引用
+        }
+    }
 
     // 攻击i相关 ================================================================================================
 
@@ -491,6 +493,35 @@ public class MothController : GuestBase, IHurtable
     }
 
 
+
+    /// <summary>
+    /// 抓取接口 
+    /// </summary>
+    // 实现 IGrabbable 接口需要的内容
+    public UnityEvent OnGrabbed { get; set; } = new UnityEvent();
+    public UnityEvent OnReleased { get; set; } = new UnityEvent();
+
+    public bool RequestStateChange(EItemState newState, int toolInstanceId = -1, ulong playerId = ulong.MaxValue)
+    {
+        if (newState == EItemState.Grabbed)
+        {
+            OnGrabbed?.Invoke();
+            return true;
+        }
+        else if (newState == EItemState.ReadyToGrab)
+        {
+            OnReleased?.Invoke();
+            return false;
+        }
+
+        return true;
+    }
+    private void HandleGrabbed()
+    {
+        Debug.Log("虫子被抓取了！");
+        behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
+        
+    }
     private void OnDrawGizmos()
     {
         // 画出攻击距离，球
