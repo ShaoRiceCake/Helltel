@@ -52,7 +52,7 @@ public class HealthView : MonoBehaviour
     }
     private void OnDestroy()
     {
-        _data.OnPlayerHealthChanged -= UpdateHealth;
+        //_data.OnPlayerHealthChanged -= UpdateHealth;
         
         EventBus<HealthChangedEvent>.UnsubscribeAll(this);
         //_animSequence?.Kill();

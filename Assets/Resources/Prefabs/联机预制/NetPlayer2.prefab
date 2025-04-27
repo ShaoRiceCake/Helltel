@@ -957,6 +957,7 @@ GameObject:
   - component: {fileID: 1223981161067070143}
   - component: {fileID: 7457104360210112091}
   - component: {fileID: 647148547710230582}
+  - component: {fileID: 8187197816729454431}
   m_Layer: 7
   m_Name: HeadBall
   m_TagString: Uncatchable
@@ -1077,6 +1078,14 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!81 &8187197816729454431
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3668631394216512178}
+  m_Enabled: 1
 --- !u!1 &4370114153455065281
 GameObject:
   m_ObjectHideFlags: 0
@@ -1700,7 +1709,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1455652107
+  GlobalObjectIdHash: 2231717590
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1831,6 +1840,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obiAttachment: {fileID: 4484440590447852134}
   catchDetectorTool: {fileID: 1255471865051633969}
+  playerID: 0
   preSelectedObjects: []
 --- !u!114 &3015747627396732766
 MonoBehaviour:
@@ -1846,6 +1856,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   obiAttachment: {fileID: 1114696319454191351}
   catchDetectorTool: {fileID: 1255471865051633969}
+  playerID: 0
   preSelectedObjects: []
 --- !u!114 &4486876453449839115
 MonoBehaviour:
@@ -2061,6 +2072,9 @@ MonoBehaviour:
   fadeStartDistance: 3
   fadeEndDistance: 0.5
   fadeSmoothTime: 0.2
+  useLazyFollow: 0
+  lazyFollowFactor: 0.1
+  scaleWithTime: 1
 --- !u!114 &6249473725638944449
 MonoBehaviour:
   m_ObjectHideFlags: 0

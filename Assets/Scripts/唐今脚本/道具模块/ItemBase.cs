@@ -3,65 +3,73 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.Events;
 
+// 可交互物品基础接口
 public interface IInteractable
 {
-    string ItemName { get; }
-    EItemState CurrentState { get; }
+    string ItemName { get; }           // 物品唯一标识
+    EItemState CurrentState { get; }    // 当前状态查询
 }
 
+// 可使用物品接口（事件驱动）
 public interface IUsable
 {
-    UnityEvent OnUseStart { get; set; }
-    UnityEvent OnUseEnd { get; set; }
+    UnityEvent OnUseStart { get; set; }  // 使用开始事件
+    UnityEvent OnUseEnd { get; set; }     // 使用结束事件
 }
 
+// 可抓取物品接口（含权限管理）
 public interface IGrabbable
 {
-    UnityEvent OnGrabbed { get; set; }
-    UnityEvent OnReleased { get; set; }
+    UnityEvent OnGrabbed { get; set; }   // 抓取成功事件
+    UnityEvent OnReleased { get; set; }  // 释放成功事件
     
+    // 状态变更请求（含权限验证）
     bool RequestStateChange(EItemState newState, int toolInstanceId = -1, ulong playerId = ulong.MaxValue);
 }
 
+/* 物品状态枚举 */
 public enum EItemState
 {
-    NotSelected,    // 未被选择（默认状态）
-    Selected,       // 被选择（进入玩家检测范围）
-    ReadyToGrab,    // 待抓取（手球体激活且最近）
-    Grabbed         // 被抓取（玩家已抓取）
+    NotSelected,    // 默认状态：未被玩家检测到
+    Selected,       // 高亮状态：进入玩家检测范围
+    ReadyToGrab,    // 可交互状态：满足抓取条件（最近且朝向正确）
+    Grabbed         // 被抓持状态：已绑定到玩家控制器
 }
 
-// 状态基类
+/* 状态模式实现 */
+// 抽象状态基类（模板方法模式）
 public abstract class ItemState
 {
-    protected readonly ItemBase Item;
-    protected EItemState stateType;
+    protected readonly ItemBase Item;    // 绑定物品实例
+    protected EItemState stateType;      // 状态类型标识
 
-    public EItemState StateType => stateType;
+    public EItemState StateType => stateType;  // 状态类型访问器
 
-    protected ItemState(ItemBase item) => this.Item = item;
-    public virtual void Enter() { }
-    public virtual void Exit() { }
-    public virtual void Update() { }
+    protected ItemState(ItemBase item) => this.Item = item;  // 构造注入
+    
+    // 状态生命周期方法（空实现允许子类选择性重写）
+    public virtual void Enter() { }   // 状态进入时调用
+    public virtual void Exit() { }    // 状态退出时调用  
+    public virtual void Update() { } // 每帧更新调用
 }
 
-// 各具体状态类实现
+// 具体状态实现类
 public class NotSelectedState : ItemState
 {
     public NotSelectedState(ItemBase item) : base(item) => stateType = EItemState.NotSelected;
-    public override void Enter() => Item.gameObject.layer = Item.OriginalLayer;
+    public override void Enter() => Item.gameObject.layer = Item.OriginalLayer; // 恢复原始层级
 }
 
 public class SelectedState : ItemState
 {
     public SelectedState(ItemBase item) : base(item) => stateType = EItemState.Selected;
-    public override void Enter() => Item.gameObject.layer = Item.OriginalLayer;
+    // 保持原始层级（可扩展高亮逻辑）
 }
 
 public class ReadyToGrabState : ItemState
 {
     public ReadyToGrabState(ItemBase item) : base(item) => stateType = EItemState.ReadyToGrab;
-    public override void Enter() => Item.gameObject.layer = Item.TargetLayer;
+    public override void Enter() => Item.gameObject.layer = Item.TargetLayer; // 设置交互专用层级
 }
 
 public class GrabbedState : ItemState
@@ -69,67 +77,71 @@ public class GrabbedState : ItemState
     public GrabbedState(ItemBase item) : base(item) => stateType = EItemState.Grabbed;
     public override void Enter()
     {
-        Item.OnGrabbed?.Invoke();
-        Item.gameObject.layer = Item.OriginalLayer;
+        Item.OnGrabbed?.Invoke();                // 触发抓取事件
+        Item.gameObject.layer = Item.OriginalLayer; // 恢复层级避免重复检测
     }
     public override void Exit()
     {
-        if (Item)
-        {
-            Item.ClearGrabPermission();
-        }
-        Item.OnReleased?.Invoke();
-    }}
+        if (Item) Item.ClearGrabPermission();    // 清理权限信息
+        Item.OnReleased?.Invoke();               // 触发释放事件
+    }
+}
 
+/* 物品基类实现 */
 [RequireComponent(typeof(NetworkObject))]
 public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
 {
-    [SerializeField] protected string itemName;
-    public string ItemName => itemName;
+    // 配置字段
+    [SerializeField] protected string itemName;  // 物品标识（需在Inspector设置）
+    public string ItemName => itemName;          // 接口实现
     
-    // 权限验证字段
-    private ulong _currentGrabbingPlayerId = ulong.MaxValue;
-    private int _currentGrabbingToolId = -1;
-    private bool IsBeingGrabbed => _currentGrabbingToolId != -1;
+    // 权限管理字段
+    private ulong _currentGrabbingPlayerId = ulong.MaxValue; // 当前持有玩家ID
+    private int _currentGrabbingToolId = -1;                 // 当前使用工具ID
+    private bool IsBeingGrabbed => _currentGrabbingToolId != -1; // 抓取状态判断
 
-    public abstract UnityEvent OnGrabbed { get; set; }
-    public abstract UnityEvent OnReleased { get; set; }
-    
-    // 状态机相关
-    private readonly Stack<ItemState> _stateStack = new();
-    private readonly Dictionary<EItemState, ItemState> _stateDictionary = new();
-    public EItemState CurrentState => _stateStack.Count > 0 ? _stateStack.Peek().StateType : EItemState.NotSelected;
-    
+    // 事件系统
+    public abstract UnityEvent OnGrabbed { get; set; }   // 抓取事件实例
+    public abstract UnityEvent OnReleased { get; set; }  // 释放事件实例
+
+    // 状态机系统
+    private readonly Stack<ItemState> _stateStack = new();          // 状态堆栈（支持状态嵌套）
+    private readonly Dictionary<EItemState, ItemState> _stateDictionary = new(); // 状态注册表
+    public EItemState CurrentState => _stateStack.Count > 0 ? _stateStack.Peek().StateType : EItemState.NotSelected; // 当前状态查询
+
     // 层级管理
-    public int OriginalLayer { get; private set; }
-    public int TargetLayer { get; private set; }
-    
+    public int OriginalLayer { get; private set; }  // 物品原始层级（自动获取）
+    public int TargetLayer { get; private set; }    // 交互专用层级（通常设置为"Item"层）
+
+    /* 生命周期方法 */
     protected virtual void Awake()
     {
+        // 层级初始化
         OriginalLayer = gameObject.layer;
         TargetLayer = LayerMask.NameToLayer("Item");
         
-        // 初始化状态机
+        // 状态机初始化
         _stateDictionary.Add(EItemState.NotSelected, new NotSelectedState(this));
         _stateDictionary.Add(EItemState.Selected, new SelectedState(this));
         _stateDictionary.Add(EItemState.ReadyToGrab, new ReadyToGrabState(this));
         _stateDictionary.Add(EItemState.Grabbed, new GrabbedState(this));
         
-        // 初始状态
-        ForceSetState(EItemState.NotSelected);
+        ForceSetState(EItemState.NotSelected); // 初始状态设置
     }
 
+    /* 核心状态转换方法 */
     public bool RequestStateChange(EItemState newState, int toolInstanceId = -1, ulong playerId = ulong.MaxValue)
     {
-        // 权限验证（抓取/释放）
+        // 抓取权限验证
         if (newState == EItemState.Grabbed && !TryAcquireGrabPermission(toolInstanceId, playerId))
             return false;
         
+        // 释放权限验证
         if (CurrentState == EItemState.Grabbed && newState != EItemState.Grabbed && 
             !IsValidPermissionHolder(toolInstanceId, playerId))
             return false;
 
-        // 状态转换规则
+        // 状态转换规则验证（有限状态机）
         switch (CurrentState)
         {
             case EItemState.NotSelected:
@@ -140,28 +152,18 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
             case EItemState.Selected:
                 switch (newState)
                 {
-                    case EItemState.NotSelected:
-                        PopState();
-                        break;
-                    case EItemState.ReadyToGrab:
-                        PushState(newState);
-                        break;
-                    default:
-                        return false;
+                    case EItemState.NotSelected: PopState(); break;
+                    case EItemState.ReadyToGrab: PushState(newState); break;
+                    default: return false;
                 }
                 break;
 
             case EItemState.ReadyToGrab:
                 switch (newState)
                 {
-                    case EItemState.Selected:
-                        PopState();
-                        break;
-                    case EItemState.Grabbed:
-                        PushState(newState);
-                        break;
-                    default:
-                        return false;
+                    case EItemState.Selected: PopState(); break;
+                    case EItemState.Grabbed: PushState(newState); break;
+                    default: return false;
                 }
                 break;
 
@@ -170,10 +172,10 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
                 else return false;
                 break;
         }
-
         return true;
     }
 
+    /* 状态机内部方法 */
     private void PushState(EItemState newState)
     {
         if (_stateStack.Count > 0) _stateStack.Peek().Exit();
@@ -187,7 +189,7 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
         if (_stateStack.Count == 0) return;
         _stateStack.Pop().Exit();
         if (_stateStack.Count > 0) _stateStack.Peek().Enter();
-        else ForceSetState(EItemState.NotSelected);
+        else ForceSetState(EItemState.NotSelected); // 空栈保护
     }
 
     private void ForceSetState(EItemState newState)
@@ -196,12 +198,15 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
         PushState(newState);
     }
 
+    /* 权限管理方法 */
     private bool TryAcquireGrabPermission(int toolInstanceId, ulong playerId)
     {
+        // 已持有权限时的验证
         if (IsBeingGrabbed)
             return _currentGrabbingToolId == toolInstanceId && 
                    _currentGrabbingPlayerId == playerId;
 
+        // 首次获取权限
         _currentGrabbingToolId = toolInstanceId;
         _currentGrabbingPlayerId = playerId;
         return true;
@@ -213,20 +218,20 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
                _currentGrabbingPlayerId == playerId;
     }
 
+    /* 更新循环 */
     protected virtual void Update()
     {
-        _stateStack.Peek().Update();
-        // Debug.Log($"[ItemState] {itemName}: {CurrentState} | OwnerID: {_currentGrabbingPlayerId}, HandID: {_currentGrabbingToolId}");
-        // Debug.Log("IsGrabbed" + IsGrabbed);
+        _stateStack.Peek().Update(); // 驱动当前状态更新
     }
 
+    // 权限清理方法
     public void ClearGrabPermission()
     {
         _currentGrabbingToolId = -1;
         _currentGrabbingPlayerId = ulong.MaxValue;
     }
     
-    // 便捷查询方法
+    /* 状态查询属性 */
     public bool IsNotSelected => CurrentState == EItemState.NotSelected;
     public bool IsSelected => CurrentState == EItemState.Selected;
     public bool IsReadyToGrab => CurrentState == EItemState.ReadyToGrab;
