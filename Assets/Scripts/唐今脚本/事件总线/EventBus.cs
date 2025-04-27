@@ -11,7 +11,7 @@ public static class EventBus<T> where T : class
     // 存储所有订阅（无参数）
     private static readonly HashSet<Action> ParameterlessListeners = new();
 
-    // 存储对象与其订阅的委托（使用 WeakReference 避免内存泄漏）
+    // 存储对象与其订阅的委托
     private static readonly Dictionary<WeakReference, List<object>> SubscriberToDelegatesMap = new();
 
     // 订阅带参数的事件
@@ -43,19 +43,16 @@ public static class EventBus<T> where T : class
     // 注册订阅关系
     private static void RegisterSubscription(MonoBehaviour subscriber, object listener)
     {
-        CleanupDeadReferences(); // 先清理无效引用
-
-        // 查找是否已存在该订阅者的记录
+        CleanupDeadReferences();
+        
         var subscriberRef = (from kvp in SubscriberToDelegatesMap where (MonoBehaviour)kvp.Key.Target == subscriber select kvp.Key).FirstOrDefault();
 
-        // 如果没有记录，则创建新记录
         if (subscriberRef == null)
         {
             subscriberRef = new WeakReference(subscriber);
             SubscriberToDelegatesMap[subscriberRef] = new List<object>();
         }
 
-        // 添加订阅
         if (!SubscriberToDelegatesMap[subscriberRef].Contains(listener))
         {
             SubscriberToDelegatesMap[subscriberRef].Add(listener);
@@ -83,7 +80,6 @@ public static class EventBus<T> where T : class
         var targetRef = (from kvp in SubscriberToDelegatesMap where (MonoBehaviour)kvp.Key.Target == subscriber select kvp.Key).FirstOrDefault();
 
         if (targetRef == null) return;
-        // 移除所有订阅
         foreach (var listener in SubscriberToDelegatesMap[targetRef])
         {
             switch (listener)
@@ -103,7 +99,7 @@ public static class EventBus<T> where T : class
     // 发布事件（带参数）
     public static void Publish(T eventData = null)
     {
-        CleanupDeadReferences(); // 先清理无效引用
+        CleanupDeadReferences(); 
 
         foreach (var listener in Listeners)
         {
@@ -118,7 +114,6 @@ public static class EventBus<T> where T : class
         }
     }
 
-    // 清空所有订阅（场景切换时调用）
     public static void Clear()
     {
         Listeners.Clear();
