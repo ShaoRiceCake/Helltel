@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
-public class MouseControl : NetworkBehaviour
+public class TestMouseControl : MonoBehaviour
 {
     public float MouseSensitivity
     {
@@ -53,14 +53,6 @@ public class MouseControl : NetworkBehaviour
 
     private void Update()
     {
-        if (!IsLocalPlayer && NetworkManager.Singleton) return;
-        
-        if (!GameManager.instance.isGameing) return;
-
-        if (!EnableMouseControl)
-            return;
-        
-
         HandleMouseButtons();
         HandleMouseWheel();
         HandleMouseMovementUpdate(); 
