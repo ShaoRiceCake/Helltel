@@ -114,7 +114,6 @@ public static class EventBus<T> where T : class
         }
     }
 
-    // 清空所有订阅（场景切换时调用）
     public static void Clear()
     {
         Listeners.Clear();

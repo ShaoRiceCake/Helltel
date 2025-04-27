@@ -17,9 +17,9 @@ public class CatchTool : MonoBehaviour
     private int CatchToolInstanceId => GetInstanceID();
     public ulong playerID;
 
-    private float pressTime;
-    private bool isPressingE;
-    private const float LONG_PRESS_THRESHOLD = 0.5f; // 长按时间阈值
+    private float _pressTime;
+    private bool _isPressingE;
+    private const float LongPressThreshold = 0.5f; // 长按时间检测阈值
     
     public GameObject CatchBall
     {
@@ -119,16 +119,16 @@ public class CatchTool : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
-            pressTime = Time.time;
-            isPressingE = true;
+            _pressTime = Time.time;
+            _isPressingE = true;
         }
 
         if (!Input.GetKeyUp(KeyCode.E)) return;
-        if (isPressingE)
+        if (_isPressingE)
         {
-            var pressDuration = Time.time - pressTime;
+            var pressDuration = Time.time - _pressTime;
             
-            if (pressDuration >= LONG_PRESS_THRESHOLD && _isGrabbing)
+            if (pressDuration >= LongPressThreshold && _isGrabbing)
             {
                 TryUseItem();
             }
@@ -144,7 +144,7 @@ public class CatchTool : MonoBehaviour
                 }
             }
         }
-        isPressingE = false;
+        _isPressingE = false;
     }
 
     private void TryUseItem()
@@ -154,10 +154,8 @@ public class CatchTool : MonoBehaviour
         var item = obiAttachment.target.gameObject.GetComponent<ItemBase>();
         if (!item) return;
     
-        // 尝试获取IUsable接口
         if (item is IUsable usableItem)
         {
-            // 如果是可使用的道具
             usableItem.OnUseStart?.Invoke();
             // usableItem.OnUseEnd?.Invoke();
         }
@@ -186,11 +184,14 @@ public class CatchTool : MonoBehaviour
 
         if (!obiAttachment.target ||
             !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item)) return;
+        
         if (!item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID)) return;
+        
+        
         _isGrabbing = false;
         obiAttachment.enabled = false;
         obiAttachment.BindToTarget(null);
-                
+            
         AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
     }
 }
