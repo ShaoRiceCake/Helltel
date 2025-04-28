@@ -14,7 +14,7 @@ public class TestControllerInformation : MonoBehaviour
     public bool isTest = false;
 
     public ControlMode mCurrentControlMode = ControlMode.LegControl;
-    private MouseControl _mMouseControl;
+    private TestMouseControl _mMouseControl;
 
     public UnityEvent onLiftLeftLeg;
     public UnityEvent onLiftRightLeg;
@@ -59,7 +59,7 @@ public class TestControllerInformation : MonoBehaviour
         onCameraControl ??= new UnityEvent(); 
         onStopCameraControl ??= new UnityEvent(); 
 
-        _mMouseControl = GetComponent<MouseControl>();
+        _mMouseControl = GetComponent<TestMouseControl>();
         _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
         _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
         _mMouseControl.onLeftMouseUp.AddListener(OnLeftMouseUp);
