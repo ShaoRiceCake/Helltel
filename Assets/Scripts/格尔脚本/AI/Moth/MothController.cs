@@ -99,8 +99,8 @@ public class MothController : GuestBase, IHurtable, IGrabbable
                 BuildDeadBranch(),
                 new Selector(
                 BuildGetDamageBranch(), // 受伤表现
-                BuildStunnedBranch(),
-                BuildAttachingBranch(), // 附着                
+                BuildStunnedBranch(),  // 眩晕表现
+                BuildAttachingBranch(), // 贴脸               
                 BuildAttackBranch(), // 攻击
                 BuildGroupMoveBranch()// 集体行动
                 )
@@ -520,7 +520,7 @@ public class MothController : GuestBase, IHurtable, IGrabbable
     {
         Debug.Log("虫子被抓取了！");
         behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
-        
+
     }
     private void OnDrawGizmos()
     {
