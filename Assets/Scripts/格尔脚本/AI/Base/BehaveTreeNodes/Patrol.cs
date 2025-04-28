@@ -26,14 +26,18 @@ namespace Helltal.Gelercat
 
         protected override void DoStop()
         {
+            // agent.ResetPath();  // 停止导航
+            // this.Stopped(false); // 明确停止
             agent.ResetPath();  // 停止导航
-            this.Stopped(false); // 明确停止
+            
+            Clock.RemoveUpdateObserver(OnUpdate);  // <<< 关键，移除更新回调！！
+            this.Stopped(false); // 明确告诉父节点：自己停止了
         }
 
         private void ChooseNextNavPoint()
         {
             currentTarget = GetClosestUnvisitedNavPoint();
-            
+
             if (currentTarget == null)
             {
                 visitDict.Clear();  // 重置访问状态
@@ -61,7 +65,7 @@ namespace Helltal.Gelercat
 
         private void OnUpdate()
         {
-             if (ReachedTarget(currentTarget))
+            if (ReachedTarget(currentTarget))
             {
                 visitDict[currentTarget] = true;
                 Clock.RemoveUpdateObserver(OnUpdate);

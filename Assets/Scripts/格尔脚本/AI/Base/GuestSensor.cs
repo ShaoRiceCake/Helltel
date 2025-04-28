@@ -35,7 +35,7 @@ namespace Helltal.Gelercat
         private void EnsureSensorSourceExists()
         {
             // 默认侦测范围
-            detectionLayer = LayerMask.GetMask("Player");
+            // detectionLayer = LayerMask.GetMask("Player");
             if (sensorSource == null)
             {
                 sensorSource = new GameObject("SensorSource");

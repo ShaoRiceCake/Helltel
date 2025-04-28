@@ -49,7 +49,6 @@ public class MothController : GuestBase, IHurtable, IGrabbable
 
     private Rigidbody rb; // 刚体组件
 
-    private Root behaviorTree;
 
 
 
@@ -82,8 +81,11 @@ public class MothController : GuestBase, IHurtable, IGrabbable
 
     private void InitSettings()
     {
+        rb = this.gameObject.GetComponent<Rigidbody>();
         if (rb == null)
-            rb = gameObject.AddComponent<Rigidbody>(); //添加刚体组件
+        {
+            rb = this.gameObject.AddComponent<Rigidbody>();
+        }
         rb.useGravity = false; // 不使用重力
         rb.isKinematic = false; // 取消动力学 
         boidsState = new BoidsState(); // 初始化集群个体的状态记录
@@ -99,10 +101,11 @@ public class MothController : GuestBase, IHurtable, IGrabbable
                 BuildDeadBranch(),
                 new Selector(
                 BuildGetDamageBranch(), // 受伤表现
-                BuildStunnedBranch(),  // 眩晕表现
+                BuildStunnedBranch(),   // 眩晕表现
+                BuildBeCatchedBranch(), // 被抓取表现
                 BuildAttachingBranch(), // 贴脸               
-                BuildAttackBranch(), // 攻击
-                BuildGroupMoveBranch()// 集体行动
+                BuildAttackBranch(),    // 攻击
+                BuildGroupMoveBranch()  // 集体行动
                 )
 
             )
@@ -209,6 +212,28 @@ public class MothController : GuestBase, IHurtable, IGrabbable
             ));
     }
 
+    private Node BuildBeCatchedBranch()
+    {
+        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY,
+            new Sequence(
+                new Action(() =>
+                {
+                    Debug.Log("虫子被抓取了！");
+                    rb.isKinematic = true; // 设置刚体为静态
+                }),
+                new Wait(3.0f), // 抓取表现等待时间
+                new Action(() =>
+                {
+                    Debug.Log("虫子被放开了！");
+                    behaviorTree.Blackboard["isGrabbed"] = false; // 重置抓取状态
+                    rb.isKinematic = false; // 恢复刚体动力学
+                    DetachFromTarget(); // 解除附着
+                })
+            ));
+    }
+
+    private bool wasGrabbed = false; // 记录曾经被抓取过，准备判断第一次落地
+    private float stunThresholdSpeed = 5.0f; // 眩晕速度阈值
     private Node BuildStunnedBranch()
     {
         return new BlackboardCondition("Stunning", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY,
@@ -250,30 +275,38 @@ public class MothController : GuestBase, IHurtable, IGrabbable
     protected override void Update()
     {
         base.Update();
-        if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
+        if (!DEBUG_STOP_BEHAVIOR_TREE)
         {
-            BoidUpdateState(); // 更新状态
-        }
-        if (behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
-        {
-        }
-
-        if (behaviorTree.Blackboard["State"].Equals(MothState.Attached.ToString()))
-        {
-            if (attachTarget != null)
+            if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
             {
-
+                BoidUpdateState(); // 更新状态
+            }
+            if (behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
+            {
             }
 
+            if (behaviorTree.Blackboard["State"].Equals(MothState.Attached.ToString()))
+            {
+                if (attachTarget != null)
+                {
+
+                }
+
+            }
         }
     }
     protected override void LateUpdate()
     {
         base.LateUpdate();
-        if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
+        if (!DEBUG_STOP_BEHAVIOR_TREE)
         {
-            BoidApplyState(); // 应用状态
+            if (behaviorTree.Blackboard["State"].Equals(MothState.UnderGroup.ToString()))
+            {
+                BoidApplyState(); // 应用状态
+            }
+
         }
+
     }
 
     // 虫子集群行为++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -461,6 +494,19 @@ public class MothController : GuestBase, IHurtable, IGrabbable
                 behaviorTree.Blackboard["Stunning"] = true;
 
             }
+        if (wasGrabbed)
+        {
+            float impactSpeed = collision.relativeVelocity.magnitude; // 碰撞时相对速度
+            Debug.Log($"释放后首次碰撞，速度 {impactSpeed}");
+
+            if (impactSpeed >= stunThresholdSpeed)
+            {
+                Debug.Log("速度超过阈值，进入眩晕状态！");
+                behaviorTree.Blackboard["Stunning"] = true;
+            }
+
+            wasGrabbed = false; // 无论如何，第一次碰撞后取消等待状态
+        }
 
     }
 
@@ -511,6 +557,7 @@ public class MothController : GuestBase, IHurtable, IGrabbable
         else if (newState == EItemState.ReadyToGrab)
         {
             OnReleased?.Invoke();
+            wasGrabbed = true;  // <<< 被释放，准备检测第一次碰撞
             return false;
         }
 
