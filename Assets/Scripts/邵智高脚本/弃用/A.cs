@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Michsky.LSS;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Michsky.LSS;
+
 
 public class A : MonoBehaviour
 {
@@ -27,6 +27,7 @@ public class A : MonoBehaviour
             
         // // 加载加载场景（单例模式）
         // SceneManager.LoadScene("Loading", LoadSceneMode.Single);  
-        loadingScreenManager.LoadScene("B");
+        loadingScreenManager.LoadScene();
+        SceneManager.LoadScene("B");  
     }
 }
