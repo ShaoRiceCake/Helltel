@@ -63,6 +63,8 @@ public class NotSelectedState : ItemState
 public class SelectedState : ItemState
 {
     public SelectedState(ItemBase item) : base(item) => stateType = EItemState.Selected;
+    public override void Enter() => Item.gameObject.layer = Item.OriginalLayer; 
+
     // 保持原始层级（可扩展高亮逻辑）
 }
 
