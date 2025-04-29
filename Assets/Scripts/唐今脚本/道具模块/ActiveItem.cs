@@ -12,4 +12,5 @@ public abstract class ActiveItem : ItemBase, IUsable
     {
         Destroy(gameObject);
     }
+    
 }
