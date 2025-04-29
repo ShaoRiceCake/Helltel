@@ -29,12 +29,12 @@ public class MothGroupController : GuestBase
     public float TargetAmt = 0.01f; // 目标吸引力系数(影响新速度)
 
 
-    private Root behaviorTree;
-
+ 
     public GameObject CurTarget;
 
     public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject attachingMoth; //当前附着的虫子
+
 
     protected override void Start()
     {
