@@ -14,8 +14,7 @@ public class NetworkSpawn : NetworkBehaviour
 {
     
     public NetworkVariable<float> _syncHealth = new NetworkVariable<float>();//ÉúÃü
-    public NetworkVariable<float> _syncMoney = new NetworkVariable<float>();//Ç®Êý
-    public NetworkVariable<float> _syncPerformence = new NetworkVariable<float>();//¼¨Ð§
+    
     public TMP_Text health_text;
 
     public PlayerInfo my_Info;
@@ -27,7 +26,7 @@ public class NetworkSpawn : NetworkBehaviour
     {
         if (IsServer)
         {
-            TakeDamageRpc(100);
+            TakeDamageRpc(90);
         }
 
 
@@ -56,18 +55,7 @@ public class NetworkSpawn : NetworkBehaviour
         _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
         UpdateHealthViewRpc();
     }
-    [Rpc(SendTo.Server)]
-    public void TakeMoneyRpc(float money)
-    {
-        _syncHealth.Value += money;
-        _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
-    }
-    [Rpc(SendTo.Server)]
-    public void TakePerformenceRpc(float performence)
-    {
-        _syncHealth.Value += performence;
-        _syncHealth.Value = Mathf.Clamp(_syncHealth.Value, 0, 100f);
-    }
+
     [Rpc(SendTo.Owner)]
     void UpdateHealthViewRpc()
     {
