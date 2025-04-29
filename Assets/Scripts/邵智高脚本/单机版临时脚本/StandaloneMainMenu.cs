@@ -56,7 +56,7 @@ public class StandaloneMainMenu : MonoBehaviour
     /// </summary>
     public void SinglePlayerButton()
     {
-        lSS_Manager.LoadScene("电梯");
+        lSS_Manager.LoadScene("单机正式电梯");
     }
 
 

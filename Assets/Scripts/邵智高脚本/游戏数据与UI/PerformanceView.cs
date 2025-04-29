@@ -23,12 +23,13 @@ public class PerformanceView : MonoBehaviour
     private void Start()
     {
         UpdatePerformanceDisplay(_data.Performance);
+        UpdatePerformanceTargetDisplay(_data.PerformanceTarget);
     }
 
     private void UpdatePerformanceDisplay(int newValue)
     {
         _performanceText.text = $"${newValue}";
-        //PlayMoneyAnimation();
+  
     }
     private void UpdatePerformanceTargetDisplay(int newValue)
     {
@@ -40,6 +41,7 @@ public class PerformanceView : MonoBehaviour
     private void OnDestroy()
     {
         _data.OnPerformanceChanged -= UpdatePerformanceDisplay;
+        _data.OnPerformanceChanged -= UpdatePerformanceTargetDisplay;
 
     }
 }
