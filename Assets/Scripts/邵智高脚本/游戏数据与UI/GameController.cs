@@ -1,4 +1,5 @@
 // Controller层核心逻辑
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -23,7 +24,28 @@ public class GameController : MonoBehaviour
     private void OnEnable() {
         
     }
-    
+    // 增加血量接口
+    public void AddHealth(int amount)
+    {
+        if (amount < 0)
+        {
+            Debug.LogError("请使用 DeductHealth 方法扣除血量");
+            return;
+        }
+        
+        _gameData.Money += amount;
+    }
+
+    // 扣血接口
+    public void DeductHealth(int amount)
+    {
+        if (_gameData.Money >= amount)
+        {
+            _gameData.Money -= amount;
+        }
+        //暂定钱可以是负数
+        _gameData.Money -= amount;
+    }
 
     // 增加钱接口
     public void AddMoney(int amount)

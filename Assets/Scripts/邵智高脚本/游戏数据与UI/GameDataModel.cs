@@ -10,6 +10,8 @@ public class GameDataModel : ScriptableObject
 {
 
     // 私有字段配合属性保护数据
+    private int _health;
+    private int _maxHealth;
     private int _money;
     private int _performance;
     private int _performanceTarget = 100;//基础绩效要求
@@ -17,6 +19,8 @@ public class GameDataModel : ScriptableObject
     private int _level = -1;
 
     // 公开事件
+    public event Action<int> OnHealthChanged;      // 生命变化
+    public event Action<int> OnMaxHealthChanged;      // 最大生命变化
     public event Action<int> OnMoneyChanged;      // 金钱变化
     public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
@@ -26,6 +30,20 @@ public class GameDataModel : ScriptableObject
 
 
     // 属性封装（数据访问入口）
+    public int Health {
+        get => _health;
+        set {
+            _health =value;
+            OnHealthChanged?.Invoke(_health); // 触发UI更新
+        }
+    }
+    public int MaxHealth {
+        get => _maxHealth;
+        set {
+            _maxHealth =value;
+            OnMaxHealthChanged?.Invoke(_maxHealth); // 触发UI更新
+        }
+    }
     public int Money {
         get => _money;
         set {
@@ -59,6 +77,8 @@ public class GameDataModel : ScriptableObject
     public void ResetData()
     {
         Money = 0;
+        MaxHealth = 100;
+        Health = MaxHealth;
         Performance = 0;
         PerformanceTarget = _performanceTarget;
         _level = -1;
