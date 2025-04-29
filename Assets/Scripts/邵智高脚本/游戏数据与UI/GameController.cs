@@ -58,19 +58,22 @@ public class GameController : MonoBehaviour
             Debug.LogError("请使用 DeductHealth 方法扣除血量");
             return;
         }
-        
         _gameData.Money += amount;
     }
 
     // 扣血接口
     public void DeductHealth(int amount)
     {
-        if (_gameData.Money >= amount)
+        if (_gameData.Health >= amount)
         {
-            _gameData.Money -= amount;
+            _gameData.Health -= amount;
         }
-        //暂定钱可以是负数
-        _gameData.Money -= amount;
+        else
+        {
+            Debug.Log("死亡");
+            return;
+        }
+      
     }
 
     // 增加钱接口
