@@ -113,7 +113,7 @@ public class NetworkRoom : MonoBehaviour
                             relayTransportNetcode.SetRoomData(resp);
                             StartHost();
                             GameManager.instance.joinConde = resp.RoomCode;
-                            lSS_Manager.LoadScene();
+                        
                             GameManager.instance.LoadScene("Lobby"); // 加载大厅场景
                         }
                         else
@@ -262,7 +262,7 @@ public class NetworkRoom : MonoBehaviour
         // // 加载加载场景（单例模式）
         // SceneManager.LoadScene("Loading", LoadSceneMode.Single);   
         //SceneManager.LoadScene("Lobby");
-        lSS_Manager.LoadScene();
+
         GameManager.instance.LoadScene("Lobby");
 
     }

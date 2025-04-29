@@ -201,7 +201,7 @@ public class LobbyControl : NetworkBehaviour
     private void OnStartClick()
     {
         GameManager.instance.StartGame(_allPlayerInfo);
-        lSS_Manager.LoadScene();
+
         GameManager.instance.LoadScene("联机电梯");
     }
 

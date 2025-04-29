@@ -27,7 +27,7 @@ public class A : MonoBehaviour
             
         // // 加载加载场景（单例模式）
         // SceneManager.LoadScene("Loading", LoadSceneMode.Single);  
-        loadingScreenManager.LoadScene();
-        SceneManager.LoadScene("B");  
+        loadingScreenManager.LoadScene("B");
+
     }
 }
