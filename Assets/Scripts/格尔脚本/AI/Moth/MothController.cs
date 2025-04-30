@@ -22,7 +22,7 @@ public enum MothState
     Attached, // 附着
     Dead, // 死亡
 }
-public class MothController : GuestBase, IHurtable, IGrabbable
+public class MothController : GuestBase, IHurtable
 {
     [Header("这个虫子属于哪个组")]
     public MothGroupController belongToGroup; // 所属的虫群
@@ -540,35 +540,7 @@ public class MothController : GuestBase, IHurtable, IGrabbable
 
 
 
-    /// <summary>
-    /// 抓取接口 
-    /// </summary>
-    // 实现 IGrabbable 接口需要的内容
-    public UnityEvent OnGrabbed { get; set; } = new UnityEvent();
-    public UnityEvent OnReleased { get; set; } = new UnityEvent();
 
-    public bool RequestStateChange(EItemState newState, int toolInstanceId = -1, ulong playerId = ulong.MaxValue)
-    {
-        if (newState == EItemState.Grabbed)
-        {
-            OnGrabbed?.Invoke();
-            return true;
-        }
-        else if (newState == EItemState.ReadyToGrab)
-        {
-            OnReleased?.Invoke();
-            wasGrabbed = true;  // <<< 被释放，准备检测第一次碰撞
-            return false;
-        }
-
-        return true;
-    }
-    private void HandleGrabbed()
-    {
-        Debug.Log("虫子被抓取了！");
-        behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
-
-    }
     private void OnDrawGizmos()
     {
         // 画出攻击距离，球
