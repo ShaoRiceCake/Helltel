@@ -172,27 +172,41 @@ public class CatchTool : MonoBehaviour
 
         _isGrabbing = true;
     
-        // 绑定到物品本身的 Transform
-        obiAttachment.BindToTarget(item.transform);
-        
-        obiAttachment.enabled = true;
+        // 瞬间移动到抓取球位置
+        target.transform.position = _catchBall.transform.position;
+        target.transform.SetParent(_catchBall.transform);
+    
+        // 重置物理状态（如果有刚体）
+        var rb = target.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.isKinematic = true;
+        }
+    
         AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
     }
-    
+
     private void ReleaseObject()
     {
-        if (!_isGrabbing) return;
+        if (!_isGrabbing || !_currentTarget) return;
 
-        if (!obiAttachment.target ||
-            !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item)) return;
-        
+        if (!_currentTarget.TryGetComponent<ItemBase>(out var item)) return;
+    
         if (!item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID)) return;
-        
-        
+    
         _isGrabbing = false;
-        obiAttachment.enabled = false;
-        obiAttachment.BindToTarget(null);
-            
+    
+        // 恢复物理状态（如果有刚体）
+        var rb = _currentTarget.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+        }
+    
+        _currentTarget.transform.SetParent(null);
+        
         AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
     }
 }
