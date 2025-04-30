@@ -12,7 +12,7 @@ public class SettingsPanel : MonoBehaviour
     public Button btnQuality;      //图形设置按钮
     public Button btnAuido;        //音频设置按钮
     public Button btnControlls;    //控制设置按钮
-    public Button btn_BackOfSettingPanel; //返回按钮
+    public Button btn_CloseSettingPanel; //返回按钮
     [Header("各设置界面")]
     public GameObject panelGame;   //游戏面板
     public GameObject panelQuality;   //游戏面板
@@ -21,12 +21,16 @@ public class SettingsPanel : MonoBehaviour
 
     [Header("音量控制界面")]
     
-    [SerializeField] private Button btnAudioResetToDefault;
+    [SerializeField] private Button btn_AudioResetToDefault;
     [SerializeField] private Slider masterSlider;
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Slider voiceSlider;
-    [SerializeField] private Toggle toggle3D;
+
+    [SerializeField] private TextMeshProUGUI masterValueText;
+    [SerializeField] private TextMeshProUGUI musicValueText;
+    [SerializeField] private TextMeshProUGUI sfxValueText;
+    [SerializeField] private TextMeshProUGUI voiceValueText;
     [SerializeField] private Toggle toggleReverb;
  
     
@@ -43,15 +47,14 @@ public class SettingsPanel : MonoBehaviour
         globalUIController = GlobalUIController.Instance.GetComponent<GlobalUIController>();
 
         // 绑定按钮事件
-        btnGame.onClick.AddListener(OpenGamePanel);
-        btnQuality.onClick.AddListener(OpenQualityPanel);
-        btnAuido.onClick.AddListener(OpenAudioPanel);
-        btnControlls.onClick.AddListener(OpenControllPanel);
-        btn_BackOfSettingPanel.onClick.AddListener(globalUIController.CloseSettings);
-        //初始化
-        InitializeSettings();
+        btnGame.onClick.AddListener(() => OpenPanel(panelGame));
+        btnQuality.onClick.AddListener(() => OpenPanel(panelQuality));
+        btnAuido.onClick.AddListener(() => OpenPanel(panelAuido));
+        btnControlls.onClick.AddListener(() => OpenPanel(panelControlls));
+        btn_CloseSettingPanel.onClick.AddListener(globalUIController.CloseSettings);
+
         //初始话音频设置
-        InitializeAduioDefaultValues();
+        InitializeAduioDefaultValues(false);
         SetupRealTimeUpdates();
         
         
@@ -59,31 +62,41 @@ public class SettingsPanel : MonoBehaviour
     /// <summary>
     /// 初始化默认音频设置（无需加载保存的数据）
     /// </summary>
-    private void InitializeAduioDefaultValues()
+    private void InitializeAduioDefaultValues(bool playSFX)
     {
         // 主音量
-        masterSlider.value = 1f;
+        masterSlider.value = 70;
         AudioManager.Instance.SetMasterVolume(masterSlider.value);
+        masterValueText.text = masterSlider.value.ToString();
+        
+        
 
         // 音乐音量
-        musicSlider.value = 0.7f;
+        musicSlider.value = 100;
         AudioManager.Instance.SetCategoryVolume(AudioCategory.Music, musicSlider.value);
+        musicValueText.text = musicSlider.value.ToString();
+        
 
         // 音效音量
-        sfxSlider.value = 0.7f;
+        sfxSlider.value = 100;
         AudioManager.Instance.SetCategoryVolume(AudioCategory.SFX, sfxSlider.value);
+        sfxValueText.text = sfxSlider.value.ToString();
+        
 
         // 语音音量
-        voiceSlider.value = 0.7f;
+        voiceSlider.value = 100;
         AudioManager.Instance.SetCategoryVolume(AudioCategory.Voice, voiceSlider.value);
-
-        // // 3D音频（默认启用）
-        // toggle3D.isOn = true;
-        // AudioManager.Instance.Toggle3DAudio(true);
+        voiceValueText.text = voiceSlider.value.ToString();
+      
 
         // 混响效果（默认启用）
         // toggleReverb.isOn = true;
         // AudioManager.Instance.ToggleReverb(true);
+        if(playSFX)
+        {
+            AudioManager.Instance.Play("泡泡音");
+        }
+        
     }
 
     /// <summary>
@@ -93,30 +106,31 @@ public class SettingsPanel : MonoBehaviour
     {
         // 主音量
         masterSlider.onValueChanged.AddListener(v => {
-            AudioManager.Instance.SetMasterVolume(v);
+            AudioManager.Instance.SetMasterVolume(v*0.01f);
+            masterValueText.text = masterSlider.value.ToString();
         });
 
         // 音乐音量
         musicSlider.onValueChanged.AddListener(v => {
-            AudioManager.Instance.SetCategoryVolume(AudioCategory.Music, v);
+            AudioManager.Instance.SetCategoryVolume(AudioCategory.Music, v*0.01f);
+            musicValueText.text = musicSlider.value.ToString();
         });
 
         // 音效音量
         sfxSlider.onValueChanged.AddListener(v => {
-            AudioManager.Instance.SetCategoryVolume(AudioCategory.SFX, v);
+            AudioManager.Instance.SetCategoryVolume(AudioCategory.SFX, v*0.01f);
+            sfxValueText.text = sfxSlider.value.ToString();
         });
 
         // 语音音量
         voiceSlider.onValueChanged.AddListener(v => {
-            AudioManager.Instance.SetCategoryVolume(AudioCategory.Voice, v);
+            AudioManager.Instance.SetCategoryVolume(AudioCategory.Voice, v*0.01f);
+            voiceValueText.text = voiceSlider.value.ToString();
         });
         //重置
-        btnAudioResetToDefault.onClick.AddListener(ResetToDefault);
+        btn_AudioResetToDefault.onClick.AddListener( () => InitializeAduioDefaultValues(true));
 
-        // // 3D音频开关
-        // toggle3D.onValueChanged.AddListener(v => {
-        //     AudioManager.Instance.Toggle3DAudio(v);
-        // });
+
 
         // // 混响开关
         // toggleReverb.onValueChanged.AddListener(v => {
@@ -124,20 +138,6 @@ public class SettingsPanel : MonoBehaviour
         // });
     }
 
-    /// <summary>
-    /// 重置为默认设置
-    /// </summary>
-    public void ResetToDefault()
-    {
-        // 重置滑动条值（自动触发事件）
-        masterSlider.value = 1f;
-        musicSlider.value = 0.7f;
-        sfxSlider.value = 0.7f;
-        voiceSlider.value = 0.7f;
-        toggle3D.isOn = true;
-        toggleReverb.isOn = true;
-        AudioManager.Instance.Play("泡泡音");
-    }
 
     private void CloseAllPanels()
     {
@@ -146,53 +146,19 @@ public class SettingsPanel : MonoBehaviour
         panelAuido.gameObject.SetActive(false);
         panelControlls.gameObject.SetActive(false);
     }
-    //打开游戏面板
-    private void OpenGamePanel()
+    //打开目标panel
+    private void OpenPanel(GameObject targetPanel)
     {
         CloseAllPanels();
-        panelGame.gameObject.SetActive(true);
-        AudioManager.Instance.Play("泡泡音");
-    }
-    //打开图形面板
-    private void OpenQualityPanel()
-    {
-        CloseAllPanels();
-        panelQuality.gameObject.SetActive(true);
-        AudioManager.Instance.Play("泡泡音");
-    }
-    //打开音频面板
-    private void OpenAudioPanel()
-    {
-        CloseAllPanels();
-        panelAuido.gameObject.SetActive(true);
-        AudioManager.Instance.Play("泡泡音");
-    }
-    //打开控制面板
-    private void OpenControllPanel()
-    {
-        CloseAllPanels();
-        panelControlls.gameObject.SetActive(true);
+        targetPanel.SetActive(true);
         AudioManager.Instance.Play("泡泡音");
     }
   
    
 
-    private void InitializeSettings()
-    {
-        OpenGamePanel();
-    }
 
 
 
-    // 应用音频设置
-    public void ApplyAudioSettings()
-    {
-        
-    }
 
-    // 应用图形设置
-    public void ApplyGraphicsSettings()
-    {
-        
-    }
+   
 }
