@@ -29,7 +29,7 @@ public class MothGroupController : GuestBase
     public float TargetAmt = 0.01f; // 目标吸引力系数(影响新速度)
 
 
- 
+
     public GameObject CurTarget;
 
     public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
@@ -107,12 +107,24 @@ public class MothGroupController : GuestBase
         );
     }
     // 
+    // private Node BuildChaseingBranch()
+    // {
+    //     return new Condition(IsEnemyCanSee, Stops.IMMEDIATE_RESTART,
+    //         new Action(() =>
+    //         {
+    //             if (CurTarget != null)
+    //             {
+    //                 agent.SetDestination(CurTarget.transform.position);
+    //             }
+    //         })
+    //     );
+    // }
     private Node BuildChaseingBranch()
     {
         return new Condition(IsEnemyCanSee, Stops.IMMEDIATE_RESTART,
             new Action(() =>
             {
-                if (CurTarget != null)
+                if (CurTarget != null && agent.isOnNavMesh)
                 {
                     agent.SetDestination(CurTarget.transform.position);
                 }
@@ -163,7 +175,7 @@ public class MothGroupController : GuestBase
             if (screenPos.z > 0) // 屏幕前方
             {
                 float health = moth.curHealth.Value;
-                float maxHealth = moth.maxHealth; 
+                float maxHealth = moth.maxHealth;
                 string text = $"❤ {health}/{maxHealth}";
 
                 GUIStyle style = new GUIStyle(GUI.skin.label);
