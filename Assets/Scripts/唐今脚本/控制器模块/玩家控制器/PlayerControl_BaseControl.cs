@@ -1,11 +1,11 @@
 using UnityEngine;
 using Unity.Netcode;
 [RequireComponent(typeof(PlayerControlInformationProcess))]
-public class PlayerControl_BaseControl : NetworkBehaviour
+public class PlayerControl_BaseControl : MonoBehaviour
 {
     public PlayerControlInformationProcess controlHandler;
     public GameObject forwardObject;
-    protected ulong ClientID;
+
 
     protected virtual void Start()
     {
@@ -13,6 +13,5 @@ public class PlayerControl_BaseControl : NetworkBehaviour
 
         NullCheckerTool.CheckNull(forwardObject, controlHandler);
         
-        ClientID = NetworkManager.ServerClientId;
     }
 }

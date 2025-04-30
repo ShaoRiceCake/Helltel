@@ -84,28 +84,32 @@ public class GlobalUIController : MonoBehaviour
     // 设置暂停/继续游戏
     public void SetPause(bool isPaused)
     {
-        //Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）由于我们是联机游戏，所以不暂停
+        // 由于网络逻辑从人物操控中删除，所以这里要改
         
-        Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
-        Cursor.visible = isPaused; // 控制鼠标可见性
-
-        PlayerControlInformationProcess[] playersControlInformation = FindObjectsOfType<PlayerControlInformationProcess>();
-       
-        for (int i = 0; i < playersControlInformation.Length; i++)
-        {
-            if(playersControlInformation[i].IsLocalPlayer == true && NetworkManager.Singleton == true)
-            {
-                Debug.Log("现在在联机且是本地玩家");
-                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
-            }
-            else if(NetworkManager.Singleton == false)
-            {
-                Debug.Log("现在不在联机");
-                playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
-            }
-        }
+        // //Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）由于我们是联机游戏，所以不暂停
+        //
+        // Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
+        // Cursor.visible = isPaused; // 控制鼠标可见性
+        //
+        // PlayerControlInformationProcess[] playersControlInformation = FindObjectsOfType<PlayerControlInformationProcess>();
+        //
+        // for (int i = 0; i < playersControlInformation.Length; i++)
+        // {
+        //     if(playersControlInformation[i].IsLocalPlayer == true && NetworkManager.Singleton == true)
+        //     {
+        //         Debug.Log("现在在联机且是本地玩家");
+        //         playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+        //     }
+        //     else if(NetworkManager.Singleton == false)
+        //     {
+        //         Debug.Log("现在不在联机");
+        //         playersControlInformation[i].stopPlayerControl = isPaused ? true:false;
+        //     }
+        // }
+        //
+        // //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
         
-        //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
+        
     }
     //关闭所有全局UI界面
     public void CloseAllGlobalUI()

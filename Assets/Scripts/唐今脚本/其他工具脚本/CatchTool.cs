@@ -15,7 +15,7 @@ public class CatchTool : MonoBehaviour
     private GameObject _currentTarget;
     private Transform _catchAimTrans;
     private int CatchToolInstanceId => GetInstanceID();
-    public ulong playerID;
+    public ulong playerID = 0;
 
     private float _pressTime;
     private bool _isPressingE;
