@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 // 可交互物品基础接口
 public interface IInteractable
@@ -90,8 +92,7 @@ public class GrabbedState : ItemState
 }
 
 /* 物品基类实现 */
-[RequireComponent(typeof(NetworkObject))]
-public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
+public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
 {
     // 配置字段
     [SerializeField] protected string itemName;  // 物品标识（需在Inspector设置）
@@ -115,6 +116,48 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
     public int OriginalLayer { get; private set; }  // 物品原始层级（自动获取）
     public int TargetLayer { get; private set; }    // 交互专用层级（通常设置为"Item"层）
 
+    // [Header("Grab Settings")]
+    // [SerializeField] private Transform grabOffsetPoint; // 在Inspector中指定抓取偏移点（如尾部）
+    //
+    //
+    // public (Vector3 position, Quaternion rotation) GetGrabPose()
+    // {
+    //     return grabOffsetPoint ?
+    //         // 直接返回偏移点的世界坐标位置和旋转
+    //         (grabOffsetPoint.position, grabOffsetPoint.rotation) :
+    //         // 默认返回物体自身的世界坐标
+    //         (transform.position, transform.rotation);
+    // }
+    //
+    // // 返回抓取点的局部偏移（相对于物体自身坐标系）
+    // public Vector3 GetLocalGrabOffsetPosition()
+    // {
+    //     return grabOffsetPoint != null ?
+    //         // 计算偏移点相对于物体自身的局部位置
+    //         transform.InverseTransformPoint(grabOffsetPoint.position) : Vector3.zero; // 默认无偏移
+    // }
+    //
+    // // 返回抓取点的局部旋转偏移（可选）
+    // public Quaternion GetLocalGrabOffsetRotation()
+    // {
+    //     if (grabOffsetPoint != null)
+    //     {
+    //         // 计算偏移点相对于物体自身的局部旋转
+    //         return Quaternion.Inverse(transform.rotation) * grabOffsetPoint.rotation;
+    //     }
+    //     return Quaternion.identity;
+    // }
+    
+    [Header("Orbit Settings")]
+    [SerializeField]
+    protected bool enableOrbit = false; // 环绕开关
+    [SerializeField] private Transform orbitCenter;    // 环绕中心点
+    [SerializeField] private float orbitRotationSpeed = 90f; // 旋转速度（度/秒）
+    [SerializeField] private Vector3 manualForwardDirection = Vector3.forward; // 手动设置的正朝向
+
+    
+    private Vector3 _currentOrbitDirection; // 当前朝向向量
+    
     /* 生命周期方法 */
     protected virtual void Awake()
     {
@@ -127,8 +170,47 @@ public abstract class ItemBase : NetworkBehaviour, IInteractable, IGrabbable
         _stateDictionary.Add(EItemState.Selected, new SelectedState(this));
         _stateDictionary.Add(EItemState.ReadyToGrab, new ReadyToGrabState(this));
         _stateDictionary.Add(EItemState.Grabbed, new GrabbedState(this));
-        
+
         ForceSetState(EItemState.NotSelected); // 初始状态设置
+    }
+
+    private void FixedUpdate()
+    {
+        if (enableOrbit)
+        {
+            UpdateOrbitRotation();
+        }
+    }
+
+    private void UpdateOrbitRotation()
+    {
+        // 计算从中心点到物体的方向向量
+        _currentOrbitDirection = transform.position - orbitCenter.position;
+    
+        // 如果方向向量长度接近0，跳过旋转
+        if (_currentOrbitDirection.sqrMagnitude < 0.001f) return;
+    
+        // 计算目标旋转（考虑手动设置的正朝向）
+        var targetRotation = Quaternion.LookRotation(-_currentOrbitDirection) * 
+                             Quaternion.FromToRotation(Vector3.forward, manualForwardDirection);
+    
+        // 直接旋转Transform
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation, 
+            targetRotation, 
+            orbitRotationSpeed * Time.fixedDeltaTime);
+    }
+
+// 新增方法：手动设置正朝向
+    public void SetManualForwardDirection(Vector3 newForward)
+    {
+        manualForwardDirection = newForward.normalized;
+    }
+
+// 新增方法：获取当前正朝向
+    public Vector3 GetCurrentForwardDirection()
+    {
+        return transform.TransformDirection(manualForwardDirection);
     }
 
     /* 核心状态转换方法 */

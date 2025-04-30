@@ -167,17 +167,18 @@ public class CatchTool : MonoBehaviour
 
     private void GrabObject(GameObject target)
     {
-        if(!target) return;
-
-        if (!target.TryGetComponent<ItemBase>(out var item)) return;
+        if (!target || !target.TryGetComponent<ItemBase>(out var item)) return;
         if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
+
         _isGrabbing = true;
-        obiAttachment.BindToTarget(target.transform);
+    
+        // 绑定到物品本身的 Transform
+        obiAttachment.BindToTarget(item.transform);
+        
         obiAttachment.enabled = true;
-                
         AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
     }
-
+    
     private void ReleaseObject()
     {
         if (!_isGrabbing) return;
