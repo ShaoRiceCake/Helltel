@@ -122,6 +122,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &14930602
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 14930604}
+  - component: {fileID: 14930603}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &14930603
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14930602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &14930604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 14930602}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &74117523 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4324052814581948827, guid: 6a7ffd75cbef1004280dadaf98729615, type: 3}
@@ -237,7 +281,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 185621031}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: "\u6293\u53D6\u70B9"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -258,50 +302,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1569963937}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &194923505
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 194923507}
-  - component: {fileID: 194923506}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &194923506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 194923505}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &194923507
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 194923505}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &218721952 stripped
 Transform:
@@ -2604,7 +2604,7 @@ GameObject:
   - component: {fileID: 2850156957616412461}
   - component: {fileID: 2850156957616412460}
   - component: {fileID: 2850156957616412462}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: duijiangji
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -2628,7 +2628,7 @@ GameObject:
   - component: {fileID: 9018191271699803195}
   - component: {fileID: 9018191271699803194}
   - component: {fileID: 9018191271699803196}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: tideng
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -2816,7 +2816,7 @@ GameObject:
   - component: {fileID: 8837592932107782768}
   - component: {fileID: 8837592932107782767}
   - component: {fileID: 8837592932107782769}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: mofadengxin
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -3215,6 +3215,10 @@ PrefabInstance:
       value: "\u68D2\u7403\u68CD"
       objectReference: {fileID: 0}
     - target: {fileID: 8069654546658556986, guid: 60368dd9207b893459b34650f96faeb3, type: 3}
+      propertyPath: m_Layer
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8069654546658556986, guid: 60368dd9207b893459b34650f96faeb3, type: 3}
       propertyPath: m_TagString
       value: Item
       objectReference: {fileID: 0}
@@ -3296,7 +3300,7 @@ GameObject:
   - component: {fileID: 6425587497917406740}
   - component: {fileID: 6425587497917406739}
   - component: {fileID: 6425587497917406741}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: chang
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -3672,7 +3676,7 @@ GameObject:
   - component: {fileID: 8666256000030921509}
   - component: {fileID: 8666256000030921508}
   - component: {fileID: 8666256000030921510}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: haimian
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -3696,7 +3700,7 @@ GameObject:
   - component: {fileID: 8298727582364629190}
   - component: {fileID: 8298727582364629189}
   - component: {fileID: 8298727582364629191}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: mofadengkuang
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -3720,7 +3724,7 @@ GameObject:
   - component: {fileID: 7608986320059758966}
   - component: {fileID: 7608986320059758965}
   - component: {fileID: 7608986320059758967}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: che
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -4500,6 +4504,6 @@ SceneRoots:
   - {fileID: 4681723189114009196}
   - {fileID: 4699550769096357766}
   - {fileID: 1414480420044896301}
-  - {fileID: 2096603110}
   - {fileID: 4556906374480228637}
-  - {fileID: 194923507}
+  - {fileID: 2096603110}
+  - {fileID: 14930604}
