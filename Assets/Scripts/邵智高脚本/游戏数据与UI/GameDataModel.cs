@@ -16,7 +16,7 @@ public class GameDataModel : ScriptableObject
     private int _performance;
     private int _performanceTarget = 100;//基础绩效要求
 
-    private int _level = -1;
+    private int _level = 0;
 
     // 公开事件
     public event Action<int> OnHealthChanged;      // 生命变化
@@ -69,6 +69,13 @@ public class GameDataModel : ScriptableObject
           
         }
     }
+    public int Level {
+        get => _level;
+        set {
+            _level =value;
+            OnLevelChanged?.Invoke(_level); 
+        }
+    }
 
 
 
@@ -81,7 +88,7 @@ public class GameDataModel : ScriptableObject
         Health = MaxHealth;
         Performance = 0;
         PerformanceTarget = _performanceTarget;
-        _level = -1;
+        _level = 0;
     }
 
 

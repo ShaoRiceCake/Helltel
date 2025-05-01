@@ -6,12 +6,13 @@ using System;
 public class SceneOverlayer : NetworkBehaviour
 {
     [Tooltip("第一个外部场景（Scene1）")]
-    public string scene1Name;
+    public string dungeon;
     
     [Tooltip("第二个外部场景（Scene2）")]
-    public string scene2Name;
+    public string shop;
 
-    [SerializeField]private string _currentLoadedScene = "";
+    private string _currentLoadedScene = "";
+    public string CurrentLoadedScene {get => _currentLoadedScene;}
     [SerializeField] private bool _isScene1Active;
     [SerializeField] private bool ready=true;
 
@@ -41,7 +42,7 @@ public class SceneOverlayer : NetworkBehaviour
 
     }
 
-    private void SwitchScenes()
+    public void SwitchScenes()
     {
         ready = false;
 
@@ -67,10 +68,10 @@ public class SceneOverlayer : NetworkBehaviour
             }
             else
             {
-                SceneManager.LoadScene(scene2Name, LoadSceneMode.Additive);
+                SceneManager.LoadScene(shop, LoadSceneMode.Additive);
             }
 
-            _currentLoadedScene = scene2Name;
+            _currentLoadedScene = shop;
             _isScene1Active = false;
         }
         else
@@ -81,24 +82,24 @@ public class SceneOverlayer : NetworkBehaviour
             }
             else
             {
-                SceneManager.LoadScene(scene1Name, LoadSceneMode.Additive);
+                SceneManager.LoadScene(dungeon, LoadSceneMode.Additive);
             }
 
-            _currentLoadedScene = scene1Name;
+            _currentLoadedScene = dungeon;
             _isScene1Active = true;
         }
     }
 
     void LoadScene1()
     {
-        GameManager.instance.LoadSceneAddtive(scene1Name);
+        GameManager.instance.LoadSceneAddtive(dungeon);
         Debug.Log("加载联机场景1");
         ready = true ;
     }
 
     void LoadScene2()
     {
-        GameManager.instance.LoadSceneAddtive(scene2Name);
+        GameManager.instance.LoadSceneAddtive(shop);
         Debug.Log("加载联机场景2");
         ready = true;
     }

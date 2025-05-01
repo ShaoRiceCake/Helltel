@@ -8,7 +8,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     [Header("数据引用")]
-    [SerializeField] private GameDataModel _gameData;
+    public GameDataModel _gameData;
 
     public static GameController Instance { get; private set; }
 
