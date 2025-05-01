@@ -41,6 +41,10 @@ public class MothController : GuestBase, IHurtable
     [Header("虫子冲刺速度")]
     public float dashSpeed = 10f; // 冲刺速度
 
+    [Header("虫子抱脸伤害")]
+    public int attachDamage = 2; // 附着伤害
+    [Header("虫子冲刺伤害")]
+    public int dashDamage = 2; // 冲刺伤害
 
 
     private Vector3 dashTarget; // 冲刺目标位置
@@ -183,8 +187,7 @@ public class MothController : GuestBase, IHurtable
                     if (belongToGroup.CurTarget != null)
                     {
                         Debug.Log("虫子附着在玩家身上, 每秒造成伤害");
-
-
+                        GameController.Instance.DeductHealth(attachDamage); // 扣除玩家血量
                     }
                 },
                 new WaitUntilStopped()
