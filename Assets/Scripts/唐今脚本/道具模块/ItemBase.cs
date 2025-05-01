@@ -17,6 +17,8 @@ public interface IUsable
 {
     UnityEvent OnUseStart { get; set; }  // 使用开始事件
     UnityEvent OnUseEnd { get; set; }     // 使用结束事件
+
+    public bool IsExhaust { get; set; }
 }
 
 // 可抓取物品接口（含权限管理）
