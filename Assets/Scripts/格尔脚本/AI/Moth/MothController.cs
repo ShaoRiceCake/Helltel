@@ -160,7 +160,8 @@ public class MothController : GuestBase, IHurtable
            new Sequence(
                 new Action(() =>
                 {
-                    Transform face = belongToGroup.CurTarget?.transform.Find("HeadTarget");
+                    Transform face = belongToGroup.CurTarget?.transform.root.Find("HeadBall");
+                    Debug.Log(face);
                     if (face == null) return;
                     dashTarget = face.position; // 获取目标位置
                 }),
