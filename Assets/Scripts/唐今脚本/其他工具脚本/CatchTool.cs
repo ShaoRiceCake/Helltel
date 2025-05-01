@@ -21,6 +21,9 @@ public class CatchTool : MonoBehaviour
     private bool _isPressingE;
     private const float LongPressThreshold = 0.5f; // 长按时间检测阈值
     
+    // 当前抓取的物品（只读）
+    public ItemBase CurrentlyGrabbedItem { get; private set; }
+    
     public GameObject CatchBall
     {
         get => _catchBall;
@@ -147,6 +150,52 @@ public class CatchTool : MonoBehaviour
         _isPressingE = false;
     }
 
+    /// <summary>
+    /// 外部调用强制释放当前抓取的物体
+    /// </summary>
+    /// <param name="forceRelease">是否强制释放（忽略权限检查）</param>
+    /// <returns>是否成功释放</returns>
+    public bool ForceRelease(bool forceRelease = false)
+    {
+        if (!_isGrabbing) return false;
+        
+        if (!obiAttachment.target || 
+            !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item))
+        {
+            return false;
+        }
+        
+        // 如果是强制释放或者有权限释放
+        if (forceRelease || item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID))
+        {
+            _isGrabbing = false;
+            CurrentlyGrabbedItem = null;
+            obiAttachment.enabled = false;
+            obiAttachment.BindToTarget(null);
+            
+            AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// <summary>
+    /// 检查当前是否正在抓取物体
+    /// </summary>
+    public bool IsGrabbing()
+    {
+        return _isGrabbing;
+    }
+
+    /// <summary>
+    /// 获取当前抓取的物品（如果没有则返回null）
+    /// </summary>
+    public ItemBase GetGrabbedItem()
+    {
+        return CurrentlyGrabbedItem;
+    }
+
     private void TryUseItem()
     {
         if (!_isGrabbing || !obiAttachment.target) return;
@@ -157,7 +206,6 @@ public class CatchTool : MonoBehaviour
         if (item is IUsable usableItem)
         {
             usableItem.OnUseStart?.Invoke();
-            // usableItem.OnUseEnd?.Invoke();
         }
         else
         {
@@ -171,6 +219,7 @@ public class CatchTool : MonoBehaviour
         if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
 
         _isGrabbing = true;
+        CurrentlyGrabbedItem = item;
     
         // 绑定到物品本身的 Transform
         obiAttachment.BindToTarget(item.transform);
@@ -181,18 +230,6 @@ public class CatchTool : MonoBehaviour
     
     private void ReleaseObject()
     {
-        if (!_isGrabbing) return;
-
-        if (!obiAttachment.target ||
-            !obiAttachment.target.gameObject.TryGetComponent<ItemBase>(out var item)) return;
-        
-        if (!item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID)) return;
-        
-        
-        _isGrabbing = false;
-        obiAttachment.enabled = false;
-        obiAttachment.BindToTarget(null);
-            
-        AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
+        ForceRelease();
     }
 }

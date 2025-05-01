@@ -97,19 +97,20 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _targetHeightOffset = _originalHeightOffset;
         
         _currentLookAtHeightOffset = 0f;
-
-        if (targetRenderer == null) return;
-        _materials = targetRenderer.materials;
-        _originalAlphas = new float[_materials.Length];
-            
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
-                
-            SetupUrpMaterial(_materials[i], _originalAlphas[i]);
-        }
-            
-        _currentAlpha = maxAlpha;
+        
+        //
+        // if (targetRenderer == null) return;
+        // _materials = targetRenderer.materials;
+        // _originalAlphas = new float[_materials.Length];
+        //     
+        // for (var i = 0; i < _materials.Length; i++)
+        // {
+        //     _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
+        //         
+        //     SetupUrpMaterial(_materials[i], _originalAlphas[i]);
+        // }
+        //     
+        // _currentAlpha = maxAlpha;
     }
 
     private void Update()
@@ -124,62 +125,62 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
         
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
-        
-        if (enableTransparency) // 只在启用透明度时更新透明度
-        {
-            UpdateTransparency();
-        }
+        //
+        // if (enableTransparency) // 只在启用透明度时更新透明度
+        // {
+        //     UpdateTransparency();
+        // }
     }
 
-    private void UpdateTransparency()
-    {
-        if (!targetRenderer || _materials == null) return;
-        
-        var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
-        var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
-        
-        _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
-        
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
-        }
-    }
-    
-    // 新增方法：启用/禁用透明度功能
-    public void SetTransparencyEnabled(bool enabled)
-    {
-        enableTransparency = enabled;
-        
-        if (enabled || !targetRenderer || _materials == null || _originalAlphas == null) return;
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            SetupUrpMaterial(_materials[i], _originalAlphas[i]);
-        }
-        _currentAlpha = maxAlpha;
-    }
-
-
-    private static void SetupUrpMaterial(Material material, float targetAlpha)
-    {
-        if (!Mathf.Approximately(material.GetFloat(Surface), 1))
-        {
-            material.SetFloat(Surface, 1); 
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.renderQueue = (int)RenderQueue.Transparent;
-            material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
-            material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt(ZWrite, 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = (int)RenderQueue.Transparent;
-        }
-
-        var baseColor = material.GetColor(BaseColor);
-        baseColor.a = targetAlpha;
-        material.SetColor(BaseColor, baseColor);
-    }
+    // private void UpdateTransparency()
+    // {
+    //     if (!targetRenderer || _materials == null) return;
+    //     
+    //     var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
+    //     var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
+    //     
+    //     _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
+    //     
+    //     for (var i = 0; i < _materials.Length; i++)
+    //     {
+    //         SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
+    //     }
+    // }
+    //
+    // // 新增方法：启用/禁用透明度功能
+    // public void SetTransparencyEnabled(bool enabled)
+    // {
+    //     enableTransparency = enabled;
+    //     
+    //     if (enabled || !targetRenderer || _materials == null || _originalAlphas == null) return;
+    //     for (var i = 0; i < _materials.Length; i++)
+    //     {
+    //         SetupUrpMaterial(_materials[i], _originalAlphas[i]);
+    //     }
+    //     _currentAlpha = maxAlpha;
+    // }
+    //
+    //
+    // private static void SetupUrpMaterial(Material material, float targetAlpha)
+    // {
+    //     if (!Mathf.Approximately(material.GetFloat(Surface), 1))
+    //     {
+    //         material.SetFloat(Surface, 1); 
+    //         material.SetOverrideTag("RenderType", "Transparent");
+    //         material.renderQueue = (int)RenderQueue.Transparent;
+    //         material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
+    //         material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
+    //         material.SetInt(ZWrite, 0);
+    //         material.DisableKeyword("_ALPHATEST_ON");
+    //         material.EnableKeyword("_ALPHABLEND_ON");
+    //         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+    //         material.renderQueue = (int)RenderQueue.Transparent;
+    //     }
+    //
+    //     var baseColor = material.GetColor(BaseColor);
+    //     baseColor.a = targetAlpha;
+    //     material.SetColor(BaseColor, baseColor);
+    // }
 
     private void LateUpdate()
     {
