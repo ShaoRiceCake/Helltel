@@ -10,30 +10,45 @@ public class PerformanceView : MonoBehaviour
     [Header("组件绑定")]
     [SerializeField] private TMP_Text _performanceText;
     [SerializeField] private TMP_Text _performanceTargetText;
-    [SerializeField] private GameDataModel _data;
+    private GameDataModel _data;
+    
+    
 
 
     private void Awake()
     {
-        // 注册事件
-        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
-        _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
+        
     }
 
     private void Start()
     {
+        _data = GameController.Instance._gameData;
+        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
+        _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
+        _data.FloorIS +=NeedActive;
         UpdatePerformanceDisplay(_data.Performance);
         UpdatePerformanceTargetDisplay(_data.PerformanceTarget);
+    }
+    private void NeedActive(string sceneName)
+    {
+        if(sceneName == _data.dungeon)
+        {
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void UpdatePerformanceDisplay(int newValue)
     {
-        _performanceText.text = $"${newValue}";
+        _performanceText.text = $"{newValue}";
   
     }
     private void UpdatePerformanceTargetDisplay(int newValue)
     {
-        _performanceTargetText.text = $"${newValue}";
+        _performanceTargetText.text = $"{newValue}";
     }
 
 
@@ -42,6 +57,7 @@ public class PerformanceView : MonoBehaviour
     {
         _data.OnPerformanceChanged -= UpdatePerformanceDisplay;
         _data.OnPerformanceChanged -= UpdatePerformanceTargetDisplay;
+        _data.FloorIS -= NeedActive;
 
     }
 }

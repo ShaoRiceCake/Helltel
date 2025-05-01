@@ -14,9 +14,16 @@ public class GameDataModel : ScriptableObject
     private int _maxHealth;
     private int _money;
     private int _performance;
-    private int _performanceTarget = 100;//基础绩效要求
-
+    private int _performanceTarget;//基础绩效要求
     private int _level = 0;
+    
+    //需要输入场景名
+    [Tooltip("第一个外部场景（Scene1）")]
+    public string dungeon = "单机正式地牢";
+    
+    [Tooltip("第二个外部场景（Scene2）")]
+    public string shop = "单机正式商店";
+    public string _currentLoadedScene ="";
 
     // 公开事件
     public event Action<int> OnHealthChanged;      // 生命变化
@@ -27,6 +34,8 @@ public class GameDataModel : ScriptableObject
     public event Action<int> OnPerformancePassed;  // 绩效达标 
     public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 层级变化
+    public event Action<string> FloorIS;      // 楼层类型为
+    
 
 
     // 属性封装（数据访问入口）
@@ -76,6 +85,13 @@ public class GameDataModel : ScriptableObject
             OnLevelChanged?.Invoke(_level); 
         }
     }
+    public string CurrentLoadedScene {
+        get => _currentLoadedScene;
+        set {
+            _currentLoadedScene = value;
+            FloorIS?.Invoke(_currentLoadedScene);
+        }
+    }
 
 
 
@@ -87,7 +103,7 @@ public class GameDataModel : ScriptableObject
         MaxHealth = 100;
         Health = MaxHealth;
         Performance = 0;
-        PerformanceTarget = _performanceTarget;
+        PerformanceTarget = 100;
         _level = 0;
     }
 

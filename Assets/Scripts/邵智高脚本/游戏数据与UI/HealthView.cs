@@ -9,19 +9,20 @@ public class HealthView : MonoBehaviour
 {
     [Header("组件绑定")]
     [SerializeField] private TextMeshProUGUI _healthText;
-    [SerializeField] private GameDataModel _data;
+    private GameDataModel _data;
     
-    private string _localPlayerId; 
 
     private void Awake()
     {
-        _data.OnHealthChanged += UpdateHealth;
+        
         
         //EventBus<HealthChangedEvent>.Subscribe(OnHealthChanged, this);
     }
 
     private void Start()
     {
+        _data = GameController.Instance._gameData;
+        _data.OnHealthChanged += UpdateHealth;
         UpdateHealth(_data.Health);
         
     }

@@ -5,16 +5,17 @@ using System;
 
 public class SceneOverlayer : NetworkBehaviour
 {
-    [Tooltip("第一个外部场景（Scene1）")]
-    public string dungeon;
-    
-    [Tooltip("第二个外部场景（Scene2）")]
-    public string shop;
+    public GameDataModel _data;
 
-    private string _currentLoadedScene = "";
-    public string CurrentLoadedScene {get => _currentLoadedScene;}
+    
+    
     [SerializeField] private bool _isScene1Active;
     [SerializeField] private bool ready=true;
+    private void Start()
+    {
+        _data = GameController.Instance._gameData;
+
+    }
 
     private void Update()
     {
@@ -45,17 +46,17 @@ public class SceneOverlayer : NetworkBehaviour
     public void SwitchScenes()
     {
         ready = false;
-
-        if (!string.IsNullOrEmpty(_currentLoadedScene))
+        Debug.Log("我执行了5");
+        if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
         {
             if (NetworkManager.Singleton)
             {
-                GameManager.instance.UnLoadScene(_currentLoadedScene);
-                Debug.Log("卸载" + _currentLoadedScene);
+                GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
+                Debug.Log("卸载" + _data.CurrentLoadedScene);
             }
             else
             {
-                SceneManager.UnloadSceneAsync(_currentLoadedScene);
+                SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
             }
 
         }
@@ -64,58 +65,58 @@ public class SceneOverlayer : NetworkBehaviour
         {
             if (NetworkManager.Singleton)
             {
-                Invoke(nameof(LoadScene2), 0.2f);
+                Invoke(nameof(LoadShopScene), 0.2f);
             }
             else
             {
-                SceneManager.LoadScene(shop, LoadSceneMode.Additive);
+                SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
             }
-
-            _currentLoadedScene = shop;
+           
+            _data.CurrentLoadedScene = _data.shop;
             _isScene1Active = false;
         }
         else
         {
             if (NetworkManager.Singleton)
             {
-                Invoke(nameof(LoadScene1), 0.2f);
+                Invoke(nameof(LoadDungeonScene), 0.2f);
             }
             else
             {
-                SceneManager.LoadScene(dungeon, LoadSceneMode.Additive);
+                SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
             }
 
-            _currentLoadedScene = dungeon;
+            _data.CurrentLoadedScene = _data.dungeon;
             _isScene1Active = true;
         }
     }
 
-    void LoadScene1()
+    void LoadDungeonScene()
     {
-        GameManager.instance.LoadSceneAddtive(dungeon);
-        Debug.Log("加载联机场景1");
+        GameManager.instance.LoadSceneAddtive(_data.dungeon);
+        Debug.Log("加载地牢");
         ready = true ;
     }
 
-    void LoadScene2()
+    void LoadShopScene()
     {
-        GameManager.instance.LoadSceneAddtive(shop);
-        Debug.Log("加载联机场景2");
+        GameManager.instance.LoadSceneAddtive(_data.shop);
+        Debug.Log("加载商店");
         ready = true;
     }
 
     private void OnDestroy()
     {
-        if (!string.IsNullOrEmpty(_currentLoadedScene))
+        if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
         {
             if (NetworkManager.Singleton)
             {
-                GameManager.instance.UnLoadScene(_currentLoadedScene);
-                Debug.Log("卸载" + _currentLoadedScene);
+                GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
+                Debug.Log("卸载" + _data.CurrentLoadedScene);
             }
             else
             {
-                SceneManager.UnloadSceneAsync(_currentLoadedScene);
+                SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
             }
 
         }
@@ -123,6 +124,6 @@ public class SceneOverlayer : NetworkBehaviour
     
     public string GetCurrentLoadedSceneName()
     {
-        return _currentLoadedScene;
+        return _data.CurrentLoadedScene;
     }
 }
