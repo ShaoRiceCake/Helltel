@@ -24,11 +24,11 @@ public class ItemMoth : PassiveItem
 
     private void Grabbed()
     {
-        _mothController.DEBUG_STOP_BEHAVIOR_TREE = true;
+        _mothController.Grabb_HandleGrabb();
     }
     private void Released()
     {
-        _mothController.DEBUG_STOP_BEHAVIOR_TREE = false;
+        _mothController.Grabb_HandleRelease();
     }
 
 }

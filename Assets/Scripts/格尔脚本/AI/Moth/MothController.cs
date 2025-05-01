@@ -214,24 +214,25 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildBeCatchedBranch()
     {
-        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY,
+        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
             new Sequence(
                 new Action(() =>
                 {
                     Debug.Log("虫子被抓取了！");
-                    rb.isKinematic = true; // 设置刚体为静态
+                    rb.velocity = Vector3.zero; // 停止虫子移动
                 }),
-                new Wait(3.0f), // 抓取表现等待时间
-                new Action(() =>
-                {
-                    Debug.Log("虫子被放开了！");
-                    behaviorTree.Blackboard["isGrabbed"] = false; // 重置抓取状态
-                    rb.isKinematic = false; // 恢复刚体动力学
-                    DetachFromTarget(); // 解除附着
-                })
+                new WaitUntilStopped()
             ));
     }
-
+    public void Grabb_HandleGrabb()
+    {
+        behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
+    }
+    public void Grabb_HandleRelease()
+    {
+        behaviorTree.Blackboard["isGrabbed"] = false; // 设置抓取状态
+        wasGrabbed = true; // 记录抓取状态
+    }
     private bool wasGrabbed = false; // 记录曾经被抓取过，准备判断第一次落地
     private float stunThresholdSpeed = 5.0f; // 眩晕速度阈值
     private Node BuildStunnedBranch()
