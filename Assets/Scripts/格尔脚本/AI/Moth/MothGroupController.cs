@@ -106,19 +106,7 @@ public class MothGroupController : GuestBase
             )
         );
     }
-    // 
-    // private Node BuildChaseingBranch()
-    // {
-    //     return new Condition(IsEnemyCanSee, Stops.IMMEDIATE_RESTART,
-    //         new Action(() =>
-    //         {
-    //             if (CurTarget != null)
-    //             {
-    //                 agent.SetDestination(CurTarget.transform.position);
-    //             }
-    //         })
-    //     );
-    // }
+
     private Node BuildChaseingBranch()
     {
         return new Condition(IsEnemyCanSee, Stops.IMMEDIATE_RESTART,

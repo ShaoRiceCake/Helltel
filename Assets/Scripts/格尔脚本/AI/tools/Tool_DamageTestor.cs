@@ -37,11 +37,11 @@ public class Tool_DamageTestor : MonoBehaviour
             Debug.LogWarning($"❗按键 [{binding.triggerKey}] 没有设置目标！");
             return;
         }
-
+        // bingding.target 在实际使用中，想办法获取到这个目标的引用，find，碰撞，或者显示引用等均可
         IHurtable hurtable = binding.target.GetComponent<IHurtable>();
         if (hurtable != null)
         {
-            Debug.Log($"按键 [{binding.triggerKey}]：对 {binding.target.name} 造成 {binding.damage} 点伤害！");
+            // Debug.Log($"按键 [{binding.triggerKey}]：对 {binding.target.name} 造成 {binding.damage} 点伤害！");
             hurtable.TakeDamage(binding.damage);
         }
         else

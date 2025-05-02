@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Helltal.Gelercat;
 using UnityEngine;
 using NPBehave;
+using System.Linq;
 using UnityEngine.Events;
 
 /// <summary>
@@ -41,6 +42,10 @@ public class MothController : GuestBase, IHurtable
     [Header("虫子冲刺速度")]
     public float dashSpeed = 10f; // 冲刺速度
 
+    [Header("虫子抱脸伤害")]
+    public int attachDamage = 2; // 附着伤害
+    [Header("虫子冲刺伤害")]
+    public int dashDamage = 2; // 冲刺伤害
 
 
     private Vector3 dashTarget; // 冲刺目标位置
@@ -51,7 +56,10 @@ public class MothController : GuestBase, IHurtable
 
 
 
-
+    protected override bool ShouldUseNavMeshAgent()
+    {
+        return false; // 禁用导航代理
+    }
     protected override void Awake()
     {
         base.Awake();
@@ -156,19 +164,29 @@ public class MothController : GuestBase, IHurtable
            new Sequence(
                 new Action(() =>
                 {
-                    Transform face = belongToGroup.CurTarget?.transform.Find("HeadTarget");
+                    List<BodyAnchor> anchors = belongToGroup.CurTarget?.transform.root.GetComponentsInChildren<BodyAnchor>().ToList(); // 获取所有的锚点
+
+                    if (anchors == null || anchors.Count == 0) return;
+                    Transform face = anchors?.Find(x => x.Name == "HeadBall")?.transform; // 找到名为"HeadBall"的锚点
                     if (face == null) return;
                     dashTarget = face.position; // 获取目标位置
                 }),
-                new Action(() =>
-                    { SetMothState(MothState.Dash); } // 设置虫子状态为冲刺
-                ),
-                new Wait(1f), // 前摇时间
-                new Action(() =>
-                {
-                    Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
-                    rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
-                }
+                new Selector(
+                    new Condition(() => dashTarget != null, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+                        new Sequence(
+                            new Action(() =>
+                            { SetMothState(MothState.Dash); } // 设置虫子状态为冲刺
+                            ),
+                            new Wait(1f), // 前摇时间
+                            new Action(() =>
+                            {
+                                Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
+                                rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
+                            })
+                    )
+
+                )
+
             )));
         return branch;
     }
@@ -183,8 +201,7 @@ public class MothController : GuestBase, IHurtable
                     if (belongToGroup.CurTarget != null)
                     {
                         Debug.Log("虫子附着在玩家身上, 每秒造成伤害");
-
-
+                        GameController.Instance.DeductHealth(attachDamage); // 扣除玩家血量
                     }
                 },
                 new WaitUntilStopped()
@@ -214,24 +231,25 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildBeCatchedBranch()
     {
-        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY,
+        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
             new Sequence(
                 new Action(() =>
                 {
                     Debug.Log("虫子被抓取了！");
-                    rb.isKinematic = true; // 设置刚体为静态
+                    rb.velocity = Vector3.zero; // 停止虫子移动
                 }),
-                new Wait(3.0f), // 抓取表现等待时间
-                new Action(() =>
-                {
-                    Debug.Log("虫子被放开了！");
-                    behaviorTree.Blackboard["isGrabbed"] = false; // 重置抓取状态
-                    rb.isKinematic = false; // 恢复刚体动力学
-                    DetachFromTarget(); // 解除附着
-                })
+                new WaitUntilStopped()
             ));
     }
-
+    public void Grabb_HandleGrabb()
+    {
+        behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
+    }
+    public void Grabb_HandleRelease()
+    {
+        behaviorTree.Blackboard["isGrabbed"] = false; // 设置抓取状态
+        wasGrabbed = true; // 记录抓取状态
+    }
     private bool wasGrabbed = false; // 记录曾经被抓取过，准备判断第一次落地
     private float stunThresholdSpeed = 5.0f; // 眩晕速度阈值
     private Node BuildStunnedBranch()
@@ -460,6 +478,7 @@ public class MothController : GuestBase, IHurtable
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("虫子碰撞了物体！" + collision.gameObject.name);
         if (collision.gameObject.CompareTag("Player") && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
             if (belongToGroup.attachingMoth == null)
             {
@@ -489,6 +508,7 @@ public class MothController : GuestBase, IHurtable
             {
                 Debug.Log("已经附着，造成伤害后眩晕");
                 // take damage;
+                GameController.Instance.DeductHealth(dashDamage);
 
                 rb.AddForce(Vector3.back * 2f, ForceMode.Impulse);
                 behaviorTree.Blackboard["Stunning"] = true;
