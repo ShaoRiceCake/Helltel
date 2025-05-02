@@ -56,7 +56,10 @@ public class MothController : GuestBase, IHurtable
 
 
 
-
+    protected override bool ShouldUseNavMeshAgent()
+    {
+        return false; // 禁用导航代理
+    }
     protected override void Awake()
     {
         base.Awake();
@@ -475,6 +478,7 @@ public class MothController : GuestBase, IHurtable
 
     private void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("虫子碰撞了物体！" + collision.gameObject.name);
         if (collision.gameObject.CompareTag("Player") && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
             if (belongToGroup.attachingMoth == null)
             {
@@ -504,6 +508,7 @@ public class MothController : GuestBase, IHurtable
             {
                 Debug.Log("已经附着，造成伤害后眩晕");
                 // take damage;
+                GameController.Instance.DeductHealth(dashDamage);
 
                 rb.AddForce(Vector3.back * 2f, ForceMode.Impulse);
                 behaviorTree.Blackboard["Stunning"] = true;

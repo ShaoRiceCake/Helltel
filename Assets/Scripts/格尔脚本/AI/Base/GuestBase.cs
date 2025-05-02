@@ -127,8 +127,12 @@ namespace Helltal.Gelercat
         protected virtual void Awake()
         {
             if (!IsHost && NetworkManager.Singleton) return;
-            agent = GetComponent<NavMeshAgent>() == null ? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
-            Debug.Log(agent);
+            if(ShouldUseNavMeshAgent())
+            {
+                agent = GetComponent<NavMeshAgent>() == null ? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
+                Debug.Log(agent);
+            }
+
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
             if (navPointsManager == null)
             {
@@ -171,6 +175,11 @@ namespace Helltal.Gelercat
             return new Root(
                 new WaitUntilStopped()
             );
+        }
+    
+        protected virtual bool ShouldUseNavMeshAgent()
+        {
+            return true;
         }
     }
 }
