@@ -12,7 +12,6 @@ public class ItemBottom : ActiveItem
     {
         base.Awake();
 
-        // 获取SkinnedMeshRenderer组件
         skinnedMeshRenderer = GetComponent<SkinnedMeshRenderer>();
         if (skinnedMeshRenderer == null)
         {
@@ -26,13 +25,11 @@ public class ItemBottom : ActiveItem
     {
         if(IsExhaust) return;
 
-        // 如果已经有混合动画在进行，先停止它
         if (blendShapeCoroutine != null)
         {
             StopCoroutine(blendShapeCoroutine);
         }
 
-        // 开始新的混合动画
         if (skinnedMeshRenderer != null)
         {
             blendShapeCoroutine = StartCoroutine(AnimateBlendShape());
@@ -46,7 +43,6 @@ public class ItemBottom : ActiveItem
         float timer = 0f;
         int blendShapeCount = skinnedMeshRenderer.sharedMesh.blendShapeCount;
 
-        // 确保有混合形状可用
         if (blendShapeCount == 0)
         {
             Debug.LogWarning("No blend shapes found on the mesh!", this);
@@ -59,7 +55,6 @@ public class ItemBottom : ActiveItem
             float progress = Mathf.Clamp01(timer / blendShapeDuration);
             float blendValue = progress * 100f;
 
-            // 设置所有混合形状的值（如果有多个）
             for (int i = 0; i < blendShapeCount; i++)
             {
                 skinnedMeshRenderer.SetBlendShapeWeight(i, blendValue);
@@ -68,7 +63,6 @@ public class ItemBottom : ActiveItem
             yield return null;
         }
 
-        // 确保最终值为100
         for (int i = 0; i < blendShapeCount; i++)
         {
             skinnedMeshRenderer.SetBlendShapeWeight(i, 100f);
@@ -81,7 +75,6 @@ public class ItemBottom : ActiveItem
     {
         OnUseStart.RemoveListener(StartUseProcess);
 
-        // 停止所有可能的协程
         if (blendShapeCoroutine != null)
         {
             StopCoroutine(blendShapeCoroutine);
