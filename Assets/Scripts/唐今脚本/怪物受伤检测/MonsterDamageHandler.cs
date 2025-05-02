@@ -45,6 +45,9 @@ public class MonsterCollisionHandler : MonoBehaviour
         // 3. 获取碰撞对象的速度
         var velocity = otherRigidbody.velocity;
         var speed = velocity.magnitude;
+        
+        if (speed < 5f) return;
+
                 
         // 4. 计算动量 (动量 = 质量 * 速度)
         var momentum = mass * speed;
@@ -58,7 +61,7 @@ public class MonsterCollisionHandler : MonoBehaviour
             : transform.position;
                 
         // 7. 通过事件总线广播怪物受伤事件
-        BroadcastMonsterHurtEvent(hitPosition, finalDamage);
+        BroadcastMonsterHurtEvent(hitPosition, finalDamage, collision);
     }
 
     // 检查碰撞是否来自我们指定的碰撞器
@@ -68,7 +71,7 @@ public class MonsterCollisionHandler : MonoBehaviour
     }
 
     // 广播怪物受伤事件
-    private void BroadcastMonsterHurtEvent(Vector3 hitPosition, float damage)
+    private void BroadcastMonsterHurtEvent(Vector3 hitPosition, float damage, Collision collision)
     {
         // 创建事件对象（确保包含所有需要的信息）
         var hurtEvent = new MonsterHurtEvent(
@@ -81,7 +84,41 @@ public class MonsterCollisionHandler : MonoBehaviour
         // 通过事件总线发布事件
         EventBus<MonsterHurtEvent>.Publish(hurtEvent);
         
+        HandleBloodSpray(hitPosition, damage, collision);
+        
+        
         // 调试日志
         Debug.Log($"怪物[{monsterID}]受伤！位置: {hitPosition}, 伤害: {damage}");
     }
+    
+    private void HandleBloodSpray(Vector3 hitPosition, float damage, Collision collision)
+    {
+        // 1. 计算喷射器数量
+        int emitterCount = Mathf.Min(1 + Mathf.FloorToInt(damage / 100f), 5);
+
+        // 2. 获取碰撞信息
+        var otherRigidbody = collision.rigidbody;
+        float speed = collision.relativeVelocity.magnitude;
+        float mass = otherRigidbody.mass;
+
+        // 4. 计算发射参数
+        float emissionSpeed = Mathf.Lerp(1f, 10f, Mathf.InverseLerp(10f, 100f, speed));
+        float randomness = Mathf.Lerp(0.3f, 0.8f, Mathf.InverseLerp(1f, 500f, mass));
+
+        // 5. 计算喷射方向（从怪物中心指向受伤点）
+        Vector3 direction = (hitPosition - transform.position).normalized;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+
+        // 6. 发布血液喷射事件
+        EventBus<BloodSprayEvent>.Publish(
+            new BloodSprayEvent(
+                hitPosition,
+                rotation,
+                emitterCount,
+                emissionSpeed,
+                randomness
+            )
+        );
+    }
+
 }
