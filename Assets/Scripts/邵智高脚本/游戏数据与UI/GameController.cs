@@ -1,5 +1,6 @@
 // Controller层核心逻辑
 using System;
+using Michsky.LSS;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,7 @@ public class GameController : MonoBehaviour
 {
     [Header("数据引用")]
     public GameDataModel _gameData;
+    public LoadingScreenManager lSS_Manager;
 
     public static GameController Instance { get; private set; }
 
@@ -24,6 +26,10 @@ public class GameController : MonoBehaviour
     private void OnEnable() {
         
     }
+    private void Start() {
+        
+    }
+
     // 增加血上限接口
     public void AddMaxHealth(int amount)
     {
@@ -118,6 +124,15 @@ public class GameController : MonoBehaviour
         //暂定绩效可以是负数
         _gameData.Performance -= amount;
     }
+
+    
+
+    //检查是否满足绩效要求
+    // public void CheckPerformance()
+    // {
+    //     if
+
+    // }
 
 
 }

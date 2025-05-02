@@ -2,14 +2,16 @@ using UnityEngine.SceneManagement;
 using UnityEngine;
 using Unity.Netcode;
 using System;
+using Michsky.LSS;
+using Agora.Rtc;
 
 public class SceneOverlayer : NetworkBehaviour
 {
-    public GameDataModel _data;
-
+    private GameDataModel _data;
     
     
-    [SerializeField] private bool _isScene1Active;
+    
+    //[SerializeField] private bool _isScene1Active;
     [SerializeField] private bool ready=true;
     private void Start()
     {
@@ -20,89 +22,91 @@ public class SceneOverlayer : NetworkBehaviour
     private void Update()
     {
 
-        if (NetworkManager.Singleton)
+        if (Input.GetKeyDown(KeyCode.K))
         {
-            if (!GameManager.instance.isGameing) return;
-            if (!ready) return;
-            if (IsHost)
-            {
-                if (Input.GetKeyDown(KeyCode.L))
-                {
-                    SwitchScenes();
-                }
-            }
-
+            SwitchToDungeon();
         }
-        else
+        if (Input.GetKeyDown(KeyCode.L))
         {
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                SwitchScenes();
-            }
+            SwitchToShop();
         }
 
     }
 
-    public void SwitchScenes()
-    {
-        ready = false;
-        Debug.Log("我执行了5");
-        if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
-        {
-            if (NetworkManager.Singleton)
-            {
-                GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
-                Debug.Log("卸载" + _data.CurrentLoadedScene);
-            }
-            else
-            {
-                SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
-            }
+    // public void SwitchScenes()
+    // {
+    //     //ready = false;
+    //     // if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
+    //     // {
+    //     //     if (NetworkManager.Singleton)
+    //     //     {
+    //     //         GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
+    //     //         Debug.Log("卸载" + _data.CurrentLoadedScene);
+    //     //     }
+    //     //     else
+    //     //     {
+    //     //         SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
+    //     //     }
 
-        }
+    //     // }
 
-        if (_isScene1Active)
-        {
-            if (NetworkManager.Singleton)
-            {
-                Invoke(nameof(LoadShopScene), 0.2f);
-            }
-            else
-            {
-                SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
-            }
+    //     // if (_data.CurrentLoadedScene == _data.dungeon)
+    //     // {
+    //     //     if (NetworkManager.Singleton)
+    //     //     {
+    //     //         Invoke(nameof(LoadShopScene), 0.2f);
+    //     //     }
+    //     //     else
+    //     //     {
+    //     //         lSS_Manager.LoadScene(_data.shop);
+    //     //         //SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
+    //     //     }
            
-            _data.CurrentLoadedScene = _data.shop;
-            _isScene1Active = false;
-        }
-        else
-        {
-            if (NetworkManager.Singleton)
-            {
-                Invoke(nameof(LoadDungeonScene), 0.2f);
-            }
-            else
-            {
-                SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
-            }
+    //     //     _data.CurrentLoadedScene = _data.shop;
+    //     //     _isScene1Active = false;
+    //     // }
+    //     // else
+    //     // {
+    //     //     if (NetworkManager.Singleton)
+    //     //     {
+    //     //         Invoke(nameof(LoadDungeonScene), 0.2f);
+    //     //     }
+    //     //     else
+    //     //     {
+    //     //         lSS_Manager.LoadScene(_data.shop);
+    //     //         //SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
+    //     //     }
 
-            _data.CurrentLoadedScene = _data.dungeon;
-            _isScene1Active = true;
-        }
+    //     //     _data.CurrentLoadedScene = _data.dungeon;
+    //     //     _isScene1Active = true;
+    //     // }
+    // }
+    public void SwitchToDungeon()
+    {
+        SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
+        GameController.Instance.lSS_Manager.LoadScene();
+        SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
+        _data.CurrentLoadedScene = _data.dungeon;
+    }
+    public void SwitchToShop()
+    {
+        SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
+        GameController.Instance.lSS_Manager.LoadScene();
+        SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
+        _data.CurrentLoadedScene = _data.shop;
+    }
+    public void LoadDungeonScene()
+    {
+        SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
+        _data.CurrentLoadedScene = _data.dungeon;
+        
     }
 
-    void LoadDungeonScene()
+    public void LoadShopScene()
     {
-        GameManager.instance.LoadSceneAddtive(_data.dungeon);
-        Debug.Log("加载地牢");
-        ready = true ;
-    }
-
-    void LoadShopScene()
-    {
-        GameManager.instance.LoadSceneAddtive(_data.shop);
-        Debug.Log("加载商店");
-        ready = true;
+        SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
+        _data.CurrentLoadedScene = _data.shop;
+        
     }
 
     private void OnDestroy()

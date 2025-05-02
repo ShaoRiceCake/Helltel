@@ -6636,13 +6636,37 @@ MonoBehaviour:
   enableRandomImages: 0
   enablePressAnyKey: 0
   forceCanvasGroup: 0
-  fadingAnimationSpeed: 3
+  fadingAnimationSpeed: 0.1
   onBeginEvents:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: 6491159d85450594c962392cd4ac25ab, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
+        m_MethodName: set_name
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: LoadingStart
+          m_BoolArgument: 0
+        m_CallState: 2
   onFinishEvents:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 11500000, guid: 6491159d85450594c962392cd4ac25ab, type: 3}
+        m_TargetAssemblyTypeName: UnityEngine.Object, UnityEngine
+        m_MethodName: set_name
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: LoadingFinished
+          m_BoolArgument: 0
+        m_CallState: 2
   spinnerHelper: 2
   updateHelper: 0
 --- !u!225 &5592592545954519599
