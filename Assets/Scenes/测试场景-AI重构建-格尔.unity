@@ -1000,12 +1000,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 651440057}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.011001587, y: -0.08, z: -0.00500679}
+  m_LocalScale: {x: 0.62895316, y: 0.62895316, z: 0.62895316}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1181891501}
+  m_Father: {fileID: 1040075969}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &651440059
 MonoBehaviour:
@@ -1840,6 +1840,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
+--- !u!4 &1040075969 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7382292123548675526, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
+  m_PrefabInstance: {fileID: 1211892831}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1053629790
 GameObject:
   m_ObjectHideFlags: 0
@@ -2020,11 +2025,6 @@ MonoBehaviour:
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
   manualForwardDirection: {x: 0, y: 0, z: 1}
---- !u!4 &1181891501 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1307435084572047336, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
-  m_PrefabInstance: {fileID: 1211892831}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1209663249
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2161,7 +2161,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1307435084572047336, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 7382292123548675526, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 651440058}
     - targetCorrespondingSourceObject: {fileID: 8320743244557151742, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
@@ -3479,7 +3479,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
