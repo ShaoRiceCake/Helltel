@@ -28,32 +28,18 @@ public class BloodSprayManager : MonoBehaviour
             return;
         }
 
-        // 创建容器对象管理一组喷射器
-        var container = new GameObject("BloodSprayGroup")
-        {
-            transform =
-            {
-                position = sprayEvent.spawnPosition,
-                rotation = sprayEvent.spawnRotation
-            }
-        };
-
-
-        CreateEmitter(container.transform, sprayEvent);
-
-
-   
-        _activeSprays.Add(container);
+        // 直接在当前游戏对象下创建喷射器
+        CreateEmitter(this.transform, sprayEvent);
     }
 
     private void CreateEmitter(Transform parent, BloodSprayEvent sprayEvent)
     {
-        // 实例化喷射器GameObject
+        // 实例化喷射器GameObject作为当前对象的子对象
         var emitterObj = Instantiate(
             bloodSprayPrefab,
-            parent.position,
-            parent.rotation * Quaternion.Euler(0, 180, 0), // 调整局部-x方向
-            parent
+            sprayEvent.spawnPosition,  // 使用事件中的位置
+            sprayEvent.spawnRotation,  // 使用事件中的旋转
+            parent  // 父对象设为当前脚本挂载的对象
         );
 
         // 获取喷射器控制器脚本
@@ -69,8 +55,11 @@ public class BloodSprayManager : MonoBehaviour
         emitter.SetEmissionSpeed(sprayEvent.emissionSpeed);
         emitter.SetEmissionRandomness(sprayEvent.emissionRandomness);
         emitter.Emit();
-    }
 
+        // 将喷射器对象添加到活动列表
+        _activeSprays.Add(emitterObj);
+    }
+    
     public void ClearAllSprays()
     {
         foreach (var spray in _activeSprays.Where(spray => spray != null))
