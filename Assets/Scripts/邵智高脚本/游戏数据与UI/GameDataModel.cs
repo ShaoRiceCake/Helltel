@@ -34,7 +34,7 @@ public class GameDataModel : ScriptableObject
     public event Action<int> OnMoneyChanged;      // 金钱变化
     public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
-    public event Action<bool> IsPerformancePassed;  // 绩效是否达标
+    //public event Action<bool> IsPerformancePassed;  // 绩效是否达标
     //public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 关卡变化
     public event Action OnFloorChanged;  //层级变化
@@ -76,7 +76,7 @@ public class GameDataModel : ScriptableObject
             _performance = value;
             OnPerformanceChanged?.Invoke(_performance);
             // 数值变化时自动检查绩效，并传递是否达标的事件
-            IsPerformancePassed?.Invoke(CheckPerformance());
+            //IsPerformancePassed?.Invoke(CheckPerformance());
 
         }
     }

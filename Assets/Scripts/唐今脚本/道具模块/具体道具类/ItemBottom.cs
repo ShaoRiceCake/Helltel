@@ -13,6 +13,7 @@ public class ItemBottom : ActiveItem
 
     private SkinnedMeshRenderer skinnedMeshRenderer; // 引用SkinnedMeshRenderer组件
     private Coroutine blendShapeCoroutine;          // 存储当前运行的协程引用
+    private GameDataModel _data;
 
     /// <summary>
     /// 重写Awake方法，初始化组件和事件监听
@@ -32,10 +33,15 @@ public class ItemBottom : ActiveItem
         OnUseStart.AddListener(StartUseProcess);
         
     }
+    private void OnEnable()
+    {
+        _data = Resources.Load<GameDataModel>("GameData");
+    }
     protected void Start()
     {
-        GameController.Instance._gameData.OnFloorChanged += ResetIsExhaust;
         
+        _data.OnFloorChanged += ResetIsExhaust;
+
     }
 
     /// <summary>
@@ -126,13 +132,21 @@ public class ItemBottom : ActiveItem
     private void OnButtonFullyPressed()
     {
         Debug.Log("按钮已完全按下");
-        GameFlow gameFlow = FindObjectOfType<GameFlow>();
-        if(gameFlow !=null)
+        if(_data.CheckPerformance()==true)
         {
-            gameFlow.LeaveThisFloor();
+            GameFlow gameFlow = FindObjectOfType<GameFlow>();
+            if(gameFlow !=null)
+            {
+                gameFlow.LeaveThisFloor();
+            }
+            else
+            Debug.Log("找不到流程脚本");
         }
         else
-        Debug.Log("找不到流程脚本");
+        {
+            //ToDo执行未达成绩效的逻辑
+        }
+        
     }
     private void ResetIsExhaust()
     {
