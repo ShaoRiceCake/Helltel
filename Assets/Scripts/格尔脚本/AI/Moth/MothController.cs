@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Helltal.Gelercat;
 using UnityEngine;
 using NPBehave;
+using System.Linq;
 using UnityEngine.Events;
 
 /// <summary>
@@ -160,20 +161,29 @@ public class MothController : GuestBase, IHurtable
            new Sequence(
                 new Action(() =>
                 {
-                    Transform face = belongToGroup.CurTarget?.transform.root.Find("HeadBall");
-                    Debug.Log(face);
+                    List<BodyAnchor> anchors = belongToGroup.CurTarget?.transform.root.GetComponentsInChildren<BodyAnchor>().ToList(); // 获取所有的锚点
+
+                    if (anchors == null || anchors.Count == 0) return;
+                    Transform face = anchors?.Find(x => x.Name == "HeadBall")?.transform; // 找到名为"HeadBall"的锚点
                     if (face == null) return;
                     dashTarget = face.position; // 获取目标位置
                 }),
-                new Action(() =>
-                    { SetMothState(MothState.Dash); } // 设置虫子状态为冲刺
-                ),
-                new Wait(1f), // 前摇时间
-                new Action(() =>
-                {
-                    Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
-                    rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
-                }
+                new Selector(
+                    new Condition(() => dashTarget != null, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+                        new Sequence(
+                            new Action(() =>
+                            { SetMothState(MothState.Dash); } // 设置虫子状态为冲刺
+                            ),
+                            new Wait(1f), // 前摇时间
+                            new Action(() =>
+                            {
+                                Vector3 dir = (dashTarget - this.transform.position).normalized; // 计算冲刺方向
+                                rb.AddForce(dir * 10f, ForceMode.Impulse); // 冲刺
+                            })
+                    )
+
+                )
+
             )));
         return branch;
     }
@@ -218,7 +228,7 @@ public class MothController : GuestBase, IHurtable
 
     private Node BuildBeCatchedBranch()
     {
-        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+        return new BlackboardCondition("isGrabbed", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
             new Sequence(
                 new Action(() =>
                 {

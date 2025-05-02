@@ -29,6 +29,7 @@ public class ItemMoth : PassiveItem
     private void Released()
     {
         _mothController.Grabb_HandleRelease();
+        Debug.Log("Released");
     }
 
 }
