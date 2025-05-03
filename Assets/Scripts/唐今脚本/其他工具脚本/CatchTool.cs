@@ -126,6 +126,7 @@ public class CatchTool : MonoBehaviour
             _isPressingE = true;
         }
 
+        // 持续检测按键是否被按住足够长时间
         if (_isPressingE && Input.GetKey(KeyCode.E))
         {
             var pressDuration = Time.time - _pressTime;
@@ -143,6 +144,7 @@ public class CatchTool : MonoBehaviour
         {
             var pressDuration = Time.time - _pressTime;
         
+            // 短按逻辑
             if (pressDuration < LongPressThreshold)
             {
                 if (_currentTarget && !_isGrabbing)
