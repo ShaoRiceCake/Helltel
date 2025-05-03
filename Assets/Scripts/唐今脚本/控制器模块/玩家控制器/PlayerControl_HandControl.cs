@@ -13,6 +13,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public CatchTool  catchTool;
     public GameObject handBallPrefab;
     
+    [Header("Weight Sensitivity")]
+    public float baseMouseSensitivity = 10f; // Rename the existing mouseSensitivity to baseMouseSensitivity
+    public float maxMassForFullSensitivity = 5f; // Objects below this mass won't affect sensitivity
+    public float minSensitivityMultiplier = 0.1f; // Minimum sensitivity when holding very heavy objects
+
+    private float _currentMouseSensitivity;
     protected int CurrentPlayerHand;
     private bool _isMouseDown;
     protected bool IsHandActive;
@@ -45,6 +51,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         if (handPrepareObj != null) NullCheckerTool.CheckNull(handPrepareObj,catchTool, handBallPrefab, handControlAttachment);
         
         handBallPrefab.SetActive(false); 
+        
+        _currentMouseSensitivity = baseMouseSensitivity;
+        mouseSensitivity = baseMouseSensitivity; // Initialize
         
         SubscribeEvents();
     }
@@ -82,6 +91,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         {
             CurrentHand = 0;
         }
+        
+        UpdateSensitivityBasedOnMass(catchTool);
+        HandleKinematicObjectGrabbing();
     }
 
     private void OnCancelHandGrab()
@@ -118,6 +130,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
 
     private void OnMouseMove(Vector2 mouseDelta)
     {
+        if (catchTool != null && catchTool.IsGrabbingKinematic())
+            return;
+
         if (CurrentPlayerHand == 0 || handBallPrefab == null || handPrepareObj == null)
             return;
 
@@ -174,9 +189,18 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     protected void ActivateControlBall()
     {
         if (!handBallPrefab) return;
-    
+
         handBallPrefab.SetActive(true);
-        handBallPrefab.transform.position = ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0];
+    
+        if (catchTool && catchTool.IsGrabbingKinematic() && catchTool.GetGrabbedItem() != null)
+        {
+            handBallPrefab.transform.position = catchTool.GetGrabbedItem().transform.position;
+        }
+        else
+        {
+            handBallPrefab.transform.position = ObiGetGroupParticles.GetParticleWorldPositions(handControlAttachment)[0];
+        }
+    
         handControlAttachment.enabled = true;
         handControlAttachment.target = handBallPrefab.transform;
         catchTool.CatchBall = handBallPrefab;
@@ -191,6 +215,48 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         handControlAttachment.target = null;
         catchTool.CatchBall = null;
         IsHandActive = false;
+    }
+    
+    protected void UpdateSensitivityBasedOnMass(CatchTool catchTool)
+    {
+        if (!catchTool || !catchTool.IsGrabbing())
+        {
+            // No item grabbed or no catch tool - use full sensitivity
+            mouseSensitivity = baseMouseSensitivity;
+            return;
+        }
+
+        var mass = catchTool.GetGrabbedItemMass();
+    
+        if (mass >= float.MaxValue)
+        {
+            // Infinite mass or kinematic - can't move
+            mouseSensitivity = 0f;
+        }
+        else if (mass <= maxMassForFullSensitivity)
+        {
+            // Light object - full sensitivity
+            mouseSensitivity = baseMouseSensitivity;
+        }
+        else
+        {
+            // Calculate sensitivity based on mass
+            var massEffect = Mathf.Clamp01((mass - maxMassForFullSensitivity) / (maxMassForFullSensitivity * 10f));
+            mouseSensitivity = Mathf.Lerp(baseMouseSensitivity, baseMouseSensitivity * minSensitivityMultiplier, massEffect);
+        }
+    
+        _currentMouseSensitivity = mouseSensitivity;
+    }
+    
+    private void HandleKinematicObjectGrabbing()
+    {
+        if (!catchTool || !catchTool.IsGrabbingKinematic() || !handBallPrefab)
+            return;
+    
+        if (catchTool.GetGrabbedItem())
+        {
+            handBallPrefab.transform.position = catchTool.GetGrabbedItem().transform.position;
+        }
     }
 }
 

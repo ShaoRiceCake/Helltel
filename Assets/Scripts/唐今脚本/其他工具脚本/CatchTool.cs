@@ -17,6 +17,7 @@ public class CatchTool : MonoBehaviour
     private int CatchToolInstanceId => GetInstanceID();
     public ulong playerID = 0;
 
+    private bool _isGrabbingKinematic = false;
     private float _pressTime;
     private bool _isPressingE;
     private const float LongPressThreshold = 0.5f; // 长按时间检测阈值
@@ -223,6 +224,7 @@ public class CatchTool : MonoBehaviour
         }
     }
 
+
     private void GrabObject(GameObject target)
     {
         if (!target || !target.TryGetComponent<ItemBase>(out var item)) return;
@@ -231,15 +233,34 @@ public class CatchTool : MonoBehaviour
         _isGrabbing = true;
         CurrentlyGrabbedItem = item;
     
-        // 绑定到物品本身的 Transform
+        // 检查是否为运动学对象
+        var rb = item.GetComponent<Rigidbody>();
+        _isGrabbingKinematic = rb && rb.isKinematic;
+    
         obiAttachment.BindToTarget(item.transform);
-        
         obiAttachment.enabled = true;
         AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
     }
     
     private void ReleaseObject()
     {
+        _isGrabbingKinematic = false; 
         ForceRelease();
+    }
+    
+    public float GetGrabbedItemMass()
+    {
+        if (!_isGrabbing || !CurrentlyGrabbedItem) return 0f;
+    
+        var rb = CurrentlyGrabbedItem.GetComponent<Rigidbody>();
+        if (rb == null) return 0f;
+    
+        if (rb.isKinematic) return float.MaxValue; // Treat kinematic objects as infinite mass
+        return rb.mass;
+    }
+    
+    public bool IsGrabbingKinematic()
+    {
+        return _isGrabbing && _isGrabbingKinematic;
     }
 }
