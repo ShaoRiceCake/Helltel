@@ -126,16 +126,24 @@ public class CatchTool : MonoBehaviour
             _isPressingE = true;
         }
 
-        if (!Input.GetKeyUp(KeyCode.E)) return;
-        if (_isPressingE)
+        if (_isPressingE && Input.GetKey(KeyCode.E))
         {
             var pressDuration = Time.time - _pressTime;
-            
             if (pressDuration >= LongPressThreshold && _isGrabbing)
             {
                 TryUseItem();
+                _isPressingE = false; // 重置状态
+                return;
             }
-            else
+        }
+
+        if (!Input.GetKeyUp(KeyCode.E)) return;
+    
+        if (_isPressingE)
+        {
+            var pressDuration = Time.time - _pressTime;
+        
+            if (pressDuration < LongPressThreshold)
             {
                 if (_currentTarget && !_isGrabbing)
                 {
