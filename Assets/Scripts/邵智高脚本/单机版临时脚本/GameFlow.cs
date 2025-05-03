@@ -29,7 +29,7 @@ public class GameFlow : MonoBehaviour
         sceneOverlayer = FindObjectOfType<SceneOverlayer>();
         sceneOverlayer.LoadDungeonScene();
         _data.SendStartLoading();
-        
+        NextFloor();
         //StartCoroutine(NextFloor());
         
                
@@ -43,10 +43,10 @@ public class GameFlow : MonoBehaviour
        
         
     }
-    IEnumerator NextFloor()
+    public void NextFloor()
     {
         
-        yield return new WaitForSecondsRealtime(0.1f);
+        //yield return new WaitForSecondsRealtime(0.1f);
         //如果电梯外面是地牢
         if(_data.CurrentLoadedScene != null &&_data.CurrentLoadedScene == _data.dungeon)
         {
