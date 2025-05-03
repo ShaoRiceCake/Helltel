@@ -12,6 +12,7 @@ public class GlobalUIController : MonoBehaviour
     public SettingsPanel Settings;
     public GuestBookPanel GuestBook;
     public GameManager gameManager;
+    private GameDataModel _data;
 
     // // 属性访问（无需基类）
     // public MenuPanel Menu => _menu;
@@ -35,6 +36,18 @@ public class GlobalUIController : MonoBehaviour
         Settings.gameObject.SetActive(false);
         GuestBook.gameObject.SetActive(false);
     }
+    private void OnEnable()
+    {
+        _data = Resources.Load<GameDataModel>("GameData");
+        _data.StartLoading += HandleStartLoading;
+        _data.FinishLoading += HandleFinishLoading;
+        
+    }
+    private void OnDisable()
+    {
+        _data.StartLoading -= HandleStartLoading;
+        _data.FinishLoading -= HandleFinishLoading;
+    }
    
     private void Update()
     {
@@ -43,6 +56,43 @@ public class GlobalUIController : MonoBehaviour
 
     private void HandleEscapeInput()
     {
+        // if (!Input.GetKeyDown(KeyCode.Escape)) return;
+
+
+        // //根据当前界面状态处理
+        // //当处于设置或宾客簿界面时
+        // if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
+        // {
+        //     if(gameManager.isGameing == true )
+        //     {
+        //         // 从二级界面返回菜单
+        //         OpenMenu();
+        //     }
+        //     else
+        //     {
+        //         CloseAllGlobalUI();
+        //         AudioManager.Instance.Play("泡泡音");
+        //     }
+            
+        // }
+        // //当处于菜单界面时
+        // else if (Menu.gameObject.activeSelf)
+        // {
+        //     // 关闭菜单返回游戏,继续游戏
+        //     ReturnGame();
+            
+        // }
+        // //当处于游戏场景且未打开UI界面
+        // else
+        // {
+        //     if(gameManager.isGameing == true )
+        //     {
+        //         // 打开菜单
+        //         OpenMenu();
+                
+        //         Time.timeScale = 0;
+        //     }
+        // }
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
 
 
@@ -50,7 +100,7 @@ public class GlobalUIController : MonoBehaviour
         //当处于设置或宾客簿界面时
         if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
         {
-            if(gameManager.isGameing == true )
+            if(SceneManager.GetActiveScene().name != "单机正式主菜单")
             {
                 // 从二级界面返回菜单
                 OpenMenu();
@@ -72,10 +122,12 @@ public class GlobalUIController : MonoBehaviour
         //当处于游戏场景且未打开UI界面
         else
         {
-            if(gameManager.isGameing == true )
+            if(SceneManager.GetActiveScene().name != "单机正式主菜单")
             {
                 // 打开菜单
                 OpenMenu();
+                
+                Time.timeScale = 0;
             }
         }
     }
@@ -84,6 +136,17 @@ public class GlobalUIController : MonoBehaviour
     // 设置暂停/继续游戏
     public void SetPause(bool isPaused)
     {
+   
+        Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）
+        
+        Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
+        Cursor.visible = isPaused; // 控制鼠标可见性
+        
+        PlayerControlInformationProcess playersControlInformation = FindObjectOfType<PlayerControlInformationProcess>();
+        if(playersControlInformation!= null)
+        playersControlInformation.stopPlayerControl = isPaused ? true:false;
+        
+        //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;
         // 由于网络逻辑从人物操控中删除，所以这里要改
         
         // //Time.timeScale = isPaused ? 0 : 1; // 控制游戏时间流速（0暂停/1正常）由于我们是联机游戏，所以不暂停
@@ -122,7 +185,7 @@ public class GlobalUIController : MonoBehaviour
     public void ReturnGame()
     {
         CloseAllGlobalUI();
-        if(gameManager.isGameing == true)
+        if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
             SetPause(false);
         }
@@ -132,7 +195,7 @@ public class GlobalUIController : MonoBehaviour
     public void OpenMenu()
     {
         CloseAllGlobalUI();
-        if(gameManager.isGameing == true)
+        if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
             SetPause(true);
         }
@@ -149,7 +212,7 @@ public class GlobalUIController : MonoBehaviour
     //关闭设置
     public void CloseSettings()
     {
-        if(gameManager.isGameing == true)
+        if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
             OpenMenu();
         }
@@ -169,7 +232,7 @@ public class GlobalUIController : MonoBehaviour
     //关闭宾客簿
     public void CloseGuestBook()
     {
-        if(gameManager.isGameing == true)
+        if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
             OpenMenu();
         }
@@ -178,6 +241,14 @@ public class GlobalUIController : MonoBehaviour
             CloseAllGlobalUI();
             AudioManager.Instance.Play("泡泡音");
         }
+    }
+    public void HandleStartLoading()
+    {
+        SetPause(true);
+    }
+    public void HandleFinishLoading()
+    {
+        SetPause(false);
     }
     
 }

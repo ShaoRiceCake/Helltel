@@ -3,16 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using DG.Tweening;
 using UnityEngine.UI;
-    //提示：通过加载场景切换场景时，可以使用类似的代码
-    // public void StartGame()
-    // {
-    //     // 设置目标场景名称
-    //     LoadingScreen.SceneLoader.TargetSceneName = "Level1";
-        
-    //     // 加载加载场景（单例模式）
-    //     SceneManager.LoadScene("LoadingScene", LoadSceneMode.Single);
-    // }
-public class LoadingScreen : MonoBehaviour 
+
+public class LoadingScreenAni : MonoBehaviour 
 {
     
     [Header("场景配置")]
@@ -76,57 +68,7 @@ public class LoadingScreen : MonoBehaviour
         StartElevatorAnimation();
         StartBackgroundScroll();
     }
-    //弃用
-    private IEnumerator LoadTargetScene(string targetScene)
-    {
-        float startTime = Time.realtimeSinceStartup; // 记录加载开始时间
-        // 异步加载目标场景（叠加模式）
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(targetScene, LoadSceneMode.Additive);
-        
-        // 禁用自动激活，确保完全加载后再切换
-        asyncLoad.allowSceneActivation = false;
 
-        // 第一阶段：等待加载至90%
-        while (asyncLoad.progress < 0.9f)
-        {
-            yield return null;
-        }
-
-        // 第二阶段：计算强制等待时间
-        float elapsed = Time.realtimeSinceStartup - startTime;
-        float remainingWait = Mathf.Max(minDisplayTime - elapsed, 0);
-        yield return new WaitForSeconds(remainingWait); // 关键点：先等待再激活
-        
-        // 第三阶段：激活场景
-        asyncLoad.allowSceneActivation = true;
-        while (!asyncLoad.isDone)
-        {
-            yield return null;
-        }
-
-        // 关键修复：设置新场景为活跃场景
-        Scene targetSceneObj = SceneManager.GetSceneByName(targetScene);
-        if (targetSceneObj.IsValid())
-        {
-            SceneManager.SetActiveScene(targetSceneObj);
-        }
-        else
-        {
-            Debug.LogError("目标场景无效: " + targetScene);
-            yield break;
-        }
-
-        // 安全卸载加载场景
-        Scene loadingSceneObj = SceneManager.GetSceneByName(loadingSceneName);
-        if (loadingSceneObj.IsValid() && loadingSceneObj.isLoaded)
-        {
-            yield return SceneManager.UnloadSceneAsync(loadingSceneObj);
-        }
-        else
-        {
-            Debug.LogError("无法卸载场景: " + loadingSceneName);
-        }
-    }
     void StartGearRotation(Transform image,bool isClockwise)
     {
         if (image == null) return;
@@ -137,7 +79,8 @@ public class LoadingScreen : MonoBehaviour
             image.DOLocalRotate(new Vector3(0, 0, -360), 360 / gearRotationSpeed, RotateMode.FastBeyond360)
             .SetEase(Ease.Linear)
             .SetLoops(-1)
-            .SetRelative();
+            .SetRelative()
+            .SetUpdate(true);
         }
         else
         {
@@ -145,7 +88,8 @@ public class LoadingScreen : MonoBehaviour
             image.DOLocalRotate(new Vector3(0, 0, 360), 360 / gearRotationSpeed, RotateMode.FastBeyond360)
             .SetEase(Ease.Linear)
             .SetLoops(-1)
-            .SetRelative();
+            .SetRelative()
+            .SetUpdate(true);
         }
         
     }
@@ -169,7 +113,8 @@ public class LoadingScreen : MonoBehaviour
                 .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Restart)
                 .OnStepComplete(() => ResetForegroundPosition(img))
-                .SetRelative();
+                .SetRelative()
+                .SetUpdate(true);
         }
         foreach (var img in ironChain)
         {
@@ -177,7 +122,8 @@ public class LoadingScreen : MonoBehaviour
                 .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Restart)
                 .OnStepComplete(() => ResetIronChainPosition(img))
-                .SetRelative();
+                .SetRelative()
+                .SetUpdate(true);
         }
     }
 
@@ -196,26 +142,30 @@ public class LoadingScreen : MonoBehaviour
     {
         if (elevator == null) return;
 
-        // 复合震动动画序列
         Sequence elevatorSequence = DOTween.Sequence()
-            // 缩放动画：轻微放大后恢复
-            .Append(elevator.DOScale(1.01f * Vector3.one, shakeDuration * 0.2f).SetEase(Ease.OutQuad))
-            .Append(elevator.DOScale(Vector3.one, shakeDuration * 0.3f).SetEase(Ease.InQuad))
+            // 缩放动画
+            .Append(elevator.DOScale(1.01f * Vector3.one, shakeDuration * 0.2f)
+                .SetEase(Ease.OutQuad)
+                .SetUpdate(true)) // 关键修改
+            .Append(elevator.DOScale(Vector3.one, shakeDuration * 0.3f)
+                .SetEase(Ease.InQuad)
+                .SetUpdate(true))
             
-            // 位移动画：随机方向晃动
+            // 震动动画
             .Join(elevator.DOShakePosition(
                 duration: shakeDuration,
                 strength: new Vector3(shakeStrength * 4, shakeStrength * 2, 0),
                 vibrato: 10,
                 fadeOut: false
-            ).SetEase(Ease.Linear))
+            ).SetEase(Ease.Linear)
+            .SetUpdate(true)) // 关键修改
             
-            // 无限循环
+            // 循环设置
             .SetLoops(-1)
+            .SetUpdate(true) // 整个序列使用真实时间
             .SetLink(gameObject);
 
-        // 添加随机性参数
-        elevatorSequence.timeScale = Random.Range(0.8f, 1.2f); // 速度随机变化
+        elevatorSequence.timeScale = Random.Range(0.8f, 1.2f);
     }
 
     void OnDestroy()

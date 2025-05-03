@@ -25,12 +25,14 @@ public class StandaloneMainMenu : MonoBehaviour
     public Button btn_ExitJoinRoom;        //加入房间的退出按钮
     public Button btn_SettingOfMainMenu;        //主菜单的设置按钮
     public Button btn_GuestBookOfMainMenu;      //主菜单里的客人图鉴按钮
+    
 
 
 
     [Header("其他组件")]
     public GlobalUIController globalUIController; //全局UI脚本
     public LoadingScreenManager lSS_Manager;
+    public GameDataModel _data ;
 
 
     private void Start()
@@ -56,7 +58,12 @@ public class StandaloneMainMenu : MonoBehaviour
     /// </summary>
     public void SinglePlayerButton()
     {
-        lSS_Manager.LoadScene("单机正式电梯");
+        lSS_Manager.LoadScene();
+        
+        //_data.SendStartLoading();
+        SceneManager.LoadScene("单机正式电梯");
+
+        
     }
 
 
