@@ -43,6 +43,7 @@ public class cocoonController : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         Debug.Log("Collision"); //调试信息
+        Debug.Log(other.gameObject.name); //调试信息
         if ((other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("PlayerBodyItem")) && !hatchlock) //如果碰撞到玩家
         {
             StartCoroutine(GenerateMoth()); //开始孵化协程
