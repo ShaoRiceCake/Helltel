@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Helltal.Gelercat;
 using NPBehave;
 using UnityEngine;
@@ -7,8 +8,17 @@ public class MRBunnyController : GuestBase, IHurtable
     // Start is called before the first frame update
     [Header("MR-Bunny的移动速度")]
     public float moveSpeed = 3.5f; // 移动速度
+    [Header("MR-Bunny 冲刺范围")]
+    public float chaseDistance = 10f; // 冲刺范围
     [Header("MR-Bunny的追击速度")]
     public float chaseSpeed = 5f; // 追击速度
+    [Header("MR-Bunny 开始攻击的范围")]
+    public float attackDistance = 2f; // 攻击范围
+
+    public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
+    public GameObject CurTarget; //当前目标    
+    private Node getDamageNode;
+    private Node attackNode;
     protected override void Awake()
     {
         base.Awake();
@@ -18,7 +28,7 @@ public class MRBunnyController : GuestBase, IHurtable
         {
             sensor = this.gameObject.AddComponent<GuestSensor>();
         }
-        
+
     }
     protected override void Start()
     {
@@ -32,18 +42,22 @@ public class MRBunnyController : GuestBase, IHurtable
         behaviorTree.Blackboard["isDead"] = false; // 死亡标志
         behaviorTree.Blackboard["isAttacking"] = false; // 攻击标志
     }
-    private Node getDamageNode;
+
     protected override Root GetBehaviorTree()
     {
         getDamageNode = BuildGetDamageBranch(); // 受伤被打断
+        attackNode = BuildAttackBranch(); // 攻击被打断
         return new Root(
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
                     getDamageNode,
-                    // BuildChesingBranch(), // 追击
-                    BuildAttackBranch(),
-                    BuildPatrolBranch() // 巡逻 
+                    attackNode, // 攻击
+                    new Selector(
+                        BuildChesingBranch(), // 追击
+                        BuildPatrolBranch() // 巡逻 
+                    )
+
                 )
 
             )
@@ -52,17 +66,79 @@ public class MRBunnyController : GuestBase, IHurtable
         );
 
     }
+
+    // private Node BuildChesingBranch()
+    // {
+    //     return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
+    //         new Action(() =>
+    //         {
+    //             if (CurTarget != null && agent.isOnNavMesh)
+    //             {
+
+    //                 agent.SetDestination(CurTarget.transform.position); // 设置目标位置
+    //                 if (Vector3.Distance(transform.position, CurTarget.transform.position) >= chaseDistance)
+    //                 {
+    //                     agent.speed = moveSpeed;
+    //                 }
+    //                 else
+    //                 {
+    //                     agent.speed = chaseSpeed; // 设置追击速度
+    //                 }
+    //             }
+    //         }));
+    // }
+    private Node BuildChesingBranch()
+    {
+        return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
+            new Action(() =>
+            {
+                if (CurTarget != null && agent.isOnNavMesh)
+                {
+                    float distance = Vector3.Distance(transform.position, CurTarget.transform.position);
+                    if (distance <= attackDistance)
+                    {
+                        agent.ResetPath(); // 停止导航
+                        agent.speed = 0f;
+                    }
+                    else
+                    {
+                        agent.SetDestination(CurTarget.transform.position);
+                        agent.speed = (distance >= chaseDistance) ? moveSpeed : chaseSpeed;
+                    }
+                }
+            }));
+    }
+
+    bool IsEnemyCanSee()
+    {
+        if (sensor != null)
+        {
+            if (sensor.detectedTargets.Count > 0)
+            {
+                foreach (var target in sensor.detectedTargets)
+                {
+                    if (EnemyList.Contains(target.gameObject))
+                    {
+                        CurTarget = target.gameObject;
+
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     private Node BuildPatrolBranch()
     {
-        return new Condition(IsNavAgentOnNavmesh,
-            new Sequence(     
+        return new Condition(IsNavAgentOnNavmesh, Stops.NONE,
+            new Sequence(
                 new Action(
                     () =>
                     {
                         agent.speed = moveSpeed; // 设置巡逻速度
                     }
                 ),
-             
+
                 new Repeater(
                 new Cooldown(1f,
                 new Patrol(agent, navPointsManager))
@@ -100,35 +176,81 @@ public class MRBunnyController : GuestBase, IHurtable
         Debug.Log("监听到：受伤结束！");
         behaviorTree.Blackboard["getDamage"] = false; // 重置受伤标志
     }
+    private bool canAttack = true;
     private Node BuildAttackBranch()
     {
-        return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
-            new Sequence(
-                new Action(() =>
-                {
-                    behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
-                    presenter.SetTrigger("Attack"); // 播放攻击动画
-                }),
-                new WaitUntilStopped()
-            ));
+        // return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
+        //     new Sequence(
+        //         new Action(() =>
+        //         {
+        //             agent.speed = 0f; // 设置攻击时速度为0
+        //         }),
+        //         new Action(() =>
+        //         {
+        //             behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
+        //             presenter.SetTrigger("Attack"); // 播放攻击动画
+        //         }),
+        //         new WaitUntilStopped()
+        //     ));
+        //     return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
+        // new Sequence(
+        //     new Action(() =>
+        //     {
+        //         behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
+        //         presenter.SetTrigger("Attack"); // 播放攻击动画
+        //     }),
+        //     new WaitUntilStopped()
+
+
+
+
+
+        // ));
+        return new BlackboardCondition("isAttacking", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
+        new Sequence(
+            new Action(() =>
+            {
+                agent.ResetPath();     // 停止追击
+                agent.speed = 0f;      // 保证站定
+                presenter.SetTrigger("Attack"); // 播放攻击动画
+            }),
+            new WaitUntilStopped()
+        )
+    );
+
+
     }
     // 监听攻击结束
     void OnAttackEnd()
     {
         Debug.Log("监听到：攻击结束！");
         behaviorTree.Blackboard["isAttacking"] = false; // 重置攻击标志
-    }
-    private bool TryAttack()
-    {
-        // debug
-        if (Input.GetKeyDown(KeyCode.J))
+        canAttack = true; // 解除攻击锁
+
+        if (attackNode != null && attackNode.CurrentState == Node.State.ACTIVE)
         {
-            Debug.Log("攻击！");
-            return true;
+            attackNode.Stop();  // 强制退出攻击节点
+            Debug.Log("强制退出攻击节点！");
         }
 
-        return false;
     }
+    // private bool TryAttack()
+    // {
+    //     // debug
+    //     // if (Input.GetKeyDown(KeyCode.J))
+    //     // {
+    //     //     Debug.Log("攻击！");
+    //     //     return true;
+    //     // }
+    //     if (!canAttack) return false;
+    //     // 检测到敌人并且在攻击范围内
+    //     if (CurTarget != null && Vector3.Distance(transform.position, CurTarget.transform.position) <= attackDistance)
+    //     {
+    //         canAttack = false; // 设置攻击锁
+    //         return true;
+    //     }
+    //     return false;
+    // }
     // 实现IHurtable接口
     public void TakeDamage(int damage)
     {
@@ -159,6 +281,41 @@ public class MRBunnyController : GuestBase, IHurtable
         {
             TakeDamage(1);
         }
+
+
+        if (CurTarget != null)
+        {
+            float distance = Vector3.Distance(transform.position, CurTarget.transform.position);
+            if (distance <= attackDistance)
+            {
+
+                if (canAttack && !behaviorTree.Blackboard["isAttacking"].Equals(true))
+                {
+                    canAttack = false;
+                    behaviorTree.Blackboard["isAttacking"] = true; // 手动触发攻击行为
+                }
+                agent.ResetPath();
+                agent.speed = 0f;
+
+            }
+        }
+        if (behaviorTree.Blackboard["isAttacking"].Equals(true))
+        {
+            agent.ResetPath(); // 停止追击
+            agent.speed = 0f; // 保证站定
+
+            Vector3 targetPosition = CurTarget.transform.position;
+            Vector3 direction = targetPosition - transform.position;
+            direction.y = 0; // 确保只在水平方向旋转
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+
+
+        }
+
     }
     protected override void LateUpdate()
     {
@@ -189,4 +346,13 @@ public class MRBunnyController : GuestBase, IHurtable
         presenter.SetFloat("Speed", normalizedSpeed);
     }
 
+    private void OnDrawGizmos()
+    {
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, chaseDistance); // 绘制追击范围
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, attackDistance); // 绘制攻击范围
+
+    }
 }
