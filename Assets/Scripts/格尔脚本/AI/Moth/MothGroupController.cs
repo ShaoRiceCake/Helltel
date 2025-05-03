@@ -146,10 +146,7 @@ public class MothGroupController : GuestBase
     }
 
 
-    private bool IsNavAgentOnNavmesh()
-    {
-        return agent.isOnNavMesh;
-    }
+    
 
 
     private void OnGUI()
