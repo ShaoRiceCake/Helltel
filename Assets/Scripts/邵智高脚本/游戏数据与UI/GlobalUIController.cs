@@ -13,6 +13,7 @@ public class GlobalUIController : MonoBehaviour
     public GuestBookPanel GuestBook;
     public GameManager gameManager;
     private GameDataModel _data;
+    private  bool canPressESC = true;
 
     // // 属性访问（无需基类）
     // public MenuPanel Menu => _menu;
@@ -93,6 +94,7 @@ public class GlobalUIController : MonoBehaviour
         //         Time.timeScale = 0;
         //     }
         // }
+        if(canPressESC == false)return;
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
 
 
@@ -245,10 +247,12 @@ public class GlobalUIController : MonoBehaviour
     public void HandleStartLoading()
     {
         SetPause(true);
+        canPressESC = false;
     }
     public void HandleFinishLoading()
     {
         SetPause(false);
+        canPressESC = true;
     }
     
 }

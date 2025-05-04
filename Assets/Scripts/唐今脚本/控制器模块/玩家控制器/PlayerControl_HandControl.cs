@@ -9,12 +9,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float handMoveSpeed = 4.0f;
     public float cylinderRadius = 10.0f;
     public float cylinderHalfHeight = 7.0f;
-    public float mouseSensitivity = 10f;
+    public float mouseSensitivity = 200f;
     public CatchTool  catchTool;
     public GameObject handBallPrefab;
     
     [Header("Weight Sensitivity")]
-    public float baseMouseSensitivity = 10f; // Rename the existing mouseSensitivity to baseMouseSensitivity
+    public float baseMouseSensitivity = 200f; // Rename the existing mouseSensitivity to baseMouseSensitivity
     public float maxMassForFullSensitivity = 5f; // Objects below this mass won't affect sensitivity
     public float minSensitivityMultiplier = 0.1f; // Minimum sensitivity when holding very heavy objects
 

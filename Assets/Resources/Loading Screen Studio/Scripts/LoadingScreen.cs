@@ -682,7 +682,18 @@ namespace Michsky.LSS
                     
                     enableFading = true;
                     onFinishEvents.Invoke();
-                    Destroy(gameObject); // 立即销毁
+                    //Destroy(gameObject); // 立即销毁
+                }
+            }
+            // 处理淡出逻辑
+            if (enableFading)
+            {
+                instance.canvasGroup.alpha -= fadingAnimationSpeed * Time.unscaledDeltaTime;
+                
+                // 完全透明后销毁对象
+                if (instance.canvasGroup.alpha <= 0)
+                {
+                    Destroy(gameObject);
                 }
             }
            
@@ -692,7 +703,7 @@ namespace Michsky.LSS
             if (enableRandomHints) ProcessRandomHints();
         }
 
-        // ========== 异步加载处理核心逻辑 ==========
+
 //         private void ProcessAsyncLoading()
 //         {
 //             // 强制CanvasGroup模式处理
