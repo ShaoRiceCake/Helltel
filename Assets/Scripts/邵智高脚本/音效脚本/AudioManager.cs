@@ -200,7 +200,7 @@ public class AudioManager : MonoBehaviour
         if (!effect.useVariation || Mathf.Approximately(baseVolume, 0f)) 
             return baseVolume;
 
-        // 生成0.95-1.05的随机倍率
+        // 生成0.9-1.1的随机倍率
         float multiplier = Random.Range(0.9f, 1.1f);
         return Mathf.Clamp(baseVolume * multiplier, 0f, 1f);
     }

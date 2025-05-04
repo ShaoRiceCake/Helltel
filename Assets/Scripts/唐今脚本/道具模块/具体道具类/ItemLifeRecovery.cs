@@ -27,7 +27,8 @@ public class ItemLifeRecovery : ActiveItem
 
     private void StartUseProcess()
     {
-        Debug.Log($"{itemName} 开始使用");
+        if(IsExhaust) return;
+
         _useCoroutine = StartCoroutine(UseCoroutine());
     }
 
@@ -63,7 +64,7 @@ public class ItemLifeRecovery : ActiveItem
     
     private void CompleteUse()
     {
-        Debug.Log($"{itemName} 使用完成");
+        IsExhaust = true;
     }
     
 }

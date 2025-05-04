@@ -133,7 +133,6 @@ GameObject:
   - component: {fileID: 200964192}
   - component: {fileID: 200964191}
   - component: {fileID: 200964189}
-  - component: {fileID: 200964190}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -158,19 +157,6 @@ MonoBehaviour:
       m_Calls: []
   isGameing: 1
   joinConde: 
---- !u!114 &200964190
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 200964188}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eaec5c81049806d469913085408d4211, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 90
 --- !u!114 &200964191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -282,7 +268,7 @@ MonoBehaviour:
   onTriggerExit: 0
   onlyLoadWithTag: 0
   startLoadingAtStart: 0
-  objectTag: 
+  objectTag: Untagged
   sceneName: 
   loadingScreens:
   - {fileID: 6498329938164979471, guid: a6d6d28fbef5e6f4aa3e250d402fdc36, type: 3}
@@ -834,6 +820,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5103182867850785256, guid: f00c02f6ce2e2f74a88c764d24327eee, type: 3}
+      propertyPath: _data
+      value: 
+      objectReference: {fileID: 11400000, guid: 0b60040e19a912740b83c35ce6deaa21, type: 2}
     - target: {fileID: 5103182867850785256, guid: f00c02f6ce2e2f74a88c764d24327eee, type: 3}
       propertyPath: gameManager
       value: 
@@ -4031,6 +4021,7 @@ MonoBehaviour:
   btn_GuestBookOfMainMenu: {fileID: 4692619786307562981}
   globalUIController: {fileID: 1964572460}
   lSS_Manager: {fileID: 595717866}
+  _data: {fileID: 11400000, guid: 0b60040e19a912740b83c35ce6deaa21, type: 2}
 --- !u!224 &8447071492301668361
 RectTransform:
   m_ObjectHideFlags: 0

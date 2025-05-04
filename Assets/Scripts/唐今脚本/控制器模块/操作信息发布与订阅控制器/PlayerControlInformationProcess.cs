@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
+using System.Collections;
 
 public class PlayerControlInformationProcess : MonoBehaviour
 {
@@ -16,6 +17,12 @@ public class PlayerControlInformationProcess : MonoBehaviour
     public ControlMode mCurrentControlMode = ControlMode.LegControl;
     private MouseControl _mMouseControl;
 
+    // Control permission flags
+    [Header("Control Permissions")]
+    public bool legControlEnabled = true;
+    public bool handControlEnabled = true;
+    
+    [Header("Events")]
     public UnityEvent onLiftLeftLeg;
     public UnityEvent onLiftRightLeg;
     public UnityEvent onReleaseLeftLeg;
@@ -73,7 +80,6 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     public void OnDestroy()
     {
-
         if (_mMouseControl == null) return;
         _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
         _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
@@ -84,7 +90,6 @@ public class PlayerControlInformationProcess : MonoBehaviour
         _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
         _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
         _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
-
     }
 
     private void Update()
@@ -110,10 +115,10 @@ public class PlayerControlInformationProcess : MonoBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onLiftLeftLeg?.Invoke();
+                if (legControlEnabled) onLiftLeftLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onLiftLeftHand?.Invoke();
+                if (handControlEnabled) onLiftLeftHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -127,10 +132,10 @@ public class PlayerControlInformationProcess : MonoBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onLiftRightLeg?.Invoke();
+                if (legControlEnabled) onLiftRightLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onLiftRightHand?.Invoke();
+                if (handControlEnabled) onLiftRightHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -144,10 +149,10 @@ public class PlayerControlInformationProcess : MonoBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onReleaseLeftLeg?.Invoke();
+                if (legControlEnabled) onReleaseLeftLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onReleaseLeftHand?.Invoke();
+                if (handControlEnabled) onReleaseLeftHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -161,10 +166,10 @@ public class PlayerControlInformationProcess : MonoBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onReleaseRightLeg?.Invoke();
+                if (legControlEnabled) onReleaseRightLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onReleaseRightHand?.Invoke();
+                if (handControlEnabled) onReleaseRightHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -178,10 +183,10 @@ public class PlayerControlInformationProcess : MonoBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onCancelLegGrab?.Invoke();
+                if (legControlEnabled) onCancelLegGrab?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onCancelHandGrab?.Invoke();
+                if (handControlEnabled) onCancelHandGrab?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -220,5 +225,41 @@ public class PlayerControlInformationProcess : MonoBehaviour
         {
             _mMouseControl.MouseSensitivity *= newSensitivity;
         }
+    }
+
+    // Public methods to control permissions
+    public void EnableLegControl(bool enable)
+    {
+        legControlEnabled = enable;
+    }
+
+    public void EnableHandControl(bool enable)
+    {
+        handControlEnabled = enable;
+    }
+
+    // Temporary disable functionality
+    public void TemporarilyDisableControl(float duration)
+    {
+        StartCoroutine(TemporaryDisableRoutine(duration));
+    }
+
+    private IEnumerator TemporaryDisableRoutine(float duration)
+    {
+        var originalLegState = legControlEnabled;
+        var originalHandState = handControlEnabled;
+        var originalStopState = stopPlayerControl;
+
+        // Disable all controls
+        legControlEnabled = false;
+        handControlEnabled = false;
+        stopPlayerControl = true;
+
+        yield return new WaitForSeconds(duration);
+
+        // Restore original states
+        legControlEnabled = originalLegState;
+        handControlEnabled = originalHandState;
+        stopPlayerControl = originalStopState;
     }
 }
