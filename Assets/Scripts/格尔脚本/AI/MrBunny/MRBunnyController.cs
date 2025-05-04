@@ -166,7 +166,19 @@ public class MRBunnyController : GuestBase, IHurtable
                 new Action(() =>
                 {
                     presenter.SetTrigger("hurt"); // 播放受伤动画
+
+
                 }),
+                new Action(() =>
+                {
+                    if (IsNavAgentOnNavmesh())
+                    {
+                        agent.ResetPath(); // 停止追击
+                        agent.velocity = Vector3.zero; // 停止移动
+                        agent.speed = 0f; // 保证站定
+                    }
+                }
+                ),
                 new WaitUntilStopped()
 
             ));
@@ -299,7 +311,19 @@ public class MRBunnyController : GuestBase, IHurtable
 
             }
         }
-        if (behaviorTree.Blackboard["isAttacking"].Equals(true))
+        if (behaviorTree.Blackboard["isAttacking"].Equals(true) && behaviorTree.Blackboard["isDead"].Equals(false))
+        {
+            // 计算攻击目标的方向
+            Vector3 targetPosition = CurTarget.transform.position;
+            Vector3 direction = targetPosition - transform.position;
+            direction.y = 0; // 确保只在水平方向旋转
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+        }
+        else if (CurTarget != null && behaviorTree.Blackboard["isDead"].Equals(false))
         {
             agent.ResetPath(); // 停止追击
             agent.speed = 0f; // 保证站定
@@ -324,8 +348,10 @@ public class MRBunnyController : GuestBase, IHurtable
         // 1. 获取当前速度
         Vector3 horizontalVelocity = agent.velocity;
         horizontalVelocity.y = 0f; // 只考虑水平速度
-        float currentSpeed = horizontalVelocity.magnitude;
 
+        
+
+        float currentSpeed = horizontalVelocity.magnitude;
         // 2. 归一化：0 = idle，0.5 = walk，1 = run
         float normalizedSpeed = 0f;
         if (currentSpeed > 0.01f)
