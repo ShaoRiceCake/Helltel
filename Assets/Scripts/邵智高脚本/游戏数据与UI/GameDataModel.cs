@@ -14,7 +14,8 @@ public class GameDataModel : ScriptableObject
     [SerializeField]private int _maxHealth;
     [SerializeField]private int _money;
     [SerializeField]private int _performance;
-    [SerializeField]private int _performanceTarget;//基础绩效要求
+    [SerializeField]private int _performanceTarget;
+    [SerializeField]private int _basePerformanceTarget;//基础绩效要求
     [SerializeField]private int _level = 0;
     [SerializeField]private bool _isPerformancePassed;
 
@@ -26,7 +27,7 @@ public class GameDataModel : ScriptableObject
     [Tooltip("第二个外部场景（Scene2）")]
     public string shop = "单机正式商店";
     //当前场景别输入
-    private string _currentLoadedScene;
+    [SerializeField]private string _currentLoadedScene;
 
     // 公开事件
     public event Action<int> OnHealthChanged;      // 生命变化
@@ -119,6 +120,32 @@ public class GameDataModel : ScriptableObject
         Level = 0;
         _isPerformancePassed = false;
         _currentLoadedScene = "";
+    }
+    //进商店调用这个
+    public void NewFloorData()
+    {
+        Money += Performance;
+        Health = MaxHealth;
+        Performance = 0;
+
+    }
+    //进地牢调用这个
+    public void NewLevelData()
+    {
+        Health = MaxHealth;
+        PerformanceTarget = ExponentialCalculation();
+        _isPerformancePassed = false;
+
+    }
+    
+    int ExponentialCalculation()
+    {
+        // 计算指数增长后的值
+        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level - 1);
+        
+        // 取整到最近的 expRoundInterval 倍数（如10、50、100等）
+        return Mathf.RoundToInt(value / 10f) * 10;
+        
     }
     public bool CheckPerformance()
     {

@@ -83,6 +83,8 @@ public class GameFlow : MonoBehaviour
         GameController.Instance.lSS_Manager.LoadScene();
         //修改玩家位置；
         ResetPlayerPosition();
+        
+
         //发送事件，接受到这个事件的地方要进行相应操作（重置属性、位置等）
         _data.SendOnFloorChangedEvent();
         
@@ -92,10 +94,14 @@ public class GameFlow : MonoBehaviour
         if(_data.CurrentLoadedScene == _data.dungeon)
         {
             sceneOverlayer.SwitchToShop();
+            //更新玩家数据
+            _data.NewFloorData();
         }
         else if(_data.CurrentLoadedScene == _data.shop)
         {
             sceneOverlayer.SwitchToDungeon();
+            //更新玩家数据
+            _data.NewLevelData();
         }
         
     }

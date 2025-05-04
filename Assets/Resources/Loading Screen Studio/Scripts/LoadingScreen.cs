@@ -659,6 +659,7 @@ namespace Michsky.LSS
 
                 // 强制设置Canvas可见
                 instance.canvasGroup.alpha = 1;
+                Debug.Log("1");
             }
             catch { Debug.LogError("<b>[LSS]</b> Prefab加载失败: Resources/Loading Screens/" + prefabName); }
         }
@@ -671,6 +672,7 @@ namespace Michsky.LSS
                 vltTimer += Time.unscaledDeltaTime;
                 progressBar.value = Mathf.Clamp01(vltTimer / virtualLoadingTimer);
                 statusObj.text = $"{(progressBar.value * 100):F0}%";
+                Debug.Log("2");
 
                 // 虚拟时间结束后直接销毁
                 if (vltTimer >= virtualLoadingTimer)
@@ -678,6 +680,7 @@ namespace Michsky.LSS
                     // 直接加载使用（注意资源路径大小写敏感）
                     GameDataModel data = Resources.Load<GameDataModel>("GameData");
                     data?.SendFinishLoading();
+                    Debug.Log("3");
                     
                     
                     enableFading = true;
@@ -688,11 +691,13 @@ namespace Michsky.LSS
             // 处理淡出逻辑
             if (enableFading)
             {
-                instance.canvasGroup.alpha -= fadingAnimationSpeed * Time.unscaledDeltaTime;
+                Debug.Log("4");
+                canvasGroup.alpha -= fadingAnimationSpeed * Time.unscaledDeltaTime;
                 
                 // 完全透明后销毁对象
-                if (instance.canvasGroup.alpha <= 0)
+                if (canvasGroup.alpha <= 0)
                 {
+                    Debug.Log("5");
                     Destroy(gameObject);
                 }
             }
