@@ -2160,6 +2160,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 932457455}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1086091737 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4130376400615222365, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
+  m_PrefabInstance: {fileID: 1211892831}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1109963267
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2452,9 +2457,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 218973160642584242, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
+      propertyPath: baseMouseSensitivity
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 2742384722935334665, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2059896725
+      objectReference: {fileID: 0}
+    - target: {fileID: 6197780918008454591, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
+      propertyPath: baseMouseSensitivity
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 7891429503665226688, guid: 94ae43f8c97593646b94cf7fe09dab8c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3995,6 +4008,7 @@ MonoBehaviour:
     m_Bits: 128
   isDebug: 1
   detectedTargets:
+  - {fileID: 1086091737}
   - {fileID: 1181891501}
   - {fileID: 651440058}
   - {fileID: 859239736}
@@ -4002,17 +4016,17 @@ MonoBehaviour:
   - {fileID: 1230334915}
   - {fileID: 977562158}
   - {fileID: 2005459468}
+  - {fileID: 1387492921}
   - {fileID: 290149247}
   - {fileID: 1974085259}
-  - {fileID: 1387492921}
   - {fileID: 1610532524}
-  - {fileID: 927041566}
+  - {fileID: 841550456}
   - {fileID: 1484895918}
   - {fileID: 1668269508}
-  - {fileID: 841550456}
-  - {fileID: 1910441932}
-  - {fileID: 990618751}
   - {fileID: 898979472}
+  - {fileID: 1910441932}
+  - {fileID: 927041566}
+  - {fileID: 990618751}
 --- !u!1001 &1858935499
 PrefabInstance:
   m_ObjectHideFlags: 0
