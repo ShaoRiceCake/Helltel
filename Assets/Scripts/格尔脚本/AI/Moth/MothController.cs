@@ -3,7 +3,7 @@ using Helltal.Gelercat;
 using UnityEngine;
 using NPBehave;
 using System.Linq;
-using UnityEngine.Events;
+
 
 /// <summary>
 /// 集群行为状态结构体
@@ -53,7 +53,7 @@ public class MothController : GuestBase, IHurtable
 
 
     private Rigidbody rb; // 刚体组件
-
+    private ConfigurableJoint joint; // 关节组件
 
 
     protected override bool ShouldUseNavMeshAgent()
@@ -95,11 +95,51 @@ public class MothController : GuestBase, IHurtable
             rb = this.gameObject.AddComponent<Rigidbody>();
         }
         rb.useGravity = false; // 不使用重力
-        rb.isKinematic = false; // 取消动力学 
+        rb.isKinematic = false; // 取消动力学         
+
+        joint = this.gameObject.GetComponent<ConfigurableJoint>();
+        if (joint == null)
+        {
+            joint = this.gameObject.AddComponent<ConfigurableJoint>();
+        }
+
+
+
         boidsState = new BoidsState(); // 初始化集群个体的状态记录
         BoidInitState(); // 初始化状态
 
 
+    }
+    private void Configurablejointinit(Rigidbody targetRB)
+    {
+        if(joint == null)
+        {
+            joint = this.gameObject.AddComponent<ConfigurableJoint>();
+        }
+        joint.connectedBody = targetRB;
+        joint.autoConfigureConnectedAnchor = false; // 不自动配置连接锚点
+        joint.connectedAnchor = Vector3.zero; // 连接锚点位置
+        joint.anchor = localAttachOffset; // 本地锚点位置
+
+        joint.xMotion = ConfigurableJointMotion.Limited; // 锁定X轴运动
+        joint.yMotion = ConfigurableJointMotion.Limited; // 锁定Y轴运动
+        joint.zMotion = ConfigurableJointMotion.Limited; // 锁定Z轴运动
+
+        joint.angularXMotion = ConfigurableJointMotion.Limited; // 锁定X轴角度运动
+        joint.angularYMotion = ConfigurableJointMotion.Limited; // 锁定Y轴角度运动
+        joint.angularZMotion = ConfigurableJointMotion.Limited; // 锁定Z轴角度运动
+
+        JointDrive springDrive = new JointDrive
+        {
+            positionSpring = 1000f, // 弹簧力
+            positionDamper = 10f, // 阻尼力
+            maximumForce = Mathf.Infinity // 最大力
+        };
+        joint.xDrive = joint.yDrive = joint.zDrive = springDrive; // 设置X、Y、Z轴的驱动
+        // joint.enableCollision = false;
+        // joint.enablePreprocessing = true;
+
+        // joint.en
     }
 
     protected override Root GetBehaviorTree()
@@ -117,6 +157,8 @@ public class MothController : GuestBase, IHurtable
                 )
 
             )
+
+
         );
     }
 
@@ -243,6 +285,11 @@ public class MothController : GuestBase, IHurtable
     }
     public void Grabb_HandleGrabb()
     {
+        if (behaviorTree.Blackboard["State"].Equals(MothState.Attached.ToString()))
+        {
+            DetachFromTarget(); // 解除附着
+
+        }
         behaviorTree.Blackboard["isGrabbed"] = true; // 设置抓取状态
     }
     public void Grabb_HandleRelease()
@@ -479,34 +526,59 @@ public class MothController : GuestBase, IHurtable
     private void OnCollisionEnter(Collision collision)
     {
         Debug.Log("虫子碰撞了物体！" + collision.gameObject.name);
-        if (collision.gameObject.CompareTag("Player") && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
+        if ((collision.gameObject.CompareTag("Player")||collision.gameObject.CompareTag("PlayerBodyItem")) && behaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
             if (belongToGroup.attachingMoth == null)
             {
-                Debug.Log("触发附着！");
+                // // 
+                // Debug.Log("触发附着！");
+                // belongToGroup.attachingMoth = this.gameObject; // 设置当前虫子为附着虫子
+                // // ContactPoint contact = collision.contacts[0];
+                // // Vector3 worldAttachPoint = contact.point;
+                // // Vector3 normal = contact.normal;
+
+                // // // 计算向上的投影方向
+                // // Vector3 upDirection = Vector3.ProjectOnPlane(Vector3.up, normal).normalized;
+                // // Quaternion attachRotation = Quaternion.LookRotation(upDirection, normal);
+
+                // // // 保存附着信息
+                // attachTarget = collision.transform;
+                // // localAttachOffset = attachTarget.InverseTransformPoint(worldAttachPoint);
+                // // localAttachRotation = Quaternion.Inverse(attachTarget.rotation) * attachRotation;
+
+                // // rb.velocity = Vector3.zero;
+                // // rb.isKinematic = true;
+
+                // // this.transform.SetParent(attachTarget); // 设置虫子为玩家的子物体
+
+                // // SetMothState(MothState.Attached);
+
                 belongToGroup.attachingMoth = this.gameObject; // 设置当前虫子为附着虫子
+                attachTarget = collision.transform;
+                List<BodyAnchor> anchors = belongToGroup.CurTarget?.transform.root.GetComponentsInChildren<BodyAnchor>().ToList(); // 获取所有的锚点
+                if (anchors == null || anchors.Count == 0) return;
+                Transform body = anchors?.Find(x => x.Name == "bodyCenter")?.transform; // 找到名为"bodyCenter"的锚点
+                if (body == null) return;
+                // 计算附着点的偏移
                 ContactPoint contact = collision.contacts[0];
                 Vector3 worldAttachPoint = contact.point;
-                Vector3 normal = contact.normal;
+                localAttachOffset = transform.InverseTransformPoint(worldAttachPoint);
 
-                // 计算向上的投影方向
-                Vector3 upDirection = Vector3.ProjectOnPlane(Vector3.up, normal).normalized;
-                Quaternion attachRotation = Quaternion.LookRotation(upDirection, normal);
+                // 初始化关节连接
+                Rigidbody targetRB = body.GetComponent<Rigidbody>();
+                if (targetRB == null) return;
 
-                // 保存附着信息
-                attachTarget = collision.transform;
-                localAttachOffset = attachTarget.InverseTransformPoint(worldAttachPoint);
-                localAttachRotation = Quaternion.Inverse(attachTarget.rotation) * attachRotation;
+                Configurablejointinit(targetRB); // 初始化关节连接
 
+                // 停止移动并禁用重力
                 rb.velocity = Vector3.zero;
-                rb.isKinematic = true;
+                rb.useGravity = false;
 
-                this.transform.SetParent(attachTarget); // 设置虫子为玩家的子物体
-
+                // 切换为附着状态
                 SetMothState(MothState.Attached);
             }
             else
             {
-                Debug.Log("已经附着，造成伤害后眩晕");
+                Debug.Log("已有附着，造成伤害后眩晕");
                 // take damage;
                 GameController.Instance.DeductHealth(dashDamage);
 
@@ -534,9 +606,14 @@ public class MothController : GuestBase, IHurtable
     {
         if (attachTarget != null)
         {
-            this.transform.SetParent(null); // 解除父子关系
-            rb.isKinematic = false;          // 恢复物理
-            attachTarget = null;             // 清除引用
+            Destroy(joint); // 销毁关节连接
+            belongToGroup.attachingMoth = null; // 清除附着虫子
+            rb.isKinematic = false;         // 恢复物理
+            rb.useGravity = true;           // 可选：恢复重力
+    
+            attachTarget = null;            // 清除附着对象
+            SetMothState(MothState.UnderGroup); // 回到集体行动状态或其他状态
+
         }
     }
 
