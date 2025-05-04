@@ -54,16 +54,16 @@ namespace Helltal.Gelercat
 
         protected virtual void Update()
         {
-            if (!IsHost)
-            {
-                transform.position = _syncPos.Value;
-                transform.rotation = _syncRot.Value;
-                return;
-            }
-            else
-            {
-                UpdateTransformRpc(transform.position, transform.rotation);
-            }
+            // if (!IsHost)
+            // {
+            //     transform.position = _syncPos.Value;
+            //     transform.rotation = _syncRot.Value;
+            //     return;
+            // }
+            // else
+            // {
+            //     UpdateTransformRpc(transform.position, transform.rotation);
+            // }
         }
 
         // protected virtual void LateUpdate()
@@ -81,7 +81,7 @@ namespace Helltal.Gelercat
 
         protected virtual void LateUpdate()
         {
-            if (behaviorTree == null) return;
+            // if (behaviorTree == null) return;
 
             if (DEBUG_STOP_BEHAVIOR_TREE)
             {
@@ -117,7 +117,7 @@ namespace Helltal.Gelercat
 
         protected virtual void Init()
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
 
             TakeDamageServerRpc(maxSpawnCount);
         }
@@ -126,7 +126,7 @@ namespace Helltal.Gelercat
         /// </summary>
         protected virtual void Awake()
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
             if (ShouldUseNavMeshAgent())
             {
                 agent = GetComponent<NavMeshAgent>() == null ? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
@@ -157,7 +157,7 @@ namespace Helltal.Gelercat
 
         protected void NegativeTo(Vector3 target)
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
             agent.SetDestination(target);
         }
         void OnDrawGizmos()
