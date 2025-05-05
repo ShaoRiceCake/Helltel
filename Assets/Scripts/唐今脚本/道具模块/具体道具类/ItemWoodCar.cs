@@ -13,6 +13,7 @@ public class ItemWoodCar : ActiveItem
     private void HandleWeaponGrabbed()
     {
         enableOrbit = true;
+        
     }
     
     protected override void UpdateOrbitRotation()

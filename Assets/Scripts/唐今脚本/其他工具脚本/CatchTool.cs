@@ -30,7 +30,18 @@ public class CatchTool : MonoBehaviour
         get => _catchBall;
         set
         {
-            if (_catchBall != value && _currentTarget)
+            // 如果新值和旧值相同，不做任何处理
+            if (_catchBall == value) return;
+
+            // 如果当前有抓取目标且CatchBall被设为null，且抓取的是运动学物体
+            if (_catchBall != null && value == null && _isGrabbing && _isGrabbingKinematic)
+            {
+                // 立即释放运动学物体
+                ReleaseObject();
+            }
+
+            // 如果当前有抓取目标且CatchBall被改变（无论新旧值是什么）
+            if (_currentTarget && _catchBall != value)
             {
                 if (_currentTarget.TryGetComponent<ItemBase>(out var item))
                 {
@@ -41,12 +52,12 @@ public class CatchTool : MonoBehaviour
 
             _catchBall = value;
             if (!_catchBall) return;
-        
+    
             _sphereCollider = _catchBall.GetComponent<SphereCollider>();
             _catchAimTrans = _catchBall.transform;
         }
     }
-
+    
     public List<GameObject> preSelectedObjects = new();
 
     private void Start()

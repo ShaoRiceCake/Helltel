@@ -174,6 +174,8 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         _stateDictionary.Add(EItemState.Grabbed, new GrabbedState(this));
 
         ForceSetState(EItemState.NotSelected); // 初始状态设置
+
+        orbitCenter = GameObject.Find("BodyBall").transform;
     }
 
     private void FixedUpdate()
