@@ -68,46 +68,38 @@ public class PlayerTeleportHandler : MonoBehaviour
     
     private IEnumerator TeleportProcess(PlayerTeleportEvent teleportEvent)
     {
-        // 1. 播放消失特效
-        if(_teleportOutEffect != null)
+        if(_teleportOutEffect)
         {
             _teleportOutEffect.transform.position = _objectToMove.position;
             _teleportOutEffect.Play();
         }
         
-        // 2. 播放音效
-        if(_teleportSound != null)
+        if(_teleportSound)
         {
             AudioSource.PlayClipAtPoint(_teleportSound, _objectToMove.position);
         }
         
-        // 3. 禁用对象
         if (_disableDuringTeleport)
         {
             _objectToMove.gameObject.SetActive(false);
         }
         
-        // 4. 等待一半的位移时间（消失效果）
         yield return new WaitForSeconds(_teleportDuration * 0.5f);
         
-        // 5. 计算新位置并移动
-        Vector3 newPosition = teleportEvent.TargetPosition + _positionOffset;
+        var newPosition = teleportEvent.TargetPosition + _positionOffset;
         _objectToMove.position = newPosition;
         
-        // 6. 启用对象
         if (_disableDuringTeleport)
         {
             _objectToMove.gameObject.SetActive(true);
         }
         
-        // 7. 播放出现特效
-        if(_teleportInEffect != null)
+        if(_teleportInEffect)
         {
             _teleportInEffect.transform.position = newPosition;
             _teleportInEffect.Play();
         }
         
-        // 8. 等待剩余时间（出现效果）
         yield return new WaitForSeconds(_teleportDuration * 0.5f);
         
         Debug.Log($"位移完成，目标对象已移动到: {newPosition}", this);
