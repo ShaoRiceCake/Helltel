@@ -17,6 +17,8 @@ public class ItemBottom : ActiveItem
     private Coroutine blendShapeCoroutine;
     private GameDataModel _data;
     private int originalLayer; // 存储目标对象原始layer
+     
+    [SerializeField] private Transform _targetPosition; // 目标位置的Transform
 
     protected override void Awake()
     {

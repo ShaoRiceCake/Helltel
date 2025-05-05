@@ -56,6 +56,7 @@ public class GameFlow : MonoBehaviour
             //这段代码会设置地牢生成的值并重新调用地牢生成
             yield return new WaitForSecondsRealtime(0.1f);
             DungeonGenerator.Instance.ReSetDungeonValue();
+            
 
         }
         else if(_data.CurrentLoadedScene != null && _data.CurrentLoadedScene == _data.shop)
@@ -82,7 +83,7 @@ public class GameFlow : MonoBehaviour
         //打开加载界面
         GameController.Instance.lSS_Manager.LoadScene();
         //修改玩家位置；
-        ResetPlayerPosition();
+        //ResetPlayerPosition();
         
 
         //发送事件，接受到这个事件的地方要进行相应操作（重置属性、位置等）
@@ -95,13 +96,14 @@ public class GameFlow : MonoBehaviour
         {
             sceneOverlayer.SwitchToShop();
             //更新玩家数据
-            _data.NewFloorData();
+            _data.NewShopFloorData();
         }
         else if(_data.CurrentLoadedScene == _data.shop)
         {
             sceneOverlayer.SwitchToDungeon();
             //更新玩家数据
-            _data.NewLevelData();
+            _data.NewDungeonFloorData();
+            StartCoroutine(NextFloor());
         }
         
     }

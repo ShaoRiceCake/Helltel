@@ -15,8 +15,8 @@ public class GameDataModel : ScriptableObject
     [SerializeField]private int _money;
     [SerializeField]private int _performance;
     [SerializeField]private int _performanceTarget;
-    [SerializeField]private int _basePerformanceTarget;//基础绩效要求
-    [SerializeField]private int _level = 0;
+    [SerializeField]private int _basePerformanceTarget ;//基础绩效要求
+    [SerializeField]private int _level;
     [SerializeField]private bool _isPerformancePassed;
 
     
@@ -116,21 +116,22 @@ public class GameDataModel : ScriptableObject
         MaxHealth = 100;
         Health = MaxHealth;
         Performance = 0;
-        PerformanceTarget = 100;
+        _basePerformanceTarget = 100;
+        PerformanceTarget = _basePerformanceTarget;
         Level = 0;
         _isPerformancePassed = false;
         _currentLoadedScene = "";
     }
-    //进商店调用这个
-    public void NewFloorData()
+    //进商店层调用这个
+    public void NewShopFloorData()
     {
         Money += Performance;
         Health = MaxHealth;
         Performance = 0;
 
     }
-    //进地牢调用这个
-    public void NewLevelData()
+    //进地牢层调用这个
+    public void NewDungeonFloorData()
     {
         Health = MaxHealth;
         PerformanceTarget = ExponentialCalculation();
@@ -141,7 +142,7 @@ public class GameDataModel : ScriptableObject
     int ExponentialCalculation()
     {
         // 计算指数增长后的值
-        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level - 1);
+        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
         
         // 取整到最近的 expRoundInterval 倍数（如10、50、100等）
         return Mathf.RoundToInt(value / 10f) * 10;
