@@ -141,7 +141,7 @@ public class AudioManager : MonoBehaviour
     {
         if (!soundEffects.TryGetValue(soundName, out SoundEffect effect))
         {
-            Debug.LogError($"音效不存在: {soundName}");
+            Debug.Log($"音效不存在: {soundName}");
             return null;
         }
 

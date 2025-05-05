@@ -1,3 +1,4 @@
+using System;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,7 +21,7 @@ public class GlobalUIController : MonoBehaviour
     // public SettingsPanel Settings => _settings;
     // public GuestBookPanel GuestBook => _guestBook;
 
-    public bool isPaused = false;
+    //public bool isPaused = false;
 
     private void Awake()
     {
@@ -216,13 +217,19 @@ public class GlobalUIController : MonoBehaviour
     {
         if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
+            Debug.Log("不是主菜单");
             OpenMenu();
+            AudioManager.Instance.Play("泡泡音");
         }
-        else
+        else if(SceneManager.GetActiveScene().name == "单机正式主菜单")
         {
+            bool isPaused = true;
+            Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
+            Cursor.visible = isPaused; // 控制鼠标可见性
             CloseAllGlobalUI();
             AudioManager.Instance.Play("泡泡音");
         }
+      
     }
     //打开宾客簿
     public void OpenGuestBook()
@@ -238,8 +245,11 @@ public class GlobalUIController : MonoBehaviour
         {
             OpenMenu();
         }
-        else
+        else if(SceneManager.GetActiveScene().name == "单机正式主菜单")
         {
+            bool isPaused = true;
+            Cursor.lockState = isPaused ? CursorLockMode.None: CursorLockMode.Locked ; // 控制鼠标锁定状态
+            Cursor.visible = isPaused; // 控制鼠标可见性
             CloseAllGlobalUI();
             AudioManager.Instance.Play("泡泡音");
         }
