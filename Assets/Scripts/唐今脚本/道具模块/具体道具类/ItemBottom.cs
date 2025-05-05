@@ -119,7 +119,7 @@ public class ItemBottom : ActiveItem
     private void OnButtonFullyPressed()
     {
         Debug.Log("按钮已完全按下");
-        if(_data.CheckPerformance() == true)
+        if(_data.CheckPerformance() == true ||_data.CurrentLoadedScene == _data.shop)
         {
             GameFlow gameFlow = FindObjectOfType<GameFlow>();
             if(gameFlow != null)
@@ -134,6 +134,8 @@ public class ItemBottom : ActiveItem
         else
         {
             //ToDo执行未达成绩效的逻辑
+            AudioManager.Instance.Play("未达成绩效");
+            IsExhaust = false;
         }
     }
 

@@ -29,7 +29,13 @@ public class GameController : MonoBehaviour
     private void Start() {
         
     }
-
+    public void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            AddPerformance(50);
+        }
+    }
     // 增加血上限接口
     public void AddMaxHealth(int amount)
     {

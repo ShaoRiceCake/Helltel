@@ -41,7 +41,7 @@ public class MoneyView : MonoBehaviour
 
     private void UpdateMoneyDisplay(int newValue)
     {
-        _moneyText.text = $"${newValue}";
+        _moneyText.text = $"{newValue}";
     
     }
 

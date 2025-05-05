@@ -9,6 +9,7 @@ public class GameFlow : MonoBehaviour
     public static GameFlow Instance { get; private set; }
     private GameDataModel _data;
     public SceneOverlayer sceneOverlayer;
+    public GameObject Player;
     
     private void Awake() {
         if (Instance == null) {
@@ -29,8 +30,8 @@ public class GameFlow : MonoBehaviour
         sceneOverlayer = FindObjectOfType<SceneOverlayer>();
         sceneOverlayer.LoadDungeonScene();
         _data.SendStartLoading();
-        NextFloor();
-        //StartCoroutine(NextFloor());
+        //NextFloor();
+        StartCoroutine(NextFloor());
         
                
         
@@ -43,17 +44,19 @@ public class GameFlow : MonoBehaviour
        
         
     }
-    public void NextFloor()
+    IEnumerator NextFloor()
     {
         
-        //yield return new WaitForSecondsRealtime(0.1f);
+        
         //如果电梯外面是地牢
         if(_data.CurrentLoadedScene != null &&_data.CurrentLoadedScene == _data.dungeon)
         {
 
             GameController.Instance._gameData.Level +=1;
             //这段代码会设置地牢生成的值并重新调用地牢生成
+            yield return new WaitForSecondsRealtime(0.1f);
             DungeonGenerator.Instance.ReSetDungeonValue();
+
         }
         else if(_data.CurrentLoadedScene != null && _data.CurrentLoadedScene == _data.shop)
         {
@@ -78,7 +81,11 @@ public class GameFlow : MonoBehaviour
         CloseDoor();
         //打开加载界面
         GameController.Instance.lSS_Manager.LoadScene();
-        //发送事件，接受到这个时间的地方要进行相应操作（重置属性、位置等）
+        //修改玩家位置；
+        ResetPlayerPosition();
+        
+
+        //发送事件，接受到这个事件的地方要进行相应操作（重置属性、位置等）
         _data.SendOnFloorChangedEvent();
         
         
@@ -87,12 +94,20 @@ public class GameFlow : MonoBehaviour
         if(_data.CurrentLoadedScene == _data.dungeon)
         {
             sceneOverlayer.SwitchToShop();
+            //更新玩家数据
+            _data.NewFloorData();
         }
         else if(_data.CurrentLoadedScene == _data.shop)
         {
             sceneOverlayer.SwitchToDungeon();
+            //更新玩家数据
+            _data.NewLevelData();
         }
         
+    }
+    public void ResetPlayerPosition()
+    {
+        //Player.transform.position = new Vector3(12.5f,15.81f,-5.31f);
     }
 
 }
