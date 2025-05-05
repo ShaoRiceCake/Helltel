@@ -105,14 +105,12 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     {
         CurrentHand = 1;
         _isMouseDown = true;
-
     }
 
     protected void OnReleaseLeftHand()
     {
         CurrentHand = 1;
         _isMouseDown = false;
-
     }
     protected void OnLiftRightHand()
     {
@@ -205,6 +203,8 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         handControlAttachment.target = handBallPrefab.transform;
         catchTool.CatchBall = handBallPrefab;
         IsHandActive = true;
+        AudioManager.Instance.Play("泡泡音", handBallPrefab.transform.position, 1f);
+
     }
     protected void DeactivateControlBall()
     {

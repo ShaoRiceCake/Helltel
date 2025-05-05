@@ -199,6 +199,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
         
         mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
         onSwitchControlMode?.Invoke();
+        AudioManager.Instance.Play("玩家手-腿控制切换",transform.position,1f);
     }
 
     private void OnMouseMoveFixedUpdate(Vector2 mouseDelta)
