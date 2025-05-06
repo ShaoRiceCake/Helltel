@@ -6,17 +6,17 @@ using UnityEngine;
 public class ItemSponge : PassiveItem, ICleanable
 {
     [Header("Cleaning Settings")]
-    [SerializeField] private ObiColliderBase eraserCollider; 
+    [SerializeField] private ObiColliderBase eraserCollider;
     
-    private void Start()
+    protected override void Awake()
     {
-        // 自动获取ObiCollider（如果没有手动指定）
+        base.Awake();
+        
         if (eraserCollider == null)
         {
             eraserCollider = GetComponent<ObiColliderBase>();
         }
         
-        // 确保碰撞体已启用
         eraserCollider.enabled = true;
     }
     

@@ -11,6 +11,8 @@ public class FluidParticleCounter : MonoBehaviour
     public List<ObiEmitter> emitters = new List<ObiEmitter>();
     public List<ObiColliderBase> cleanableColliders = new List<ObiColliderBase>();
 
+    private bool _canPlaySound = true;          // 控制音效播放的标记
+
     public event Action<int> OnParticleDestroyed;
 
     private void Start()
@@ -130,8 +132,24 @@ public class FluidParticleCounter : MonoBehaviour
         yield return null; 
         emitter.DeactivateParticle(actorIndex);
         OnParticleDestroyed?.Invoke(actorIndex);
+        var lastCleanPosition = solver.transform.TransformPoint(solver.positions[solver.simplices[actorIndex]]);
+
+        if (_canPlaySound)
+        {
+            StartCoroutine(PlayCleanSound(lastCleanPosition));
+        }
     }
 
+    private System.Collections.IEnumerator PlayCleanSound(Vector3 position)
+    {
+        _canPlaySound = false;
+    
+        // 播放音效
+        AudioManager.Instance.Play("擦地", position, 1f);
+        yield return new WaitForSeconds(1f);
+        _canPlaySound = true;
+    }
+    
     public void RefreshCleanableObjects()
     {
         FindAllCleanableObjects();
