@@ -145,7 +145,7 @@ public class FluidParticleCounter : MonoBehaviour
         _canPlaySound = false;
     
         // 播放音效
-        AudioManager.Instance.Play("擦地", position, 1f);
+        AudioManager.Instance.Play("擦除", position, 1f);
         yield return new WaitForSeconds(1f);
         _canPlaySound = true;
     }
