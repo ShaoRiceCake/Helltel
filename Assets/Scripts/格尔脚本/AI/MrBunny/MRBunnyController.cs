@@ -15,7 +15,7 @@ public class MRBunnyController : GuestBase, IHurtable
     [Header("MR-Bunny 开始攻击的范围")]
     public float attackDistance = 2f; // 攻击范围
 
-    public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
+    // public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject CurTarget; //当前目标    
     private Node getDamageNode;
     private Node attackNode;
@@ -117,7 +117,8 @@ public class MRBunnyController : GuestBase, IHurtable
             {
                 foreach (var target in sensor.detectedTargets)
                 {
-                    if (EnemyList.Contains(target.gameObject))
+                    // if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
+                    if (GameManager.instance.PlayerIdentifiyers.Contains(target.gameObject.transform))
                     {
                         CurTarget = target.gameObject;
 
@@ -336,10 +337,7 @@ public class MRBunnyController : GuestBase, IHurtable
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             }
-
-
         }
-
     }
     protected override void LateUpdate()
     {

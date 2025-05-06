@@ -16,6 +16,9 @@ public class GameManager : Singleton<GameManager>
 
     public Dictionary<ulong, PlayerInfo> AllPlayerInfos { get; private set; }
     public Dictionary<ulong, NetworkSpawn> AllPlayers;
+
+    public List<Transform> PlayerIdentifiyers;
+
     public string joinConde;
 
     protected override void Awake()
@@ -23,7 +26,8 @@ public class GameManager : Singleton<GameManager>
         base.Awake();
         AllPlayerInfos = new Dictionary<ulong, PlayerInfo>();
         AllPlayers = new Dictionary<ulong, NetworkSpawn>();
-        if (isDontDestroyOnLoad && GameObject.FindGameObjectsWithTag("NetworkManager").Length>1)
+        PlayerIdentifiyers = new List<Transform>();
+        if (isDontDestroyOnLoad && GameObject.FindGameObjectsWithTag("NetworkManager").Length > 1)
         {
             Destroy(GameObject.FindGameObjectsWithTag("NetworkManager")[1].gameObject);
         }
@@ -37,9 +41,39 @@ public class GameManager : Singleton<GameManager>
         {
             Destroy(gameObject);
         }
- 
+        // 事件总线
+        EventBus<PlayerInitailizeEvent>.Subscribe(registPlayer, this);
+        // EventBus<PlayerInitailizeEvent>.Subscribe(UnregistPlayer, this);
     }
-
+    private void registPlayer(PlayerInitailizeEvent evt)
+    {
+        Debug.Log("监听到注册玩家标识符事件" + evt.identifiyer.name);
+        if (evt.identifiyer != null && !PlayerIdentifiyers.Contains(evt.identifiyer))
+        {
+            Debug.Log("注册玩家标识符" + evt.identifiyer.name);
+            PlayerIdentifiyers.Add(evt.identifiyer);
+        }
+        else
+        {
+            Debug.LogError("玩家标识符为空或已存在");
+        }
+    }
+    private void UnregistPlayer(PlayerInitailizeEvent evt)
+    {
+        if (evt.identifiyer != null && PlayerIdentifiyers.Contains(evt.identifiyer))
+        {
+            PlayerIdentifiyers.Remove(evt.identifiyer);
+        }
+        else
+        {
+            Debug.LogError("玩家标识符为空或不存在");
+        }
+    }
+    private void ODestroy()
+    {
+        // 取消事件总线订阅
+        EventBus<PlayerInitailizeEvent>.UnsubscribeAll(this);
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -94,7 +128,7 @@ public class GameManager : Singleton<GameManager>
         isGameing = false;
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     private void UpdateAllPlayerInfosServerRpc()
     {
         foreach (var playerInfo in AllPlayerInfos)
@@ -151,7 +185,7 @@ public struct PlayerInfo : INetworkSerializable
 
     public string name;
 
-    public PlayerInfo(ulong id, string name,bool isReady)
+    public PlayerInfo(ulong id, string name, bool isReady)
     {
         this.id = id;
         this.name = name;

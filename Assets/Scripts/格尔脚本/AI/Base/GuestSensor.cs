@@ -23,13 +23,6 @@ namespace Helltal.Gelercat
         private void Update()
         {
             Scan();
-            // if(isDebug && detectedTargets.Count > 0)
-            // {
-            //     foreach (var target in detectedTargets)
-            //     {
-            //         Debug.Log("Detected: " + target.name);
-            //     }
-            // }
         }
 
         private void EnsureSensorSourceExists()
