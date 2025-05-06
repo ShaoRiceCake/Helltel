@@ -5,6 +5,7 @@ using Unity.Netcode;
 using UnityEngine.SceneManagement;
 using System;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -12,12 +13,12 @@ public class GameManager : Singleton<GameManager>
 
     public bool isGameing;
 
-    private static bool isDontDestroyOnLoad;
+    private static bool _isDontDestroyOnLoad;
 
     public Dictionary<ulong, PlayerInfo> AllPlayerInfos { get; private set; }
     public Dictionary<ulong, NetworkSpawn> AllPlayers;
 
-    public List<Transform> PlayerIdentifiyers;
+    public List<Transform> playerIdentifiers;
 
     public string joinConde;
 
@@ -26,15 +27,15 @@ public class GameManager : Singleton<GameManager>
         base.Awake();
         AllPlayerInfos = new Dictionary<ulong, PlayerInfo>();
         AllPlayers = new Dictionary<ulong, NetworkSpawn>();
-        PlayerIdentifiyers = new List<Transform>();
-        if (isDontDestroyOnLoad && GameObject.FindGameObjectsWithTag("NetworkManager").Length > 1)
+        playerIdentifiers = new List<Transform>();
+        if (_isDontDestroyOnLoad && GameObject.FindGameObjectsWithTag("NetworkManager").Length > 1)
         {
             Destroy(GameObject.FindGameObjectsWithTag("NetworkManager")[1].gameObject);
         }
 
-        if (!isDontDestroyOnLoad)
+        if (!_isDontDestroyOnLoad)
         {
-            isDontDestroyOnLoad = true;
+            _isDontDestroyOnLoad = true;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -42,27 +43,29 @@ public class GameManager : Singleton<GameManager>
             Destroy(gameObject);
         }
         // 事件总线
-        EventBus<PlayerInitailizeEvent>.Subscribe(registPlayer, this);
-        // EventBus<PlayerInitailizeEvent>.Subscribe(UnregistPlayer, this);
+        EventBus<PlayerInitializeEvent>.Subscribe(RegisterPlayer, this);
+        // EventBus<PlayerInitializeEvent>.Subscribe(UnregistPlayer, this);
     }
-    private void registPlayer(PlayerInitailizeEvent evt)
+
+    
+    private void RegisterPlayer(PlayerInitializeEvent evt)
     {
-        Debug.Log("监听到注册玩家标识符事件" + evt.identifiyer.name);
-        if (evt.identifiyer != null && !PlayerIdentifiyers.Contains(evt.identifiyer))
+        Debug.Log("监听到注册玩家标识符事件" + evt.Identifier.name);
+        if (evt.Identifier != null && !playerIdentifiers.Contains(evt.Identifier))
         {
-            Debug.Log("注册玩家标识符" + evt.identifiyer.name);
-            PlayerIdentifiyers.Add(evt.identifiyer);
+            Debug.Log("注册玩家标识符" + evt.Identifier.name);
+            playerIdentifiers.Add(evt.Identifier);
         }
         else
         {
             Debug.LogError("玩家标识符为空或已存在");
         }
     }
-    private void UnregistPlayer(PlayerInitailizeEvent evt)
+    private void UnregistPlayer(PlayerInitializeEvent evt)
     {
-        if (evt.identifiyer != null && PlayerIdentifiyers.Contains(evt.identifiyer))
+        if (evt.Identifier != null && playerIdentifiers.Contains(evt.Identifier))
         {
-            PlayerIdentifiyers.Remove(evt.identifiyer);
+            playerIdentifiers.Remove(evt.Identifier);
         }
         else
         {
@@ -72,7 +75,7 @@ public class GameManager : Singleton<GameManager>
     private void ODestroy()
     {
         // 取消事件总线订阅
-        EventBus<PlayerInitailizeEvent>.UnsubscribeAll(this);
+        EventBus<PlayerInitializeEvent>.UnsubscribeAll(this);
     }
     public override void OnNetworkSpawn()
     {

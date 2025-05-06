@@ -118,7 +118,7 @@ public class MRBunnyController : GuestBase, IHurtable
                 foreach (var target in sensor.detectedTargets)
                 {
                     // if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
-                    if (GameManager.instance.PlayerIdentifiyers.Contains(target.gameObject.transform))
+                    if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform))
                     {
                         CurTarget = target.gameObject;
 
