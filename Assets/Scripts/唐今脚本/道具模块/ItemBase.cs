@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Obi;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.Events;
@@ -10,6 +11,12 @@ public interface IInteractable
 {
     string ItemName { get; }           // 物品唯一标识
     EItemState CurrentState { get; }    // 当前状态查询
+}
+
+// 清洁道具接口（仅用于清洁的道具挂载）
+public interface ICleanable
+{
+    ObiColliderBase GetObiCollider();
 }
 
 // 可使用物品接口（事件驱动）

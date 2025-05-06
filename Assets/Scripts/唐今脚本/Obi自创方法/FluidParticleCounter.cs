@@ -1,21 +1,25 @@
 using Obi;
 using UnityEngine;
 using System;
-using System.Collections.Generic; // Added for List
+using System.Collections.Generic;
 
 public class FluidParticleCounter : MonoBehaviour
 {
-    [Tooltip("Layers that trigger particle deactivation")]
-    public LayerMask triggerLayers;
-    
     [Tooltip("The ObiSolver that handles the physics")]
     public ObiSolver solver;
     
-    [Tooltip("List of emitters whose particles should be tracked")]
     public List<ObiEmitter> emitters = new List<ObiEmitter>();
+    public List<ObiColliderBase> cleanableColliders = new List<ObiColliderBase>();
 
-    // Define a public event that others can subscribe to
     public event Action<int> OnParticleDestroyed;
+
+    private void Start()
+    {
+        FindAllCleanableObjects();
+        FindChildEmitters();
+        
+        EventBus<BloodSprayEvent>.Subscribe(OnNewEmitterCreated, this);
+    }
 
     private void OnEnable()
     {
@@ -31,11 +35,60 @@ public class FluidParticleCounter : MonoBehaviour
         {
             solver.OnCollision -= OnSolverCollision;
         }
+        
+        EventBus<BloodSprayEvent>.UnsubscribeAll(this);
+    }
+
+    private void OnNewEmitterCreated(BloodSprayEvent sprayEvent)
+    {
+        StartCoroutine(CheckForNewEmittersNextFrame());
+    }
+
+    private System.Collections.IEnumerator CheckForNewEmittersNextFrame()
+    {
+        yield return null;
+        FindChildEmitters();
+    }
+
+    private void FindAllCleanableObjects()
+    {
+        cleanableColliders.Clear();
+        var cleanableObjects = FindObjectsOfType<MonoBehaviour>();
+        foreach (var obj in cleanableObjects)
+        {
+            if (obj is not ICleanable cleanable) continue;
+            var obiCollider = cleanable.GetObiCollider();
+            if (obiCollider != null)
+            {
+                cleanableColliders.Add(obiCollider);
+            }
+        }
+    }
+
+    private void FindChildEmitters()
+    {
+        if (!solver) return;
+
+        var childEmitters = solver.GetComponentsInChildren<ObiEmitter>(true);
+        
+        foreach (var emitter in childEmitters)
+        {
+            if (!emitter || emitters.Contains(emitter)) continue;
+            emitters.Add(emitter);
+        }
+        
+        for (var i = emitters.Count - 1; i >= 0; i--)
+        {
+            if (!emitters[i] || emitters[i].transform.parent != solver.transform)
+            {
+                emitters.RemoveAt(i);
+            }
+        }
     }
 
     private void OnSolverCollision(object sender, ObiNativeContactList contacts)
     {
-        if (emitters.Count == 0) return;
+        if (emitters.Count == 0 || cleanableColliders.Count == 0) return;
 
         var colliderWorld = ObiColliderWorld.GetInstance();
 
@@ -43,8 +96,10 @@ public class FluidParticleCounter : MonoBehaviour
         {
             if (!(contacts[i].distance < 0.01f)) continue;
             
-            var col = colliderWorld.colliderHandles[contacts[i].bodyB].owner;
-            if (!col || triggerLayers != (triggerLayers | (1 << col.gameObject.layer))) continue;
+            var obiColliderHandle = colliderWorld.colliderHandles[contacts[i].bodyB];
+            var obiCollider = obiColliderHandle.owner;
+            
+            if (obiCollider == null || !cleanableColliders.Contains(obiCollider)) continue;
             
             var solverParticleIndex = solver.simplices[contacts[i].bodyA];
             
@@ -55,7 +110,7 @@ public class FluidParticleCounter : MonoBehaviour
                 var actorIndex = FindActorIndex(emitter, solverParticleIndex);
                 if (actorIndex < 0) continue;
                 StartCoroutine(DeactivateNextFrame(emitter, actorIndex));
-                break; // Particle can only belong to one emitter
+                break;
             }
         }
     }
@@ -74,24 +129,11 @@ public class FluidParticleCounter : MonoBehaviour
     {
         yield return null; 
         emitter.DeactivateParticle(actorIndex);
-        
         OnParticleDestroyed?.Invoke(actorIndex);
     }
 
-    // Helper methods to manage emitters
-    public void AddEmitter(ObiEmitter emitter)
+    public void RefreshCleanableObjects()
     {
-        if (emitter != null && !emitters.Contains(emitter))
-        {
-            emitters.Add(emitter);
-        }
-    }
-
-    public void RemoveEmitter(ObiEmitter emitter)
-    {
-        if (emitter != null && emitters.Contains(emitter))
-        {
-            emitters.Remove(emitter);
-        }
+        FindAllCleanableObjects();
     }
 }
