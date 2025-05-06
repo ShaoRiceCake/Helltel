@@ -9,42 +9,44 @@ public class HealthView : MonoBehaviour
 {
     [Header("组件绑定")]
     [SerializeField] private TextMeshProUGUI _healthText;
-    [SerializeField] private GameDataModel _data;
+    private GameDataModel _data;
     
-    private string _localPlayerId; 
 
     private void Awake()
     {
-        _data.OnPlayerHealthChanged += UpdateHealth;
+        
+        
+        //EventBus<HealthChangedEvent>.Subscribe(OnHealthChanged, this);
     }
 
     private void Start()
     {
-        //_playerId = "p1";
-        //UpdateHealth(_localPlayerId,_data.GetPlayer(_localPlayerId).Health);
-    }
-    // public void BindLocalPlayer(string playerId)
-    // {
-    //     _localPlayerId = playerId;
+        _data = GameController.Instance._gameData;
+        _data.OnHealthChanged += UpdateHealth;
+        UpdateHealth(_data.Health);
         
-    //     // 立即显示初始值
-    //     var playerData = _data.GetPlayer(_localPlayerId);
-    //     if(playerData != null)
-    //         UpdateHealth(_localPlayerId, playerData.Health);
-    // }
+    }
+  
  
 
-    private void UpdateHealth(string id, int health)
+    private void UpdateHealth(int health)
     {
-        if(id == _localPlayerId)
-            _healthText.text = $"HP: {health}";
+        _healthText.text = $"{health}";
     }
-
-
-
+    
+    // private void OnHealthChanged(HealthChangedEvent evt)
+    // {
+    //     // 更新UI显示
+    //     if (_healthText != null)
+    //     {
+    //         _healthText.text = $"{evt.CurrentHealth}";
+    //     }
+    // }
     private void OnDestroy()
     {
-        _data.OnPlayerHealthChanged -= UpdateHealth;
-        //_animSequence?.Kill();
+        _data.OnHealthChanged -= UpdateHealth;
+        
+        //EventBus<HealthChangedEvent>.UnsubscribeAll(this);
+
     }
 }

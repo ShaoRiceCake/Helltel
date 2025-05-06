@@ -8,29 +8,61 @@ using UnityEngine.InputSystem;
 [CreateAssetMenu(fileName = "GameData", menuName = "Helltel/Data/GameData")]
 public class GameDataModel : ScriptableObject
 {
-    [Header("绩效增长倍率参数")]
-    [SerializeField, Range(1.1f, 2f)] private float _performanceGrowth = 1.2f;
-    [SerializeField] private int _baseTarget = 100;//基础绩效要求
 
     // 私有字段配合属性保护数据
-    private int _money;
-    private int _performance;
-    private int _day = 1;
-    private int _level = -1;
-    private Dictionary<string, PlayerData> _players = new();
+    [SerializeField]private int _health;
+    [SerializeField]private int _maxHealth;
+    [SerializeField]private int _money;
+    [SerializeField]private int _performance;
+    [SerializeField]private int _performanceTarget;
+    [SerializeField]private int _basePerformanceTarget ;//基础绩效要求
+    [SerializeField]private int _level;
+    [SerializeField]private bool _isPerformancePassed;
+
     
+    //输入商店和地牢的场景名
+    [Tooltip("第一个外部场景（Scene1）")]
+    public string dungeon = "单机正式地牢";
+    
+    [Tooltip("第二个外部场景（Scene2）")]
+    public string shop = "单机正式商店";
+    //当前场景别输入
+    [SerializeField]private string _currentLoadedScene;
 
     // 公开事件
+    public event Action<int> OnHealthChanged;      // 生命变化
+    public event Action<int> OnMaxHealthChanged;      // 最大生命变化
     public event Action<int> OnMoneyChanged;      // 金钱变化
     public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
-    public event Action<int> OnDayChanged;        // 天数变化
-    public event Action<int> OnPerformancePassed;  // 绩效达标 
-    public event Action OnPerformanceFailed;      // 绩效失败
-    public event Action<int> OnLevelChanged;      // 层级变化
-    public event Action<string, int> OnPlayerHealthChanged; // 玩家ID, 新生命值
+    //public event Action<bool> IsPerformancePassed;  // 绩效是否达标
+    //public event Action OnPerformanceFailed;      // 绩效失败
+    public event Action<int> OnLevelChanged;      // 关卡变化
+    public event Action OnFloorChanged;  //层级变化
+    public event Action StartLoading;  //开始加载
+    public event Action FinishLoading;  //结束加载
+    public event Action<string> FloorIS;      // 楼层类型为
+
+   
+     
+    
+
 
     // 属性封装（数据访问入口）
+    public int Health {
+        get => _health;
+        set {
+            _health =value;
+            OnHealthChanged?.Invoke(_health); // 触发UI更新
+        }
+    }
+    public int MaxHealth {
+        get => _maxHealth;
+        set {
+            _maxHealth =value;
+            OnMaxHealthChanged?.Invoke(_maxHealth); // 触发UI更新
+        }
+    }
     public int Money {
         get => _money;
         set {
@@ -44,85 +76,105 @@ public class GameDataModel : ScriptableObject
         set {
             _performance = value;
             OnPerformanceChanged?.Invoke(_performance);
-            //CheckPerformance(); // 数值变化时自动检查绩效
+            // 数值变化时自动检查绩效，并传递是否达标的事件
+            //IsPerformancePassed?.Invoke(CheckPerformance());
+
         }
     }
 
-    public int PerformanceTarget { get; set; }
-
-    public int CurrentDay {
-        get => _day;
+    public int PerformanceTarget {
+        get => _performanceTarget;
         set {
-            _day = value;
-            OnDayChanged?.Invoke(_day);
+             _performanceTarget = value;
+            OnPerformanceTargetChanged?.Invoke(_performanceTarget);
+          
         }
     }
-    public int PlayerCount => _players.Count;
+    public int Level {
+        get => _level;
+        set {
+            _level =value;
+            OnLevelChanged?.Invoke(_level); 
+        }
+    }
+    
+    public string CurrentLoadedScene {
+        get => _currentLoadedScene;
+        set {
+            _currentLoadedScene = value;
+            FloorIS?.Invoke(_currentLoadedScene);
+        }
+    }
+
+
+
 
     // 初始化方法
     public void ResetData()
     {
         Money = 0;
+        MaxHealth = 100;
+        Health = MaxHealth;
         Performance = 0;
-        PerformanceTarget = _baseTarget;
-        CurrentDay = 1;
-        _level = -1;
+        _basePerformanceTarget = 100;
+        PerformanceTarget = _basePerformanceTarget;
+        Level = 0;
+        _isPerformancePassed = false;
+        _currentLoadedScene = "";
     }
-
-    // 内部绩效检查
-    // private void CheckPerformance()
-    // {
-    //     if (Performance >= PerformanceTarget)
-    //     {
-    //         PerformanceTarget = Mathf.FloorToInt(PerformanceTarget * _performanceGrowth);
-    //         OnPerformancePassed?.Invoke(PerformanceTarget);
-    //     }
-    //     else 
-    //     {
-    //         OnPerformanceFailed?.Invoke();
-    //     }
-    // }
-    //======= 玩家数据类 =======//
-    public class PlayerData
+    //进商店层调用这个
+    public void NewShopFloorData()
     {
-        private int _health = 100;
-        private int _maxHealth = 100;
-        public int Health
-        {
-            get => _health;
-            set
-            {
-                int newVal = Mathf.Clamp(value, 0, _maxHealth);
-                if (newVal != _health)
-                {
-                    _health = newVal;
-                    OnHealthChanged?.Invoke(newVal);
-                }
-            }
-        }
+        Money += Performance;
+        Health = MaxHealth;
+        Performance = 0;
 
-        public event Action<int> OnHealthChanged;
     }
+    //进地牢层调用这个
+    public void NewDungeonFloorData()
+    {
+        Health = MaxHealth;
+        PerformanceTarget = ExponentialCalculation();
+        _isPerformancePassed = false;
 
-    //======= 玩家管理接口 =======//
-    //所有玩家加入游戏后，游戏开始要为每个玩家注册，来储存对应ID的生命值
-    // public void RegisterNetworkPlayer(string id)
-    // {
-    //     if (!_players.ContainsKey(id))
-    //     {
-    //         var player = new PlayerData();
-    //         // 给玩家的OnHealthChanged添加监听,当OnHealthChanged触发时触发另一个叫OnPlayerHealthChanged的事件，该事件会将玩家AI和生命值传递出去
-    //         player.OnHealthChanged += (health) => 
-    //             OnPlayerHealthChanged?.Invoke(id, health);
-    //         //将新玩家存入字典
-    //         _players[id] = player;
-    //         // 触发初始值显示
-    //         player.Health = player.Health; // 强制触发事件
-    //     }
-    //     // 如果已经有这个ID，什么都不做（避免重复注册）
-    // }
-    // /// <summary>
-    // /// 根据ID获取玩家数据（找不到返回null）
-    // /// </summary>
-    // public PlayerData GetPlayer(string id) => _players.TryGetValue(id, out var p) ? p : null;
+    }
+    
+    int ExponentialCalculation()
+    {
+        // 计算指数增长后的值
+        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
+        
+        // 取整到最近的 expRoundInterval 倍数（如10、50、100等）
+        return Mathf.RoundToInt(value / 10f) * 10;
+        
+    }
+    public bool CheckPerformance()
+    {
+        if(Performance>=PerformanceTarget)
+        {
+            _isPerformancePassed = true;
+            return true;
+        }
+        else
+        {
+            _isPerformancePassed = false;
+            return false;
+        }
+        
+    }
+    public void SendOnFloorChangedEvent()
+    {
+        OnFloorChanged?.Invoke(); 
+    }
+    public void SendStartLoading()
+    {
+        StartLoading?.Invoke(); 
+    }
+    public void SendFinishLoading()
+    {
+        FinishLoading?.Invoke(); 
+    }
+    
+
+
 }

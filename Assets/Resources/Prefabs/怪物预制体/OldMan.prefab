@@ -13,8 +13,12 @@ GameObject:
   - component: {fileID: 4431677487335623229}
   - component: {fileID: 9025769673691886382}
   - component: {fileID: 2774862717538406847}
+<<<<<<< HEAD
+  - component: {fileID: -540939717823616148}
+=======
   - component: {fileID: 6999972676545484166}
   - component: {fileID: 2102709506945716907}
+>>>>>>> main
   m_Layer: 21
   m_Name: OldMan
   m_TagString: Untagged
@@ -74,8 +78,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD
+  GlobalObjectIdHash: 2517095638
+  InScenePlacedSourceGlobalObjectIdHash: 0
+=======
   GlobalObjectIdHash: 2559047203
   InScenePlacedSourceGlobalObjectIdHash: 3073396
+>>>>>>> main
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -136,15 +145,21 @@ MonoBehaviour:
   lonelyDeathMax: 11
   moneybag: {fileID: 6478862569813391879, guid: 986289d73aaaaf94992adf2feac6784f, type: 3}
   blackFogController: {fileID: 3369218109782044298}
---- !u!95 &6999972676545484166
-Animator:
-  serializedVersion: 5
+--- !u!114 &-540939717823616148
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 781970947012123368}
   m_Enabled: 1
+<<<<<<< HEAD
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bcb977e01f50a5f40851cba73514d126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 8341520951402194291}
+=======
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 1a3e86f838b57854e802a5d0c1afc9dc, type: 2}
   m_CullingMode: 0
@@ -184,6 +199,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+>>>>>>> main
 --- !u!1001 &1171869125505626080
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -239,13 +255,42 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 195f81081385ed247ac880d531fdaa7d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8341520951402194291}
   m_SourcePrefab: {fileID: 100100000, guid: 195f81081385ed247ac880d531fdaa7d, type: 3}
 --- !u!4 &1714158142889117707 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 195f81081385ed247ac880d531fdaa7d, type: 3}
   m_PrefabInstance: {fileID: 1171869125505626080}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2054267134356198065 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 195f81081385ed247ac880d531fdaa7d, type: 3}
+  m_PrefabInstance: {fileID: 1171869125505626080}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8341520951402194291
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2054267134356198065}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 1a3e86f838b57854e802a5d0c1afc9dc, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &7319317735662234101
 PrefabInstance:
   m_ObjectHideFlags: 0

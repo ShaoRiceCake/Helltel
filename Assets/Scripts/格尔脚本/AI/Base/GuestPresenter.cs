@@ -9,15 +9,19 @@ namespace Helltal.Gelercat
     /// <summary>
     /// 在这层同步表现层的逻辑
     /// </summary>
-    [RequireComponent(typeof(Animator))]
+
     public class GuestPresenter : MonoBehaviour
     {
 
-        private Animator animator;
+        public Animator animator;
 
         private void Awake()
         {
-            animator = GetComponent<Animator>();
+            animator = this.gameObject.GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = this.gameObject.AddComponent<Animator>();
+            }
         }
 
         public void PlayAnimation(string animName)
@@ -38,6 +42,22 @@ namespace Helltal.Gelercat
         public void SetFloat(string param, float value)
         {
             animator.SetFloat(param, value);
+        }
+
+        // tools 应该不用同步
+        public AnimatorStateInfo  GetCurrentAnimationState()
+        {
+            return animator.GetCurrentAnimatorStateInfo(0);
+        }
+
+        public float GetCurrentAnimationCliplength()
+        {
+            return animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        }
+
+        public void SetAnimatiorSpeed(float speed)
+        {
+            animator.speed = speed;
         }
     }
 }

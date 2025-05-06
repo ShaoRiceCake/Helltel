@@ -23,19 +23,19 @@ namespace Helltal.Gelercat
         private void Update()
         {
             Scan();
-            if(isDebug && detectedTargets.Count > 0)
-            {
-                foreach (var target in detectedTargets)
-                {
-                    Debug.Log("Detected: " + target.name);
-                }
-            }
+            // if(isDebug && detectedTargets.Count > 0)
+            // {
+            //     foreach (var target in detectedTargets)
+            //     {
+            //         Debug.Log("Detected: " + target.name);
+            //     }
+            // }
         }
 
         private void EnsureSensorSourceExists()
         {
             // 默认侦测范围
-            detectionLayer = LayerMask.GetMask("Player");
+            // detectionLayer = LayerMask.GetMask("Player");
             if (sensorSource == null)
             {
                 sensorSource = new GameObject("SensorSource");

@@ -10,54 +10,54 @@ public class PerformanceView : MonoBehaviour
     [Header("组件绑定")]
     [SerializeField] private TMP_Text _performanceText;
     [SerializeField] private TMP_Text _performanceTargetText;
-    [SerializeField] private GameDataModel _data;
+    private GameDataModel _data;
+    
+    
 
-    // [Header("动画参数")]
-    // [SerializeField] private float _punchScale = 1.2f;
-    // [SerializeField] private float _animDuration = 0.3f;
-    // [SerializeField] private Color _flashColor = Color.yellow;
-
-    private Sequence _animSequence;
 
     private void Awake()
     {
-        // 注册事件
-        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
-        _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
+        
     }
 
     private void Start()
     {
+        _data = GameController.Instance._gameData;
+        _data.OnPerformanceChanged += UpdatePerformanceDisplay;
+        _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
+        _data.FloorIS +=NeedActive;
         UpdatePerformanceDisplay(_data.Performance);
+        UpdatePerformanceTargetDisplay(_data.PerformanceTarget);
+    }
+    private void NeedActive(string sceneName)
+    {
+        if(sceneName == _data.dungeon)
+        {
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void UpdatePerformanceDisplay(int newValue)
     {
-        _performanceText.text = $"${newValue}";
-        //PlayMoneyAnimation();
+        _performanceText.text = $"{newValue}";
+  
     }
     private void UpdatePerformanceTargetDisplay(int newValue)
     {
-        _performanceTargetText.text = $"${newValue}";
+        _performanceTargetText.text = $"{newValue}";
     }
 
-    // private void PlayMoneyAnimation()
-    // {
-    //     // 停止已有动画防止重叠
-    //     _animSequence?.Kill();
 
-    //     // 创建动画序列
-    //     _animSequence = DOTween.Sequence()
-    //         .Append(_moneyText.transform.DOScale(_originalScale * _punchScale, _animDuration/2))
-    //         .Join(_moneyText.DOColor(_flashColor, _animDuration/4))
-    //         .Append(_moneyText.transform.DOScale(_originalScale, _animDuration/2))
-    //         .Join(_moneyText.DOColor(_originalColor, _animDuration/2))
-    //         .SetEase(Ease.OutBack);
-    // }
 
     private void OnDestroy()
     {
         _data.OnPerformanceChanged -= UpdatePerformanceDisplay;
-        _animSequence?.Kill();
+        _data.OnPerformanceChanged -= UpdatePerformanceTargetDisplay;
+        _data.FloorIS -= NeedActive;
+
     }
 }

@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using NPBehave;
 
@@ -27,7 +28,10 @@ namespace Helltal.Gelercat
         private float lonelyDuration;  // 当前孤独状态持续时间
         private float lonelyDeathThreshold;
 
-
+        protected override void Awake()
+        {
+            base.Awake();
+        }
         protected override void Start()
         {
 
@@ -40,10 +44,10 @@ namespace Helltal.Gelercat
             behaviorTree.Blackboard["Dead"] = false; // 死亡标志
             behaviorTree.Blackboard["Lonely"] = false; // 孤独标志
             behaviorTree.Blackboard["Happying"] = false; // 高兴标志
-            Debug.Log("presenter:" + presenter);
+            Debug.Log("presenter:" + presenter.isActiveAndEnabled);
             behaviorTree.Start();
         }
-        public override Root GetBehaviorTree()
+        protected override Root GetBehaviorTree()
         {
             return new Root(
                 new Selector(

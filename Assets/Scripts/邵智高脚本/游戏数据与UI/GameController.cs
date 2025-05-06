@@ -1,4 +1,6 @@
 // Controller层核心逻辑
+using System;
+using Michsky.LSS;
 using UnityEngine;
 
 /// <summary>
@@ -7,7 +9,8 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     [Header("数据引用")]
-    [SerializeField] private GameDataModel _gameData;
+    public GameDataModel _gameData;
+    public LoadingScreenManager lSS_Manager;
 
     public static GameController Instance { get; private set; }
 
@@ -18,14 +21,72 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
         }
         _gameData.ResetData();
-        // 仅供测试，实际由网络模块调用
-        // _gameData.RegisterNetworkPlayer("test_local");
-        // NotifyLocalPlayerReady("test_local");
+
     }
     private void OnEnable() {
         
     }
-    
+    private void Start() {
+        
+    }
+    public void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            AddPerformance(50);
+        }
+    }
+    // 增加血上限接口
+    public void AddMaxHealth(int amount)
+    {
+        if (amount < 0)
+        {
+            Debug.LogError("请使用 DeductHealth 方法扣除血量");
+            return;
+        }
+        
+        _gameData.Money += amount;
+    }
+    // 扣血血上限接口（这个一般没用）
+    public void DeductMaxHealth(int amount)
+    {
+        if (_gameData.MaxHealth >= amount)
+        {
+            _gameData.MaxHealth -= amount;
+        }
+        else
+        {
+            Debug.LogError("血上限不能是负数");
+            return;
+        }
+   
+    }
+
+    // 增加血量接口
+    public void AddHealth(int amount)
+    {
+        if (amount < 0)
+        {
+            Debug.LogError("请使用 DeductHealth 方法扣除血量");
+            return;
+        }
+        _gameData.Money += amount;
+    }
+
+    // 扣血接口
+    public void DeductHealth(int amount)
+    {
+        if (_gameData.Health >= amount)
+        {
+            _gameData.Health -= amount;
+        }
+        else
+        {
+            Debug.Log("死亡");
+            return;
+        }
+      
+    }
 
     // 增加钱接口
     public void AddMoney(int amount)
@@ -69,61 +130,15 @@ public class GameController : MonoBehaviour
         //暂定绩效可以是负数
         _gameData.Performance -= amount;
     }
-    // 推进天数
-    public void AdvanceDay()
-    {
-        _gameData.CurrentDay++;
-        
-    }
- 
-    //供网络模块调用
-    // public void NotifyLocalPlayerReady(string playerId)
+
+    
+
+    //检查是否满足绩效要求
+    // public void CheckPerformance()
     // {
-    //     // 获取视图组件并绑定
-    //     var healthView = FindObjectOfType<HealthView>();
-    //     if(healthView != null)
-    //         healthView.BindLocalPlayer(playerId);
+    //     if
+
     // }
 
-    //离开服务层
-    public void LeaveServiceFloor()
-    {
-        //这里要补上关门逻辑
-        //所有不在电梯里的人被遗弃了，扣血致死
-        //要补上进入加载界面的逻辑
-        //删除所有玩家
-        //删除所有本服务层的逻辑
-        ClearUnsavedFloorGameObject();
-        //将绩效转换成钱的逻辑
-       
-    }
-    //进入商店
-    public void GoToShop()
-    {
-        //在电梯外生成商店
-        //在电梯里生成所有玩家
-        //加载界面结束
-        //给所有玩家控制权
-        //电梯门打开
-    }
-    //离开商店
-    public void LeaveShop()
-    {
-        //这里要补上关门逻辑
-        //所有不在电梯里的人被遗弃了，扣血致死
-        //进入加载界面
-        //删除所有玩家
-        //删除商店
 
-    }
-    //进入新的服务层
-    public void GoToServiceFloor()
-    {
-        
-    }
-    //删除本层各种无需保存的东西
-    public void ClearUnsavedFloorGameObject()
-    {
-
-    }
 }

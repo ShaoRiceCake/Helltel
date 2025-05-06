@@ -2,18 +2,27 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
+using System.Collections;
 
-public class PlayerControlInformationProcess : NetworkBehaviour
+public class PlayerControlInformationProcess : MonoBehaviour
 {
     public enum ControlMode
     {
         LegControl,
         HandControl
     }
+    
+    public bool isTest = false;
 
     public ControlMode mCurrentControlMode = ControlMode.LegControl;
     private MouseControl _mMouseControl;
 
+    // Control permission flags
+    [Header("Control Permissions")]
+    public bool legControlEnabled = true;
+    public bool handControlEnabled = true;
+    
+    [Header("Events")]
     public UnityEvent onLiftLeftLeg;
     public UnityEvent onLiftRightLeg;
     public UnityEvent onReleaseLeftLeg;
@@ -57,11 +66,6 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         onCameraControl ??= new UnityEvent(); 
         onStopCameraControl ??= new UnityEvent(); 
         
-        if (NetworkManager.Singleton)
-        {
-            if (!IsLocalPlayer) return;
-        }
-
         _mMouseControl = GetComponent<MouseControl>();
         _mMouseControl.onLeftMouseDown.AddListener(OnLeftMouseDown);
         _mMouseControl.onRightMouseDown.AddListener(OnRightMouseDown);
@@ -74,39 +78,18 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         _mMouseControl.onNoMouseButtonDown.AddListener(OnNoMouseButtonDown);
     }
 
-    public override void OnDestroy()
+    public void OnDestroy()
     {
-        if (NetworkManager.Singleton)
-        {
-            if (IsLocalPlayer)
-            {
-                if (_mMouseControl == null) return;
-                _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
-                _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
-                _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
-                _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
-                _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
-                _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
-                _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
-                _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
-                _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
-            }
-        }
-        else
-        {
-            if (_mMouseControl == null) return;
-            _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
-            _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
-            _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
-            _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
-            _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
-            _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
-            _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
-            _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
-            _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
-        }
-
-        base.OnDestroy();
+        if (_mMouseControl == null) return;
+        _mMouseControl.onLeftMouseDown.RemoveListener(OnLeftMouseDown);
+        _mMouseControl.onRightMouseDown.RemoveListener(OnRightMouseDown);
+        _mMouseControl.onLeftMouseUp.RemoveListener(OnLeftMouseUp);
+        _mMouseControl.onRightMouseUp.RemoveListener(OnRightMouseUp);
+        _mMouseControl.onBothMouseButtonsDown.RemoveListener(OnBothMouseButtonsDown);
+        _mMouseControl.onMiddleMouseDown.RemoveListener(OnMiddleMouseDown);
+        _mMouseControl.onMouseMoveFixedUpdate.RemoveListener(OnMouseMoveFixedUpdate);
+        _mMouseControl.onMouseMoveUpdate.RemoveListener(OnMouseMoveUpdate);
+        _mMouseControl.onNoMouseButtonDown.RemoveListener(OnNoMouseButtonDown);
     }
 
     private void Update()
@@ -132,10 +115,10 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onLiftLeftLeg?.Invoke();
+                if (legControlEnabled) onLiftLeftLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onLiftLeftHand?.Invoke();
+                if (handControlEnabled) onLiftLeftHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -149,10 +132,10 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onLiftRightLeg?.Invoke();
+                if (legControlEnabled) onLiftRightLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onLiftRightHand?.Invoke();
+                if (handControlEnabled) onLiftRightHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -166,10 +149,10 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onReleaseLeftLeg?.Invoke();
+                if (legControlEnabled) onReleaseLeftLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onReleaseLeftHand?.Invoke();
+                if (handControlEnabled) onReleaseLeftHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -183,10 +166,10 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onReleaseRightLeg?.Invoke();
+                if (legControlEnabled) onReleaseRightLeg?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onReleaseRightHand?.Invoke();
+                if (handControlEnabled) onReleaseRightHand?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -200,10 +183,10 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         switch (mCurrentControlMode)
         {
             case ControlMode.LegControl:
-                onCancelLegGrab?.Invoke();
+                if (legControlEnabled) onCancelLegGrab?.Invoke();
                 break;
             case ControlMode.HandControl:
-                onCancelHandGrab?.Invoke();
+                if (handControlEnabled) onCancelHandGrab?.Invoke();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -216,6 +199,7 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         
         mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
         onSwitchControlMode?.Invoke();
+        AudioManager.Instance.Play("玩家手-腿控制切换",transform.position,1f);
     }
 
     private void OnMouseMoveFixedUpdate(Vector2 mouseDelta)
@@ -242,5 +226,41 @@ public class PlayerControlInformationProcess : NetworkBehaviour
         {
             _mMouseControl.MouseSensitivity *= newSensitivity;
         }
+    }
+
+    // Public methods to control permissions
+    public void EnableLegControl(bool enable)
+    {
+        legControlEnabled = enable;
+    }
+
+    public void EnableHandControl(bool enable)
+    {
+        handControlEnabled = enable;
+    }
+
+    // Temporary disable functionality
+    public void TemporarilyDisableControl(float duration)
+    {
+        StartCoroutine(TemporaryDisableRoutine(duration));
+    }
+
+    private IEnumerator TemporaryDisableRoutine(float duration)
+    {
+        var originalLegState = legControlEnabled;
+        var originalHandState = handControlEnabled;
+        var originalStopState = stopPlayerControl;
+
+        // Disable all controls
+        legControlEnabled = false;
+        handControlEnabled = false;
+        stopPlayerControl = true;
+
+        yield return new WaitForSeconds(duration);
+
+        // Restore original states
+        legControlEnabled = originalLegState;
+        handControlEnabled = originalHandState;
+        stopPlayerControl = originalStopState;
     }
 }

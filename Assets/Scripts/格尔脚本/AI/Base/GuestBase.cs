@@ -1,12 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
-using System;
 using NPBehave;
-using UnityEngine.InputSystem;
-using UnityEditor.SceneManagement;
 
 namespace Helltal.Gelercat
 {
@@ -21,12 +16,11 @@ namespace Helltal.Gelercat
         [Header("最大生命值")] public float maxHealth = 15f;
         [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();
         [Header("熵值")] public float entropyValue = 0f;
-        
 
-        public bool Debugging = false; // 是否开启调试模式
-        // 基础控件        
-        public GameObject[] players;
-        
+        public bool DEBUG_STOP_BEHAVIOR_TREE = false; //调试用，是否停止行为树
+
+        public bool Debugging = false; // 是否开启单机调试模式
+
         public NavPointsManager navPointsManager;  // 导航点管理器
 
         public NavMeshAgent agent;  // 导航代理
@@ -35,6 +29,7 @@ namespace Helltal.Gelercat
 
         /// TODO：AudioPresident
         public GuestSensor sensor;  // 
+        protected Root behaviorTree;
 
 
         public NetworkVariable<AIState> aiState = new NetworkVariable<AIState>(AIState.LIVE);
@@ -59,20 +54,56 @@ namespace Helltal.Gelercat
 
         protected virtual void Update()
         {
-            if (!IsHost)
+            // if (!IsHost)
+            // {
+            //     transform.position = _syncPos.Value;
+            //     transform.rotation = _syncRot.Value;
+            //     return;
+            // }
+            // else
+            // {
+            //     UpdateTransformRpc(transform.position, transform.rotation);
+            // }
+        }
+
+        // protected virtual void LateUpdate()
+        // {
+        //     if(DEBUG_STOP_BEHAVIOR_TREE && behaviorTree != null)
+        //     {
+        //         behaviorTree.Stop();
+        //     }
+        //     else if (behaviorTree != null && !behaviorTree.IsActive)
+        //     {
+        //         behaviorTree.Start();
+        //     }
+        // }
+
+
+        protected virtual void LateUpdate()
+        {
+            // if (behaviorTree == null) return;
+
+            if (DEBUG_STOP_BEHAVIOR_TREE)
             {
-                transform.position = _syncPos.Value;
-                transform.rotation = _syncRot.Value;
-                return;
+                if (behaviorTree.IsActive)
+                {
+                    behaviorTree.Stop();
+                }
             }
             else
             {
-                UpdateTransformRpc(transform.position, transform.rotation);
+                // 只有完全停止后才能重新启动
+                if (behaviorTree.CurrentState == NPBehave.Node.State.INACTIVE && !behaviorTree.IsActive)
+                {
+                    behaviorTree.Start();
+                }
             }
         }
 
+
+
         [Rpc(SendTo.Server)]
-        void UpdateTransformRpc(Vector3 pos , Quaternion rot)
+        void UpdateTransformRpc(Vector3 pos, Quaternion rot)
         {
             _syncPos.Value = pos;
             _syncRot.Value = rot;
@@ -86,23 +117,29 @@ namespace Helltal.Gelercat
 
         protected virtual void Init()
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
 
             TakeDamageServerRpc(maxSpawnCount);
         }
-
-        protected virtual void Start()
+        /// <summary>
+        /// 在这里写组件初始化逻辑 
+        /// </summary>
+        protected virtual void Awake()
         {
             // if (!IsHost && NetworkManager.Singleton) return;
+            if (ShouldUseNavMeshAgent())
+            {
+                agent = GetComponent<NavMeshAgent>() == null ? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
+                Debug.Log(agent);
+            }
 
-            agent = GetComponent<NavMeshAgent>()==null? gameObject.AddComponent<NavMeshAgent>() : GetComponent<NavMeshAgent>();
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
             if (navPointsManager == null)
             {
                 Debug.LogError("请先在场景中添加导航点管理器");
             }
-            players = GameObject.FindGameObjectsWithTag("Player");
-            if(GetComponent<GuestPresenter>() == null)
+
+            if (GetComponent<GuestPresenter>() == null)
             {
                 presenter = this.gameObject.AddComponent<GuestPresenter>();
             }
@@ -110,17 +147,17 @@ namespace Helltal.Gelercat
             {
                 presenter = GetComponent<GuestPresenter>();
             }
-            sensor = GetComponent<GuestSensor>();
-            if (sensor == null)
-            {
-                sensor = this.gameObject.AddComponent<GuestSensor>();
-
-            }
         }
+        protected virtual void Start()
+        {
+            curHealth.Value = maxHealth;
+
+        }
+
 
         protected void NegativeTo(Vector3 target)
         {
-            if (!IsHost && NetworkManager.Singleton) return;
+            // if (!IsHost && NetworkManager.Singleton) return;
             agent.SetDestination(target);
         }
         void OnDrawGizmos()
@@ -130,12 +167,24 @@ namespace Helltal.Gelercat
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, targetPosition);
             Gizmos.DrawSphere(targetPosition, 0.5f);
-            
+
         }
         // interface IGetBehaviorTree
-        public virtual Root GetBehaviorTree()
+        protected virtual Root GetBehaviorTree()
         {
-            return null;
+            return new Root(
+                new WaitUntilStopped()
+            );
         }
+
+        protected virtual bool ShouldUseNavMeshAgent()
+        {
+            return true;
+        }
+        protected bool IsNavAgentOnNavmesh()
+        {
+            return agent.isOnNavMesh;
+        }
+
     }
 }

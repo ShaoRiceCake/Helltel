@@ -1787,7 +1787,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5110805748090747419}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d174fab52f0c4b8399f25d5c3ea524c, type: 3}
   m_Name: 
@@ -1999,7 +1999,7 @@ MonoBehaviour:
   onStopCameraControl:
     m_PersistentCalls:
       m_Calls: []
-  _stopPlayerControl: 0
+  stopPlayerControl: 0
 --- !u!114 &7966969784971030153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2278,6 +2278,18 @@ MonoBehaviour:
     m_Bits: 64
   collisionOffset: 0.3
   sphereCastRadius: 0.3
+  heightAdjustmentSpeed: 2
+  minHeightAdjustment: 0.5
+  maxHeightAdjustment: 2
+  collisionDamping: 0.5
+  lookAtHeightRatio: 0.5
+  lookAtSmoothTime: 0.2
+  targetRenderer: {fileID: 0}
+  minAlpha: 0.3
+  maxAlpha: 1
+  fadeStartDistance: 3
+  fadeEndDistance: 0.5
+  fadeSmoothTime: 0.2
 --- !u!114 &6294049283025068870
 MonoBehaviour:
   m_ObjectHideFlags: 0

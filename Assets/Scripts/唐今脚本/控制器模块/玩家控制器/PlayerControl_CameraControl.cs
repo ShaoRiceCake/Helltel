@@ -37,15 +37,21 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     [SerializeField] private float lookAtSmoothTime = 0.2f; 
 
     [Header("透明度设置")]
+    [SerializeField] private bool enableTransparency = true; // 新增：是否启用透明度功能
     [SerializeField] private Renderer targetRenderer; // 要调整透明度的人物模型Renderer
     [SerializeField] private float minAlpha = 0.3f; // 最小透明度值
     [SerializeField] private float maxAlpha = 1.0f; // 最大透明度值
     [SerializeField] private float fadeStartDistance = 3.0f; // 开始淡出的距离
     [SerializeField] private float fadeEndDistance = 0.5f; // 完全淡出的距离
     [SerializeField] private float fadeSmoothTime = 0.2f; // 淡出平滑时间
+    
+    [Header("Follow Mode")]
+    [SerializeField] private bool useLazyFollow = false; // 是否使用慵懒跟随模式
+    [SerializeField] [Range(0.01f, 1f)] private float lazyFollowFactor = 0.1f; // 慵懒跟随系数
+    [SerializeField] private bool scaleWithTime = true; // 是否随时间缩放
 
-    private Material[] _materials; // 存储所有材质
-    private float[] _originalAlphas; // 存储原始透明度
+    private Material[] _materials; 
+    private float[] _originalAlphas; 
     private float _currentAlpha;
     private float _alphaVelocity;
     private float _currentLookAtHeightOffset;
@@ -67,23 +73,8 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     {
         base.Start();
         
-        if (controlHandler != null)
-        {
-            if (NetworkManager.Singleton)
-            {
-                if (IsLocalPlayer)
-                {
-                    controlHandler.onCameraControl.AddListener(EnableCameraControl);
-                    controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
-                }
-            }
-            else
-            {
-                controlHandler.onCameraControl.AddListener(EnableCameraControl);
-                controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
-            }
-
-        }
+        controlHandler.onCameraControl.AddListener(EnableCameraControl);
+        controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
 
         if (controlledCamera == null) controlledCamera = Camera.main;
         if (target == null)
@@ -106,26 +97,24 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _targetHeightOffset = _originalHeightOffset;
         
         _currentLookAtHeightOffset = 0f;
-
-        if (targetRenderer == null) return;
-        _materials = targetRenderer.materials;
-        _originalAlphas = new float[_materials.Length];
-            
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
-                
-            SetupUrpMaterial(_materials[i], _originalAlphas[i]);
-        }
-            
-        _currentAlpha = maxAlpha;
+        
+        //
+        // if (targetRenderer == null) return;
+        // _materials = targetRenderer.materials;
+        // _originalAlphas = new float[_materials.Length];
+        //     
+        // for (var i = 0; i < _materials.Length; i++)
+        // {
+        //     _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
+        //         
+        //     SetupUrpMaterial(_materials[i], _originalAlphas[i]);
+        // }
+        //     
+        // _currentAlpha = maxAlpha;
     }
 
     private void Update()
     {
-        if (!IsLocalPlayer && NetworkManager.Singleton) return;
-
-        if (!GameManager.instance.isGameing) return;
 
         if (!_isCameraControlActive) return;
         
@@ -136,53 +125,65 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
         
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
-        
-        // 更新透明度
-         UpdateTransparency();
+        //
+        // if (enableTransparency) // 只在启用透明度时更新透明度
+        // {
+        //     UpdateTransparency();
+        // }
     }
 
-    private void UpdateTransparency()
-    {
-        if (!targetRenderer || _materials == null) return;
-        
-        var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
-        var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
-        
-        _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
-        
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
-        }
-    }
-
-    private static void SetupUrpMaterial(Material material, float targetAlpha)
-    {
-        if (!Mathf.Approximately(material.GetFloat(Surface), 1))
-        {
-            material.SetFloat(Surface, 1); 
-            material.SetOverrideTag("RenderType", "Transparent");
-            material.renderQueue = (int)RenderQueue.Transparent;
-            material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
-            material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
-            material.SetInt(ZWrite, 0);
-            material.DisableKeyword("_ALPHATEST_ON");
-            material.EnableKeyword("_ALPHABLEND_ON");
-            material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-            material.renderQueue = (int)RenderQueue.Transparent;
-        }
-
-        var baseColor = material.GetColor(BaseColor);
-        baseColor.a = targetAlpha;
-        material.SetColor(BaseColor, baseColor);
-    }
+    // private void UpdateTransparency()
+    // {
+    //     if (!targetRenderer || _materials == null) return;
+    //     
+    //     var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
+    //     var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
+    //     
+    //     _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
+    //     
+    //     for (var i = 0; i < _materials.Length; i++)
+    //     {
+    //         SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
+    //     }
+    // }
+    //
+    // // 新增方法：启用/禁用透明度功能
+    // public void SetTransparencyEnabled(bool enabled)
+    // {
+    //     enableTransparency = enabled;
+    //     
+    //     if (enabled || !targetRenderer || _materials == null || _originalAlphas == null) return;
+    //     for (var i = 0; i < _materials.Length; i++)
+    //     {
+    //         SetupUrpMaterial(_materials[i], _originalAlphas[i]);
+    //     }
+    //     _currentAlpha = maxAlpha;
+    // }
+    //
+    //
+    // private static void SetupUrpMaterial(Material material, float targetAlpha)
+    // {
+    //     if (!Mathf.Approximately(material.GetFloat(Surface), 1))
+    //     {
+    //         material.SetFloat(Surface, 1); 
+    //         material.SetOverrideTag("RenderType", "Transparent");
+    //         material.renderQueue = (int)RenderQueue.Transparent;
+    //         material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
+    //         material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
+    //         material.SetInt(ZWrite, 0);
+    //         material.DisableKeyword("_ALPHATEST_ON");
+    //         material.EnableKeyword("_ALPHABLEND_ON");
+    //         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+    //         material.renderQueue = (int)RenderQueue.Transparent;
+    //     }
+    //
+    //     var baseColor = material.GetColor(BaseColor);
+    //     baseColor.a = targetAlpha;
+    //     material.SetColor(BaseColor, baseColor);
+    // }
 
     private void LateUpdate()
     {
-        if (!IsLocalPlayer && NetworkManager.Singleton) return;
-
-        if (!GameManager.instance.isGameing) return;
-
 
         if (!controlledCamera || !target) return;
         
@@ -247,10 +248,22 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
                     lookAtSmoothTime);
             }
         }
+        if (useLazyFollow)
+        {
+            var deltaFactor = scaleWithTime ? lazyFollowFactor * Time.deltaTime * 60f : lazyFollowFactor;
+            deltaFactor = Mathf.Clamp01(deltaFactor);
+            
+            var currentPos = controlledCamera.transform.position;
+            currentPos += (desiredPosition - currentPos) * deltaFactor;
+            controlledCamera.transform.position = currentPos;
+        }
         else
         {
-            _dampedDistance = _currentDistance;
-            _currentLookAtHeightOffset = 0f;
+            controlledCamera.transform.position = Vector3.SmoothDamp(
+                controlledCamera.transform.position, 
+                desiredPosition, 
+                ref _smoothVelocity, 
+                smoothTime);
         }
 
         controlledCamera.transform.position = Vector3.SmoothDamp(
@@ -280,26 +293,13 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _isCameraControlActive = false;
     }
 
-    public override void OnDestroy()
+    public void OnDestroy()
     {
-        base.OnDestroy();
 
-        if (NetworkManager.Singleton)
-        {
-            if (IsLocalPlayer)
-            {
-                if (controlHandler == null) return;
-                controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
-                controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
-            }
+        if (controlHandler == null) return;
+        controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
+        controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
 
-        }
-        else
-        {
-            if (controlHandler == null) return;
-            controlHandler.onCameraControl.RemoveListener(EnableCameraControl);
-            controlHandler.onStopCameraControl.RemoveListener(DisableCameraControl);
-        }
     }
     
     public void SetZoomRange(float min, float max)
@@ -371,3 +371,4 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         maxAlpha = Mathf.Clamp01(max);
     }
 }
+

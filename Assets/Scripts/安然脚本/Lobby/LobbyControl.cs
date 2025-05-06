@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using UnityEngine.SceneManagement;
+using Michsky.LSS;
 
 public class LobbyControl : NetworkBehaviour
 {
@@ -33,6 +34,7 @@ public class LobbyControl : NetworkBehaviour
 
     Dictionary<ulong, PlayerListCell> _cellDictionary;
     Dictionary<ulong, PlayerInfo> _allPlayerInfo;
+    public LoadingScreenManager lSS_Manager;
 
 
     public override void OnNetworkSpawn()
@@ -43,6 +45,7 @@ public class LobbyControl : NetworkBehaviour
             NetworkManager.OnClientConnectedCallback += OnClientConn;
 
         }
+        lSS_Manager = FindObjectOfType<LoadingScreenManager>();
         _allPlayerInfo = new Dictionary<ulong, PlayerInfo>();
         _startBtn.onClick.AddListener(OnStartClick);
         _exitBtn.onClick.AddListener(OnExitClick);
@@ -198,7 +201,8 @@ public class LobbyControl : NetworkBehaviour
     private void OnStartClick()
     {
         GameManager.instance.StartGame(_allPlayerInfo);
-        GameManager.instance.LoadScene("Game");
+
+        GameManager.instance.LoadScene("联机电梯");
     }
 
     private void OnExitClick()

@@ -1,16 +1,17 @@
 using UnityEngine;
 using Unity.Netcode;
 [RequireComponent(typeof(PlayerControlInformationProcess))]
-public class PlayerControl_BaseControl : NetworkBehaviour
+public class PlayerControl_BaseControl : MonoBehaviour
 {
     public PlayerControlInformationProcess controlHandler;
     public GameObject forwardObject;
-    
 
-    virtual protected void Start()
+
+    protected virtual void Start()
     {
         controlHandler = GetComponent<PlayerControlInformationProcess>();
 
         NullCheckerTool.CheckNull(forwardObject, controlHandler);
+        
     }
 }
