@@ -70,7 +70,7 @@ public class GameController : MonoBehaviour
             Debug.LogError("请使用 DeductHealth 方法扣除血量");
             return;
         }
-        _gameData.Money += amount;
+        _gameData.Health += amount;
     }
 
     // 扣血接口
