@@ -21,7 +21,7 @@ public class HealthView : MonoBehaviour
 
     private void Start()
     {
-        _data = GameController.Instance._gameData;
+        _data = Resources.Load<GameDataModel>("GameData");
         _data.OnHealthChanged += UpdateHealth;
         UpdateHealth(_data.Health);
         
