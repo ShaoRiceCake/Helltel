@@ -14,27 +14,45 @@ public class ItemWeapon_BaseballBat : PassiveItem
     [SerializeField] private float soundCooldown = 0.5f; // Time between sound plays
     [SerializeField] private float soundVolume = 1.0f; // Volume of the swing sound
 
-    private Rigidbody rb;
-    private float lastSoundTime;
-    private bool soundReady = true;
+    private Rigidbody _rb;
+    private float _lastSoundTime;
+    private bool _soundReady = true;
 
+    private bool _onCatch;
+    
     protected override void Awake()
     {
-        base.Awake(); // Preserve any existing Awake functionality
-        rb = GetComponent<Rigidbody>();
+        base.Awake(); 
+        _rb = GetComponent<Rigidbody>();
         
-        // Add Rigidbody if missing (configured as kinematic by default)
-        if (rb == null)
-        {
-            rb = gameObject.AddComponent<Rigidbody>();
-            rb.isKinematic = true;
-        }
+        if (_rb != null) return;
+        _rb = gameObject.AddComponent<Rigidbody>();
+        _rb.isKinematic = true;
+
     }
+
+    private void Start()
+    {
+        OnGrabbed.AddListener(OnBaseballBatGrabbed);
+        OnReleased.AddListener(OnBaseballBatReleased);
+    }
+
+    private void OnBaseballBatReleased()
+    {
+        _onCatch = false;
+    }
+
+    private void OnBaseballBatGrabbed()
+    {
+        _onCatch = true;
+    }
+
 
     private void FixedUpdate()
     {
         UpdateAssociatedObjectLayer();
         CheckSwingVelocity();
+        Debug.Log("_onCatch" +_onCatch);
     }
 
     private void UpdateAssociatedObjectLayer()
@@ -47,14 +65,11 @@ public class ItemWeapon_BaseballBat : PassiveItem
 
     private void CheckSwingVelocity()
     {
-        if (rb == null || !soundReady) return;
-
-        // Check if velocity exceeds threshold
-        if (rb.velocity.magnitude > velocityThreshold)
-        {
-            PlaySwingSound();
-            StartCoroutine(SoundCooldown());
-        }
+        if(!_onCatch) return;
+        if (_rb == null || !_soundReady) return;
+        if (!(_rb.velocity.magnitude > velocityThreshold)) return;
+        PlaySwingSound();
+        StartCoroutine(SoundCooldown());
     }
 
     private void PlaySwingSound()
@@ -64,8 +79,8 @@ public class ItemWeapon_BaseballBat : PassiveItem
 
     private IEnumerator SoundCooldown()
     {
-        soundReady = false;
+        _soundReady = false;
         yield return new WaitForSeconds(soundCooldown);
-        soundReady = true;
+        _soundReady = true;
     }
 }

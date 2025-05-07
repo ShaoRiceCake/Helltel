@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Light))]
@@ -26,6 +27,10 @@ public class ItemLantern : PassiveItem
         lanternLight = GetComponent<Light>();
         lanternLight.enabled = false;
         
+    }
+
+    private void Start()
+    {
         OnGrabbed.AddListener(OnLanternGrabbed);
         OnReleased.AddListener(OnLanternReleased);
     }
