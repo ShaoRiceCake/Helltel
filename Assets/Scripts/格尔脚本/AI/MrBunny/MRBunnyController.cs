@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Helltal.Gelercat;
 using NPBehave;
 using UnityEngine;
@@ -41,6 +40,7 @@ public class MRBunnyController : GuestBase, IHurtable
         behaviorTree.Blackboard["getDamage"] = false; // 受伤标志
         behaviorTree.Blackboard["isDead"] = false; // 死亡标志
         behaviorTree.Blackboard["isAttacking"] = false; // 攻击标志
+        behaviorTree.Start();
     }
 
     protected override Root GetBehaviorTree()
@@ -192,33 +192,7 @@ public class MRBunnyController : GuestBase, IHurtable
     private bool canAttack = true;
     private Node BuildAttackBranch()
     {
-        // return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
-        //     new Sequence(
-        //         new Action(() =>
-        //         {
-        //             agent.speed = 0f; // 设置攻击时速度为0
-        //         }),
-        //         new Action(() =>
-        //         {
-        //             behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
-        //             presenter.SetTrigger("Attack"); // 播放攻击动画
-        //         }),
-        //         new WaitUntilStopped()
-        //     ));
-        //     return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
-        // new Sequence(
-        //     new Action(() =>
-        //     {
-        //         behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
-        //         presenter.SetTrigger("Attack"); // 播放攻击动画
-        //     }),
-        //     new WaitUntilStopped()
 
-
-
-
-
-        // ));
         return new BlackboardCondition("isAttacking", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
         new Sequence(
             new Action(() =>
@@ -247,25 +221,7 @@ public class MRBunnyController : GuestBase, IHurtable
         }
 
     }
-    // private bool TryAttack()
-    // {
-    //     // debug
-    //     // if (Input.GetKeyDown(KeyCode.J))
-    //     // {
-    //     //     Debug.Log("攻击！");
-    //     //     return true;
-    //     // }
-    //     if (!canAttack) return false;
-    //     // 检测到敌人并且在攻击范围内
-    //     if (CurTarget != null && Vector3.Distance(transform.position, CurTarget.transform.position) <= attackDistance)
-    //     {
-    //         canAttack = false; // 设置攻击锁
-    //         return true;
-    //     }
-    //     return false;
-    // }
-    // 实现IHurtable接口
-    public void TakeDamage(int damage)
+   public void TakeDamage(int damage)
     {
         if (damage >= curHealth.Value)
         {
