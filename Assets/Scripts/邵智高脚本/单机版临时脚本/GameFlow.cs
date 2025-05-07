@@ -23,9 +23,11 @@ public class GameFlow : MonoBehaviour
 
 
  
-
     void Start()
     {
+        
+        
+
         _data = GameController.Instance._gameData;
         sceneOverlayer = FindObjectOfType<SceneOverlayer>();
         sceneOverlayer.LoadDungeonScene();
@@ -41,6 +43,7 @@ public class GameFlow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
        
         
     }

@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
     
     [SerializeField, Tooltip("默认音频混合组")] 
     private AudioMixerGroup defaultMixerGroup;
+    
     //混响组件
     [SerializeField] private AudioMixer audioMixer;
     #endregion
@@ -47,6 +48,8 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region Runtime Data
+    //跟踪音频源的字典
+    private Dictionary<AudioSource, (string soundName, Coroutine tracker)> activeSources = new Dictionary<AudioSource, (string, Coroutine)>();
     private Dictionary<string, SoundEffect> soundEffects = new Dictionary<string, SoundEffect>();
     public List<AudioSource> audioSourcePool = new List<AudioSource>();
     #endregion
@@ -84,7 +87,7 @@ public class AudioManager : MonoBehaviour
             CreateNewAudioSource();
         }
     }
-    // 新增分类初始化方法
+    //分类初始化方法
     private void InitializeCategories()
     {
         // 强制创建必要分类
@@ -148,7 +151,38 @@ public class AudioManager : MonoBehaviour
         AudioSource source = GetAvailableAudioSource() ?? CreateNewAudioSource();
         ConfigureAudioSource(source, effect, position, dynamicVolume, loop);
         source.Play();
+        // 清理旧的状态跟踪
+        if (activeSources.TryGetValue(source, out var oldState))
+        {
+            StopCoroutine(oldState.tracker);
+        }
+
+        // 创建新的状态跟踪
+        Coroutine tracker = StartCoroutine(TrackAudioSource(source, soundName, loop));
+        activeSources[source] = (soundName, tracker);
+
         return source;
+    }
+    // 跟踪方法
+    private IEnumerator TrackAudioSource(AudioSource source, string soundName, bool loop)
+    {
+        if (loop)
+        {
+            while (source.isPlaying && source.loop)
+            {
+                yield return null;
+            }
+        }
+        else
+        {
+            yield return new WaitForSeconds(source.clip.length);
+            while (source.isPlaying)
+            {
+                yield return null;
+            }
+        }
+
+        activeSources.Remove(source);
     }
 
     /// <summary>
@@ -305,7 +339,7 @@ public class AudioManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// 切换3D音频功能
+    /// 切换3D音频功能（未完成
     /// </summary>
     public void Toggle3DAudio(bool enable)
     {
@@ -316,14 +350,59 @@ public class AudioManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// 控制混响效果开关
+    /// 控制混响效果开关（未完成
     /// </summary>
     /// <param name="enable">true启用混响，false关闭</param>
     public void ToggleReverb(bool enable)
     {
-        // 通过音频混合器控制（推荐）
+        // 通过音频混合器控制
         audioMixer.SetFloat("ReverbMix", enable ? 0f : -80f); // 0dB启用，-80dB静音
     }
+    /// <summary>
+    /// 停止指定名称的所有音效实例
+    /// </summary>
+    public void Stop(string soundName)
+    {
+        List<AudioSource> toStop = new List<AudioSource>();
+        
+        foreach (var pair in activeSources)
+        {
+            if (pair.Value.soundName == soundName && pair.Key.isPlaying)
+            {
+                toStop.Add(pair.Key);
+            }
+        }
+
+        foreach (var source in toStop)
+        {
+            source.Stop();
+            if (activeSources.TryGetValue(source, out var state))
+            {
+                StopCoroutine(state.tracker);
+                activeSources.Remove(source);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 停止指定的AudioSource实例
+    /// </summary>
+    //用法演示：
+    //AudioSource mySource = AudioManager.Instance.Play("背景音乐", loop: true);
+    // ...稍后...
+    //AudioManager.Instance.Stop(mySource);  // 停止这个特定的循环音效
+    public void Stop(AudioSource source)
+    {
+        if (source == null) return;
+
+        if (activeSources.TryGetValue(source, out var state))
+        {
+            source.Stop();
+            StopCoroutine(state.tracker);
+            activeSources.Remove(source);
+        }
+    }
     #endregion
-    
+
+   
 }
