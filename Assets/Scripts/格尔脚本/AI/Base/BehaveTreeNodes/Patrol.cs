@@ -12,17 +12,28 @@ namespace Helltal.Gelercat
         private Dictionary<NavPoint, bool> visitDict;
         private NavPoint currentTarget;
 
-        public Patrol(NavMeshAgent agent, NavPointsManager navPointsManager) : base("Patrol")
+        private float searchDist; // 搜索距离
+
+        public Patrol(NavMeshAgent agent, NavPointsManager navPointsManager, float SerchingDist = 1.5f) : base("Patrol")
         {
             this.agent = agent;
             this.navPointsManager = navPointsManager;
+            this.searchDist = SerchingDist;
             visitDict = new Dictionary<NavPoint, bool>();
         }
 
         protected override void DoStart()
         {
-            if (agent == null || agent.gameObject == null) return;
+
+            if (agent == null || agent.gameObject == null || !agent.isOnNavMesh)
+            {
+                Debug.LogWarning("Patrol agent not ready or not on NavMesh.");
+                this.Stopped(false);
+                return;
+            }
+
             ChooseNextNavPoint();
+
         }
 
         protected override void DoStop()
@@ -30,9 +41,9 @@ namespace Helltal.Gelercat
             // agent.ResetPath();  // 停止导航
             // this.Stopped(false); // 明确停止
             if (agent == null || agent.gameObject == null) return;
-
-            agent.ResetPath();  // 停止导航
             
+            agent.ResetPath();  // 停止导航
+
             Clock.RemoveUpdateObserver(OnUpdate);  // <<< 关键，移除更新回调！！
             this.Stopped(false); // 明确告诉父节点：自己停止了
         }
@@ -55,6 +66,15 @@ namespace Helltal.Gelercat
                     return;
                 }
             }
+            float distToTarget = Vector3.Distance(agent.transform.position, currentTarget.transform.position);
+            if (distToTarget <= searchDist)
+            {
+                visitDict[currentTarget] = true;
+                Debug.Log("导航点在搜索距离内，直接标记为已访问：" + currentTarget.name);
+                ChooseNextNavPoint();  // 继续选择下一个
+                return;
+            }
+
             bool setDestinationSuccess = agent.SetDestination(currentTarget.transform.position);
             if (!setDestinationSuccess)
             {
@@ -104,7 +124,11 @@ namespace Helltal.Gelercat
 
         private bool ReachedTarget(NavPoint target)
         {
-            return !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance && !agent.hasPath;
+            // return !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance && !agent.hasPath;
+            if (target == null || agent == null) return false;
+
+            float distance = Vector3.Distance(agent.transform.position, target.transform.position);
+            return distance <= searchDist;
         }
     }
 }

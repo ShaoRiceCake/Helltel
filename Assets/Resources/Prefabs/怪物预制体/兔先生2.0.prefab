@@ -544,7 +544,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3786087019
+  GlobalObjectIdHash: 935879877
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -569,7 +569,7 @@ MonoBehaviour:
   maxHealth: 3
   curHealth:
     m_InternalValue: 0
-  entropyValue: 0
+  entropyValue: 10
   DEBUG_STOP_BEHAVIOR_TREE: 0
   Debugging: 0
   navPointsManager: {fileID: 0}
@@ -583,6 +583,7 @@ MonoBehaviour:
   chaseDistance: 10.25
   chaseSpeed: 5
   attackDistance: 2
+  searchAccuracy: 5
   CurTarget: {fileID: 0}
 --- !u!195 &7713747658515556212
 NavMeshAgent:
@@ -592,7 +593,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6896343395691544031}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -623,7 +624,7 @@ MonoBehaviour:
   viewDistance: 18.81
   detectionLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 192
   isDebug: 1
   detectedTargets: []
 --- !u!114 &8068660485153739002
