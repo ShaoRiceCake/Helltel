@@ -34,11 +34,16 @@ public class GameFlow : MonoBehaviour
         _data.SendStartLoading();
         //NextFloor();
         StartCoroutine(NextFloor());
-        
+        _data.PlayerDieEvent += PlayerDie;
                
         
         
     }
+    void OnDestroy() 
+    {
+        _data.PlayerDieEvent -= PlayerDie;
+    }
+  
 
     // Update is called once per frame
     void Update()
@@ -47,6 +52,7 @@ public class GameFlow : MonoBehaviour
        
         
     }
+    
     IEnumerator NextFloor()
     {
         
@@ -110,9 +116,11 @@ public class GameFlow : MonoBehaviour
         }
         
     }
-    public void ResetPlayerPosition()
+  
+    
+    public void PlayerDie()
     {
-        //Player.transform.position = new Vector3(12.5f,15.81f,-5.31f);
+        
     }
 
 }

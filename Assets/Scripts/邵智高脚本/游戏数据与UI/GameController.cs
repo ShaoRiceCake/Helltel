@@ -83,6 +83,7 @@ public class GameController : MonoBehaviour
         else
         {
             Debug.Log("死亡");
+
             return;
         }
       
@@ -132,13 +133,6 @@ public class GameController : MonoBehaviour
     }
 
     
-
-    //检查是否满足绩效要求
-    // public void CheckPerformance()
-    // {
-    //     if
-
-    // }
 
 
 }
