@@ -13,7 +13,12 @@ namespace Helltal.Gelercat
         public LayerMask detectionLayer; // 要检测的生物层级（玩家、生物等）
         public bool isDebug = true; // 是否启用调试模式
         [Header("Scan Result")]
-        public List<Transform> detectedTargets = new List<Transform>();
+        public List<Transform> detectedTargets;// = new List<Transform>();
+        private void Awake()
+        {
+            detectedTargets = new List<Transform>();
+             
+        }
 
         private void Start()
         {

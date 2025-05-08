@@ -42,6 +42,7 @@ public class GameDataModel : ScriptableObject
     public event Action StartLoading;  //开始加载
     public event Action FinishLoading;  //结束加载
     public event Action<string> FloorIS;      // 楼层类型为
+    public event Action PlayerDieEvent;      // 玩家死亡事件
 
    
      
@@ -173,6 +174,10 @@ public class GameDataModel : ScriptableObject
     public void SendFinishLoading()
     {
         FinishLoading?.Invoke(); 
+    }
+    public void SendPlayerDieEvent()
+    {
+        PlayerDieEvent?.Invoke(); 
     }
     
 
