@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Unity.Netcode;
 using NPBehave;
-
+using System.Collections.Generic;
 namespace Helltal.Gelercat
 {
     public class GuestBase : NetworkBehaviour
@@ -31,6 +31,7 @@ namespace Helltal.Gelercat
         public GuestSensor sensor;  // 
         protected Root behaviorTree;
 
+        public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
 
         public NetworkVariable<AIState> aiState = new NetworkVariable<AIState>(AIState.LIVE);
         /// <summary>
@@ -147,7 +148,10 @@ namespace Helltal.Gelercat
             {
                 presenter = GetComponent<GuestPresenter>();
             }
+
+            
         }
+
         protected virtual void Start()
         {
             curHealth.Value = maxHealth;
@@ -185,6 +189,6 @@ namespace Helltal.Gelercat
         {
             return agent.isOnNavMesh;
         }
-
+    
     }
 }
