@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Helltal.Gelercat;
 using NPBehave;
 using UnityEngine;
@@ -15,7 +14,9 @@ public class MRBunnyController : GuestBase, IHurtable
     [Header("MR-Bunny 开始攻击的范围")]
     public float attackDistance = 2f; // 攻击范围
 
-    public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
+    [Header("搜索精度")]
+    public float searchAccuracy = 5f; // 搜索精度
+    // public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject CurTarget; //当前目标    
     private Node getDamageNode;
     private Node attackNode;
@@ -41,6 +42,7 @@ public class MRBunnyController : GuestBase, IHurtable
         behaviorTree.Blackboard["getDamage"] = false; // 受伤标志
         behaviorTree.Blackboard["isDead"] = false; // 死亡标志
         behaviorTree.Blackboard["isAttacking"] = false; // 攻击标志
+        behaviorTree.Start();
     }
 
     protected override Root GetBehaviorTree()
@@ -117,7 +119,8 @@ public class MRBunnyController : GuestBase, IHurtable
             {
                 foreach (var target in sensor.detectedTargets)
                 {
-                    if (EnemyList.Contains(target.gameObject))
+                    // if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
+                    if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform))
                     {
                         CurTarget = target.gameObject;
 
@@ -141,7 +144,7 @@ public class MRBunnyController : GuestBase, IHurtable
 
                 new Repeater(
                 new Cooldown(1f,
-                new Patrol(agent, navPointsManager))
+                new Patrol(agent, navPointsManager,searchAccuracy))
             ))
 
         );
@@ -166,7 +169,19 @@ public class MRBunnyController : GuestBase, IHurtable
                 new Action(() =>
                 {
                     presenter.SetTrigger("hurt"); // 播放受伤动画
+
+
                 }),
+                new Action(() =>
+                {
+                    if (IsNavAgentOnNavmesh())
+                    {
+                        agent.ResetPath(); // 停止追击
+                        agent.velocity = Vector3.zero; // 停止移动
+                        agent.speed = 0f; // 保证站定
+                    }
+                }
+                ),
                 new WaitUntilStopped()
 
             ));
@@ -179,33 +194,7 @@ public class MRBunnyController : GuestBase, IHurtable
     private bool canAttack = true;
     private Node BuildAttackBranch()
     {
-        // return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
-        //     new Sequence(
-        //         new Action(() =>
-        //         {
-        //             agent.speed = 0f; // 设置攻击时速度为0
-        //         }),
-        //         new Action(() =>
-        //         {
-        //             behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
-        //             presenter.SetTrigger("Attack"); // 播放攻击动画
-        //         }),
-        //         new WaitUntilStopped()
-        //     ));
-        //     return new Condition(() => { return TryAttack() || behaviorTree.Blackboard["isAttacking"].Equals(true); }, Stops.IMMEDIATE_RESTART,
-        // new Sequence(
-        //     new Action(() =>
-        //     {
-        //         behaviorTree.Blackboard["isAttacking"] = true; // 设置攻击标志
-        //         presenter.SetTrigger("Attack"); // 播放攻击动画
-        //     }),
-        //     new WaitUntilStopped()
 
-
-
-
-
-        // ));
         return new BlackboardCondition("isAttacking", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
         new Sequence(
             new Action(() =>
@@ -234,25 +223,7 @@ public class MRBunnyController : GuestBase, IHurtable
         }
 
     }
-    // private bool TryAttack()
-    // {
-    //     // debug
-    //     // if (Input.GetKeyDown(KeyCode.J))
-    //     // {
-    //     //     Debug.Log("攻击！");
-    //     //     return true;
-    //     // }
-    //     if (!canAttack) return false;
-    //     // 检测到敌人并且在攻击范围内
-    //     if (CurTarget != null && Vector3.Distance(transform.position, CurTarget.transform.position) <= attackDistance)
-    //     {
-    //         canAttack = false; // 设置攻击锁
-    //         return true;
-    //     }
-    //     return false;
-    // }
-    // 实现IHurtable接口
-    public void TakeDamage(int damage)
+   public void TakeDamage(int damage)
     {
         if (damage >= curHealth.Value)
         {
@@ -299,7 +270,19 @@ public class MRBunnyController : GuestBase, IHurtable
 
             }
         }
-        if (behaviorTree.Blackboard["isAttacking"].Equals(true))
+        if (behaviorTree.Blackboard["isAttacking"].Equals(true) && behaviorTree.Blackboard["isDead"].Equals(false))
+        {
+            // 计算攻击目标的方向
+            Vector3 targetPosition = CurTarget.transform.position;
+            Vector3 direction = targetPosition - transform.position;
+            direction.y = 0; // 确保只在水平方向旋转
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+        }
+        else if (CurTarget != null && behaviorTree.Blackboard["isDead"].Equals(false))
         {
             agent.ResetPath(); // 停止追击
             agent.speed = 0f; // 保证站定
@@ -312,10 +295,7 @@ public class MRBunnyController : GuestBase, IHurtable
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             }
-
-
         }
-
     }
     protected override void LateUpdate()
     {
@@ -324,8 +304,10 @@ public class MRBunnyController : GuestBase, IHurtable
         // 1. 获取当前速度
         Vector3 horizontalVelocity = agent.velocity;
         horizontalVelocity.y = 0f; // 只考虑水平速度
-        float currentSpeed = horizontalVelocity.magnitude;
 
+        
+
+        float currentSpeed = horizontalVelocity.magnitude;
         // 2. 归一化：0 = idle，0.5 = walk，1 = run
         float normalizedSpeed = 0f;
         if (currentSpeed > 0.01f)
@@ -353,6 +335,14 @@ public class MRBunnyController : GuestBase, IHurtable
         Gizmos.DrawWireSphere(transform.position, chaseDistance); // 绘制追击范围
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, attackDistance); // 绘制攻击范围
+        Gizmos.color = Color.yellow; // 绘制搜索精度范围
+        Gizmos.DrawWireSphere(transform.position, searchAccuracy); // 绘制搜索精度范围
 
+    }
+
+    void OnDestroy()
+    {
+        base.OnDestroy();
+        behaviorTree?.Stop(); // 停止行为树
     }
 }
