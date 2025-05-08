@@ -13,13 +13,13 @@ namespace Helltal.Gelercat
         public LayerMask detectionLayer; // 要检测的生物层级（玩家、生物等）
         public bool isDebug = true; // 是否启用调试模式
         [Header("Scan Result")]
-        public List<Transform> detectedTargets;// = new List<Transform>();
-        private void Awake()
+        public List<Transform> detectedTargets;
+
+        void Awake()
         {
             detectedTargets = new List<Transform>();
-             
-        }
 
+        }
         private void Start()
         {
             EnsureSensorSourceExists();
@@ -44,7 +44,7 @@ namespace Helltal.Gelercat
 
         private void Scan()
         {
-       
+
             detectedTargets.Clear();
 
             Collider[] hits = Physics.OverlapSphere(sensorSource.transform.position, viewDistance, detectionLayer);
@@ -85,5 +85,8 @@ namespace Helltal.Gelercat
             Gizmos.DrawRay(origin, left * viewDistance);
             Gizmos.DrawRay(origin, right * viewDistance);
         }
+
+   
+
     }
 }
