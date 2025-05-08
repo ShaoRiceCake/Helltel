@@ -21,6 +21,7 @@ namespace Helltal.Gelercat
 
         protected override void DoStart()
         {
+            if (agent == null || agent.gameObject == null) return;
             ChooseNextNavPoint();
         }
 
@@ -28,6 +29,8 @@ namespace Helltal.Gelercat
         {
             // agent.ResetPath();  // 停止导航
             // this.Stopped(false); // 明确停止
+            if (agent == null || agent.gameObject == null) return;
+
             agent.ResetPath();  // 停止导航
             
             Clock.RemoveUpdateObserver(OnUpdate);  // <<< 关键，移除更新回调！！
@@ -36,6 +39,8 @@ namespace Helltal.Gelercat
 
         private void ChooseNextNavPoint()
         {
+            if (agent == null || agent.gameObject == null) return;
+
             currentTarget = GetClosestUnvisitedNavPoint();
 
             if (currentTarget == null)
@@ -50,7 +55,6 @@ namespace Helltal.Gelercat
                     return;
                 }
             }
-
             bool setDestinationSuccess = agent.SetDestination(currentTarget.transform.position);
             if (!setDestinationSuccess)
             {
@@ -75,6 +79,7 @@ namespace Helltal.Gelercat
 
         private NavPoint GetClosestUnvisitedNavPoint()
         {
+
             NavPoint closest = null;
             float minDist = float.MaxValue;
             Vector3 pos = agent.transform.position;

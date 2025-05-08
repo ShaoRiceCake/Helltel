@@ -335,4 +335,10 @@ public class MRBunnyController : GuestBase, IHurtable
         Gizmos.DrawWireSphere(transform.position, attackDistance); // 绘制攻击范围
 
     }
+
+    void OnDestroy()
+    {
+        base.OnDestroy();
+        behaviorTree?.Stop(); // 停止行为树
+    }
 }
