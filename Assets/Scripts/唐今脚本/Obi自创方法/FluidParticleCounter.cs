@@ -101,7 +101,7 @@ public class FluidParticleCounter : MonoBehaviour
             var obiColliderHandle = colliderWorld.colliderHandles[contacts[i].bodyB];
             var obiCollider = obiColliderHandle.owner;
             
-            if (obiCollider == null || !cleanableColliders.Contains(obiCollider)) continue;
+            if (!obiCollider || !cleanableColliders.Contains(obiCollider)) continue;
             
             var solverParticleIndex = solver.simplices[contacts[i].bodyA];
             
