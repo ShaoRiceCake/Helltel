@@ -34,14 +34,14 @@ public class GameFlow : MonoBehaviour
         _data.SendStartLoading();
         //NextFloor();
         StartCoroutine(NextFloor());
-        _data.PlayerDieEvent += PlayerDie;
+
                
         
         
     }
     void OnDestroy() 
     {
-        _data.PlayerDieEvent -= PlayerDie;
+
     }
   
 
@@ -120,6 +120,8 @@ public class GameFlow : MonoBehaviour
     
     public void PlayerDie()
     {
+        
+
         
     }
 
