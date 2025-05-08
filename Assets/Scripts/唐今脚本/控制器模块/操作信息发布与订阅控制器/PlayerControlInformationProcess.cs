@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using Unity.Netcode;
 using System.Collections;
+using UnityEngine.Serialization;
 
 public class PlayerControlInformationProcess : MonoBehaviour
 {
@@ -42,7 +43,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
     public UnityEvent onCameraControl;
     public UnityEvent onStopCameraControl;
     
-    private bool _isCameraControlActive;
+    public bool isCameraControlActive;
     public bool stopPlayerControl;
 
     private void Start()
@@ -98,19 +99,19 @@ public class PlayerControlInformationProcess : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            _isCameraControlActive = true;
+            isCameraControlActive = true;
             onCameraControl?.Invoke();
         }
         else if (Input.GetKeyUp(KeyCode.Space))
         {
             onStopCameraControl?.Invoke();
-            _isCameraControlActive = false;
+            isCameraControlActive = false;
         }
     }
 
     private void OnLeftMouseDown()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -127,7 +128,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     private void OnRightMouseDown()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -144,7 +145,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     private void OnLeftMouseUp()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -161,7 +162,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     private void OnRightMouseUp()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -178,7 +179,7 @@ public class PlayerControlInformationProcess : MonoBehaviour
 
     private void OnBothMouseButtonsDown()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
+        if (stopPlayerControl || isCameraControlActive) return;
         
         switch (mCurrentControlMode)
         {
@@ -193,11 +194,27 @@ public class PlayerControlInformationProcess : MonoBehaviour
         }
     }
 
+// 在 OnMiddleMouseDown 方法中添加控制粒子显示的代码
     private void OnMiddleMouseDown()
     {
-        if (stopPlayerControl || _isCameraControlActive) return;
-        
+        if (stopPlayerControl || isCameraControlActive) return;
+    
         mCurrentControlMode = (mCurrentControlMode == ControlMode.LegControl) ? ControlMode.HandControl : ControlMode.LegControl;
+    
+        // 切换控制模式时更新所有肢体的粒子显示状态
+        var footControls = GetComponentsInChildren<PlayerControl_FootControl>();
+        var handControls = GetComponentsInChildren<PlayerControl_HandControl>();
+    
+        foreach (var foot in footControls)
+        {
+            foot.shouldShowParticles = (mCurrentControlMode == ControlMode.LegControl);
+        }
+    
+        foreach (var hand in handControls)
+        {
+            hand.shouldShowParticles = (mCurrentControlMode == ControlMode.HandControl);
+        }
+    
         onSwitchControlMode?.Invoke();
         AudioManager.Instance.Play("玩家手-腿控制切换",transform.position,1f);
     }

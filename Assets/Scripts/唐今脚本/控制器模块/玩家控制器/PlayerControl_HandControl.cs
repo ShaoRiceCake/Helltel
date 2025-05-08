@@ -94,6 +94,7 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         
         UpdateSensitivityBasedOnMass(catchTool);
         HandleKinematicObjectGrabbing();
+        UpdateParticleEffect();
     }
 
     private void OnCancelHandGrab()
@@ -189,7 +190,9 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         if (!handBallPrefab) return;
 
         handBallPrefab.SetActive(true);
-    
+        
+        shouldShowParticles = true; // 激活手部控制时显示粒子
+        
         if (catchTool && catchTool.IsGrabbingKinematic() && catchTool.GetGrabbedItem() != null)
         {
             handBallPrefab.transform.position = catchTool.GetGrabbedItem().transform.position;
@@ -215,6 +218,8 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         handControlAttachment.target = null;
         catchTool.CatchBall = null;
         IsHandActive = false;
+        shouldShowParticles = false; // 停用手部控制时隐藏粒子
+
     }
     
     protected void UpdateSensitivityBasedOnMass(CatchTool catchTool)
@@ -256,6 +261,28 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         if (catchTool.GetGrabbedItem())
         {
             handBallPrefab.transform.position = catchTool.GetGrabbedItem().transform.position;
+        }
+    }
+    
+    protected virtual void UpdateParticleEffect()
+    {
+        if (!controlParticleEffect || !handBallPrefab) return;
+    
+        if (shouldShowParticles && IsHandActive)
+        {
+            if (!controlParticleEffect.isPlaying)
+            {
+                controlParticleEffect.transform.position = handBallPrefab.transform.position;
+                controlParticleEffect.Play();
+            }
+            else
+            {
+                controlParticleEffect.transform.position = handBallPrefab.transform.position;
+            }
+        }
+        else if (controlParticleEffect.isPlaying)
+        {
+            controlParticleEffect.Stop();
         }
     }
 }

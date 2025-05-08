@@ -11,6 +11,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     [Header("Camera Settings")]
     [SerializeField] private Camera controlledCamera;
+    [SerializeField] private GameObject headBall;
     [SerializeField] private Transform target;
     [SerializeField] private float distance = 5.0f;
     [SerializeField] private float mouseSensitivity = 3.0f;
@@ -130,6 +131,10 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         // {
         //     UpdateTransparency();
         // }
+        
+        // if(!controlHandler.isCameraControlActive) return;
+        // controlParticleEffect.transform.position = headBall.transform.position;
+        // controlParticleEffect.Play();
     }
 
     // private void UpdateTransparency()
