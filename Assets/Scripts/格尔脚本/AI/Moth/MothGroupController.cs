@@ -32,7 +32,7 @@ public class MothGroupController : GuestBase
 
     public GameObject CurTarget;
 
-    public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
+    // public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject attachingMoth; //当前附着的虫子
 
 
@@ -128,7 +128,7 @@ public class MothGroupController : GuestBase
             {
                 foreach (var target in sensor.detectedTargets)
                 {
-                    if (EnemyList.Contains(target.gameObject))
+                    if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
                     {
                         CurTarget = target.gameObject;
 
