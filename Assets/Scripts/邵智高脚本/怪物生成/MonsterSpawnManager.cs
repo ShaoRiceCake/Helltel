@@ -8,11 +8,7 @@ using Unity.Netcode;
 public class MonsterSpawnSystem : NetworkBehaviour
 {
     //============== 核心参数配置区 ==============
-    [Header("楼层配置")]
-    [Tooltip("当前楼层（通常为负数）")]
-    public int currentFloor = -1;
 
-    [Header("熵值公式参数")]
     [Header("游戏基础熵值")]
     public float baseEntropy = 50f;
     [Header("每层变化的熵值")]
@@ -21,10 +17,6 @@ public class MonsterSpawnSystem : NetworkBehaviour
     public float timeFactor = 0.3f;
     [Header("每一块钱增加的熵值")]
     public float moneyFactor = 0.05f;
-    [Header("每次死亡减少的熵值")]
-    public float deathFactorD = 1f;
-    [Header("通过死亡最多能减少多少熵值")]
-    public float deathFactorE = 9f;
 
     [Header("基础客梯数")]
     public int baseGuestElevatorCount = 8;
@@ -37,32 +29,37 @@ public class MonsterSpawnSystem : NetworkBehaviour
     private int maxAttempts = 5;
     [Header("可生成的怪物池")]
     public List<GameObject> monsterPrefabs;
+    private GameDataModel _data;
 
     //============== 运行时状态 ==============
     private List<Transform> activeGuestElevators = new(); // 可用客梯列表
     private float floorTimeCounter;                      // 本层停留计时（本关持续的时间）
     private float totalMoney;                            // 累计金钱
-    private int totalDeaths;                             // 死亡次数
+    //private int totalDeaths;                             // 死亡次数
     private Dictionary<GameObject, int> spawnRecords = new(); // 生成记录
     private List<GuestBase> activeMonsters = new();        // 存活怪物列表
 
     //============== 初始化流程 ==============
     void Start()
     {
-        if (NetworkManager.Singleton)
-        {
-            if (IsHost)
-            {
-                //InitializeElevators();
-                InitializeSpawnData();
-                StartCoroutine(SpawnRoutine());
-            }
-        }
-        else
-        {
-            InitializeSpawnData();
-            StartCoroutine(SpawnRoutine());
-        }
+        _data = Resources.Load<GameDataModel>("GameData");
+        
+        InitializeSpawnData();
+        StartCoroutine(SpawnRoutine());
+        // if (NetworkManager.Singleton)
+        // {
+        //     if (IsHost)
+        //     {
+        //         //InitializeElevators();
+        //         InitializeSpawnData();
+        //         StartCoroutine(SpawnRoutine());
+        //     }
+        // }
+        // else
+        // {
+        //     InitializeSpawnData();
+        //     StartCoroutine(SpawnRoutine());
+        // }
 
     }
 
@@ -83,7 +80,7 @@ public class MonsterSpawnSystem : NetworkBehaviour
 
         // 计算允许的客梯数量
         int maxGuestElevators = Mathf.Max(
-            baseGuestElevatorCount - (currentFloor * guestElevatorFloorMultiplier), 
+            baseGuestElevatorCount + (_data.Level * guestElevatorFloorMultiplier), 
             1 // 保证至少1个客梯
         );
 
@@ -190,7 +187,7 @@ public class MonsterSpawnSystem : NetworkBehaviour
         Debug.Log("生成在"+spawnPoint);
 
         // 实例化并记录
-        var instance = Instantiate(prefab, spawnPoint, Quaternion.identity);
+        var instance = Instantiate(prefab, spawnPoint, Quaternion.identity,this.gameObject.transform);
         if (NetworkManager.Singleton)
         {
             instance.GetComponent<NetworkObject>().Spawn();
@@ -220,12 +217,10 @@ public class MonsterSpawnSystem : NetworkBehaviour
     /// </summary>
     float CalculateEntropyLimit()
     {
-        float deathPenalty = Mathf.Max(totalDeaths * deathFactorD, deathFactorE);
         return baseEntropy 
-            - currentFloor * floorMultiplier
+            + _data.Level * floorMultiplier
             + floorTimeCounter * timeFactor
-            + totalMoney * moneyFactor
-            - deathPenalty;
+            + totalMoney * moneyFactor;
     }
 
     /// <summary>
@@ -252,14 +247,7 @@ public class MonsterSpawnSystem : NetworkBehaviour
         
     }
 
-    /// <summary>
-    /// 玩家死亡时调用
-    /// </summary>
-    public void RegisterPlayerDeath()
-    {
-        totalDeaths++;
-        Debug.Log($"玩家死亡，当前死亡次数：{totalDeaths}");
-    }
+ 
 
    
 }

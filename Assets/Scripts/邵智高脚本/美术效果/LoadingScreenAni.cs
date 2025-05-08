@@ -146,7 +146,7 @@ public class LoadingScreenAni : MonoBehaviour
             // 缩放动画
             .Append(elevator.DOScale(1.01f * Vector3.one, shakeDuration * 0.2f)
                 .SetEase(Ease.OutQuad)
-                .SetUpdate(true)) // 关键修改
+                .SetUpdate(true)) 
             .Append(elevator.DOScale(Vector3.one, shakeDuration * 0.3f)
                 .SetEase(Ease.InQuad)
                 .SetUpdate(true))
@@ -158,7 +158,7 @@ public class LoadingScreenAni : MonoBehaviour
                 vibrato: 10,
                 fadeOut: false
             ).SetEase(Ease.Linear)
-            .SetUpdate(true)) // 关键修改
+            .SetUpdate(true)) 
             
             // 循环设置
             .SetLoops(-1)

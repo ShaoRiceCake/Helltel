@@ -135,8 +135,6 @@ namespace Helltal.Gelercat
             }
 
             navPointsManager = GameObject.Find("NavPointManager").GetComponent<NavPointsManager>();
-
-            Debug.Log(navPointsManager);
             if (navPointsManager == null)
             {
                 Debug.LogError("请先在场景中添加导航点管理器");
