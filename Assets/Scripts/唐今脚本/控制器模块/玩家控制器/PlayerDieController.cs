@@ -1,58 +1,93 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+
 
 public class PlayerDieController : MonoBehaviour
 {
     private GameDataModel _data;
+    private PlayerControlInformationProcess _playerControl;
+
+
     
 
-    // Start is called before the first frame update
-    public void Awake()
+    
+    [Header("Death Settings")]
+
+    [SerializeField] private float _blackScreenDelay = 3f;
+
+    
+    [Header("References")]
+
+
+    
+    private Coroutine _deathSequenceCoroutine;
+
+    private void Awake()
     {
         _data = Resources.Load<GameDataModel>("GameData");
         _data.OnIsPlayerDiedChangedEvent += PlayerDie;
         
+        _playerControl = FindObjectOfType<PlayerControlInformationProcess>();
+
+        
+
     }
-    public void OnDestroy()
+
+    private void OnDestroy()
     {
         _data.OnIsPlayerDiedChangedEvent -= PlayerDie;
-    }
-    void Start()
-    {
         
-        
+        if (_deathSequenceCoroutine != null)
+        {
+            StopCoroutine(_deathSequenceCoroutine);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     void PlayerDie(bool isDie)
     {
-        if(isDie)
+        if (isDie && _deathSequenceCoroutine == null)
         {
-            //停止玩家控制
-            PlayerControlInformationProcess playersControlInformation = FindObjectOfType<PlayerControlInformationProcess>();
-            if(playersControlInformation != null)
-            playersControlInformation.stopPlayerControl = true;
-            //To DO：最好能有个镜头控制，调转到正上方或者其他比较适合观察死亡的位置（不转也行，因为我们本来就是第三人称）
+            _deathSequenceCoroutine = StartCoroutine(DeathSequence());
+        }
+    }
 
-            //To DO：玩家控制的角色倒地
-
-            //To DO：血液生成器
-
-            //To DO：屏幕血液shader
-
-            //To DO：屏幕变黑白
-
-            //To DO：死亡音效
-            AudioManager.Instance.Play("气球爆炸");
-            //To DO：渐变为黑色
-            //让流程管理器返回开始界面
-
+    private IEnumerator DeathSequence()
+    {
+        // 1. 停止玩家控制
+        if (_playerControl != null)
+        {
+            _playerControl.stopPlayerControl = true;
         }
 
+        // 2. 播放死亡动画
+
+
+        // 3. 播放死亡音效
+        AudioManager.Instance.Play("气球爆炸");
+        
+        // 4. 生成血液效果
+
+
+        // 5. 屏幕血液效果
+
+
+        // 6. 移动摄像机到死亡视角（可不做）
+
+        
+
+
+        // 7. 屏幕变黑白
+
+
+        // 8. 等待片刻
+        yield return new WaitForSeconds(_blackScreenDelay);
+
+        // 9. 渐变为黑色 (使用渐晕效果)
+
+        // 10. 返回开始界面
+        
+        GameManager.Instance.ReturnToMainMenu();
+        
+        _deathSequenceCoroutine = null;
     }
 }
