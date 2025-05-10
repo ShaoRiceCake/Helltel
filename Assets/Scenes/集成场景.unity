@@ -44097,7 +44097,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -4372536172839912495, guid: 15b98188dc3c6254aa9e1dc03ca0b5fa, type: 3}
+  - {fileID: 2100000, guid: f342c944c10cc4c9188a4f352c6a6eee, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -44431,8 +44431,6 @@ GameObject:
   - component: {fileID: 1490886414400050700}
   - component: {fileID: 8837592932107782766}
   - component: {fileID: 8837592932107782768}
-  - component: {fileID: 8837592932107782767}
-  - component: {fileID: 8837592932107782769}
   m_Layer: 12
   m_Name: mofadengxin
   m_TagString: Item
@@ -47447,25 +47445,12 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1.4363562, y: 1.4363573, z: 1.4363567}
   m_Center: {x: 0.012001097, y: -0.5679499, z: -0.040738404}
---- !u!114 &8837592932107782767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181796441439228740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a3b299c37179b846a5dc8174695d00d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  kinematicForParticles: 0
 --- !u!54 &8837592932107782768
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -47488,29 +47473,11 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &8837592932107782769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181796441439228740}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6757b231cedd544c583ef8aeaf773b2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  thickness: 0
-  inverted: 0
-  material: {fileID: 0}
-  filter: -65535
-  m_SourceCollider: {fileID: 8837592932107782766}
-  m_DistanceField: {fileID: 0}
 --- !u!1001 &8954337684255524083
 PrefabInstance:
   m_ObjectHideFlags: 0
