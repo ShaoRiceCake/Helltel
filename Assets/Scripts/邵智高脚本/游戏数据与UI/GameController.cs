@@ -35,6 +35,10 @@ public class GameController : MonoBehaviour
         {
             AddPerformance(50);
         }
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            DeductHealth(50);
+        }
     }
     // 增加血上限接口
     public void AddMaxHealth(int amount)

@@ -54,7 +54,7 @@ public class GameDataModel : ScriptableObject
     public int Health {
         get => _health;
         set {
-            if(_health<=0)
+            if(value<=0)
             {
                 IsPlayerDied = true;
                 _health = 0;
