@@ -326,6 +326,21 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         _currentGrabbingPlayerId = ulong.MaxValue;
     }
     
+    // 道具自毁或者自主脱手（忽略权限检查）
+    public void SelfDetach(bool isDestroy)
+    {
+        ForceSetState(EItemState.NotSelected);
+        ClearGrabPermission();
+        // 通知抓取工具释放（如果被抓取中）
+        if (IsGrabbed)
+        {
+            OnReleased?.Invoke();
+        }
+        // 如果自毁模式则销毁游戏对象
+        if (isDestroy)
+            Destroy(gameObject);
+    }
+    
     /* 状态查询属性 */
     public bool IsNotSelected => CurrentState == EItemState.NotSelected;
     public bool IsSelected => CurrentState == EItemState.Selected;

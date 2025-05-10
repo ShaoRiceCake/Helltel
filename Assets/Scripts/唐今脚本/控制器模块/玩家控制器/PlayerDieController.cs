@@ -86,7 +86,7 @@ public class PlayerDieController : MonoBehaviour
 
         // 10. 返回开始界面
         
-        GameManager.Instance.ReturnToMainMenu();
+        // GameManager.instance.ReturnToMainMenu();
         
         _deathSequenceCoroutine = null;
     }
