@@ -146,7 +146,7 @@ public class GlobalUIController : MonoBehaviour
         Cursor.visible = isPaused; // 控制鼠标可见性
         
         PlayerControlInformationProcess playersControlInformation = FindObjectOfType<PlayerControlInformationProcess>();
-        if(playersControlInformation!= null)
+        if(playersControlInformation != null)
         playersControlInformation.stopPlayerControl = isPaused ? true:false;
         
         //FindAnyObjectByType<PlayerControlInformationProcess>().stopPlayerControl = isPaused ? true:false;

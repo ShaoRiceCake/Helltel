@@ -13,13 +13,13 @@ namespace Helltal.Gelercat
         public LayerMask detectionLayer; // 要检测的生物层级（玩家、生物等）
         public bool isDebug = true; // 是否启用调试模式
         [Header("Scan Result")]
-        public List<Transform> detectedTargets;// = new List<Transform>();
-        private void Awake()
+        public List<Transform> detectedTargets;
+
+        void Awake()
         {
             detectedTargets = new List<Transform>();
-             
-        }
 
+        }
         private void Start()
         {
             EnsureSensorSourceExists();
@@ -44,19 +44,38 @@ namespace Helltal.Gelercat
 
         private void Scan()
         {
-       
+
             detectedTargets.Clear();
 
             Collider[] hits = Physics.OverlapSphere(sensorSource.transform.position, viewDistance, detectionLayer);
 
+            // foreach (var hit in hits)
+            // {
+            //     Vector3 dirToTarget = (hit.transform.position - sensorSource.transform.position).normalized;
+            //     float angleToTarget = Vector3.Angle(sensorSource.transform.forward, dirToTarget);
+
+            //     if (angleToTarget < viewAngle / 2f)
+            //     {
+            //         detectedTargets.Add(hit.transform);
+            //     }
+            // }
+
+
             foreach (var hit in hits)
             {
-                Vector3 dirToTarget = (hit.transform.position - sensorSource.transform.position).normalized;
+                Transform target = hit.transform;
+                Vector3 dirToTarget = (target.position - sensorSource.transform.position).normalized;
                 float angleToTarget = Vector3.Angle(sensorSource.transform.forward, dirToTarget);
 
                 if (angleToTarget < viewAngle / 2f)
                 {
-                    detectedTargets.Add(hit.transform);
+                    float distToTarget = Vector3.Distance(sensorSource.transform.position, target.position);
+
+                    // 检查中间是否有阻挡物
+                    if (!Physics.Raycast(sensorSource.transform.position, dirToTarget, out RaycastHit hitInfo, distToTarget, ~detectionLayer))
+                    {
+                        detectedTargets.Add(target);
+                    }
                 }
             }
         }
@@ -84,6 +103,16 @@ namespace Helltal.Gelercat
             Gizmos.color = new Color(1, 1, 0, 0.1f);
             Gizmos.DrawRay(origin, left * viewDistance);
             Gizmos.DrawRay(origin, right * viewDistance);
+
+            // 画出射线投射
+            foreach (var target in detectedTargets)
+            {
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(sensorSource.transform.position, target.position);
+            }
         }
+
+
+
     }
 }

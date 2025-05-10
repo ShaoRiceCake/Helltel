@@ -14,6 +14,8 @@ public class MRBunnyController : GuestBase, IHurtable
     [Header("MR-Bunny 开始攻击的范围")]
     public float attackDistance = 2f; // 攻击范围
 
+    [Header("搜索精度")]
+    public float searchAccuracy = 5f; // 搜索精度
     // public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject CurTarget; //当前目标    
     private Node getDamageNode;
@@ -142,7 +144,7 @@ public class MRBunnyController : GuestBase, IHurtable
 
                 new Repeater(
                 new Cooldown(1f,
-                new Patrol(agent, navPointsManager))
+                new Patrol(agent, navPointsManager,searchAccuracy))
             ))
 
         );
@@ -333,6 +335,14 @@ public class MRBunnyController : GuestBase, IHurtable
         Gizmos.DrawWireSphere(transform.position, chaseDistance); // 绘制追击范围
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, attackDistance); // 绘制攻击范围
+        Gizmos.color = Color.yellow; // 绘制搜索精度范围
+        Gizmos.DrawWireSphere(transform.position, searchAccuracy); // 绘制搜索精度范围
 
+    }
+
+    void OnDestroy()
+    {
+        base.OnDestroy();
+        behaviorTree?.Stop(); // 停止行为树
     }
 }

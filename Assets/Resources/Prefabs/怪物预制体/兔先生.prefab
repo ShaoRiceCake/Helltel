@@ -255,7 +255,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 94469131
+  GlobalObjectIdHash: 1513215654
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -287,14 +287,14 @@ MonoBehaviour:
   agent: {fileID: 0}
   presenter: {fileID: 0}
   sensor: {fileID: 0}
+  EnemyList:
+  - {fileID: 0}
   aiState:
     m_InternalValue: 0
   moveSpeed: 3.5
   chaseDistance: 10.25
   chaseSpeed: 5
   attackDistance: 2
-  EnemyList:
-  - {fileID: 0}
   CurTarget: {fileID: 0}
 --- !u!195 &7379766586752322120
 NavMeshAgent:
@@ -304,7 +304,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6743905690197895573}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8

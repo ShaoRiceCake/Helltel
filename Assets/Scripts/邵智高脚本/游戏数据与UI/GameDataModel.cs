@@ -18,6 +18,7 @@ public class GameDataModel : ScriptableObject
     [SerializeField]private int _basePerformanceTarget ;//基础绩效要求
     [SerializeField]private int _level;
     [SerializeField]private bool _isPerformancePassed;
+    [SerializeField]private bool _isPlayerDied ;
 
     
     //输入商店和地牢的场景名
@@ -42,7 +43,7 @@ public class GameDataModel : ScriptableObject
     public event Action StartLoading;  //开始加载
     public event Action FinishLoading;  //结束加载
     public event Action<string> FloorIS;      // 楼层类型为
-    public event Action PlayerDieEvent;      // 玩家死亡事件
+    public event Action<bool> OnIsPlayerDiedChangedEvent;      // 玩家死亡状态变化事件
 
    
      
@@ -53,7 +54,15 @@ public class GameDataModel : ScriptableObject
     public int Health {
         get => _health;
         set {
-            _health =value;
+            if(_health<=0)
+            {
+                IsPlayerDied = true;
+                _health = 0;
+            }
+            else
+            {
+                _health =value;
+            }
             OnHealthChanged?.Invoke(_health); // 触发UI更新
         }
     }
@@ -106,6 +115,13 @@ public class GameDataModel : ScriptableObject
             FloorIS?.Invoke(_currentLoadedScene);
         }
     }
+    public bool IsPlayerDied {
+        get => _isPlayerDied;
+        set {
+            _isPlayerDied = true;
+            OnIsPlayerDiedChangedEvent?.Invoke(value);
+        }
+    }
 
 
 
@@ -122,6 +138,7 @@ public class GameDataModel : ScriptableObject
         Level = 0;
         _isPerformancePassed = false;
         _currentLoadedScene = "";
+        IsPlayerDied = false;
     }
     //进商店层调用这个
     public void NewShopFloorData()
@@ -175,10 +192,7 @@ public class GameDataModel : ScriptableObject
     {
         FinishLoading?.Invoke(); 
     }
-    public void SendPlayerDieEvent()
-    {
-        PlayerDieEvent?.Invoke(); 
-    }
+    
     
 
 
