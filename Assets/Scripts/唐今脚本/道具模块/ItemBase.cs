@@ -107,7 +107,8 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     [SerializeField] protected string itemName;  // 物品标识（需在Inspector设置）
     public string ItemName => itemName;          // 接口实现
     public int itemPrice = 0;
-
+    private Rigidbody _rb;
+    private float _baseMass;
     public bool IsPurchase
     {
         get => _isPurchase;
@@ -165,6 +166,7 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         ForceSetState(EItemState.NotSelected); // 初始状态设置
 
         orbitCenter = GameObject.Find("BodyBall").transform;
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate()

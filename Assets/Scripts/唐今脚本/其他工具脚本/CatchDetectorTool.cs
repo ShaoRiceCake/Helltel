@@ -2,16 +2,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using TMPro;
 
 public class CatchDetectorTool : MonoBehaviour
 {
     public event Action<List<GameObject>> OnDetectedObjectsUpdated;
-    public GameObject signboardPrefab;
+    public GameObject warningSignPrefab;    // 警告提示牌（金额不足）
+    public GameObject approvedSignPrefab;  // 许可提示牌（金额足够）
+    public float signHeight = 1f;          // 提示牌固定高度
 
     private int _frameCounter;
     public Collider triggerCollider;
     public List<GameObject> detectedObjects = new();
-    private Dictionary<GameObject, GameObject> _objectSignMap = new(); 
+    private readonly Dictionary<GameObject, GameObject> _objectSignMap = new();
 
     private void Start()
     {
@@ -31,13 +34,12 @@ public class CatchDetectorTool : MonoBehaviour
         if (_frameCounter < 5) return;
         _frameCounter = 0;
         UpdateDetectedObjects();
-        UpdateSignsRotation(); // 新增：更新所有告示牌的旋转
+        UpdateSignsPositionAndRotation();
     }
-
+    
     private void UpdateDetectedObjects()
     {
         var currentDetections = new List<GameObject>();
-
         var previousDetections = new List<GameObject>(detectedObjects);
         detectedObjects.Clear();
 
@@ -46,52 +48,101 @@ public class CatchDetectorTool : MonoBehaviour
         foreach (var col in colliders)
         {
             if (!col.TryGetComponent(out IGrabbable _)) continue;
+            
+            var item = col.GetComponent<ItemBase>();
             detectedObjects.Add(col.gameObject);
             currentDetections.Add(col.gameObject);
-                
-            var item = col.GetComponent<ItemBase>(); 
-            if (!item || item.itemPrice == 0) continue;
-            if (!_objectSignMap.ContainsKey(col.gameObject))
+            
+            // 检查是否需要移除已有提示牌
+            if (_objectSignMap.ContainsKey(col.gameObject) && (item == null || item.itemPrice == 0 || item.IsPurchase))
             {
-                CreateSignForObject(col.gameObject, item.itemPrice);
+                RemoveSignForObject(col.gameObject);
+                continue;
+            }
+            
+            // 创建/更新提示牌
+            if (item && item.itemPrice > 0 && !item.IsPurchase)
+            {
+                UpdateOrCreateSign(col.gameObject, item);
             }
         }
 
+        // 移除不再检测到的对象的提示牌
         foreach (var oldObj in previousDetections.Where(oldObj => !currentDetections.Contains(oldObj)))
         {
-            if (!_objectSignMap.TryGetValue(oldObj, out var sign)) continue;
-            Destroy(sign);
-            _objectSignMap.Remove(oldObj);
+            RemoveSignForObject(oldObj);
         }
 
         OnDetectedObjectsUpdated?.Invoke(detectedObjects);
     }
 
-    private void CreateSignForObject(GameObject targetObject, int price)
+    private void UpdateOrCreateSign(GameObject targetObject, ItemBase item)
     {
-        if (!signboardPrefab)
+        var canAfford = GameController.Instance.GetMoney() >= item.itemPrice;
+        var correctPrefab = canAfford ? approvedSignPrefab : warningSignPrefab;
+        var correctTag = canAfford ? "ApprovedSign" : "WarningSign";
+
+        // 如果已有正确类型的提示牌，只需更新不需要重建
+        if (_objectSignMap.TryGetValue(targetObject, out var existingSign))
         {
-            Debug.LogWarning("Signboard prefab is not assigned!");
-            return;
+            if (existingSign.CompareTag(correctTag)) 
+            {
+                return; // 已有正确类型的提示牌
+            }
+            // 只有类型不匹配时才销毁重建
+            RemoveSignForObject(targetObject);
         }
 
-        var signPosition = targetObject.transform.position + Vector3.up * 1f;
-        
-        // 计算旋转使告示牌的 -Y 轴指向当前对象
-        var directionToDetector = transform.position - signPosition;
-        var targetRotation = Quaternion.LookRotation(Vector3.forward, -directionToDetector);
-        
-        var sign = Instantiate(signboardPrefab, signPosition, targetRotation);
-        
-        _objectSignMap[targetObject] = sign;
+        CreateSignForObject(targetObject, item.itemPrice, correctPrefab, correctTag);
     }
 
-    // 新增方法：更新所有告示牌的旋转
-    private void UpdateSignsRotation()
+    private void CreateSignForObject(GameObject targetObject, int price, GameObject prefab, string tag)
     {
-        foreach (var kvp in _objectSignMap.Where(kvp => kvp.Value))
+        if (!prefab || price == 0) return;
+
+        var signPosition = new Vector3(
+            targetObject.transform.position.x,
+            targetObject.transform.position.y + signHeight,
+            targetObject.transform.position.z
+        );
+        
+        var sign = Instantiate(prefab, signPosition, Quaternion.identity);
+        sign.tag = tag;
+        _objectSignMap[targetObject] = sign;
+
+    }
+
+    private void RemoveSignForObject(GameObject targetObject)
+    {
+        if (!_objectSignMap.TryGetValue(targetObject, out var sign)) return;
+        
+        if (sign)
         {
-            kvp.Value.transform.Rotate(Vector3.left, 300 * Time.deltaTime);
+            Destroy(sign);
+        }
+        _objectSignMap.Remove(targetObject);
+    }
+    
+    private void UpdateSignsPositionAndRotation()
+    {
+        if (_objectSignMap.Count == 0) return;
+        
+        foreach (var kvp in _objectSignMap.ToList())
+        {
+            if (!kvp.Value || !kvp.Key)
+            {
+                _objectSignMap.Remove(kvp.Key);
+                continue;
+            }
+            
+            var targetPos = kvp.Key.transform.position;
+            kvp.Value.transform.position = Vector3.Lerp(
+                kvp.Value.transform.position,
+                new Vector3(targetPos.x, targetPos.y + signHeight, targetPos.z),
+                10f * Time.deltaTime
+            );
+            
+            kvp.Value.transform.Rotate(100 * Time.deltaTime, 100 * Time.deltaTime, 100 * Time.deltaTime, Space.World);
         }
     }
 }

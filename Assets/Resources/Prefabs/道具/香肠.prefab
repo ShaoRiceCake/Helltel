@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 3407216013135049965}
   - component: {fileID: 3757876540364231019}
   - component: {fileID: 4893512099515986783}
-  - component: {fileID: 6510032587399802444}
   - component: {fileID: 195638015568126911}
   - component: {fileID: 1009184730859494248}
   - component: {fileID: 5328000538937819928}
   - component: {fileID: 6502723925958507329}
   - component: {fileID: 6948315531091201407}
+  - component: {fileID: 91309487606870047}
   m_Layer: 12
   m_Name: "\u9999\u80A0"
   m_TagString: Item
@@ -32,7 +32,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2634309564649138330}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00000008146034, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -25.061205, y: 0.87167937, z: -1.0402973}
   m_LocalScale: {x: 0.08125598, y: 0.08125598, z: 0.15403625}
   m_ConstrainProportionsScale: 0
@@ -89,23 +89,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &6510032587399802444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2634309564649138330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 809b0662667b6cb4382f0a7cf24f6d16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemName: 
-  enableOrbit: 0
-  orbitCenter: {fileID: 0}
-  orbitRotationSpeed: 90
-  manualForwardDirection: {x: 0, y: 0, z: 1}
 --- !u!65 &195638015568126911
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -203,3 +186,24 @@ MonoBehaviour:
   excludeLayers:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &91309487606870047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2634309564649138330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 944fc6c74ce7f3f4eb7be6e04b242628, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u9999\u80A0"
+  itemPrice: 0
+  enableOrbit: 0
+  orbitCenter: {fileID: 0}
+  orbitRotationSpeed: 90
+  manualForwardDirection: {x: 0, y: 0, z: 1}
+  amount: 25
+  destroyEffectPrefab: {fileID: 2606771552359765001, guid: ae5d9410900abf44391f9866697c4a4f, type: 3}
+  destroyEffectDuration: 0.5
