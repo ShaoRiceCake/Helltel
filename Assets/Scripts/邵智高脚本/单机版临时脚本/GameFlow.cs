@@ -9,7 +9,7 @@ public class GameFlow : MonoBehaviour
     public static GameFlow Instance { get; private set; }
     private GameDataModel _data;
     public SceneOverlayer sceneOverlayer;
-    public GameObject Player;
+
     
     private void Awake() {
         if (Instance == null) {
@@ -29,6 +29,8 @@ public class GameFlow : MonoBehaviour
         
 
         _data = GameController.Instance._gameData;
+
+        
         sceneOverlayer = FindObjectOfType<SceneOverlayer>();
         sceneOverlayer.LoadDungeonScene();
         _data.SendStartLoading();
