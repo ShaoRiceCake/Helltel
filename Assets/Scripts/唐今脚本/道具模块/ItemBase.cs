@@ -11,6 +11,7 @@ public interface IInteractable
 {
     string ItemName { get; }           // 物品唯一标识
     EItemState CurrentState { get; }    // 当前状态查询
+    int ItemDamage{get;set;}
 }
 
 // 清洁道具接口（仅用于清洁的道具挂载）
@@ -104,8 +105,14 @@ public class GrabbedState : ItemState
 public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
 {
     // 配置字段
-    [SerializeField] protected string itemName;  // 物品标识（需在Inspector设置）
-    public string ItemName => itemName;          // 接口实现
+    [SerializeField] protected string itemName; 
+    public string ItemName => itemName;         
+    [SerializeField] protected int itemDamage;  
+    public int ItemDamage
+    {
+        get => itemDamage;
+        set => itemDamage = value;
+    }
     public int itemPrice = 0;
     private Rigidbody _rb;
     private float _baseMass;
@@ -134,6 +141,7 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     private readonly Stack<ItemState> _stateStack = new();          // 状态堆栈（支持状态嵌套）
     private readonly Dictionary<EItemState, ItemState> _stateDictionary = new(); // 状态注册表
     public EItemState CurrentState => _stateStack.Count > 0 ? _stateStack.Peek().StateType : EItemState.NotSelected; // 当前状态查询
+
 
     // 层级管理
     public int OriginalLayer { get; private set; }  // 物品原始层级（自动获取）

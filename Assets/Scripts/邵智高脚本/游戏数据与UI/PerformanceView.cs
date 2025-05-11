@@ -22,7 +22,7 @@ public class PerformanceView : MonoBehaviour
 
     private void Start()
     {
-        _data = GameController.Instance._gameData;
+        _data = Resources.Load<GameDataModel>("GameData");
         _data.OnPerformanceChanged += UpdatePerformanceDisplay;
         _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
         _data.FloorIS +=NeedActive;

@@ -7,7 +7,6 @@ public class ObiEmitterManager : MonoBehaviour
     private ObiEmitter _obiEmitter;
     private bool _isSubscribed;
 
-    [Tooltip("完全手动控制")]
     public bool forceManualEmission = true;
 
     private void Start()
@@ -63,14 +62,13 @@ public class ObiEmitterManager : MonoBehaviour
         _obiEmitter.speed = sprayEvent.emissionSpeed;
         _obiEmitter.randomDirection = sprayEvent.emissionRandomness;
 
-        // StartCoroutine(EmitParticlesOverTime(sprayEvent.emitterCount));
         TriggerBurst(sprayEvent.emitterCount);
 
     }
 
     private System.Collections.IEnumerator EmitParticlesOverTime(int totalCount)
     {
-        var batchSize = Mathf.Min(10, totalCount); // 每批发射10个
+        var batchSize = Mathf.Min(10, totalCount);
         var emitted = 0;
 
         while(emitted < totalCount)
@@ -81,7 +79,7 @@ public class ObiEmitterManager : MonoBehaviour
                 _obiEmitter.EmitParticle(0);
             }
             emitted += toEmit;
-            yield return null; // 等待下一帧
+            yield return null; 
         }
     }
 

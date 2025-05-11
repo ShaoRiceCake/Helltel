@@ -14,7 +14,7 @@ public class ItemWeapon_BaseballBat : PassiveItem
     [SerializeField] private float soundCooldown = 0.5f; // Time between sound plays
     [SerializeField] private float soundVolume = 1.0f; // Volume of the swing sound
 
-    private Rigidbody _rb;
+    private Rigidbody _rigidbody;
     private float _lastSoundTime;
     private bool _soundReady = true;
 
@@ -23,11 +23,11 @@ public class ItemWeapon_BaseballBat : PassiveItem
     protected override void Awake()
     {
         base.Awake(); 
-        _rb = GetComponent<Rigidbody>();
+        _rigidbody = GetComponent<Rigidbody>();
         
-        if (_rb != null) return;
-        _rb = gameObject.AddComponent<Rigidbody>();
-        _rb.isKinematic = true;
+        if (_rigidbody != null) return;
+        _rigidbody = gameObject.AddComponent<Rigidbody>();
+        _rigidbody.isKinematic = true;
 
     }
 
@@ -65,8 +65,8 @@ public class ItemWeapon_BaseballBat : PassiveItem
     private void CheckSwingVelocity()
     {
         if(!_onCatch) return;
-        if (_rb == null || !_soundReady) return;
-        if (!(_rb.velocity.magnitude > velocityThreshold)) return;
+        if (!_rigidbody || !_soundReady) return;
+        if (!(_rigidbody.velocity.magnitude > velocityThreshold)) return;
         PlaySwingSound();
         StartCoroutine(SoundCooldown());
     }

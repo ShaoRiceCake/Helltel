@@ -13,9 +13,14 @@ public class SceneOverlayer : NetworkBehaviour
     
     //[SerializeField] private bool _isScene1Active;
     [SerializeField] private bool ready=true;
-    private void Start()
+    public void Awake()
     {
         _data = GameController.Instance._gameData;
+        
+    }
+    private void Start()
+    {
+        
 
     }
 

@@ -21,7 +21,7 @@ public class MoneyView : MonoBehaviour
 
     private void Start()
     {
-        _data = GameController.Instance._gameData;
+        _data = Resources.Load<GameDataModel>("GameData");
         // 注册事件
         _data.OnMoneyChanged += UpdateMoneyDisplay;
         _data.FloorIS +=NeedActive;
