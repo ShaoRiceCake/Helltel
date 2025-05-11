@@ -137,11 +137,9 @@ public class MouseControl : MonoBehaviour
     private void HandleMouseMovementUpdate()
     {
         var currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-        if (currentMousePosition != _lastMousePosition)
-        {
-            var mouseDelta = currentMousePosition * _mMouseSensitivity;
-            onMouseMoveUpdate?.Invoke(mouseDelta);
-        }
-        _lastMousePosition = currentMousePosition;
+
+        var mouseDelta = currentMousePosition * _mMouseSensitivity;
+        onMouseMoveUpdate?.Invoke(mouseDelta);
+
     }
 }

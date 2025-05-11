@@ -66,7 +66,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         controlHandler.onCameraControl.AddListener(EnableCameraControl);
         controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
-        controlHandler.onMouseMoveFixedUpdate.AddListener(MouseMoveFixedUpdate);
+        controlHandler.onMouseMoveUpdate.AddListener(MouseMoveUpdate);
 
         if (controlledCamera == null) controlledCamera = Camera.main;
         if (target == null)
@@ -107,7 +107,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
 
     
 
-    private void MouseMoveFixedUpdate(Vector2 arg0)
+    private void MouseMoveUpdate(Vector2 arg0)
     {
 
         if (!controlledCamera || !target) return;
