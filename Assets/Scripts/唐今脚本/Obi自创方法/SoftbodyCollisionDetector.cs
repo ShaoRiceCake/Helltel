@@ -4,70 +4,97 @@ using System;
 
 public class SoftbodyCollisionDetector : MonoBehaviour
 {
-    // 只有这个层级的对象会产生玩家粒子碰撞检测，目前设定是PlayerDetect
     [Tooltip("Layers that trigger collision detection")]
     public LayerMask triggerLayers;
     
     [Tooltip("The ObiSolver that handles the physics")]
-    public ObiSolver solver;
+    private ObiSolver _solver;
     
     [Tooltip("The ObiSoftbody whose collisions we want to detect")]
-    public ObiSoftbody softbody;
+    private ObiSoftbody _softbody;
+    
+    private ObiCollider _obiCollider;
 
-    // 订阅这个事件，获取玩家对象粒子碰撞位置
-    public event Action<Vector3> OnSoftbodyCollision;
+    private void Awake()
+    {
+        _obiCollider = GetComponent<ObiCollider>();
+        if (_obiCollider == null)
+        {
+            Debug.LogError("BalloonCollisionDetector requires an ObiCollider component!");
+            enabled = false;
+            return;
+        }
 
+        FindPlayerComponents();
+    }
+    
+    private void FindPlayerComponents()
+    {
+        var playerSolverObj = GameObject.Find("PlayerSolver");
+        if (playerSolverObj == null)
+        {
+            Debug.LogError("找不到 PlayerSolver 对象！请确保玩家 Solver 在场景中。");
+            enabled = false;
+            return;
+        }
+
+        _solver = playerSolverObj.GetComponent<ObiSolver>();
+        if (_solver == null)
+        {
+            Debug.LogError("PlayerSolver 对象上没有 ObiSolver 组件！");
+            enabled = false;
+            return;
+        }
+
+        _softbody = playerSolverObj.GetComponentInChildren<ObiSoftbody>();
+        if (_softbody == null)
+        {
+            Debug.LogError("PlayerSolver 的子对象中没有 ObiSoftbody 组件！");
+            enabled = false;
+            return;
+        }
+
+        Debug.Log("成功找到玩家 Solver 和 Softbody！");
+    }
+    
     private void OnEnable()
     {
-        if (solver != null)
+        if (_solver != null)
         {
-            solver.OnCollision += OnSolverCollision;
+            _solver.OnCollision += OnSolverCollision;
         }
     }
 
     private void OnDisable()
     {
-        if (solver != null)
+        if (_solver != null)
         {
-            solver.OnCollision -= OnSolverCollision;
+            _solver.OnCollision -= OnSolverCollision;
         }
     }
 
-    private void OnSolverCollision(object sender, ObiNativeContactList contacts)
+    private void OnSolverCollision(object sender, Obi.ObiNativeContactList contacts)
     {
-        if (!softbody) return;
+        if (_obiCollider == null || _solver == null) return;
 
         var colliderWorld = ObiColliderWorld.GetInstance();
 
-        for (var i = 0; i < contacts.count; ++i)
+        for (var i = 0; i < contacts.count; i++)
         {
-            if (!(contacts[i].distance < 0.01f)) continue;
-            
-            var col = colliderWorld.colliderHandles[contacts[i].bodyB].owner;
-            if (!col || triggerLayers != (triggerLayers | (1 << col.gameObject.layer))) continue;
-            
-            var solverParticleIndex = solver.simplices[contacts[i].bodyA];
-            
-            var actorIndex = FindActorIndex(softbody, solverParticleIndex);
-            if (actorIndex < 0) continue;
-            
-            var particlePosition = solver.transform.TransformPoint(solver.positions[solverParticleIndex]);
-            
-            OnSoftbodyCollision?.Invoke(particlePosition);
-            
-            // Debug.Log("particlePosition:"+particlePosition);
-            
-            break;
-        }
-    }
+            if (contacts[i].distance >= 0) continue;
 
-    private static int FindActorIndex(ObiSoftbody softbody, int solverParticleIndex)
-    {
-        for (var i = 0; i < softbody.solverIndices.count; i++)
-        {
-            if (softbody.solverIndices[i] == solverParticleIndex)
-                return i;
+            var otherColliderHandle = contacts[i].bodyB;
+            var otherCollider = colliderWorld.colliderHandles[otherColliderHandle].owner;
+
+            if (otherCollider != _obiCollider) continue;
+
+            var particleIndex = contacts[i].bodyA;
+            var particleObject = _solver.particleToActor[particleIndex].actor?.gameObject;
+
+            if (particleObject == null || (triggerLayers.value & (1 << particleObject.layer)) == 0)
+                continue;
+            
+            Debug.Log($"与玩家碰撞！");
         }
-        return -1;
     }
 }
