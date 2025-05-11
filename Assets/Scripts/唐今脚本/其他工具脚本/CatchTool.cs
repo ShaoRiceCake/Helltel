@@ -187,19 +187,22 @@ public class CatchTool : MonoBehaviour
             return false;
         }
         
-        // 如果是强制释放或者有权限释放
-        if (forceRelease || item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID))
-        {
-            _isGrabbing = false;
-            CurrentlyGrabbedItem = null;
-            obiAttachment.enabled = false;
-            obiAttachment.BindToTarget(null);
-            
-            AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
-            return true;
-        }
+        if (!forceRelease && !item.RequestStateChange(EItemState.ReadyToGrab, CatchToolInstanceId, playerID))
+            return false;
         
-        return false;
+        if (CurrentlyGrabbedItem)
+        {
+            CurrentlyGrabbedItem.OnReleased.RemoveListener(OnItemReleased);
+        }
+            
+        _isGrabbing = false;
+        CurrentlyGrabbedItem = null;
+        obiAttachment.enabled = false;
+        obiAttachment.BindToTarget(null);
+            
+        AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
+        return true;
+
     }
 
     /// <summary>
@@ -239,18 +242,54 @@ public class CatchTool : MonoBehaviour
     private void GrabObject(GameObject target)
     {
         if (!target || !target.TryGetComponent<ItemBase>(out var item)) return;
+        
+        if (item.itemPrice > 0 && !item.IsPurchase)
+        {
+            var price = item.itemPrice;
+            var hasEnoughMoney = CheckPlayerMoney(playerID, price);
+        
+            if (hasEnoughMoney)
+            {
+                DeductPlayerMoney(playerID, price);
+                item.IsPurchase = true;
+            
+                AudioManager.Instance.Play("购买", _catchBall.transform.position, 0.7f);
+            }
+            else
+            {
+                AudioManager.Instance.Play("无法购买", _catchBall.transform.position, 0.7f);
+                return;
+            }
+        }
+        
         if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
 
         _isGrabbing = true;
         CurrentlyGrabbedItem = item;
-    
-        // 检查是否为运动学对象
+
+        item.OnReleased.AddListener(OnItemReleased);
+
         var rb = item.GetComponent<Rigidbody>();
         _isGrabbingKinematic = rb && rb.isKinematic;
-    
+
         obiAttachment.BindToTarget(item.transform);
         obiAttachment.enabled = true;
         AudioManager.Instance.Play("玩家抓取", _catchBall.transform.position, 0.7f);
+    }
+
+    private void OnItemReleased()
+    {
+        if (!_isGrabbing) return;
+        if (CurrentlyGrabbedItem)
+        {
+            CurrentlyGrabbedItem.OnReleased.RemoveListener(OnItemReleased);
+        }
+        
+        _isGrabbing = false;
+        _isGrabbingKinematic = false;
+        CurrentlyGrabbedItem = null;
+        obiAttachment.enabled = false;
+        obiAttachment.BindToTarget(null);
     }
     
     private void ReleaseObject()
@@ -264,14 +303,25 @@ public class CatchTool : MonoBehaviour
         if (!_isGrabbing || !CurrentlyGrabbedItem) return 0f;
     
         var rb = CurrentlyGrabbedItem.GetComponent<Rigidbody>();
-        if (rb == null) return 0f;
+        if (!rb) return 0f;
     
-        if (rb.isKinematic) return float.MaxValue; // Treat kinematic objects as infinite mass
-        return rb.mass;
+        return rb.isKinematic ? float.MaxValue : 
+            rb.mass;
     }
     
     public bool IsGrabbingKinematic()
     {
         return _isGrabbing && _isGrabbingKinematic;
     }
+    
+    private bool CheckPlayerMoney(ulong playerId, int price)
+    {
+        return GameController.Instance.GetMoney() >= price;
+    }
+
+    private void DeductPlayerMoney(ulong playerId, int amount)
+    {
+        GameController.Instance.DeductMoney(amount);
+    }
+
 }

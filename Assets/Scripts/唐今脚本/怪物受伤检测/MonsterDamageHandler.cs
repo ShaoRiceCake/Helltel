@@ -80,14 +80,14 @@ public class MonsterCollisionHandler : MonoBehaviour
     
     private void HandleBloodSpray(Vector3 hitPosition, float damage, Collision collision)
     {
-        var emitterCount = Mathf.Min(1 + Mathf.FloorToInt(damage / 100f), 5);
+        var emitterCount = (int)damage;
 
         var otherRigidbody = collision.rigidbody;
         var speed = collision.relativeVelocity.magnitude;
         // float mass = otherRigidbody.mass;
 
         var emissionSpeed = Mathf.Lerp(1f, 10f, Mathf.InverseLerp(10f, 100f, speed));
-        var randomness = Mathf.Lerp(0.3f, 0.8f, Mathf.InverseLerp(10f, 100f, speed));
+        var randomness = 0.3f;
 
         var direction = (hitPosition - transform.position).normalized;
         var rotation = Quaternion.LookRotation(direction);

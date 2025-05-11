@@ -52,7 +52,6 @@ public class ItemWeapon_BaseballBat : PassiveItem
     {
         UpdateAssociatedObjectLayer();
         CheckSwingVelocity();
-        Debug.Log("_onCatch" +_onCatch);
     }
 
     private void UpdateAssociatedObjectLayer()

@@ -35,6 +35,10 @@ public class GameController : MonoBehaviour
         {
             AddPerformance(50);
         }
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            DeductHealth(50);
+        }
     }
     // 增加血上限接口
     public void AddMaxHealth(int amount)
@@ -89,7 +93,7 @@ public class GameController : MonoBehaviour
       
     }
 
-    // 增加钱接口
+    // 增加玩家资金接口
     public void AddMoney(int amount)
     {
         if (amount < 0)
@@ -101,7 +105,7 @@ public class GameController : MonoBehaviour
         _gameData.Money += amount;
     }
 
-    // 扣钱接口
+    // 扣玩家资金接口
     public void DeductMoney(int amount)
     {
         if (_gameData.Money >= amount)
@@ -111,6 +115,14 @@ public class GameController : MonoBehaviour
         //暂定钱可以是负数
         _gameData.Money -= amount;
     }
+    
+    // 检查玩家资金接口
+    public int GetMoney()
+    {
+        return _gameData.Money;
+    }
+
+    
     //增加绩效接口
     public void AddPerformance(int amount)
     {

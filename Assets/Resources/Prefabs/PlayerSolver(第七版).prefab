@@ -1168,6 +1168,7 @@ GameObject:
   - component: {fileID: 1469289449080089784}
   - component: {fileID: 2573883085121155524}
   - component: {fileID: 7914970566067257061}
+  - component: {fileID: 780498937325419430}
   m_Layer: 7
   m_Name: shang
   m_TagString: Player
@@ -1218,17 +1219,17 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 1061491990900004933, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -2806404139380182949, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: 8255028161511215929, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -1734466688874716094, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -4372536172839912495, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: 830258910468995235, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -2728332429266605417, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -345553374890253111, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -8429602205177196161, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: 7488959734034726970, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
-  - {fileID: -1483966851040617411, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
+  - {fileID: 2100000, guid: 99bbfe3eda5528a4898efa330594cec5, type: 2}
+  - {fileID: 2100000, guid: 71f57388bef6b6a4385563ad485519c2, type: 2}
+  - {fileID: 2100000, guid: e7f13b3a1cc0397438b93e5a8e1ad7e2, type: 2}
+  - {fileID: 2100000, guid: 26c908df7ecd5c8428dc0c3e0055c739, type: 2}
+  - {fileID: 2100000, guid: e8556aabcc928dc48b3afcbc72e9fc7d, type: 2}
+  - {fileID: 2100000, guid: 14087b5cecbc20d46952c64f95c201cf, type: 2}
+  - {fileID: 2100000, guid: 9e0359da0115efb4caa299f2196c22fb, type: 2}
+  - {fileID: 2100000, guid: 732be53606953bc49a524b1a1e3fbd5d, type: 2}
+  - {fileID: 2100000, guid: 784e75ceade39e142b3abda84f47ac5c, type: 2}
+  - {fileID: 2100000, guid: b8293d34514ec1c4cae8c97b51df4d88, type: 2}
+  - {fileID: 2100000, guid: 6b48405bce2b11e4f8c84a394bfbf71f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -14947,6 +14948,27 @@ MonoBehaviour:
   - 1
   - 1
   <sourceMesh>k__BackingField: {fileID: 101098846338017502, guid: 947734a5c4e58ca4eb88794576b4b4d4, type: 3}
+--- !u!95 &780498937325419430
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4550777167604612642}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 806c08e62e0c30041b4f66a5b02dff68, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4772937933276496232
 GameObject:
   m_ObjectHideFlags: 0
@@ -16906,6 +16928,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2d359f3c8c0a543a871e5c87839f85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  signboardPrefab: {fileID: 1746548963585488098, guid: a5d1867b7ae091340960fc7b85a9e9f6, type: 3}
   triggerCollider: {fileID: 9048211293632716141}
   detectedObjects: []
 --- !u!114 &4042899305123341103
