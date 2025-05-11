@@ -4,6 +4,8 @@ using NPBehave;
 using NUnit.Framework.Constraints;
 using UnityEngine;
 
+using UnityEngine.VFX; //测试用特效
+
 public class BalloonController : GuestBase, IHurtable
 {
     [Header("气球移动参数")]
@@ -26,6 +28,9 @@ public class BalloonController : GuestBase, IHurtable
     private bool isApproaching = false;
     private bool isCoolingdown = false;
     private bool exploded = false;
+
+
+
 
     protected override void Awake()
     {
@@ -102,7 +107,7 @@ public class BalloonController : GuestBase, IHurtable
     IEnumerator ExplodeCoroutine()
     {
         // 等待一段时间后执行爆炸
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(2f);
         Explode();
     }
     private Node BuildApproachBranch()
@@ -160,22 +165,18 @@ public class BalloonController : GuestBase, IHurtable
     }
 
     public void TakeDamage(int damage)
-    {
+    {   
+        Debug.Log("气球受伤：" + damage);
         if (!exploded)
         {
             curHealth.Value -= damage;
+            Debug.Log("气球当前血量：" + curHealth.Value);
             if (curHealth.Value <= 0)
             {
                 behaviorTree.Blackboard["isDead"] = true;
+                Debug.Log("气球死亡");
+                Debug.Log("气球当前血量：" + curHealth.Value);
             }
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!exploded && GameManager.instance.playerIdentifiers.Contains(other.transform))
-        {
-            behaviorTree.Blackboard["isDead"] = true;
         }
     }
 
@@ -224,6 +225,7 @@ public class BalloonController : GuestBase, IHurtable
  
         // 播放爆炸动画或特效
         Debug.Log("气球爆炸！");
+        AudioManager.Instance.Play("气球爆炸",this.transform.position);
 
         // 自毁
         Destroy(gameObject);
@@ -235,7 +237,7 @@ public class BalloonController : GuestBase, IHurtable
         if (isApproaching)
         {
             approachTimer -= Time.deltaTime;
-            Debug.Log("气球追逐中，剩余时间：" + approachTimer);
+            // Debug.Log("气球追逐中，剩余时间：" + approachTimer);
             if (approachTimer <= 0f)
             {
                 isApproaching = false; // 结束追逐状态
@@ -247,7 +249,7 @@ public class BalloonController : GuestBase, IHurtable
         if (isCoolingdown)
         {
             cooldownTimer -= Time.deltaTime;
-            Debug.Log("气球冷却中，剩余时间：" + cooldownTimer);
+            // Debug.Log("气球冷却中，剩余时间：" + cooldownTimer);
             if (cooldownTimer <= 0f)
             {
                 isCoolingdown = false; // 结束冷却状态
