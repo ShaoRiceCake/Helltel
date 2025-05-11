@@ -53,21 +53,18 @@ public class CatchDetectorTool : MonoBehaviour
             detectedObjects.Add(col.gameObject);
             currentDetections.Add(col.gameObject);
             
-            // 检查是否需要移除已有提示牌
             if (_objectSignMap.ContainsKey(col.gameObject) && (item == null || item.itemPrice == 0 || item.IsPurchase))
             {
                 RemoveSignForObject(col.gameObject);
                 continue;
             }
             
-            // 创建/更新提示牌
             if (item && item.itemPrice > 0 && !item.IsPurchase)
             {
                 UpdateOrCreateSign(col.gameObject, item);
             }
         }
 
-        // 移除不再检测到的对象的提示牌
         foreach (var oldObj in previousDetections.Where(oldObj => !currentDetections.Contains(oldObj)))
         {
             RemoveSignForObject(oldObj);
@@ -82,14 +79,12 @@ public class CatchDetectorTool : MonoBehaviour
         var correctPrefab = canAfford ? approvedSignPrefab : warningSignPrefab;
         var correctTag = canAfford ? "ApprovedSign" : "WarningSign";
 
-        // 如果已有正确类型的提示牌，只需更新不需要重建
         if (_objectSignMap.TryGetValue(targetObject, out var existingSign))
         {
             if (existingSign.CompareTag(correctTag)) 
             {
-                return; // 已有正确类型的提示牌
+                return; 
             }
-            // 只有类型不匹配时才销毁重建
             RemoveSignForObject(targetObject);
         }
 
