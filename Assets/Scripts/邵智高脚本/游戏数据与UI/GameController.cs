@@ -83,6 +83,7 @@ public class GameController : MonoBehaviour
         if (_gameData.Health >= amount)
         {
             _gameData.Health -= amount;
+            Debug.Log("玩家扣除血量" + amount);
         }
         else
         {
