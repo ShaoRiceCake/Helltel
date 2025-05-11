@@ -23,6 +23,7 @@ public class BalloonController : GuestBase, IHurtable
     private float cooldownTimer = 0f;
 
     private bool isApproaching = false;
+    private bool isCoolingdown = false;
     private bool exploded = false;
 
     protected override void Awake()
@@ -57,9 +58,15 @@ public class BalloonController : GuestBase, IHurtable
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
-                    new Condition(IsNavAgentOnNavmesh, Stops.NONE,
+                    new Condition(IsNavAgentOnNavmesh, Stops.IMMEDIATE_RESTART,
                         new Selector(
-                            BuildApproachBranch(),
+                            new Condition(() => !isCoolingdown, Stops.IMMEDIATE_RESTART,
+                                new Selector(
+                                    BuildApproachBranch(),
+                                    BuildcantseeApproachBranch()    
+                                )
+                            ),
+
                             BuildPatrolBranch()
                         )
                     )
@@ -84,31 +91,36 @@ public class BalloonController : GuestBase, IHurtable
 
     private Node BuildApproachBranch()
     {
-        // return new Condition(() => IsEnemyCanSee(), Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
-        //     new Sequence(
-        //         new Action(() =>
-        //             {
-
-        //             }
-        //         ),
-        //         new WaitUntilStopped()w
-        //     )
-
-        //     );
-        return new Cooldown(coolDownTime,  // 冷却时间 20 秒
-           new Condition(() => { return (IsEnemyCanSee() || isApproaching);}, Stops.IMMEDIATE_RESTART,
-               new Sequence(
-                   new Action(() =>
-                   {
-                       if (curTarget != null && agent.isOnNavMesh)
-                       {  
-                           agent.SetDestination(curTarget.transform.position);
-                           agent.speed = approachSpeed; // 设置追踪速度
-                       }
-                   }),
-                   new WaitUntilStopped()
-               )
-           ));
+        // 追逐状态
+        return new Condition(() => IsEnemyCanSee() ,Stops.LOWER_PRIORITY,
+            new Sequence(
+                new Action(() =>{
+                    approachTimer = approachTime; // 刷新追逐时间
+                    isApproaching = true; // 设置追逐状态
+                }),
+                new Action(() => {
+                    if (curTarget != null && IsNavAgentOnNavmesh())
+                    {
+                        agent.speed = approachSpeed; // 设置追逐速度
+                        agent.SetDestination(curTarget.transform.position); // 追逐目标
+                    }
+                })
+            )
+        );
+    }                    
+    private Node BuildcantseeApproachBranch() //持续追逐目标
+    {
+        return new Condition(() => isApproaching, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+            new Sequence(
+                new Action(() =>{
+                    if (curTarget != null && IsNavAgentOnNavmesh())
+                    {
+                        agent.speed = approachSpeed; // 设置追逐速度
+                        agent.SetDestination(curTarget.transform.position); // 追逐目标
+                    }
+                })
+            )
+        );
     }
 
     private Node BuildPatrolBranch()
@@ -187,14 +199,27 @@ public class BalloonController : GuestBase, IHurtable
     }
     protected override void Update()
     {
+
         base.Update();
-        if (isApproaching)
+        if(isApproaching)
         {
             approachTimer -= Time.deltaTime;
+            Debug.Log("气球追逐中，剩余时间：" + approachTimer);
             if (approachTimer <= 0f)
             {
-                isApproaching = false;
-                cooldownTimer = cooldownTime;
+                isApproaching = false; // 结束追逐状态
+                cooldownTimer = cooldownTime; // 开启冷却时间
+                isCoolingdown = true; // 设置冷却状态
+            }
+        }
+        
+        if(isCoolingdown)
+        {
+            cooldownTimer -= Time.deltaTime;
+            Debug.Log("气球冷却中，剩余时间：" + cooldownTimer);
+            if (cooldownTimer <= 0f)
+            {
+                isCoolingdown = false; // 结束冷却状态
             }
         }
     }

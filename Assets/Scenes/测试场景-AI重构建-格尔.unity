@@ -1749,6 +1749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: 
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -1987,6 +1988,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: "\u94B1\u888B"
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -2154,6 +2156,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7163374222232244473, guid: ba2d581a5b461a54e829a42170af2822, type: 3}
   m_PrefabInstance: {fileID: 504026204}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1336585699
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1336585701}
+  - component: {fileID: 1336585700}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1336585700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336585699}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1336585701
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1336585699}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1346521820
 GameObject:
   m_ObjectHideFlags: 0
@@ -2589,6 +2635,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: 
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -2959,50 +3006,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4999745932188293686, guid: ba2d581a5b461a54e829a42170af2822, type: 3}
   m_PrefabInstance: {fileID: 504026204}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1681389984
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1681389986}
-  - component: {fileID: 1681389985}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1681389985
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681389984}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1681389986
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681389984}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1691488126
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3329,6 +3332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: "\u94B1\u888B"
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -3978,6 +3982,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: "\u94B1\u888B"
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -4179,6 +4184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemName: 
+  itemPrice: 0
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -4251,15 +4257,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1181740835687680726, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10
+      value: -15.17
       objectReference: {fileID: 0}
     - target: {fileID: 1181740835687680726, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.2
+      value: 0.01
       objectReference: {fileID: 0}
     - target: {fileID: 1181740835687680726, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -57.9
+      value: -32.32
       objectReference: {fileID: 0}
     - target: {fileID: 1181740835687680726, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4297,9 +4303,21 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 2727973590
       objectReference: {fileID: 0}
+    - target: {fileID: 3119063263379976698, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 4.36
+      objectReference: {fileID: 0}
     - target: {fileID: 6071780852534440434, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
       propertyPath: m_Name
       value: "\u6C14\u7403"
+      objectReference: {fileID: 0}
+    - target: {fileID: 7679741613501497277, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
+      propertyPath: viewDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7679741613501497277, guid: b6e4212177eb2a049affe109f052c52b, type: 3}
+      propertyPath: detectionLayer.m_Bits
+      value: 8192
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4704,6 +4722,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: "\u5154\u5148\u751F2.0"
       objectReference: {fileID: 0}
+    - target: {fileID: 6896343395691544031, guid: a741fd3db6444334ea00125e49e23c82, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8414009537207423830, guid: a741fd3db6444334ea00125e49e23c82, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 750973229
@@ -4751,4 +4773,4 @@ SceneRoots:
   - {fileID: 1935610350}
   - {fileID: 4487111813403238107}
   - {fileID: 504026204}
-  - {fileID: 1681389986}
+  - {fileID: 1336585701}
