@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 3895475162594761838}
   - component: {fileID: 3727350495667656479}
   - component: {fileID: 5579997614683268520}
+  - component: {fileID: 7971640997630490980}
   m_Layer: 7
   m_Name: LeftBall
   m_TagString: Player
@@ -289,6 +290,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 1
+--- !u!114 &7971640997630490980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679796940312919519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35195b9bb25c7044817bb98d8dad63e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u5DE6\u624B\u62F3\u5957"
+  itemDamage: 0
 --- !u!1 &799395259229106358
 GameObject:
   m_ObjectHideFlags: 0
@@ -1004,6 +1019,7 @@ GameObject:
   - component: {fileID: 6963328691889940704}
   - component: {fileID: 2040212182363522893}
   - component: {fileID: 7588596814269287674}
+  - component: {fileID: 4623320426464144685}
   m_Layer: 7
   m_Name: RightHandBall
   m_TagString: Player
@@ -1156,6 +1172,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 1
+--- !u!114 &4623320426464144685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3891041467380816305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35195b9bb25c7044817bb98d8dad63e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u53F3\u624B"
+  itemDamage: 0
 --- !u!1 &4550777167604612642
 GameObject:
   m_ObjectHideFlags: 0
@@ -15091,6 +15121,7 @@ GameObject:
   - component: {fileID: 7819581227096386141}
   - component: {fileID: 2905588204687784353}
   - component: {fileID: 3092450428475733509}
+  - component: {fileID: 8265529959814241111}
   m_Layer: 7
   m_Name: LeftHandBall
   m_TagString: Player
@@ -15243,6 +15274,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 1
+--- !u!114 &8265529959814241111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4797699628857317054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35195b9bb25c7044817bb98d8dad63e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u5DE6\u624B"
+  itemDamage: 0
 --- !u!1 &5410227155746831209
 GameObject:
   m_ObjectHideFlags: 0
@@ -15407,6 +15452,7 @@ GameObject:
   - component: {fileID: 3440281035748446822}
   - component: {fileID: 7453536562246813982}
   - component: {fileID: 1464296392604141185}
+  - component: {fileID: 619031624065926405}
   m_Layer: 7
   m_Name: RightBall
   m_TagString: Player
@@ -15559,6 +15605,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 1
+--- !u!114 &619031624065926405
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5424734720623958030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35195b9bb25c7044817bb98d8dad63e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemName: "\u53F3\u624B\u62F3\u5957"
+  itemDamage: 0
 --- !u!1 &5499738864598328152
 GameObject:
   m_ObjectHideFlags: 0
@@ -16928,7 +16988,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2d359f3c8c0a543a871e5c87839f85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  signboardPrefab: {fileID: 1746548963585488098, guid: a5d1867b7ae091340960fc7b85a9e9f6, type: 3}
+  warningSignPrefab: {fileID: 1746548963585488098, guid: a5d1867b7ae091340960fc7b85a9e9f6, type: 3}
+  approvedSignPrefab: {fileID: 1746548963585488098, guid: ef219d8d15a769d46a5f4afee8b12918, type: 3}
+  signHeight: 1
   triggerCollider: {fileID: 9048211293632716141}
   detectedObjects: []
 --- !u!114 &4042899305123341103
