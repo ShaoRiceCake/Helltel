@@ -4,6 +4,8 @@ using NPBehave;
 using NUnit.Framework.Constraints;
 using UnityEngine;
 
+using UnityEngine.VFX; //测试用特效
+
 public class BalloonController : GuestBase, IHurtable
 {
     [Header("气球移动参数")]
@@ -224,6 +226,7 @@ public class BalloonController : GuestBase, IHurtable
         // 播放爆炸动画或特效
         Debug.Log("气球爆炸！");
         AudioManager.Instance.Play("气球爆炸",this.transform.position);
+
         // 自毁
         Destroy(gameObject);
     }
