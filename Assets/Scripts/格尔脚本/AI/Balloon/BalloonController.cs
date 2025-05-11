@@ -1,5 +1,6 @@
 using Helltal.Gelercat;
 using NPBehave;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 public class BalloonController : GuestBase, IHurtable
@@ -7,20 +8,21 @@ public class BalloonController : GuestBase, IHurtable
     [Header("气球移动参数")]
     public float patrolSpeed = 1f;
     public float approachSpeed = 1f;
+    [Header("搜索精度")]
     public float detectRadius = 5f;
-    public float approachDuration = 5f;
     public float coolDownTime = 20f;
 
     [Header("爆炸参数")]
     public float explosionRadius = 5f;
     public float explosionDamage = 80f;
-
+    [Header("时间参数")]
+    public float approachTime = 5f; // 追踪
+    public float cooldownTime = 20f; // 冷却时间
     private GameObject curTarget;
     private float approachTimer = 0f;
     private float cooldownTimer = 0f;
 
     private bool isApproaching = false;
-    private bool isCooldown = false;
     private bool exploded = false;
 
     protected override void Awake()
@@ -28,6 +30,7 @@ public class BalloonController : GuestBase, IHurtable
         base.Awake();
 
         sensor = this.gameObject.GetComponent<GuestSensor>();
+        sensor.viewDistance = detectRadius; // 气球的搜索精度和探测范围是一致的
         if (sensor == null)
         {
             sensor = this.gameObject.AddComponent<GuestSensor>();
@@ -44,6 +47,7 @@ public class BalloonController : GuestBase, IHurtable
         debugger.BehaviorTree = behaviorTree;
 #endif
         behaviorTree.Blackboard["isDead"] = false;
+        behaviorTree.Blackboard["chaseTimer"] = 0f;
         behaviorTree.Start();
     }
 
@@ -53,8 +57,13 @@ public class BalloonController : GuestBase, IHurtable
             new Selector(
                 BuildDeadBranch(),
                 new Selector(
-                    BuildApproachBranch(),
-                    BuildPatrolBranch()
+                    new Condition(IsNavAgentOnNavmesh, Stops.NONE,
+                        new Selector(
+                            BuildApproachBranch(),
+                            BuildPatrolBranch()
+                        )
+                    )
+
                 )
             )
         );
@@ -75,36 +84,36 @@ public class BalloonController : GuestBase, IHurtable
 
     private Node BuildApproachBranch()
     {
-        return new Condition(() => isApproaching && !isCooldown && curTarget != null, Stops.NONE,
-            new Action(() =>
-            {
-                if (agent.isOnNavMesh)
-                {
-                    float distance = Vector3.Distance(transform.position, curTarget.transform.position);
-                    if (distance < 1f) // 玩家触碰
-                    {
-                        behaviorTree.Blackboard["isDead"] = true;
-                        return;
-                    }
+        // return new Condition(() => IsEnemyCanSee(), Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+        //     new Sequence(
+        //         new Action(() =>
+        //             {
 
-                    agent.SetDestination(curTarget.transform.position);
-                    agent.speed = approachSpeed;
+        //             }
+        //         ),
+        //         new WaitUntilStopped()w
+        //     )
 
-                    approachTimer -= Time.deltaTime;
-                    if (approachTimer <= 0f)
-                    {
-                        isApproaching = false;
-                        isCooldown = true;
-                        cooldownTimer = coolDownTime;
-                    }
-                }
-            }));
+        //     );
+        return new Cooldown(coolDownTime,  // 冷却时间 20 秒
+           new Condition(() => { return (IsEnemyCanSee() || isApproaching);}, Stops.IMMEDIATE_RESTART,
+               new Sequence(
+                   new Action(() =>
+                   {
+                       if (curTarget != null && agent.isOnNavMesh)
+                       {  
+                           agent.SetDestination(curTarget.transform.position);
+                           agent.speed = approachSpeed; // 设置追踪速度
+                       }
+                   }),
+                   new WaitUntilStopped()
+               )
+           ));
     }
 
     private Node BuildPatrolBranch()
     {
-        return new Condition(IsNavAgentOnNavmesh, Stops.NONE,
-            new Sequence(
+        return new Sequence(
                 new Action(
                     () =>
                     {
@@ -114,9 +123,9 @@ public class BalloonController : GuestBase, IHurtable
 
                 new Repeater(
                 new Cooldown(1f,
-                new Patrol(agent, navPointsManager))
+                new Patrol(agent, navPointsManager, detectRadius))
             )
-            ));
+            );
     }
 
     public void TakeDamage(int damage)
@@ -139,6 +148,25 @@ public class BalloonController : GuestBase, IHurtable
         }
     }
 
+    bool IsEnemyCanSee()
+    {
+        if (sensor != null)
+        {
+            if (sensor.detectedTargets.Count > 0)
+            {
+                foreach (var target in sensor.detectedTargets)
+                {
+                    // if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
+                    if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform)) // 单机版本特供，仅有一个玩家
+                    {
+                        curTarget = target.gameObject;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     private void Explode()
     {
         // 简单爆炸实现，可扩展为AOE + 伤害衰减
@@ -157,7 +185,19 @@ public class BalloonController : GuestBase, IHurtable
         // 自毁
         Destroy(gameObject);
     }
-
+    protected override void Update()
+    {
+        base.Update();
+        if (isApproaching)
+        {
+            approachTimer -= Time.deltaTime;
+            if (approachTimer <= 0f)
+            {
+                isApproaching = false;
+                cooldownTimer = cooldownTime;
+            }
+        }
+    }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;

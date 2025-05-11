@@ -123,12 +123,13 @@ public class MRBunnyController : GuestBase, IHurtable
                     if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform))
                     {
                         CurTarget = target.gameObject;
-
                         return true;
                     }
                 }
+                CurTarget = null; // 如果没有检测到目标，则设置为null
             }
         }
+        // CurTarget = null; // 如果没有检测到目标，则设置为null
         return false;
     }
     private Node BuildPatrolBranch()

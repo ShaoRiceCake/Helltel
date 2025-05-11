@@ -40,10 +40,11 @@ namespace Helltal.Gelercat
         {
             // agent.ResetPath();  // 停止导航
             // this.Stopped(false); // 明确停止
-            if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+            if (agent == null && !agent.isOnNavMesh)
             {
-                agent.ResetPath();
+                return;   
             }
+            agent.ResetPath();
             Clock.RemoveUpdateObserver(OnUpdate);  // <<< 关键，移除更新回调！！
             this.Stopped(false); // 明确告诉父节点：自己停止了
         }

@@ -11,6 +11,8 @@ namespace Helltal.Gelercat
         public float viewAngle = 60f;   // 视野角度（锥形）
         public float viewDistance = 10f; // 探测距离
         public LayerMask detectionLayer; // 要检测的生物层级（玩家、生物等）
+        
+        public LayerMask ObstructionLayer; // 遮挡层级（墙壁、地面等）
         public bool isDebug = true; // 是否启用调试模式
         [Header("Scan Result")]
         public List<Transform> detectedTargets;
@@ -49,35 +51,35 @@ namespace Helltal.Gelercat
 
             Collider[] hits = Physics.OverlapSphere(sensorSource.transform.position, viewDistance, detectionLayer);
 
-            // foreach (var hit in hits)
-            // {
-            //     Vector3 dirToTarget = (hit.transform.position - sensorSource.transform.position).normalized;
-            //     float angleToTarget = Vector3.Angle(sensorSource.transform.forward, dirToTarget);
-
-            //     if (angleToTarget < viewAngle / 2f)
-            //     {
-            //         detectedTargets.Add(hit.transform);
-            //     }
-            // }
-
-
             foreach (var hit in hits)
             {
-                Transform target = hit.transform;
-                Vector3 dirToTarget = (target.position - sensorSource.transform.position).normalized;
+                Vector3 dirToTarget = (hit.transform.position - sensorSource.transform.position).normalized;
                 float angleToTarget = Vector3.Angle(sensorSource.transform.forward, dirToTarget);
 
                 if (angleToTarget < viewAngle / 2f)
                 {
-                    float distToTarget = Vector3.Distance(sensorSource.transform.position, target.position);
-
-                    // 检查中间是否有阻挡物
-                    if (!Physics.Raycast(sensorSource.transform.position, dirToTarget, out RaycastHit hitInfo, distToTarget, ~detectionLayer))
-                    {
-                        detectedTargets.Add(target);
-                    }
+                    detectedTargets.Add(hit.transform);
                 }
             }
+
+
+            // foreach (var hit in hits)
+            // {
+            //     Transform target = hit.transform;
+            //     Vector3 dirToTarget = (target.position - sensorSource.transform.position).normalized;
+            //     float angleToTarget = Vector3.Angle(sensorSource.transform.forward, dirToTarget);
+
+            //     if (angleToTarget < viewAngle / 2f)
+            //     {
+            //         float distToTarget = Vector3.Distance(sensorSource.transform.position, target.position);
+
+            //         // 检查中间是否有阻挡物
+            //         if (!Physics.Raycast(sensorSource.transform.position, dirToTarget, out RaycastHit hitInfo, distToTarget, ~detectionLayer))
+            //         {
+            //             detectedTargets.Add(target);
+            //         }
+            //     }
+            // }
         }
 
         // 可视化锥形视野
