@@ -1,3 +1,4 @@
+using System.Collections;
 using Helltal.Gelercat;
 using NPBehave;
 using NUnit.Framework.Constraints;
@@ -63,7 +64,7 @@ public class BalloonController : GuestBase, IHurtable
                             new Condition(() => !isCoolingdown, Stops.IMMEDIATE_RESTART,
                                 new Selector(
                                     BuildApproachBranch(),
-                                    BuildcantseeApproachBranch()    
+                                    BuildcantseeApproachBranch()
                                 )
                             ),
 
@@ -79,26 +80,43 @@ public class BalloonController : GuestBase, IHurtable
     private Node BuildDeadBranch()
     {
         return new BlackboardCondition("isDead", Operator.IS_EQUAL, true, Stops.SELF,
+            new Sequence(
+            new Action(() =>
+            {
+                agent.isStopped = true; // 停止移动
+                agent.ResetPath(); // 重置路径
+
+            }),
             new Action(() =>
             {
                 if (!exploded)
                 {
-                    exploded = true;
-                    Explode();
+                    exploded = true; // 设置为已爆炸
+                    StartCoroutine(ExplodeCoroutine());
                 }
-            }));
-    }
+            }),
 
+            new WaitUntilStopped()
+            ));
+    }
+    IEnumerator ExplodeCoroutine()
+    {
+        // 等待一段时间后执行爆炸
+        yield return new WaitForSeconds(0.5f);
+        Explode();
+    }
     private Node BuildApproachBranch()
     {
         // 追逐状态
-        return new Condition(() => IsEnemyCanSee() ,Stops.LOWER_PRIORITY,
+        return new Condition(() => IsEnemyCanSee(), Stops.LOWER_PRIORITY,
             new Sequence(
-                new Action(() =>{
+                new Action(() =>
+                {
                     approachTimer = approachTime; // 刷新追逐时间
                     isApproaching = true; // 设置追逐状态
                 }),
-                new Action(() => {
+                new Action(() =>
+                {
                     if (curTarget != null && IsNavAgentOnNavmesh())
                     {
                         agent.speed = approachSpeed; // 设置追逐速度
@@ -107,12 +125,13 @@ public class BalloonController : GuestBase, IHurtable
                 })
             )
         );
-    }                    
+    }
     private Node BuildcantseeApproachBranch() //持续追逐目标
     {
         return new Condition(() => isApproaching, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
             new Sequence(
-                new Action(() =>{
+                new Action(() =>
+                {
                     if (curTarget != null && IsNavAgentOnNavmesh())
                     {
                         agent.speed = approachSpeed; // 设置追逐速度
@@ -181,16 +200,28 @@ public class BalloonController : GuestBase, IHurtable
     }
     private void Explode()
     {
-        // 简单爆炸实现，可扩展为AOE + 伤害衰减
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius);
+        //
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius,LayerMask.NameToLayer("PlayerDetect"));
+
+        ///<summary>
+        /// 多玩家时
+        ///<summary>
         foreach (var hit in hitColliders)
         {
             float dist = Vector3.Distance(transform.position, hit.transform.position);
-            float damage = Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius);
-            // 假设玩家带有 IHurtable 接口
-            hit.GetComponent<IHurtable>()?.TakeDamage(Mathf.RoundToInt(damage));
+            int damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
+            ///<summary>
+            /// 多玩家时
+            ///<summary>
+            // 玩家s受伤 IHurtable 接口
+            // hit.GetComponent<IHurtable>()?.TakeDamage(Mathf.RoundToInt(damage));
+            ///<summary>
+            /// 单玩家特供
+            ///<summary>
+            GameController.Instance.DeductHealth(damage);
         }
 
+ 
         // 播放爆炸动画或特效
         Debug.Log("气球爆炸！");
 
@@ -201,7 +232,7 @@ public class BalloonController : GuestBase, IHurtable
     {
 
         base.Update();
-        if(isApproaching)
+        if (isApproaching)
         {
             approachTimer -= Time.deltaTime;
             Debug.Log("气球追逐中，剩余时间：" + approachTimer);
@@ -212,8 +243,8 @@ public class BalloonController : GuestBase, IHurtable
                 isCoolingdown = true; // 设置冷却状态
             }
         }
-        
-        if(isCoolingdown)
+
+        if (isCoolingdown)
         {
             cooldownTimer -= Time.deltaTime;
             Debug.Log("气球冷却中，剩余时间：" + cooldownTimer);
@@ -230,4 +261,6 @@ public class BalloonController : GuestBase, IHurtable
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
+
+    
 }
