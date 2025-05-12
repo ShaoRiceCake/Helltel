@@ -123,9 +123,6 @@ public class GameDataModel : ScriptableObject
         }
     }
 
-
-
-
     // 初始化方法
     public void ResetData()
     {
@@ -156,15 +153,12 @@ public class GameDataModel : ScriptableObject
         _isPerformancePassed = false;
 
     }
-    
-    int ExponentialCalculation()
+
+    private int ExponentialCalculation()
     {
         // 计算指数增长后的值
-        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
-        
-        // 取整到最近的 expRoundInterval 倍数（如10、50、100等）
+        var value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
         return Mathf.RoundToInt(value / 10f) * 10;
-        
     }
     public bool CheckPerformance()
     {

@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2168931558151596550}
-  - component: {fileID: 1815709204618688106}
   - component: {fileID: 2216069781889418493}
   - component: {fileID: 4525606100600637456}
   - component: {fileID: 4975977422384793002}
@@ -37,19 +36,6 @@ Transform:
   - {fileID: 4681957846396408583}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1815709204618688106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 266975186793283453}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9e6e456ffac57347a169ccf16f18b39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bloodSprayPrefab: {fileID: 4145974007093961052, guid: cea402b9c434fe44796fea2caaa7969b, type: 3}
 --- !u!114 &2216069781889418493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -40291,7 +40277,8 @@ PrefabInstance:
       value: 9999
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2790427594972639077, guid: a14954aba275d7b4fbfa6af44156c361, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a14954aba275d7b4fbfa6af44156c361, type: 3}

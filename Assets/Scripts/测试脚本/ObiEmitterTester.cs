@@ -12,16 +12,16 @@ public class ObiEmitterTester : MonoBehaviour
     public Vector2 randomnessRange = new Vector2(0.1f, 0.5f);
 
     [Header("发射设置")]
-    public float emissionInterval = 0.5f;
-    public bool loopEmission = false; // 是否循环发射
-    public bool randomRotation = false; // 是否使用随机旋转
+    public float emissionInterval = 0.2f;
+    public bool loopEmission; // 是否循环发射
+    public bool randomRotation = true; // 是否使用随机旋转
 
     [Header("引用")]
     public ObiEmitterManager emitterManager;
 
     private float _timer;
     private int _currentIndex;
-    private bool _isCompleted = false;
+    private bool _isCompleted;
 
     private void Start()
     {

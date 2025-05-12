@@ -63,7 +63,6 @@ public class ObiEmitterManager : MonoBehaviour
         _obiEmitter.randomDirection = sprayEvent.emissionRandomness;
 
         TriggerBurst(sprayEvent.emitterCount);
-
     }
 
     private System.Collections.IEnumerator EmitParticlesOverTime(int totalCount)

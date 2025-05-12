@@ -21,25 +21,20 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
         }
         _gameData.ResetData();
-
     }
-    private void OnEnable() {
-        
-    }
-    private void Start() {
-        
-    }
-    public void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.M))
-        {
-            AddPerformance(50);
-        }
-        if(Input.GetKeyDown(KeyCode.J))
-        {
-            DeductHealth(50);
-        }
-    }
+    
+    // public void Update()
+    // {
+    //     if(Input.GetKeyDown(KeyCode.M))
+    //     {
+    //         AddPerformance(50);
+    //     }
+    //     if(Input.GetKeyDown(KeyCode.J))
+    //     {
+    //         DeductHealth(50);
+    //     }
+    // }
+    
     // 增加血上限接口
     public void AddMaxHealth(int amount)
     {
@@ -63,7 +58,6 @@ public class GameController : MonoBehaviour
             Debug.LogError("血上限不能是负数");
             return;
         }
-   
     }
 
     // 增加血量接口
