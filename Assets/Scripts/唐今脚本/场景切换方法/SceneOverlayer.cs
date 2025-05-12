@@ -5,87 +5,16 @@ using System;
 using Michsky.LSS;
 using Agora.Rtc;
 
-public class SceneOverlayer : NetworkBehaviour
+public class SceneOverlayer : MonoBehaviour
 {
     private GameDataModel _data;
-    
-    
-    
-    //[SerializeField] private bool _isScene1Active;
+
     [SerializeField] private bool ready=true;
     public void Awake()
     {
         _data = GameController.Instance._gameData;
-        
-    }
-    private void Start()
-    {
-        
-
     }
 
-    private void Update()
-    {
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            SwitchToDungeon();
-        }
-        if (Input.GetKeyDown(KeyCode.L))
-        {
-            SwitchToShop();
-        }
-
-    }
-
-    // public void SwitchScenes()
-    // {
-    //     //ready = false;
-    //     // if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
-    //     // {
-    //     //     if (NetworkManager.Singleton)
-    //     //     {
-    //     //         GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
-    //     //         Debug.Log("卸载" + _data.CurrentLoadedScene);
-    //     //     }
-    //     //     else
-    //     //     {
-    //     //         SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
-    //     //     }
-
-    //     // }
-
-    //     // if (_data.CurrentLoadedScene == _data.dungeon)
-    //     // {
-    //     //     if (NetworkManager.Singleton)
-    //     //     {
-    //     //         Invoke(nameof(LoadShopScene), 0.2f);
-    //     //     }
-    //     //     else
-    //     //     {
-    //     //         lSS_Manager.LoadScene(_data.shop);
-    //     //         //SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
-    //     //     }
-           
-    //     //     _data.CurrentLoadedScene = _data.shop;
-    //     //     _isScene1Active = false;
-    //     // }
-    //     // else
-    //     // {
-    //     //     if (NetworkManager.Singleton)
-    //     //     {
-    //     //         Invoke(nameof(LoadDungeonScene), 0.2f);
-    //     //     }
-    //     //     else
-    //     //     {
-    //     //         lSS_Manager.LoadScene(_data.shop);
-    //     //         //SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
-    //     //     }
-
-    //     //     _data.CurrentLoadedScene = _data.dungeon;
-    //     //     _isScene1Active = true;
-    //     // }
-    // }
     public void SwitchToDungeon()
     {
         SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
@@ -104,30 +33,25 @@ public class SceneOverlayer : NetworkBehaviour
     {
         SceneManager.LoadScene(_data.dungeon, LoadSceneMode.Additive);
         _data.CurrentLoadedScene = _data.dungeon;
-        
     }
 
     public void LoadShopScene()
     {
         SceneManager.LoadScene(_data.shop, LoadSceneMode.Additive);
         _data.CurrentLoadedScene = _data.shop;
-        
     }
 
     private void OnDestroy()
     {
-        if (!string.IsNullOrEmpty(_data.CurrentLoadedScene))
+        if (string.IsNullOrEmpty(_data.CurrentLoadedScene)) return;
+        if (NetworkManager.Singleton)
         {
-            if (NetworkManager.Singleton)
-            {
-                GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
-                Debug.Log("卸载" + _data.CurrentLoadedScene);
-            }
-            else
-            {
-                SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
-            }
-
+            GameManager.instance.UnLoadScene(_data.CurrentLoadedScene);
+            Debug.Log("卸载" + _data.CurrentLoadedScene);
+        }
+        else
+        {
+            SceneManager.UnloadSceneAsync(_data.CurrentLoadedScene);
         }
     }
     
