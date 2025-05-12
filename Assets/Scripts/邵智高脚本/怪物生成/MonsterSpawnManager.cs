@@ -10,9 +10,9 @@ public class MonsterSpawnSystem : NetworkBehaviour
     //============== 核心参数配置区 ==============
 
     [Header("游戏基础熵值")]
-    public float baseEntropy = 50f;
+    public float baseEntropy = 20f;
     [Header("每层变化的熵值")]
-    public float floorMultiplier = 15f;
+    public float floorMultiplier = 8f;
     [Header("每分钟增加的熵值")]
     public float timeFactor = 0.3f;
     [Header("每一块钱增加的熵值")]

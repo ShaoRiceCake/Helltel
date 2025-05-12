@@ -9,11 +9,16 @@ public class MoneyView : MonoBehaviour
 {
     [Header("组件绑定")]
     [SerializeField] private TextMeshProUGUI _moneyText;
-    [SerializeField] private GameDataModel _data;
+    private GameDataModel _data;
 
 
     private void Awake()
     {
+        _data = Resources.Load<GameDataModel>("GameData");
+        // 注册事件
+        _data.OnMoneyChanged += UpdateMoneyDisplay;
+        _data.FloorIS +=NeedActive;
+        UpdateMoneyDisplay(_data.Money);
        
         
         
@@ -21,11 +26,7 @@ public class MoneyView : MonoBehaviour
 
     private void Start()
     {
-        _data = Resources.Load<GameDataModel>("GameData");
-        // 注册事件
-        _data.OnMoneyChanged += UpdateMoneyDisplay;
-        _data.FloorIS +=NeedActive;
-        UpdateMoneyDisplay(_data.Money);
+        
     }
     private void NeedActive(string sceneName)
     {
