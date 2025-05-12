@@ -49,6 +49,10 @@ public class MouseControl : MonoBehaviour
         onNoMouseButtonDown ??= new UnityEvent();
         onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
         onMouseMoveUpdate ??= new UnityEvent<Vector2>();
+        
+#if !UNITY_EDITOR
+Debug.unityLogger.logEnabled = false;
+#endif
     }
 
     private void Update()
