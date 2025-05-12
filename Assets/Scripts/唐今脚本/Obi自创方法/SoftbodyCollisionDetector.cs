@@ -30,16 +30,16 @@ public class SoftbodyCollisionDetector : MonoBehaviour
     
     private void FindPlayerComponents()
     {
-        var playerSolverObj = GameObject.Find("PlayerSolver");
-        if (playerSolverObj == null)
+        var playerSolverObj = GameObject.Find("Solver");
+        if (!playerSolverObj)
         {
-            Debug.LogError("找不到 PlayerSolver 对象！请确保玩家 Solver 在场景中。");
-            enabled = false;
-            return;
+            playerSolverObj = GameObject.Find("PlayerSolver");
+            if (!playerSolverObj)
+                Debug.LogError("找不到 PlayerSolver 对象！");
         }
 
         _solver = playerSolverObj.GetComponent<ObiSolver>();
-        if (_solver == null)
+        if (!_solver)
         {
             Debug.LogError("PlayerSolver 对象上没有 ObiSolver 组件！");
             enabled = false;
@@ -47,7 +47,7 @@ public class SoftbodyCollisionDetector : MonoBehaviour
         }
 
         _softbody = playerSolverObj.GetComponentInChildren<ObiSoftbody>();
-        if (_softbody == null)
+        if (!_softbody)
         {
             Debug.LogError("PlayerSolver 的子对象中没有 ObiSoftbody 组件！");
             enabled = false;
@@ -59,7 +59,7 @@ public class SoftbodyCollisionDetector : MonoBehaviour
     
     private void OnEnable()
     {
-        if (_solver != null)
+        if (_solver)
         {
             _solver.OnCollision += OnSolverCollision;
         }
@@ -67,7 +67,7 @@ public class SoftbodyCollisionDetector : MonoBehaviour
 
     private void OnDisable()
     {
-        if (_solver != null)
+        if (_solver)
         {
             _solver.OnCollision -= OnSolverCollision;
         }
@@ -75,7 +75,7 @@ public class SoftbodyCollisionDetector : MonoBehaviour
 
     private void OnSolverCollision(object sender, Obi.ObiNativeContactList contacts)
     {
-        if (_obiCollider == null || _solver == null) return;
+        if (!_obiCollider || !_solver) return;
 
         var colliderWorld = ObiColliderWorld.GetInstance();
 
@@ -91,7 +91,7 @@ public class SoftbodyCollisionDetector : MonoBehaviour
             var particleIndex = contacts[i].bodyA;
             var particleObject = _solver.particleToActor[particleIndex].actor?.gameObject;
 
-            if (particleObject == null || (triggerLayers.value & (1 << particleObject.layer)) == 0)
+            if (!particleObject || (triggerLayers.value & (1 << particleObject.layer)) == 0)
                 continue;
             
             Debug.Log($"与玩家碰撞！");
