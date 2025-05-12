@@ -21,13 +21,11 @@ public class ItemWeapon_BoxingGlove : PassiveItem
 
     private void HandleWeaponGrabbed()
     {
-        // 隐藏拳套模型
         var selfRender = GetComponent<Renderer>();
         if (selfRender) selfRender.enabled = false;
 
         DestroyProcess();
 
-        // 查找人类控制器并设置拳击状态
         var humanController = GameObject.Find("HumanController");
         if (humanController == null)
         {
@@ -38,8 +36,8 @@ public class ItemWeapon_BoxingGlove : PassiveItem
         var leftHand = humanController.GetComponent<PlayerControl_LeftHandControl>();
         var rightHand = humanController.GetComponent<PlayerControl_RightHandControl>();
         
-        if (leftHand != null) leftHand.IsPunching = true;
-        if (rightHand != null) rightHand.IsPunching = true;
+        if (leftHand != null) leftHand.PunchDamage += 50;
+        if (rightHand != null) rightHand.PunchDamage += 50;
         
         _animationCoroutine = StartCoroutine(AnimateMaterial());
     }

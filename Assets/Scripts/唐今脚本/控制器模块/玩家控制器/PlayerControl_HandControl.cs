@@ -13,18 +13,13 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float mouseSensitivity = 200f;
     public CatchTool  catchTool;
     public GameObject handBallPrefab;
+    public ItemWeapon_PlayerHand handWeapon;
 
-    public bool IsPunching
+    public int PunchDamage
     {
-        get => isPunching;
-        set
-        {
-            isPunching = value;
-            var hand = handBallPrefab.GetComponent<ItemWeapon_PlayerHand>();
-            hand.ItemDamage = 50;
-        }
+        get => handWeapon.ItemDamage ;
+        set => handWeapon.ItemDamage = value;
     }
-    [SerializeField] private bool isPunching = false;
     
     [Header("Weight Sensitivity")]
     public float baseMouseSensitivity = 200f; // Rename the existing mouseSensitivity to baseMouseSensitivity
@@ -69,6 +64,8 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         mouseSensitivity = baseMouseSensitivity; // Initialize
         
         SubscribeEvents();
+        
+        handWeapon = handBallPrefab.GetComponent<ItemWeapon_PlayerHand>();
     }
 
 
