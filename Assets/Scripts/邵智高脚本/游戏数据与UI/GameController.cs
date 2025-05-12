@@ -23,17 +23,17 @@ public class GameController : MonoBehaviour
         _gameData.ResetData();
     }
     
-    // public void Update()
-    // {
-    //     if(Input.GetKeyDown(KeyCode.M))
-    //     {
-    //         AddPerformance(50);
-    //     }
-    //     if(Input.GetKeyDown(KeyCode.J))
-    //     {
-    //         DeductHealth(50);
-    //     }
-    // }
+    public void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            AddPerformance(50);
+        }
+        if(Input.GetKeyDown(KeyCode.J))
+        {
+            DeductHealth(50);
+        }
+    }
     
     // 增加血上限接口
     public void AddMaxHealth(int amount)

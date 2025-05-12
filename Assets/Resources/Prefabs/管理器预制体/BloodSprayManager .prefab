@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2216069781889418493}
   - component: {fileID: 4525606100600637456}
   - component: {fileID: 4975977422384793002}
-  - component: {fileID: 4642009012361928271}
+  - component: {fileID: 7428682436850845484}
   m_Layer: 0
   m_Name: 'BloodSprayManager '
   m_TagString: Untagged
@@ -201,7 +201,7 @@ MonoBehaviour:
   solver: {fileID: 2216069781889418493}
   emitters: []
   cleanableColliders: []
---- !u!114 &4642009012361928271
+--- !u!114 &7428682436850845484
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -210,20 +210,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 266975186793283453}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6128656ef523a394ca0f3ea269ff6615, type: 3}
+  m_Script: {fileID: 11500000, guid: 721b4ddff838a774693028cdffd9351f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emissionPositions:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  countRange: {x: 50, y: 100}
-  speedRange: {x: 2, y: 5}
-  randomnessRange: {x: 0.1, y: 0.5}
-  emissionInterval: 1
-  loopEmission: 0
-  randomRotation: 1
   emitterManager: {fileID: 2915088306905408323}
+  specialEmissionMode: 0
+  countRange: {x: 5, y: 10}
+  speedRange: {x: 1, y: 5}
+  randomnessRange: {x: 0.1, y: 0.5}
+  emissionInterval: 0.2
+  randomRotation: 1
 --- !u!1001 &648186570042119133
 PrefabInstance:
   m_ObjectHideFlags: 0
