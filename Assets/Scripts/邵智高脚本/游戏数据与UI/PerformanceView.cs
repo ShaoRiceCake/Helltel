@@ -17,17 +17,18 @@ public class PerformanceView : MonoBehaviour
 
     private void Awake()
     {
-        
-    }
-
-    private void Start()
-    {
         _data = Resources.Load<GameDataModel>("GameData");
         _data.OnPerformanceChanged += UpdatePerformanceDisplay;
         _data.OnPerformanceTargetChanged += UpdatePerformanceTargetDisplay;
         _data.FloorIS +=NeedActive;
         UpdatePerformanceDisplay(_data.Performance);
         UpdatePerformanceTargetDisplay(_data.PerformanceTarget);
+        
+    }
+
+    private void Start()
+    {
+        
     }
     private void NeedActive(string sceneName)
     {
