@@ -128,9 +128,9 @@ public class DungeonGenerator : NetworkBehaviour
     }
     public void ReSetDungeonValue()
     {
-        mainLength = GameController.Instance._gameData.Level*4+6;
-        branchLength = GameController.Instance._gameData.Level*2+2;
-        branchNumber = GameController.Instance._gameData.Level*4+2;;
+        mainLength = GameController.Instance._gameData.Level*1+4;
+        branchLength = GameController.Instance._gameData.Level*1+2;
+        branchNumber = GameController.Instance._gameData.Level*1+2;
         DungeonBuild();
     }
 
