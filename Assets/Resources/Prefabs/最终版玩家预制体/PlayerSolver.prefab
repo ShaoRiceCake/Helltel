@@ -16690,6 +16690,7 @@ GameObject:
   - component: {fileID: 543113036617379453}
   - component: {fileID: 7239416167458982059}
   - component: {fileID: 4174135896292918973}
+  - component: {fileID: 1690568284185700324}
   m_Layer: 7
   m_Name: HumanController
   m_TagString: Player
@@ -16800,7 +16801,7 @@ MonoBehaviour:
   mouseSensitivity: 200
   catchTool: {fileID: 8779136072819237235}
   handBallPrefab: {fileID: 4500133911504334770}
-  isPunching: 0
+  handWeapon: {fileID: 0}
   baseMouseSensitivity: 200
   maxMassForFullSensitivity: 5
   minSensitivityMultiplier: 0.1
@@ -16827,7 +16828,7 @@ MonoBehaviour:
   mouseSensitivity: 200
   catchTool: {fileID: 5493086960608626991}
   handBallPrefab: {fileID: 326534287535638902}
-  isPunching: 0
+  handWeapon: {fileID: 0}
   baseMouseSensitivity: 200
   maxMassForFullSensitivity: 5
   minSensitivityMultiplier: 0.1
@@ -17090,6 +17091,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 799a40d77ab188b459979a39bac33c39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1690568284185700324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4758233158350188680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a1a4f586e97e9345a2a10dc882783a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _blackScreenDelay: 3
 --- !u!1 &5463011786079697193
 GameObject:
   m_ObjectHideFlags: 0

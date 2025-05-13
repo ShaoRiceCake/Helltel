@@ -6,20 +6,12 @@ public class PlayerDieController : MonoBehaviour
 {
     private GameDataModel _data;
     private PlayerControlInformationProcess _playerControl;
-
-
-    
-
     
     [Header("Death Settings")]
-
     [SerializeField] private float _blackScreenDelay = 3f;
-
     
     [Header("References")]
-
-
-    
+    [SerializeField]  private GameObject upCube;
     private Coroutine _deathSequenceCoroutine;
 
     private void Awake()
@@ -27,10 +19,7 @@ public class PlayerDieController : MonoBehaviour
         _data = Resources.Load<GameDataModel>("GameData");
         _data.OnIsPlayerDiedChangedEvent += PlayerDie;
         
-        _playerControl = FindObjectOfType<PlayerControlInformationProcess>();
-
-        
-
+        _playerControl = GetComponent<PlayerControlInformationProcess>();
     }
 
     private void OnDestroy()
@@ -43,7 +32,7 @@ public class PlayerDieController : MonoBehaviour
         }
     }
 
-    void PlayerDie(bool isDie)
+    private void PlayerDie(bool isDie)
     {
         if (isDie && _deathSequenceCoroutine == null)
         {
@@ -54,13 +43,13 @@ public class PlayerDieController : MonoBehaviour
     private IEnumerator DeathSequence()
     {
         // 1. 停止玩家控制
-        if (_playerControl != null)
+        if (_playerControl)
         {
             _playerControl.stopPlayerControl = true;
         }
 
         // 2. 播放死亡动画
-
+        upCube.SetActive(false);
 
         // 3. 播放死亡音效
         AudioManager.Instance.Play("气球爆炸");
