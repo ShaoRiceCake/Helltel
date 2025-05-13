@@ -82,9 +82,30 @@ namespace Helltal.Gelercat
         // }
 
 
+        // protected virtual void LateUpdate()
+        // {
+        //     // if (behaviorTree == null) return;
+
+        //     if (DEBUG_STOP_BEHAVIOR_TREE)
+        //     {
+        //         if (behaviorTree.IsActive)
+        //         {
+        //             behaviorTree.Stop();
+        //         }
+        //     }
+        //     else
+        //     {
+        //         // 只有完全停止后才能重新启动
+        //         if (behaviorTree.CurrentState == NPBehave.Node.State.INACTIVE && !behaviorTree.IsActive)
+        //         {
+        //             behaviorTree.Start();
+        //         }
+        //     }
+        // }
+
         protected virtual void LateUpdate()
         {
-            // if (behaviorTree == null) return;
+            if (behaviorTree == null) return;  // ✅ 关键保护代码
 
             if (DEBUG_STOP_BEHAVIOR_TREE)
             {
@@ -95,13 +116,13 @@ namespace Helltal.Gelercat
             }
             else
             {
-                // 只有完全停止后才能重新启动
                 if (behaviorTree.CurrentState == NPBehave.Node.State.INACTIVE && !behaviorTree.IsActive)
                 {
                     behaviorTree.Start();
                 }
             }
         }
+
 
 
 
@@ -201,7 +222,7 @@ namespace Helltal.Gelercat
         }
         protected virtual void OnDestroy()
         {
-            base.OnDestroy(); 
+            base.OnDestroy();
             if (behaviorTree != null && behaviorTree.IsActive)
             {
                 behaviorTree.Stop();

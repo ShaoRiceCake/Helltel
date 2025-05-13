@@ -37,6 +37,7 @@ public class BlackForgController : MonoBehaviour
     private bool isStage2 = false;
     public void StartFogStage1()
     {
+        Debug.Log("StartFogStage1");
         isActive = true;
         isStage2 = false;
         currentRadius = 0f;
@@ -49,6 +50,7 @@ public class BlackForgController : MonoBehaviour
 
     public void StartFogStage2()
     {
+        Debug.Log("StartFogStage2");
         isActive = true;
         isStage2 = true;
         currentSpeed = Stage2FogSpeed * 3f;
@@ -59,6 +61,7 @@ public class BlackForgController : MonoBehaviour
 
     public void StopFog()
     {
+        Debug.Log("StopFog");
         isActive = false;
         fogEffect.Stop();
     }
@@ -101,5 +104,12 @@ public class BlackForgController : MonoBehaviour
 
             }
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        // 绘制黑雾范围
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, currentRadius);
     }
 }

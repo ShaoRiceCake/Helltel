@@ -19,8 +19,6 @@ namespace Helltal.Gelercat
 
         bool DEBUG_chatting = false;
 
-        private Root behaviorTree;
-
 
 
         // debug
@@ -31,11 +29,6 @@ namespace Helltal.Gelercat
         protected override void Awake()
         {
             base.Awake();
-        }
-        protected override void Start()
-        {
-
-            base.Start();
             behaviorTree = GetBehaviorTree();
 #if UNITY_EDITOR
             Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
@@ -46,6 +39,12 @@ namespace Helltal.Gelercat
             behaviorTree.Blackboard["Happying"] = false; // 高兴标志
             Debug.Log("presenter:" + presenter.isActiveAndEnabled);
             behaviorTree.Start();
+        }
+        protected override void Start()
+        {
+
+            base.Start();
+
         }
         protected override Root GetBehaviorTree()
         {
@@ -111,7 +110,7 @@ namespace Helltal.Gelercat
         // ===================== 状态3：高兴 =====================
         private Node BuildHappyBranch()
         {
-            return new Condition(IsPlayerChatting,Stops.IMMEDIATE_RESTART,
+            return new Condition(IsPlayerChatting, Stops.IMMEDIATE_RESTART,
                 new Sequence(
                     new Action(() =>
                     {
@@ -121,7 +120,7 @@ namespace Helltal.Gelercat
                             // 从孤独状态进入高兴状态，触发奖励结算
                             int coins = Mathf.FloorToInt(10 + lonelyDuration * lonelyDuration / 1000f + 0.3f * lonelyDuration);
                             DropCoinBag(coins);
-                            StopBlackFog();                        
+                            StopBlackFog();
                             behaviorTree.Blackboard["Lonely"] = false; // 重置孤独状态
                             behaviorTree.Blackboard["Happying"] = true; // 设置高兴状态
 
@@ -134,13 +133,15 @@ namespace Helltal.Gelercat
         }
         private Node BuildHappyingBranch()
         {
-            return new BlackboardCondition("Happying",Operator.IS_EQUAL,true, Stops.NONE,
+            return new BlackboardCondition("Happying", Operator.IS_EQUAL, true, Stops.NONE,
                 new Sequence(
-                    new Action(()=>{
+                    new Action(() =>
+                    {
                         Debug.Log("HAPPY to wait 4");
                     }),
                     new Wait(happyTimer),
-                    new Action(()=>{
+                    new Action(() =>
+                    {
                         Debug.Log("HAPPY to wait 4");
                         presenter.SetTrigger("HappyToWait"); // 播放高兴动画
                         behaviorTree.Blackboard["Happying"] = false; // 重置高兴状态
@@ -277,17 +278,19 @@ namespace Helltal.Gelercat
 
 
             }
-            if(behaviorTree!=null){
-            // timer
-            if (behaviorTree.Blackboard.Get<bool>("Lonely"))
+            if (behaviorTree != null)
             {
-                lonelyDuration += Time.deltaTime;
-                if (lonelyDuration >= lonelyDeathThreshold)
+                // timer
+                if (behaviorTree.Blackboard.Get<bool>("Lonely"))
                 {
-                    // 触发死亡状态
-                    behaviorTree.Blackboard["Dead"] = true;
+                    lonelyDuration += Time.deltaTime;
+                    if (lonelyDuration >= lonelyDeathThreshold)
+                    {
+                        // 触发死亡状态
+                        behaviorTree.Blackboard["Dead"] = true;
+                    }
                 }
-            }}
+            }
 
         }
         // gui 上现实lonelyDuration，方便调试
