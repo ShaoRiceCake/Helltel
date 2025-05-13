@@ -266,14 +266,6 @@ namespace Helltal.Gelercat
         }
 
         // OnDestroy 时清理行为树
-        public override void OnDestroy()
-        {
-            if (behaviorTree != null && behaviorTree.CurrentState == Node.State.ACTIVE)
-            {
-                behaviorTree.Stop();
-            }
-        }
-
 
         protected override void Update()
         {
