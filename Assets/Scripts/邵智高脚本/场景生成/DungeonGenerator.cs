@@ -77,7 +77,7 @@ public class DungeonGenerator : NetworkBehaviour
 
     // [Range(0, 1f)]
     // [Tooltip("房间生成间隔时间（秒）")]
-    // public float constructionDelay;        // 视觉效果延迟
+    private float constructionDelay = 0.03f;        // 视觉效果延迟
 
     [Header("运行时数据")]
     [Tooltip("已生成房间列表")]
@@ -131,7 +131,7 @@ public class DungeonGenerator : NetworkBehaviour
         mainLength = GameController.Instance._gameData.Level*1+4;
         branchLength = GameController.Instance._gameData.Level*1+2;
         branchNumber = GameController.Instance._gameData.Level*1+2;
-        DungeonBuild();
+        StartCoroutine(DungeonBuild());
     }
 
     /// <summary>
@@ -144,7 +144,7 @@ public class DungeonGenerator : NetworkBehaviour
     /// 5. 生成分支路径
     /// 6. 执行最终清理
     /// </summary>
-    public void DungeonBuild()
+    public IEnumerator DungeonBuild()
     { 
         // 创建主路径父对象
         GameObject goContainer = new GameObject("Main Path");
@@ -168,7 +168,7 @@ public class DungeonGenerator : NetworkBehaviour
         {
 
             // 生成间隔（可视化效果）
-            //yield return new WaitForSeconds(constructionDelay);
+            yield return new  WaitForSecondsRealtime(constructionDelay);
             // 更新房间指针
             tileFrom = tileTo;
             tileTo = CreatTile();
@@ -222,7 +222,7 @@ public class DungeonGenerator : NetworkBehaviour
                 tileTo = tileRoot;
                 for (int i = 0; i < branchLength ; i++)
                 {
-                    //yield return new WaitForSeconds(constructionDelay);
+                    yield return new  WaitForSecondsRealtime(constructionDelay);
                     tileFrom = tileTo;
                     tileTo = CreatTile();
                     ConnectTiles();
@@ -469,13 +469,16 @@ public class DungeonGenerator : NetworkBehaviour
     // }
     void CollisionCheck()
     {
-        BoxCollider box = tileTo.GetComponent<BoxCollider>();
-        if (box == null)
-        {
-            // 创建临时触发器用于碰撞检测（不会触发物理反馈）
-            box = tileTo.gameObject.AddComponent<BoxCollider>();
-            box.isTrigger = true;
-        }
+        // 创建临时触发器用于碰撞检测（不会触发物理反馈）
+        BoxCollider    box = tileTo.gameObject.AddComponent<BoxCollider>();
+        box.isTrigger = true;
+        // BoxCollider box = tileTo.GetComponent<BoxCollider>();
+        // if (box == null)
+        // {
+        //     // 创建临时触发器用于碰撞检测（不会触发物理反馈）
+        //     box = tileTo.gameObject.AddComponent<BoxCollider>();
+        //     box.isTrigger = true;
+        // }
 
         // 计算碰撞体中心点的世界坐标偏移（考虑房间旋转的影响）
         Vector3 offset = (tileTo.right * box.center.x)

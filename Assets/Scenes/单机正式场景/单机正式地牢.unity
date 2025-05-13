@@ -184,50 +184,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 183118659467714359, guid: 8d36915db4c98464c8408790083a1a70, type: 3}
   m_PrefabInstance: {fileID: 508795963}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &682932967
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 682932969}
-  - component: {fileID: 682932968}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &682932968
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 682932967}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &682932969
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 682932967}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &903177973
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -472,15 +428,35 @@ PrefabInstance:
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: startTile
       value: 
-      objectReference: {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
+      objectReference: {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: elevatorTile
       value: 
       objectReference: {fileID: 980979732}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: doorPrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: exitPrefabs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.size
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: doorPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 2424739538366229017, guid: 776880d4fe899df4eab9edb824c2a8f4, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: doorPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 4693191324333178762, guid: d0b58bc455ae1f74f8c8694a964a7935, type: 3}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.data[0]
       value: 
@@ -496,15 +472,15 @@ PrefabInstance:
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.data[3]
       value: 
-      objectReference: {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
+      objectReference: {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.data[4]
       value: 
-      objectReference: {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
+      objectReference: {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.data[5]
       value: 
-      objectReference: {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
+      objectReference: {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
     - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: tilePrefabs.Array.data[6]
       value: 
@@ -565,6 +541,30 @@ PrefabInstance:
       propertyPath: tilePrefabs.Array.data[20]
       value: 
       objectReference: {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 5343370063151627190, guid: 4c49da63c5918444a95a69cddac0e9cd, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 6143833312253660151, guid: 287a6a07b521f844a8a78cb15bb1369e, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 8719785782222926197, guid: 216ac384280a49747919f52394d95d6b, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[3]
+      value: 
+      objectReference: {fileID: 497921899292682526, guid: cfdcdc3f97785ea4d9ec5116d2fc803e, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[4]
+      value: 
+      objectReference: {fileID: 497921899292682526, guid: cfdcdc3f97785ea4d9ec5116d2fc803e, type: 3}
+    - target: {fileID: 5420871367105433588, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
+      propertyPath: blockedPrefabs.Array.data[5]
+      value: 
+      objectReference: {fileID: 497921899292682526, guid: cfdcdc3f97785ea4d9ec5116d2fc803e, type: 3}
     - target: {fileID: 5816238570797794469, guid: bc4a7e30bcc5711479bd7059a03cbfe9, type: 3}
       propertyPath: m_Name
       value: Generator
@@ -733,6 +733,50 @@ Transform:
   m_Children:
   - {fileID: 508795964}
   m_Father: {fileID: 980979732}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1807634040
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1807634042}
+  - component: {fileID: 1807634041}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1807634041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807634040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1807634042
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1807634040}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2091664528
 GameObject:
@@ -938,5 +982,5 @@ SceneRoots:
   - {fileID: 1408540163}
   - {fileID: 1561069541}
   - {fileID: 980979732}
-  - {fileID: 682932969}
   - {fileID: 903177973}
+  - {fileID: 1807634042}
