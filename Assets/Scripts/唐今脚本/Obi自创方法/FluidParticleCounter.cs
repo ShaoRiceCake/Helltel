@@ -25,7 +25,7 @@ public class FluidParticleCounter : MonoBehaviour
 
     private void OnEnable()
     {
-        if (solver != null)
+        if (solver)
         {
             solver.OnCollision += OnSolverCollision;
         }
@@ -33,7 +33,7 @@ public class FluidParticleCounter : MonoBehaviour
 
     private void OnDisable()
     {
-        if (solver != null)
+        if (solver)
         {
             solver.OnCollision -= OnSolverCollision;
         }
@@ -60,7 +60,7 @@ public class FluidParticleCounter : MonoBehaviour
         {
             if (obj is not ICleanable cleanable) continue;
             var obiCollider = cleanable.GetObiCollider();
-            if (obiCollider != null)
+            if (obiCollider)
             {
                 cleanableColliders.Add(obiCollider);
             }
@@ -132,6 +132,7 @@ public class FluidParticleCounter : MonoBehaviour
         yield return null; 
         emitter.DeactivateParticle(actorIndex);
         OnParticleDestroyed?.Invoke(actorIndex);
+        GameController.Instance.AddPerformance(1);
         var lastCleanPosition = solver.transform.TransformPoint(solver.positions[solver.simplices[actorIndex]]);
 
         if (_canPlaySound)

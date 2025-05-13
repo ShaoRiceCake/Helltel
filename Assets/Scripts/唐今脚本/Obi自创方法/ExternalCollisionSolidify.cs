@@ -87,7 +87,7 @@ public class ExternalCollisionSolidify : MonoBehaviour
     private void Solidify(int particleIndex, SolidData solid)
     {
         if (particleIndex < 0 || particleIndex >= _solver.phases.count || 
-            particleIndex >= _solids.Length || solid.Reference == null)
+            particleIndex >= _solids.Length || !solid.Reference)
             return;
 
         _solver.phases[particleIndex] &= (int)(~ObiUtils.ParticleFlags.Fluid);

@@ -126,13 +126,11 @@ public class GlobalUIController : MonoBehaviour
         //当处于游戏场景且未打开UI界面
         else
         {
-            if(SceneManager.GetActiveScene().name != "单机正式主菜单")
-            {
-                // 打开菜单
-                OpenMenu();
+            if (SceneManager.GetActiveScene().name == "单机正式主菜单") return;
+            // 打开菜单
+            OpenMenu();
                 
-                Time.timeScale = 0;
-            }
+            Time.timeScale = 0;
         }
     }
    
@@ -140,8 +138,7 @@ public class GlobalUIController : MonoBehaviour
     // 设置暂停/继续游戏
     public void SetPause(bool isPaused)
     {
-        Time.timeScale = isPaused ? 0 : 1;
-    
+        // Time.timeScale = isPaused ? 0 : 1;
         StartCoroutine(SetCursorStateWithDelay(isPaused));
     }
 

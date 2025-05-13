@@ -15,7 +15,7 @@ public class GameController : MonoBehaviour
     public static GameController Instance { get; private set; }
 
     private void Awake() {
-        if (Instance == null) {
+        if (!Instance) {
             Instance = this;
         } else {
             Destroy(gameObject);

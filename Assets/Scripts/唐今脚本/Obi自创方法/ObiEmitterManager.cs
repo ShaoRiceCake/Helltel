@@ -12,7 +12,7 @@ public class ObiEmitterManager : MonoBehaviour
     private void Start()
     {
         _obiEmitter = GetComponent<ObiEmitter>();
-        if (_obiEmitter == null)
+        if (!_obiEmitter)
         {
             Debug.LogError("ObiEmitterController requires an ObiEmitter component");
             return;
@@ -107,7 +107,7 @@ public class ObiEmitterManager : MonoBehaviour
     
     public void KillAllParticles()
     {
-        if(_obiEmitter != null)
+        if(_obiEmitter)
             _obiEmitter.KillAll();
     }
 }
