@@ -218,9 +218,9 @@ public class MonsterSpawnSystem : NetworkBehaviour
     float CalculateEntropyLimit()
     {
         return baseEntropy 
-            + _data.Level * floorMultiplier
-            + floorTimeCounter * timeFactor
-            + totalMoney * moneyFactor;
+            + _data.Level * floorMultiplier;
+            //+ floorTimeCounter * timeFactor
+            //+ totalMoney * moneyFactor;
     }
 
     /// <summary>
