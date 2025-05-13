@@ -199,5 +199,13 @@ namespace Helltal.Gelercat
                 return false;
             }
         }
+        protected virtual void OnDestroy()
+        {
+            base.OnDestroy(); 
+            if (behaviorTree != null && behaviorTree.IsActive)
+            {
+                behaviorTree.Stop();
+            }
+        }
     }
 }

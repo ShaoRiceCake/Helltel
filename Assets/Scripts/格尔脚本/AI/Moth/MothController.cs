@@ -625,7 +625,7 @@ public class MothController : GuestBase, IHurtable
         return rb.velocity;
     }
 
-    public override void OnDestroy()
+    protected override void OnDestroy()
     {
         base.OnDestroy();
         belongToGroup.UnregisterMoth(this.gameObject);
