@@ -169,6 +169,7 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
+            Time.timeScale = 0;
             SetPause(false);
         }
         AudioManager.Instance.Play("泡泡音");
@@ -179,6 +180,7 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
+            Time.timeScale =1;
             SetPause(true);
         }
         Menu.gameObject.SetActive(true);
@@ -235,11 +237,13 @@ public class GlobalUIController : MonoBehaviour
     }
     public void HandleStartLoading()
     {
+        Time.timeScale = 1;
         SetPause(true);
         canPressESC = false;
     }
     public void HandleFinishLoading()
     {
+        Time.timeScale = 0;
         SetPause(false);
         canPressESC = true;
     }

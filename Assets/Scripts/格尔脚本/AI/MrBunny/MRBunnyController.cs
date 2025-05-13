@@ -343,7 +343,8 @@ public class MRBunnyController : GuestBase, IHurtable
 
     void OnDestroy()
     {
-        base.OnDestroy();
         behaviorTree?.Stop(); // 停止行为树
+        base.OnDestroy();
+        
     }
 }
