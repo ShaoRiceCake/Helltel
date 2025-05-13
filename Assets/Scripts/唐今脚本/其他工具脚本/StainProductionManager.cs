@@ -134,7 +134,7 @@ public class StainProductionManager : MonoBehaviour
     private void ResetAllState()
     {
         // 安全地清理粒子
-        if (emitterManager != null && emitterManager.gameObject.activeInHierarchy)
+        if (emitterManager && emitterManager.gameObject.activeInHierarchy)
         {
             emitterManager.KillAllParticles();
         }

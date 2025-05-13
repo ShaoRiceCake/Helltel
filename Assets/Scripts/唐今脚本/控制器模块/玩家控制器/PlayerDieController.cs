@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class PlayerDieController : MonoBehaviour
@@ -42,42 +43,38 @@ public class PlayerDieController : MonoBehaviour
 
     private IEnumerator DeathSequence()
     {
-        // 1. 停止玩家控制
+        // 停止玩家控制
         if (_playerControl)
         {
             _playerControl.stopPlayerControl = true;
         }
+        
+        // 生成血液效果
+        var emitterCount = 1000;
+        var emissionSpeed = 2;
+        var randomness = 0.2f;
+        var rotation = Quaternion.identity;
+        EventBus<BloodSprayEvent>.Publish(
+            new BloodSprayEvent(
+                upCube.transform.position,
+                rotation,
+                emitterCount,
+                emissionSpeed,
+                randomness
+            )
+        );
+        
+        BloodEffectController.ActivateBloodEffect();
 
-        // 2. 播放死亡动画
+        // 播放死亡动画
         upCube.SetActive(false);
-
-        // 3. 播放死亡音效
+        
+        // 播放死亡音效
         AudioManager.Instance.Play("气球爆炸");
-        
-        // 4. 生成血液效果
 
-
-        // 5. 屏幕血液效果
-
-
-        // 6. 移动摄像机到死亡视角（可不做）
-
-        
-
-
-        // 7. 屏幕变黑白
-
-
-        // 8. 等待片刻
         yield return new WaitForSeconds(_blackScreenDelay);
-
-        // 9. 渐变为黑色 (使用渐晕效果)
-
-        // 10. 返回开始界面
-        
-        // GameManager.Instance.ReturnToMainMenu();
-        // GameManager.instance.ReturnToMainMenu();
-        
+        // 返回开始界面
+        SceneManager.LoadSceneAsync("开始场景");        
         _deathSequenceCoroutine = null;
     }
 }

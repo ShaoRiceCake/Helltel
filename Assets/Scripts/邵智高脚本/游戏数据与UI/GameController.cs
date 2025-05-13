@@ -77,15 +77,14 @@ public class GameController : MonoBehaviour
         if (_gameData.Health >= amount)
         {
             _gameData.Health -= amount;
+            BloodEffectController.ActivateBloodEffect();
             Debug.Log("玩家扣除血量" + amount);
         }
         else
         {
             Debug.Log("死亡");
-
             return;
         }
-      
     }
 
     // 增加玩家资金接口

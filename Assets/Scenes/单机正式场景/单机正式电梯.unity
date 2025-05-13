@@ -122,6 +122,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &21563158
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 21563160}
+  - component: {fileID: 21563159}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &21563159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21563158}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &21563160
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 21563158}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &41725148
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -179,50 +223,27 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8060292415504b9468846c6d8da409f6, type: 3}
---- !u!1 &369165759
+--- !u!1 &719527181 stripped
 GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 2719067651408631493, guid: 62c2ff5147fe8634e90615214749746a, type: 3}
+  m_PrefabInstance: {fileID: 1361083078874401951}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 369165761}
-  - component: {fileID: 369165760}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &369165760
+--- !u!114 &719527184
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 369165759}
-  m_Enabled: 1
+  m_GameObject: {fileID: 719527181}
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Script: {fileID: 11500000, guid: dccadc80e5bc89c49bfa57aba581f0cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &369165761
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 369165759}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  damageAmount: 10
+  damageKey: 99
+  healKey: 118
+  healAmount: 10
 --- !u!114 &1281655183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -415,6 +436,25 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c6589af6ca4efc40940285523d6b519, type: 3}
+--- !u!1 &1664907719 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5192887038180837320, guid: a2e8ef19b62f7514499a2f5e537301b1, type: 3}
+  m_PrefabInstance: {fileID: 599591163791520627}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1664907723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1664907719}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4215320ea658fb4a819b91817e348c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rendererData: {fileID: 11400000, guid: 4aa81c379b8d48944835ea9c591c68d6, type: 2}
+  effectDuration: 3
 --- !u!114 &1773135141 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3245851442405254141, guid: 2c4e02ba217d0384581a6766e393ea99, type: 3}
@@ -791,7 +831,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5192887038180837320, guid: a2e8ef19b62f7514499a2f5e537301b1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1664907723}
   m_SourcePrefab: {fileID: 100100000, guid: a2e8ef19b62f7514499a2f5e537301b1, type: 3}
 --- !u!1 &787824927679722450
 GameObject:
@@ -869,7 +912,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2719067651408631493, guid: 62c2ff5147fe8634e90615214749746a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 719527184}
   m_SourcePrefab: {fileID: 100100000, guid: 62c2ff5147fe8634e90615214749746a, type: 3}
 --- !u!1 &1361083078874401952 stripped
 GameObject:
@@ -963,4 +1009,4 @@ SceneRoots:
   - {fileID: 1361083078874401951}
   - {fileID: 41725148}
   - {fileID: 1499763933}
-  - {fileID: 369165761}
+  - {fileID: 21563160}

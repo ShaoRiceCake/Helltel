@@ -45,11 +45,6 @@ public class GameDataModel : ScriptableObject
     public event Action<string> FloorIS;      // 楼层类型为
     public event Action<bool> OnIsPlayerDiedChangedEvent;      // 玩家死亡状态变化事件
 
-   
-     
-    
-
-
     // 属性封装（数据访问入口）
     public int Health {
         get => _health;
