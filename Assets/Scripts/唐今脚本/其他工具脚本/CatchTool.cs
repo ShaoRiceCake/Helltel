@@ -2,12 +2,14 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 
 public class CatchTool : MonoBehaviour
 {
     [Header("References")]
     public ObiParticleAttachment obiAttachment;
-    public CatchDetectorTool catchDetectorTool; 
+    public CatchDetectorTool catchDetectorTool;
+    public ProgressBarPro progressBar; // 新增进度条引用
 
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
@@ -20,7 +22,8 @@ public class CatchTool : MonoBehaviour
     private bool _isGrabbingKinematic = false;
     private float _pressTime;
     private bool _isPressingE;
-    private const float LongPressThreshold = 0.5f; // 长按时间检测阈值
+    private const float ShortPressThreshold = 0.2f; // 短按时间阈值
+    private const float LongPressThreshold = 1f; // 长按时间阈值
     
     // 当前抓取的物品（只读）
     public ItemBase CurrentlyGrabbedItem { get; private set; }
@@ -30,17 +33,13 @@ public class CatchTool : MonoBehaviour
         get => _catchBall;
         set
         {
-            // 如果新值和旧值相同，不做任何处理
             if (_catchBall == value) return;
 
-            // 如果当前有抓取目标且CatchBall被设为null，且抓取的是运动学物体
             if (_catchBall != null && value == null && _isGrabbing && _isGrabbingKinematic)
             {
-                // 立即释放运动学物体
                 ReleaseObject();
             }
 
-            // 如果当前有抓取目标且CatchBall被改变（无论新旧值是什么）
             if (_currentTarget && _catchBall != value)
             {
                 if (_currentTarget.TryGetComponent<ItemBase>(out var item))
@@ -67,8 +66,12 @@ public class CatchTool : MonoBehaviour
             Debug.LogError("catchDetectCylinder未分配！");
             return;
         }
-        
         catchDetectorTool.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
+        // 初始化进度条
+        if (progressBar != null)
+        {
+            progressBar.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
@@ -136,28 +139,50 @@ public class CatchTool : MonoBehaviour
         {
             _pressTime = Time.time;
             _isPressingE = true;
+        
+            // 初始化进度条
+            if (_isGrabbing && progressBar)
+            {
+                progressBar.gameObject.SetActive(true);
+                progressBar.SetValue(0f); // 重置为0
+            }
         }
 
         // 持续检测按键是否被按住足够长时间
         if (_isPressingE && Input.GetKey(KeyCode.E))
         {
-            var pressDuration = Time.time - _pressTime;
-            if (pressDuration >= LongPressThreshold && _isGrabbing)
+            float pressDuration = Time.time - _pressTime;
+
+            // 超过短按阈值但未到长按阈值时更新进度条
+            if (pressDuration >= ShortPressThreshold && pressDuration < LongPressThreshold && _isGrabbing)
+            {
+                if (progressBar)
+                {
+                    // 计算0-1的进度比例 (从短按后开始计算)
+                    float progressTime = pressDuration - ShortPressThreshold;
+                    float totalProgressDuration = LongPressThreshold - ShortPressThreshold;
+                    float progress = Mathf.Clamp01(progressTime / totalProgressDuration);
+                    
+                    progressBar.SetValue(progress);
+                }
+            }
+            // 长按逻辑
+            else if (pressDuration >= LongPressThreshold && _isGrabbing)
             {
                 TryUseItem();
-                _isPressingE = false; // 重置状态
+                _isPressingE = false;
+                HideProgressBar();
                 return;
             }
         }
 
-        if (!Input.GetKeyUp(KeyCode.E)) return;
-    
-        if (_isPressingE)
+        if (Input.GetKeyUp(KeyCode.E))
         {
-            var pressDuration = Time.time - _pressTime;
+            _isPressingE = false;
+            HideProgressBar();
         
             // 短按逻辑
-            if (pressDuration < LongPressThreshold)
+            if (Time.time - _pressTime < LongPressThreshold)
             {
                 if (_currentTarget && !_isGrabbing)
                 {
@@ -169,7 +194,24 @@ public class CatchTool : MonoBehaviour
                 }
             }
         }
-        _isPressingE = false;
+    }
+
+    // 二次缓入函数 (开始慢，结束快)
+    private float EaseInQuad(float t) {
+        return t * t;
+    }
+
+    // 如果需要更明显的效果，可以使用三次缓入
+    private float EaseInCubic(float t) {
+        return t * t * t;
+    }
+
+    private void HideProgressBar()
+    {
+        if (progressBar)
+        {
+            progressBar.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -202,7 +244,6 @@ public class CatchTool : MonoBehaviour
             
         AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
         return true;
-
     }
 
     /// <summary>
@@ -237,7 +278,6 @@ public class CatchTool : MonoBehaviour
             Debug.Log($"[CatchTool] 这个道具({item.ItemName})不能被使用");
         }
     }
-
 
     private void GrabObject(GameObject target)
     {
@@ -323,5 +363,4 @@ public class CatchTool : MonoBehaviour
     {
         GameController.Instance.DeductMoney(amount);
     }
-
 }
