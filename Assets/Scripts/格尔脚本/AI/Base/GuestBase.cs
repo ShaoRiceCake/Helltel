@@ -151,7 +151,7 @@ namespace Helltal.Gelercat
                 presenter = GetComponent<GuestPresenter>();
             }
 
-            
+
         }
 
         protected virtual void Start()
@@ -187,10 +187,17 @@ namespace Helltal.Gelercat
         {
             return true;
         }
+
         protected bool IsNavAgentOnNavmesh()
         {
-            return agent.isOnNavMesh;
+            try
+            {
+                return agent != null && agent.isOnNavMesh;
+            }
+            catch
+            {
+                return false;
+            }
         }
-    
     }
 }
