@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using System.Collections;
@@ -12,6 +13,7 @@ public class BloodEffectController : MonoBehaviour
 
     private const string FeatureName = "FullScreenPassRendererFeature";
     private Coroutine _effectCoroutine;
+    private ScriptableRendererFeature _rendererFeature;
     
     // 单例实例
     private static BloodEffectController _instance;
@@ -48,6 +50,8 @@ public class BloodEffectController : MonoBehaviour
         
         // 如果希望跨场景保持，取消下面注释
         // DontDestroyOnLoad(this.gameObject);
+        
+        _rendererFeature =  rendererData.rendererFeatures.Find(f => f.name == FeatureName);
     }
 
     /// <summary>
@@ -91,17 +95,20 @@ public class BloodEffectController : MonoBehaviour
             Debug.LogError("Renderer Data未分配!");
             return;
         }
-
-        // 查找指定的Renderer Feature
-        var feature = rendererData.rendererFeatures.Find(f => f.name == FeatureName);
-        if (feature)
+        
+        if (_rendererFeature)
         {
-            feature.SetActive(active);
+            _rendererFeature.SetActive(active);
             rendererData.SetDirty();
         }
         else
         {
             Debug.LogError($"找不到名为 {FeatureName} 的Renderer Feature!");
         }
+    }
+
+    private void OnDestroy()
+    {
+        _rendererFeature.SetActive(false);
     }
 }
