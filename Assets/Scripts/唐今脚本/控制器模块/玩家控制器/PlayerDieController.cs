@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using Michsky.LSS;
 
 public class PlayerDieController : MonoBehaviour
 {
@@ -9,11 +9,13 @@ public class PlayerDieController : MonoBehaviour
     private PlayerControlInformationProcess _playerControl;
     
     [Header("Death Settings")]
-    [SerializeField] private float _blackScreenDelay = 3f;
+    private float _blackScreenDelay = 8f;
     
     [Header("References")]
     [SerializeField]  private GameObject upCube;
     private Coroutine _deathSequenceCoroutine;
+
+    
 
     private void Awake()
     {
@@ -70,10 +72,14 @@ public class PlayerDieController : MonoBehaviour
         upCube.SetActive(false);
         
         // 播放死亡音效
-        AudioManager.Instance.Play("气球爆炸");
+        AudioManager.Instance.Play("死亡");
 
         yield return new WaitForSeconds(_blackScreenDelay);
-        // 返回开始界面
+        // // 返回开始界面
+        // if(GameController.Instance != null)
+        // {
+        //     GameController.Instance.lSS_Manager.LoadScene();
+        // }
         SceneManager.LoadSceneAsync("开始场景");        
         _deathSequenceCoroutine = null;
     }

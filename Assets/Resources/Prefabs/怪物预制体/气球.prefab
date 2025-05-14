@@ -95,7 +95,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2727973590
+  GlobalObjectIdHash: 2378078871
   InScenePlacedSourceGlobalObjectIdHash: 2727973590
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -182,8 +182,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   isDebug: 1
-  detectedTargets:
-  - {fileID: 0}
+  detectedTargets: []
 --- !u!1 &6735601704042519372
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,12 +223,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 1181740835687680726}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.4999999
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.4999999
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.4999999
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 4.54
+      value: 2.83
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
       propertyPath: m_LocalPosition.z
@@ -262,6 +273,10 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 107aed6ec6c5145468aa50d63c79d8af, type: 3}
       propertyPath: m_Name
