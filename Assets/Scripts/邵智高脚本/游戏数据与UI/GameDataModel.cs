@@ -135,10 +135,11 @@ public class GameDataModel : ScriptableObject
     //进商店层调用这个
     public void NewShopFloorData()
     {
-        Money += Performance;
+        // Money += Performance;
         Health = MaxHealth;
-        Performance = 0;
+        // Performance = 0;
 
+        //改由商店内部脚本实现
     }
     //进地牢层调用这个
     public void NewDungeonFloorData()

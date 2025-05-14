@@ -140,11 +140,10 @@ public class CatchTool : MonoBehaviour
             _pressTime = Time.time;
             _isPressingE = true;
         
-            // 初始化进度条
+            // 初始化进度条（但不立即显示）
             if (_isGrabbing && progressBar)
             {
-                progressBar.gameObject.SetActive(true);
-                progressBar.SetValue(0f); // 重置为0
+                progressBar.gameObject.SetActive(false); // 初始隐藏
             }
         }
 
@@ -158,12 +157,17 @@ public class CatchTool : MonoBehaviour
             {
                 if (progressBar)
                 {
-                    // 计算0-1的进度比例 (从短按后开始计算)
-                    float progressTime = pressDuration - ShortPressThreshold;
-                    float totalProgressDuration = LongPressThreshold - ShortPressThreshold;
-                    float progress = Mathf.Clamp01(progressTime / totalProgressDuration);
-                    
-                    progressBar.SetValue(progress);
+                    // 只在第一次超过阈值时显示进度条
+                    if (!progressBar.gameObject.activeSelf)
+                    {
+                        progressBar.SetValue(1f);
+                        progressBar.gameObject.SetActive(true);
+                    }
+                
+                    // 计算0.3-1秒之间的进度(0-1)
+                    float progressTime = pressDuration - ShortPressThreshold; // 0到0.7
+                    float progress = progressTime / (LongPressThreshold - ShortPressThreshold); // 0到1
+                    progressBar.SetValue(1f - progress); // 从1降到0
                 }
             }
             // 长按逻辑
@@ -181,7 +185,7 @@ public class CatchTool : MonoBehaviour
             _isPressingE = false;
             HideProgressBar();
         
-            // 短按逻辑
+            // 短按逻辑（只在释放时且未达到长按阈值时执行）
             if (Time.time - _pressTime < LongPressThreshold)
             {
                 if (_currentTarget && !_isGrabbing)
@@ -196,16 +200,6 @@ public class CatchTool : MonoBehaviour
         }
     }
 
-    // 二次缓入函数 (开始慢，结束快)
-    private float EaseInQuad(float t) {
-        return t * t;
-    }
-
-    // 如果需要更明显的效果，可以使用三次缓入
-    private float EaseInCubic(float t) {
-        return t * t * t;
-    }
-
     private void HideProgressBar()
     {
         if (progressBar)
@@ -213,6 +207,7 @@ public class CatchTool : MonoBehaviour
             progressBar.gameObject.SetActive(false);
         }
     }
+    
 
     /// <summary>
     /// 外部调用强制释放当前抓取的物体
