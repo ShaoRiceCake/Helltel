@@ -68,27 +68,6 @@ public class MRBunnyController : GuestBase, IHurtable
         );
 
     }
-
-    // private Node BuildChesingBranch()
-    // {
-    //     return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
-    //         new Action(() =>
-    //         {
-    //             if (CurTarget != null && agent.isOnNavMesh)
-    //             {
-
-    //                 agent.SetDestination(CurTarget.transform.position); // 设置目标位置
-    //                 if (Vector3.Distance(transform.position, CurTarget.transform.position) >= chaseDistance)
-    //                 {
-    //                     agent.speed = moveSpeed;
-    //                 }
-    //                 else
-    //                 {
-    //                     agent.speed = chaseSpeed; // 设置追击速度
-    //                 }
-    //             }
-    //         }));
-    // }
     private Node BuildChesingBranch()
     {
         return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,

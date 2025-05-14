@@ -31,7 +31,8 @@ namespace Helltal.Gelercat
 
         /// TODO：AudioPresident
         public GuestSensor sensor;  // 
-        protected Root behaviorTree;
+
+        public Root behaviorTree;
 
         public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
 
