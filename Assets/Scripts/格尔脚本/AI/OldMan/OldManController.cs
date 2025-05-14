@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using NPBehave;
+using System.Collections.Generic;
 
 namespace Helltal.Gelercat
 {
@@ -17,9 +18,11 @@ namespace Helltal.Gelercat
 
         [Header("黑雾")] public BlackForgController blackFogController; // 黑雾控制器
 
+        [Header("触发奖励时间")] public float triggerRewardTime = 3f; // 触发奖励时间
+        public LayerMask TriggerMask; // 触发器层级
         bool DEBUG_chatting = false;
 
-
+        private Collider aroundCollider; // 触发器  玩家如果进入，就开启
 
         // debug
 
@@ -29,6 +32,8 @@ namespace Helltal.Gelercat
         protected override void Awake()
         {
             base.Awake();
+
+
             behaviorTree = GetBehaviorTree();
 #if UNITY_EDITOR
             Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
@@ -38,13 +43,13 @@ namespace Helltal.Gelercat
             behaviorTree.Blackboard["Lonely"] = false; // 孤独标志
             behaviorTree.Blackboard["Happying"] = false; // 高兴标志
             Debug.Log("presenter:" + presenter.isActiveAndEnabled);
-            behaviorTree.Start();
+
         }
         protected override void Start()
         {
 
             base.Start();
-
+            behaviorTree.Start();
         }
         protected override Root GetBehaviorTree()
         {
@@ -180,29 +185,36 @@ namespace Helltal.Gelercat
 
 
         // 判断玩家是否正在进行足够音量的聊天（true：满足条件）
+        // private bool IsPlayerChatting()
+        // {
+        //     // TODO: 实现对指定分贝阈值的声音检测，且玩家位于老人10米内
+
+        //     // FOR Debug:
+
+        //     if (Debugging)
+        //     {
+        //         if (DEBUG_chatting)
+        //         {
+        //             Debug.Log("玩家正在聊天");
+        //             return true;
+        //         }
+        //         else
+        //         {
+        //             return false;
+        //         }
+        //     }
+
+
+
+        //     return false;
+        // }
+        private bool isPlayerChatting = false;  // 玩家是否满足聊天条件
+        private bool hasTriggeredReward = false; // 是否已触发奖励，防止重复奖励
         private bool IsPlayerChatting()
         {
-            // TODO: 实现对指定分贝阈值的声音检测，且玩家位于老人10米内
-
-            // FOR Debug:
-
-            if (Debugging)
-            {
-                if (DEBUG_chatting)
-                {
-                    Debug.Log("玩家正在聊天");
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-
-
-            return false;
+            return isPlayerChatting;
         }
+
 
         // 黑雾启动
         private void StartBlackFog()
@@ -218,7 +230,8 @@ namespace Helltal.Gelercat
         {
 
             if (Debugging) Debug.Log("黑雾停止");
-            blackFogController.StopFog(); // 停止黑雾
+            // blackFogController.StopFog(); // 停止黑雾
+            blackFogController.FadeOutFog(); // 淡出黑雾
         }
 
         // 进入死亡状态的逻辑
@@ -268,6 +281,9 @@ namespace Helltal.Gelercat
 
         // OnDestroy 时清理行为树
 
+        private List<GameObject> playerlist;
+
+        float playerstayTimmer = 0f; // 玩家在触发器内的时间
         protected override void Update()
         {
             base.Update();
@@ -292,6 +308,7 @@ namespace Helltal.Gelercat
                 }
             }
 
+
         }
         // gui 上现实lonelyDuration，方便调试
         void OnGUI()
@@ -300,6 +317,48 @@ namespace Helltal.Gelercat
             {
                 GUI.Label(new Rect(10, 10, 200, 20), "lonelyDuration: " + lonelyDuration.ToString("F2"));
                 GUI.Label(new Rect(10, 30, 200, 20), "lonelyDeathThreshold: " + lonelyDeathThreshold.ToString("F2"));
+            }
+        }
+
+        void OnTriggerEnter(Collider other)
+        {
+
+            // 玩家进入触发器
+            if (Debugging) Debug.Log("玩家进入触发器");
+            playerstayTimmer = 0f; // 重置玩家在触发器内的时间
+
+        }
+        void OnTriggerExit(Collider other)
+        {
+
+            if (Debugging) Debug.Log("玩家离开触发器");
+
+            // 离开时重置状态
+            playerstayTimmer = 0f;
+            isPlayerChatting = false;
+            hasTriggeredReward = false;
+
+        }
+        void OnTriggerStay(Collider other)
+        {
+            // 只有在“孤独状态”才允许判定聊天
+            if (behaviorTree.Blackboard.Get<bool>("Lonely"))
+            {
+                playerstayTimmer += Time.deltaTime;
+
+                if (playerstayTimmer >= triggerRewardTime && !hasTriggeredReward)
+                {
+                    isPlayerChatting = true;
+                    hasTriggeredReward = true; // 防止重复奖励
+                    if (Debugging) Debug.Log("聊天条件达成，准备奖励");
+                }
+            }
+            else
+            {
+                // 如果不是孤独状态，就重置
+                playerstayTimmer = 0f;
+                isPlayerChatting = false;
+                hasTriggeredReward = false;
             }
         }
     }

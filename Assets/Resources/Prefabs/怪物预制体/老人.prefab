@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 539313676750664309}
   - component: {fileID: 4259392732718560279}
   - component: {fileID: 8051829878967072517}
+  - component: {fileID: 2153131250301358703}
   m_Layer: 0
   m_Name: "\u8001\u4EBA"
   m_TagString: Untagged
@@ -48,8 +49,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 988116501
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 3603382873
+  InScenePlacedSourceGlobalObjectIdHash: 1624158115
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -89,6 +90,10 @@ MonoBehaviour:
   lonelyDeathMax: 15
   moneybag: {fileID: 6478862569813391879, guid: 986289d73aaaaf94992adf2feac6784f, type: 3}
   blackFogController: {fileID: 8744655807176584049}
+  triggerRewardTime: 3
+  TriggerMask:
+    serializedVersion: 2
+    m_Bits: 8192
 --- !u!114 &8051829878967072517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -102,6 +107,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3194600844122201699}
+--- !u!135 &2153131250301358703
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44534023199289709}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 8192
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 7.08
+  m_Center: {x: 0, y: 0.97, z: 0}
 --- !u!1 &1305299119579404530
 GameObject:
   m_ObjectHideFlags: 0
@@ -147,13 +173,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fogEffect: {fileID: 6165201647049010568, guid: aa7b0348e2bfbed4099dab3518145061, type: 3}
-  Stage1FogDamage: 1
-  Stage2FogDamage: 2
+  fogExpandRange: 25.3
   Stage1FogSpeed: 1.5
-  Stage2FogSpeed: 2
-  fogExpandRange: 5
+  Stage1FogDamage: 1
   Stage1FogDamageInterval: 0.5
+  Stage2FogSpeed: 2
+  Stage2FogDamage: 2
   Stage2FogDamageInterval: 0.5
+  fadeOutSpeed: 2
 --- !u!1001 &1467074165737496120
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -204,7 +231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c75864ae3c9fab34ebfb28ed38a9e8f8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.78
+      value: 1.41
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c75864ae3c9fab34ebfb28ed38a9e8f8, type: 3}
       propertyPath: m_LocalPosition.z
