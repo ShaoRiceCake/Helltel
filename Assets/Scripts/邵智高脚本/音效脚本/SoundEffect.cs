@@ -39,6 +39,13 @@ public class SoundEffect
     [Tooltip("允许随机选择的音频剪辑列表")]
     public List<AudioClip> randomClips = new List<AudioClip>();
 
+    [Header("轮播列表")]
+    [Tooltip("配置循环轮播的音频剪辑列表（按顺序播放）")]
+    public List<AudioClip> cycleClips = new List<AudioClip>();
+    
+    [Tooltip("启用循环轮播功能")]
+    public bool useCycle = false;
+
     [Header("分类设置")]
     [Tooltip("从下拉菜单中选择分类")]
     public AudioCategory category = AudioCategory.SFX;

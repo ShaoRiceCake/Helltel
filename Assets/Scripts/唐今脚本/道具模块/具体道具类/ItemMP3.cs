@@ -17,13 +17,13 @@ public class ItemMP3 : ActiveItem
         if (_isPlaying) return;
         
         _isPlaying = true;
-        AudioManager.Instance.Play("MP3音乐",transform.position);
+        AudioManager.Instance.Play("MP3音乐",transform.position, owner :this);
     }
 
     private void ReleaseProcess()
     {
         _isPlaying = false;
-        AudioManager.Instance.Stop("MP3音乐");
+        AudioManager.Instance.Stop("MP3音乐",owner :this);
     }
     private void OnDestroy()
     {

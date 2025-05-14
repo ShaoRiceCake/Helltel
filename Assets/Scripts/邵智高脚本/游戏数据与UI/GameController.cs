@@ -28,10 +28,14 @@ public class GameController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.M))
         {
             AddPerformance(50);
+            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+            
         }
         if(Input.GetKeyDown(KeyCode.J))
         {
             DeductHealth(50);
+            AudioManager.Instance.Stop("压抑氛围环境音",owner:this);
+            
         }
     }
     
