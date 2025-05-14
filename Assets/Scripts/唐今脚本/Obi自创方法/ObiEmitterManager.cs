@@ -7,13 +7,12 @@ public class ObiEmitterManager : MonoBehaviour
     private ObiEmitter _obiEmitter;
     private bool _isSubscribed;
 
-    [Tooltip("完全手动控制")]
     public bool forceManualEmission = true;
 
     private void Start()
     {
         _obiEmitter = GetComponent<ObiEmitter>();
-        if (_obiEmitter == null)
+        if (!_obiEmitter)
         {
             Debug.LogError("ObiEmitterController requires an ObiEmitter component");
             return;
@@ -63,14 +62,12 @@ public class ObiEmitterManager : MonoBehaviour
         _obiEmitter.speed = sprayEvent.emissionSpeed;
         _obiEmitter.randomDirection = sprayEvent.emissionRandomness;
 
-        // StartCoroutine(EmitParticlesOverTime(sprayEvent.emitterCount));
         TriggerBurst(sprayEvent.emitterCount);
-
     }
 
     private System.Collections.IEnumerator EmitParticlesOverTime(int totalCount)
     {
-        var batchSize = Mathf.Min(10, totalCount); // 每批发射10个
+        var batchSize = Mathf.Min(10, totalCount);
         var emitted = 0;
 
         while(emitted < totalCount)
@@ -81,12 +78,15 @@ public class ObiEmitterManager : MonoBehaviour
                 _obiEmitter.EmitParticle(0);
             }
             emitted += toEmit;
-            yield return null; // 等待下一帧
+            yield return null; 
         }
     }
 
     private void TriggerBurst(int burstCount)
     {
+        // 确保发射器已初始化
+        if (!_obiEmitter) return;
+        _obiEmitter.UpdateEmitter(); // 显式调用初始化
         _obiEmitter.emissionMethod = ObiEmitter.EmissionMethod.BURST;
         StartCoroutine(ExecuteBurst(burstCount));
     }
@@ -110,7 +110,7 @@ public class ObiEmitterManager : MonoBehaviour
     
     public void KillAllParticles()
     {
-        if(_obiEmitter != null)
+        if(_obiEmitter)
             _obiEmitter.KillAll();
     }
 }

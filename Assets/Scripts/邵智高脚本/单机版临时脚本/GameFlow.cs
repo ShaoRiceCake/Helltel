@@ -9,7 +9,6 @@ public class GameFlow : MonoBehaviour
     public static GameFlow Instance { get; private set; }
     private GameDataModel _data;
     public SceneOverlayer sceneOverlayer;
-
     
     private void Awake() {
         if (Instance == null) {
@@ -18,63 +17,29 @@ public class GameFlow : MonoBehaviour
             Destroy(gameObject);
         }
         
-
     }
-
-
- 
-    void Start()
+    private void Start()
     {
-        
-        
-
         _data = GameController.Instance._gameData;
-
-        
         sceneOverlayer = FindObjectOfType<SceneOverlayer>();
         sceneOverlayer.LoadDungeonScene();
         _data.SendStartLoading();
-        //NextFloor();
         StartCoroutine(NextFloor());
-
-               
-        
-        
     }
-    void OnDestroy() 
+    private IEnumerator NextFloor()
     {
-
-    }
-  
-
-    // Update is called once per frame
-    void Update()
-    {
-       
-       
-        
-    }
-    
-    IEnumerator NextFloor()
-    {
-        
-        
         //如果电梯外面是地牢
         if(_data.CurrentLoadedScene != null &&_data.CurrentLoadedScene == _data.dungeon)
         {
-
             GameController.Instance._gameData.Level +=1;
             //这段代码会设置地牢生成的值并重新调用地牢生成
             yield return new WaitForSecondsRealtime(0.1f);
             DungeonGenerator.Instance.ReSetDungeonValue();
-            
-
         }
         else if(_data.CurrentLoadedScene != null && _data.CurrentLoadedScene == _data.shop)
         {
 
         }
-
     }
     public void OpenDoor()
     {
@@ -96,11 +61,8 @@ public class GameFlow : MonoBehaviour
         //修改玩家位置；
         //ResetPlayerPosition();
         
-
         //发送事件，接受到这个事件的地方要进行相应操作（重置属性、位置等）
         _data.SendOnFloorChangedEvent();
-        
-        
         
         //切换叠加的场景
         if(_data.CurrentLoadedScene == _data.dungeon)
@@ -116,15 +78,5 @@ public class GameFlow : MonoBehaviour
             _data.NewDungeonFloorData();
             StartCoroutine(NextFloor());
         }
-        
     }
-  
-    
-    public void PlayerDie()
-    {
-        
-
-        
-    }
-
 }

@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4447181458767226666}
   - component: {fileID: 9207803099867067585}
   - component: {fileID: 6924486005683348235}
+  - component: {fileID: 6080369867368745770}
   m_Layer: 12
   m_Name: "\u6447\u6643\u63D0\u706F"
   m_TagString: Item
@@ -34,13 +35,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3875119479494177505}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.000000015454313, y: -0.70710677, z: -0.000000015454313, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -24.959642, y: 1.148031, z: -2.6730654}
   m_LocalScale: {x: 0.13403028, y: 0.019818688, z: 0.13403028}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!33 &2756867618417788717
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -104,8 +105,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 624763026
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 640995534
+  InScenePlacedSourceGlobalObjectIdHash: 3059838703
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -210,7 +211,7 @@ Light:
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -289,7 +290,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47b83e29a5279134eaba16e5789d6921, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemName: 
+  itemName: "\u6447\u6643\u706F"
+  itemDamage: 15
+  itemPrice: 200
   enableOrbit: 0
   orbitCenter: {fileID: 0}
   orbitRotationSpeed: 90
@@ -301,3 +304,21 @@ MonoBehaviour:
   activationSpeedThreshold: 3
   deactivationSpeedThreshold: 1
   responseCurvePower: 2
+--- !u!114 &6080369867368745770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3875119479494177505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b7639d3ce46b8344908486b19f10873, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundName: "\u91D1\u5C5E\u7269\u4F53\u78B0\u649E\u5E38\u89C4\u97F3\u6548"
+  volume: 1
+  minPlayInterval: 0.2
+  excludeLayers:
+    serializedVersion: 2
+    m_Bits: 128

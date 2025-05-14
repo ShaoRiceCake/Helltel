@@ -11,6 +11,7 @@ public interface IInteractable
 {
     string ItemName { get; }           // 物品唯一标识
     EItemState CurrentState { get; }    // 当前状态查询
+    int ItemDamage{get;set;}
 }
 
 // 清洁道具接口（仅用于清洁的道具挂载）
@@ -104,8 +105,28 @@ public class GrabbedState : ItemState
 public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
 {
     // 配置字段
-    [SerializeField] protected string itemName;  // 物品标识（需在Inspector设置）
-    public string ItemName => itemName;          // 接口实现
+    [SerializeField] protected string itemName; 
+    public string ItemName => itemName;         
+    [SerializeField] protected int itemDamage;  
+    public int ItemDamage
+    {
+        get => itemDamage;
+        set => itemDamage = value;
+    }
+    public int itemPrice = 0;
+    private Rigidbody _rb;
+    private float _baseMass;
+    public bool IsPurchase
+    {
+        get => _isPurchase;
+        set
+        {
+            if (!value) return;
+            itemPrice = 0;
+            _isPurchase = true;
+        }
+    }
+    private bool _isPurchase = false;
     
     // 权限管理字段
     private ulong _currentGrabbingPlayerId = ulong.MaxValue; // 当前持有玩家ID
@@ -121,41 +142,11 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     private readonly Dictionary<EItemState, ItemState> _stateDictionary = new(); // 状态注册表
     public EItemState CurrentState => _stateStack.Count > 0 ? _stateStack.Peek().StateType : EItemState.NotSelected; // 当前状态查询
 
+
     // 层级管理
     public int OriginalLayer { get; private set; }  // 物品原始层级（自动获取）
     public int TargetLayer { get; private set; }    // 交互专用层级（通常设置为"Item"层）
-
-    // [Header("Grab Settings")]
-    // [SerializeField] private Transform grabOffsetPoint; // 在Inspector中指定抓取偏移点（如尾部）
-    //
-    //
-    // public (Vector3 position, Quaternion rotation) GetGrabPose()
-    // {
-    //     return grabOffsetPoint ?
-    //         // 直接返回偏移点的世界坐标位置和旋转
-    //         (grabOffsetPoint.position, grabOffsetPoint.rotation) :
-    //         // 默认返回物体自身的世界坐标
-    //         (transform.position, transform.rotation);
-    // }
-    //
-    // // 返回抓取点的局部偏移（相对于物体自身坐标系）
-    // public Vector3 GetLocalGrabOffsetPosition()
-    // {
-    //     return grabOffsetPoint != null ?
-    //         // 计算偏移点相对于物体自身的局部位置
-    //         transform.InverseTransformPoint(grabOffsetPoint.position) : Vector3.zero; // 默认无偏移
-    // }
-    //
-    // // 返回抓取点的局部旋转偏移（可选）
-    // public Quaternion GetLocalGrabOffsetRotation()
-    // {
-    //     if (grabOffsetPoint != null)
-    //     {
-    //         // 计算偏移点相对于物体自身的局部旋转
-    //         return Quaternion.Inverse(transform.rotation) * grabOffsetPoint.rotation;
-    //     }
-    //     return Quaternion.identity;
-    // }
+    
     
     [Header("Orbit Settings")]
     [SerializeField]
@@ -183,6 +174,7 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         ForceSetState(EItemState.NotSelected); // 初始状态设置
 
         orbitCenter = GameObject.Find("BodyBall").transform;
+        _rb = GetComponent<Rigidbody>();
     }
 
     private void FixedUpdate()

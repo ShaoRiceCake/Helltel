@@ -2,12 +2,14 @@ using UnityEngine;
 using Obi;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 
 public class CatchTool : MonoBehaviour
 {
     [Header("References")]
     public ObiParticleAttachment obiAttachment;
-    public CatchDetectorTool catchDetectorTool; 
+    public CatchDetectorTool catchDetectorTool;
+    public ProgressBarPro progressBar; // 新增进度条引用
 
     private SphereCollider _sphereCollider;
     private GameObject _catchBall;
@@ -20,7 +22,8 @@ public class CatchTool : MonoBehaviour
     private bool _isGrabbingKinematic = false;
     private float _pressTime;
     private bool _isPressingE;
-    private const float LongPressThreshold = 0.5f; // 长按时间检测阈值
+    private const float ShortPressThreshold = 0.2f; // 短按时间阈值
+    private const float LongPressThreshold = 1f; // 长按时间阈值
     
     // 当前抓取的物品（只读）
     public ItemBase CurrentlyGrabbedItem { get; private set; }
@@ -30,17 +33,13 @@ public class CatchTool : MonoBehaviour
         get => _catchBall;
         set
         {
-            // 如果新值和旧值相同，不做任何处理
             if (_catchBall == value) return;
 
-            // 如果当前有抓取目标且CatchBall被设为null，且抓取的是运动学物体
             if (_catchBall != null && value == null && _isGrabbing && _isGrabbingKinematic)
             {
-                // 立即释放运动学物体
                 ReleaseObject();
             }
 
-            // 如果当前有抓取目标且CatchBall被改变（无论新旧值是什么）
             if (_currentTarget && _catchBall != value)
             {
                 if (_currentTarget.TryGetComponent<ItemBase>(out var item))
@@ -67,8 +66,12 @@ public class CatchTool : MonoBehaviour
             Debug.LogError("catchDetectCylinder未分配！");
             return;
         }
-        
         catchDetectorTool.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
+        // 初始化进度条
+        if (progressBar != null)
+        {
+            progressBar.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
@@ -136,28 +139,54 @@ public class CatchTool : MonoBehaviour
         {
             _pressTime = Time.time;
             _isPressingE = true;
+        
+            // 初始化进度条（但不立即显示）
+            if (_isGrabbing && progressBar)
+            {
+                progressBar.gameObject.SetActive(false); // 初始隐藏
+            }
         }
 
         // 持续检测按键是否被按住足够长时间
         if (_isPressingE && Input.GetKey(KeyCode.E))
         {
-            var pressDuration = Time.time - _pressTime;
-            if (pressDuration >= LongPressThreshold && _isGrabbing)
+            float pressDuration = Time.time - _pressTime;
+
+            // 超过短按阈值但未到长按阈值时更新进度条
+            if (pressDuration >= ShortPressThreshold && pressDuration < LongPressThreshold && _isGrabbing)
+            {
+                if (progressBar)
+                {
+                    // 只在第一次超过阈值时显示进度条
+                    if (!progressBar.gameObject.activeSelf)
+                    {
+                        progressBar.SetValue(1f);
+                        progressBar.gameObject.SetActive(true);
+                    }
+                
+                    // 计算0.3-1秒之间的进度(0-1)
+                    float progressTime = pressDuration - ShortPressThreshold; // 0到0.7
+                    float progress = progressTime / (LongPressThreshold - ShortPressThreshold); // 0到1
+                    progressBar.SetValue(1f - progress); // 从1降到0
+                }
+            }
+            // 长按逻辑
+            else if (pressDuration >= LongPressThreshold && _isGrabbing)
             {
                 TryUseItem();
-                _isPressingE = false; // 重置状态
+                _isPressingE = false;
+                HideProgressBar();
                 return;
             }
         }
 
-        if (!Input.GetKeyUp(KeyCode.E)) return;
-    
-        if (_isPressingE)
+        if (Input.GetKeyUp(KeyCode.E))
         {
-            var pressDuration = Time.time - _pressTime;
+            _isPressingE = false;
+            HideProgressBar();
         
-            // 短按逻辑
-            if (pressDuration < LongPressThreshold)
+            // 短按逻辑（只在释放时且未达到长按阈值时执行）
+            if (Time.time - _pressTime < LongPressThreshold)
             {
                 if (_currentTarget && !_isGrabbing)
                 {
@@ -169,8 +198,16 @@ public class CatchTool : MonoBehaviour
                 }
             }
         }
-        _isPressingE = false;
     }
+
+    private void HideProgressBar()
+    {
+        if (progressBar)
+        {
+            progressBar.gameObject.SetActive(false);
+        }
+    }
+    
 
     /// <summary>
     /// 外部调用强制释放当前抓取的物体
@@ -202,7 +239,6 @@ public class CatchTool : MonoBehaviour
             
         AudioManager.Instance.Play("玩家松手", _catchBall.transform.position, 0.3f);
         return true;
-
     }
 
     /// <summary>
@@ -238,10 +274,29 @@ public class CatchTool : MonoBehaviour
         }
     }
 
-
     private void GrabObject(GameObject target)
     {
         if (!target || !target.TryGetComponent<ItemBase>(out var item)) return;
+        
+        if (item.itemPrice > 0 && !item.IsPurchase)
+        {
+            var price = item.itemPrice;
+            var hasEnoughMoney = CheckPlayerMoney(playerID, price);
+        
+            if (hasEnoughMoney)
+            {
+                DeductPlayerMoney(playerID, price);
+                item.IsPurchase = true;
+            
+                AudioManager.Instance.Play("购买", _catchBall.transform.position, 0.7f);
+            }
+            else
+            {
+                AudioManager.Instance.Play("无法购买", _catchBall.transform.position, 0.7f);
+                return;
+            }
+        }
+        
         if (!item.RequestStateChange(EItemState.Grabbed, CatchToolInstanceId, playerID)) return;
 
         _isGrabbing = true;
@@ -283,14 +338,24 @@ public class CatchTool : MonoBehaviour
         if (!_isGrabbing || !CurrentlyGrabbedItem) return 0f;
     
         var rb = CurrentlyGrabbedItem.GetComponent<Rigidbody>();
-        if (rb == null) return 0f;
+        if (!rb) return 0f;
     
-        if (rb.isKinematic) return float.MaxValue; // Treat kinematic objects as infinite mass
-        return rb.mass;
+        return rb.isKinematic ? float.MaxValue : 
+            rb.mass;
     }
     
     public bool IsGrabbingKinematic()
     {
         return _isGrabbing && _isGrabbingKinematic;
+    }
+    
+    private bool CheckPlayerMoney(ulong playerId, int price)
+    {
+        return GameController.Instance.GetMoney() >= price;
+    }
+
+    private void DeductPlayerMoney(ulong playerId, int amount)
+    {
+        GameController.Instance.DeductMoney(amount);
     }
 }

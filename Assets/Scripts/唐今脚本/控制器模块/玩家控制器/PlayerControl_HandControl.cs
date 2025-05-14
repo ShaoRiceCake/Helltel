@@ -1,5 +1,6 @@
 using UnityEngine;
 using Obi;
+using UnityEngine.Serialization;
 using static PlayerControlInformationProcess;
 
 public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
@@ -12,6 +13,13 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
     public float mouseSensitivity = 200f;
     public CatchTool  catchTool;
     public GameObject handBallPrefab;
+    public ItemWeapon_PlayerHand handWeapon;
+
+    public int PunchDamage
+    {
+        get => handWeapon.ItemDamage ;
+        set => handWeapon.ItemDamage = value;
+    }
     
     [Header("Weight Sensitivity")]
     public float baseMouseSensitivity = 200f; // Rename the existing mouseSensitivity to baseMouseSensitivity
@@ -56,6 +64,8 @@ public abstract class PlayerControl_HandControl : PlayerControl_BaseControl
         mouseSensitivity = baseMouseSensitivity; // Initialize
         
         SubscribeEvents();
+        
+        handWeapon = handBallPrefab.GetComponent<ItemWeapon_PlayerHand>();
     }
 
 

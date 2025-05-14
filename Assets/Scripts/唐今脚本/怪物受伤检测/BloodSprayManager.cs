@@ -27,14 +27,12 @@ public class BloodSprayManager : MonoBehaviour
             Debug.LogError("血液喷射器预制体未设置！");
             return;
         }
-
-        // 直接在当前游戏对象下创建喷射器
+        
         CreateEmitter(this.transform, sprayEvent);
     }
 
     private void CreateEmitter(Transform parent, BloodSprayEvent sprayEvent)
     {
-        // 实例化喷射器GameObject作为当前对象的子对象
         var emitterObj = Instantiate(
             bloodSprayPrefab,
             sprayEvent.spawnPosition,  // 使用事件中的位置

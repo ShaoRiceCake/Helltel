@@ -68,27 +68,6 @@ public class MRBunnyController : GuestBase, IHurtable
         );
 
     }
-
-    // private Node BuildChesingBranch()
-    // {
-    //     return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
-    //         new Action(() =>
-    //         {
-    //             if (CurTarget != null && agent.isOnNavMesh)
-    //             {
-
-    //                 agent.SetDestination(CurTarget.transform.position); // 设置目标位置
-    //                 if (Vector3.Distance(transform.position, CurTarget.transform.position) >= chaseDistance)
-    //                 {
-    //                     agent.speed = moveSpeed;
-    //                 }
-    //                 else
-    //                 {
-    //                     agent.speed = chaseSpeed; // 设置追击速度
-    //                 }
-    //             }
-    //         }));
-    // }
     private Node BuildChesingBranch()
     {
         return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
@@ -123,12 +102,13 @@ public class MRBunnyController : GuestBase, IHurtable
                     if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform))
                     {
                         CurTarget = target.gameObject;
-
                         return true;
                     }
                 }
+                CurTarget = null; // 如果没有检测到目标，则设置为null
             }
         }
+        // CurTarget = null; // 如果没有检测到目标，则设置为null
         return false;
     }
     private Node BuildPatrolBranch()
@@ -342,7 +322,8 @@ public class MRBunnyController : GuestBase, IHurtable
 
     void OnDestroy()
     {
-        base.OnDestroy();
         behaviorTree?.Stop(); // 停止行为树
+        base.OnDestroy();
+        
     }
 }

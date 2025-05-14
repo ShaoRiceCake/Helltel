@@ -43,6 +43,8 @@ public class ItemSausage : ActiveItem
             }
         }
         
+        GameController.Instance.AddHealth(amount);
+        
         SelfDetach(true);
     }
 

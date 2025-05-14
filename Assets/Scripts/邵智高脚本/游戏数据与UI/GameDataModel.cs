@@ -45,11 +45,6 @@ public class GameDataModel : ScriptableObject
     public event Action<string> FloorIS;      // 楼层类型为
     public event Action<bool> OnIsPlayerDiedChangedEvent;      // 玩家死亡状态变化事件
 
-   
-     
-    
-
-
     // 属性封装（数据访问入口）
     public int Health {
         get => _health;
@@ -123,9 +118,6 @@ public class GameDataModel : ScriptableObject
         }
     }
 
-
-
-
     // 初始化方法
     public void ResetData()
     {
@@ -143,10 +135,11 @@ public class GameDataModel : ScriptableObject
     //进商店层调用这个
     public void NewShopFloorData()
     {
-        Money += Performance;
+        // Money += Performance;
         Health = MaxHealth;
-        Performance = 0;
+        // Performance = 0;
 
+        //改由商店内部脚本实现
     }
     //进地牢层调用这个
     public void NewDungeonFloorData()
@@ -156,15 +149,12 @@ public class GameDataModel : ScriptableObject
         _isPerformancePassed = false;
 
     }
-    
-    int ExponentialCalculation()
+
+    private int ExponentialCalculation()
     {
         // 计算指数增长后的值
-        float value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
-        
-        // 取整到最近的 expRoundInterval 倍数（如10、50、100等）
+        var value = _basePerformanceTarget * Mathf.Pow(1.5f, Level);
         return Mathf.RoundToInt(value / 10f) * 10;
-        
     }
     public bool CheckPerformance()
     {

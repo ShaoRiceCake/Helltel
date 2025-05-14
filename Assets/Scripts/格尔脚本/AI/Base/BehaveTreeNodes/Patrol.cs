@@ -40,7 +40,7 @@ namespace Helltal.Gelercat
         {
             // agent.ResetPath();  // 停止导航
             // this.Stopped(false); // 明确停止
-            if (agent != null && agent.isActiveAndEnabled && agent.isOnNavMesh)
+            if (agent != null && agent.isOnNavMesh)
             {
                 agent.ResetPath();
             }
@@ -48,43 +48,91 @@ namespace Helltal.Gelercat
             this.Stopped(false); // 明确告诉父节点：自己停止了
         }
 
+        // private void ChooseNextNavPoint()
+        // {
+        //     if (agent == null || agent.gameObject == null) return;
+
+        //     currentTarget = GetClosestUnvisitedNavPoint();
+
+        //     if (currentTarget == null)
+        //     {
+        //         visitDict.Clear();  // 重置访问状态
+        //         currentTarget = GetClosestUnvisitedNavPoint();
+
+        //         if (currentTarget == null)
+        //         {
+        //             Debug.Log("无任何可达导航点，Patrol失败");
+        //             this.Stopped(false);
+        //             return;
+        //         }
+        //     }
+        //     float distToTarget = Vector3.Distance(agent.transform.position, currentTarget.transform.position);
+        //     if (distToTarget <= searchDist)
+        //     {
+        //         visitDict[currentTarget] = true;
+        //         Debug.Log("导航点在搜索距离内，直接标记为已访问：" + currentTarget.name);
+        //         ChooseNextNavPoint();  // 继续选择下一个
+        //         return;
+        //     }
+
+        //     bool setDestinationSuccess = agent.SetDestination(currentTarget.transform.position);
+        //     if (!setDestinationSuccess)
+        //     {
+        //         visitDict[currentTarget] = true;
+        //         Debug.Log("无法到达导航点：" + currentTarget.name);
+        //         ChooseNextNavPoint(); // 尝试下一个点
+        //         return;
+        //     }
+
+        //     Clock.AddUpdateObserver(OnUpdate);
+        // }
         private void ChooseNextNavPoint()
         {
             if (agent == null || agent.gameObject == null) return;
 
-            currentTarget = GetClosestUnvisitedNavPoint();
+            int attempts = 0;
+            int maxAttempts = 2; // 防止死循环
 
-            if (currentTarget == null)
+            while (attempts < maxAttempts)
             {
-                visitDict.Clear();  // 重置访问状态
                 currentTarget = GetClosestUnvisitedNavPoint();
 
                 if (currentTarget == null)
                 {
-                    Debug.Log("无任何可达导航点，Patrol失败");
-                    this.Stopped(false);
-                    return;
+                    visitDict.Clear();  // 重置访问状态
+                    currentTarget = GetClosestUnvisitedNavPoint();
+
+                    if (currentTarget == null)
+                    {
+                        Debug.Log("无任何可达导航点，Patrol失败");
+                        this.Stopped(false);
+                        return;
+                    }
                 }
-            }
-            float distToTarget = Vector3.Distance(agent.transform.position, currentTarget.transform.position);
-            if (distToTarget <= searchDist)
-            {
-                visitDict[currentTarget] = true;
-                Debug.Log("导航点在搜索距离内，直接标记为已访问：" + currentTarget.name);
-                ChooseNextNavPoint();  // 继续选择下一个
-                return;
+
+                float distToTarget = Vector3.Distance(agent.transform.position, currentTarget.transform.position);
+                if (distToTarget <= searchDist)
+                {
+                    visitDict[currentTarget] = true;
+                    Debug.Log("导航点在搜索距离内，跳过：" + currentTarget.name);
+                    attempts++;
+                    continue;
+                }
+
+                if (!agent.SetDestination(currentTarget.transform.position))
+                {
+                    visitDict[currentTarget] = true;
+                    Debug.Log("无法到达导航点：" + currentTarget.name);
+                    attempts++;
+                    continue;
+                }
+
+                Clock.AddUpdateObserver(OnUpdate);
+                return; // 设置成功，退出
             }
 
-            bool setDestinationSuccess = agent.SetDestination(currentTarget.transform.position);
-            if (!setDestinationSuccess)
-            {
-                visitDict[currentTarget] = true;
-                Debug.Log("无法到达导航点：" + currentTarget.name);
-                ChooseNextNavPoint(); // 尝试下一个点
-                return;
-            }
-
-            Clock.AddUpdateObserver(OnUpdate);
+            Debug.LogWarning("超过最大尝试次数，Patrol失败");
+            this.Stopped(false);
         }
 
         private void OnUpdate()

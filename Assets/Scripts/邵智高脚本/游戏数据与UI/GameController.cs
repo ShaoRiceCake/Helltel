@@ -15,31 +15,30 @@ public class GameController : MonoBehaviour
     public static GameController Instance { get; private set; }
 
     private void Awake() {
-        if (Instance == null) {
+        if (!Instance) {
             Instance = this;
         } else {
             Destroy(gameObject);
         }
         _gameData.ResetData();
-
     }
-    private void OnEnable() {
-        
-    }
-    private void Start() {
-        
-    }
+    
     public void Update()
     {
         if(Input.GetKeyDown(KeyCode.M))
         {
             AddPerformance(50);
+            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+            
         }
         if(Input.GetKeyDown(KeyCode.J))
         {
             DeductHealth(50);
+            AudioManager.Instance.Stop("压抑氛围环境音",owner:this);
+            
         }
     }
+    
     // 增加血上限接口
     public void AddMaxHealth(int amount)
     {
@@ -63,7 +62,6 @@ public class GameController : MonoBehaviour
             Debug.LogError("血上限不能是负数");
             return;
         }
-   
     }
 
     // 增加血量接口
@@ -83,17 +81,17 @@ public class GameController : MonoBehaviour
         if (_gameData.Health >= amount)
         {
             _gameData.Health -= amount;
+            BloodEffectController.ActivateBloodEffect();
+            Debug.Log("玩家扣除血量" + amount);
         }
         else
         {
             Debug.Log("死亡");
-
             return;
         }
-      
     }
 
-    // 增加钱接口
+    // 增加玩家资金接口
     public void AddMoney(int amount)
     {
         if (amount < 0)
@@ -105,7 +103,7 @@ public class GameController : MonoBehaviour
         _gameData.Money += amount;
     }
 
-    // 扣钱接口
+    // 扣玩家资金接口
     public void DeductMoney(int amount)
     {
         if (_gameData.Money >= amount)
@@ -115,6 +113,14 @@ public class GameController : MonoBehaviour
         //暂定钱可以是负数
         _gameData.Money -= amount;
     }
+    
+    // 检查玩家资金接口
+    public int GetMoney()
+    {
+        return _gameData.Money;
+    }
+
+    
     //增加绩效接口
     public void AddPerformance(int amount)
     {

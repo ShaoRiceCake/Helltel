@@ -49,6 +49,10 @@ public class MouseControl : MonoBehaviour
         onNoMouseButtonDown ??= new UnityEvent();
         onMouseMoveFixedUpdate ??= new UnityEvent<Vector2>();
         onMouseMoveUpdate ??= new UnityEvent<Vector2>();
+        
+#if !UNITY_EDITOR
+Debug.unityLogger.logEnabled = false;
+#endif
     }
 
     private void Update()
@@ -137,11 +141,9 @@ public class MouseControl : MonoBehaviour
     private void HandleMouseMovementUpdate()
     {
         var currentMousePosition = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-        if (currentMousePosition != _lastMousePosition)
-        {
-            var mouseDelta = currentMousePosition * _mMouseSensitivity;
-            onMouseMoveUpdate?.Invoke(mouseDelta);
-        }
-        _lastMousePosition = currentMousePosition;
+
+        var mouseDelta = currentMousePosition * _mMouseSensitivity;
+        onMouseMoveUpdate?.Invoke(mouseDelta);
+
     }
 }

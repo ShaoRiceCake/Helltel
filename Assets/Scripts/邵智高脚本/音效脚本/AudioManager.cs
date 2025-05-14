@@ -23,7 +23,6 @@ public class AudioManager : MonoBehaviour
     
     [SerializeField, Tooltip("默认音频混合组")] 
     private AudioMixerGroup defaultMixerGroup;
-    
     //混响组件
     [SerializeField] private AudioMixer audioMixer;
     #endregion
@@ -46,12 +45,31 @@ public class AudioManager : MonoBehaviour
         new SoundCategory{ type = AudioCategory.Voice }
     };
     #endregion
+    //轮播
+    private class CyclePlaybackInfo
+    {
+        public SoundEffect effect;
+        public int currentIndex;
+        public Vector3 position;
+        public float dynamicVolume;
+        public AudioSource nextSource; // 预加载的下一个音源
+        public float transitionProgress; // 过渡进度
+    }
+    private Dictionary<AudioSource, CyclePlaybackInfo> activeCycleSources = new Dictionary<AudioSource, CyclePlaybackInfo>();
 
     #region Runtime Data
-    //跟踪音频源的字典
-    private Dictionary<AudioSource, (string soundName, Coroutine tracker)> activeSources = new Dictionary<AudioSource, (string, Coroutine)>();
     private Dictionary<string, SoundEffect> soundEffects = new Dictionary<string, SoundEffect>();
     public List<AudioSource> audioSourcePool = new List<AudioSource>();
+    // 新增播放上下文记录
+    private Dictionary<AudioSource, PlaybackContext> playbackContexts = 
+        new Dictionary<AudioSource, PlaybackContext>();
+    // 上下文数据结构
+    private class PlaybackContext
+    {
+        public string soundName;
+        public MonoBehaviour owner;
+    }
+    private Dictionary<AudioSource, string> activeSounds = new Dictionary<AudioSource, string>();
     #endregion
 
     #region Initialization
@@ -61,6 +79,12 @@ public class AudioManager : MonoBehaviour
         InitializeCategories();
         InitializeAudioPool();
         LoadAudioConfig();
+    }
+    private void Update()
+    {
+        HandleCyclePlayback();
+        CleanInactiveSources();
+        CleanInvalidContexts();
     }
 
     /// <summary>
@@ -87,7 +111,7 @@ public class AudioManager : MonoBehaviour
             CreateNewAudioSource();
         }
     }
-    //分类初始化方法
+    // 分类初始化方法
     private void InitializeCategories()
     {
         // 强制创建必要分类
@@ -140,7 +164,8 @@ public class AudioManager : MonoBehaviour
     public AudioSource Play(string soundName, 
                           Vector3 position = default, 
                           float dynamicVolume = 1f,
-                          bool loop = false)
+                          bool loop = false,
+                          MonoBehaviour owner = null)
     {
         if (!soundEffects.TryGetValue(soundName, out SoundEffect effect))
         {
@@ -151,38 +176,19 @@ public class AudioManager : MonoBehaviour
         AudioSource source = GetAvailableAudioSource() ?? CreateNewAudioSource();
         ConfigureAudioSource(source, effect, position, dynamicVolume, loop);
         source.Play();
-        // 清理旧的状态跟踪
-        if (activeSources.TryGetValue(source, out var oldState))
+        // 记录播放上下文
+        if (owner != null)
         {
-            StopCoroutine(oldState.tracker);
+            playbackContexts[source] = new PlaybackContext
+            {
+                soundName = soundName,
+                owner = owner
+            };
+            
+            // 自动清理失效引用
+            StartCoroutine(MonitorOwnerLifecycle(source, owner));
         }
-
-        // 创建新的状态跟踪
-        Coroutine tracker = StartCoroutine(TrackAudioSource(source, soundName, loop));
-        activeSources[source] = (soundName, tracker);
-
         return source;
-    }
-    // 跟踪方法
-    private IEnumerator TrackAudioSource(AudioSource source, string soundName, bool loop)
-    {
-        if (loop)
-        {
-            while (source.isPlaying && source.loop)
-            {
-                yield return null;
-            }
-        }
-        else
-        {
-            yield return new WaitForSeconds(source.clip.length);
-            while (source.isPlaying)
-            {
-                yield return null;
-            }
-        }
-
-        activeSources.Remove(source);
     }
 
     /// <summary>
@@ -194,8 +200,32 @@ public class AudioManager : MonoBehaviour
                                      float dynamicVolume,
                                      bool loop)
     {
-        // 选择音频剪辑（优先使用随机列表）
-        source.clip = SelectRandomClip(effect);
+        //清理可能存在的旧nextSource
+        if (activeCycleSources.TryGetValue(source, out var oldInfo) && oldInfo.nextSource != null)
+        {
+            oldInfo.nextSource.Stop();
+            activeCycleSources.Remove(oldInfo.nextSource);
+        }
+        // 初始化循环播放信息
+        if (effect.useCycle && effect.cycleClips.Count > 0)
+        {
+            var cycleInfo = new CyclePlaybackInfo
+            {
+                effect = effect,
+                currentIndex = 0,
+                position = position,
+                dynamicVolume = dynamicVolume
+            };
+            
+            source.clip = effect.cycleClips[0];
+            activeCycleSources[source] = cycleInfo;
+            loop = false; // 循环列表时禁用单曲循环
+        }
+        else
+        {
+            // 没有轮播音频时从随机列表中随机选择逻辑
+            source.clip = SelectRandomClip(effect);
+        }
         
         // 分层音量计算（Master > Category > Default > Dynamic）
         float masterVolume = GetCategoryVolume(AudioCategory.Master);
@@ -211,6 +241,91 @@ public class AudioManager : MonoBehaviour
         
         // 空间音频配置
         ConfigureSpatialAudio(source, effect, position);
+    }
+    // 处理循环列表播放
+    private void HandleCyclePlayback()
+    {
+        float transitionDuration = 0.5f; // 过渡时间(秒)
+
+        foreach (var kvp in activeCycleSources.ToList())
+        {
+            var source = kvp.Key;
+            var info = kvp.Value;
+
+            // 当前音频即将结束时(最后1秒)预加载下一个
+            if (info.nextSource == null && 
+                source.clip != null && 
+                source.time > source.clip.length - 1f)
+            {
+                PrepareNextClip(source, info);
+            }
+
+            // 处理过渡中的交叉淡入淡出
+            if (info.nextSource != null)
+            {
+                info.transitionProgress += Time.deltaTime / transitionDuration;
+                
+                // 当前音源淡出
+                source.volume = Mathf.Lerp(
+                    GetFinalVolume(source, info), 
+                    0f, 
+                    info.transitionProgress
+                );
+                
+                // 下一个音源淡入
+                info.nextSource.volume = Mathf.Lerp(
+                    0f, 
+                    GetFinalVolume(info.nextSource, info), 
+                    info.transitionProgress
+                );
+
+                // 过渡完成
+                if (info.transitionProgress >= 1f)
+                {
+                    CompleteTransition(source, info);
+                }
+            }
+        }
+    }
+    // 轮播时准备下一个音源
+    private void PrepareNextClip(AudioSource currentSource, CyclePlaybackInfo info)
+    {
+        info.currentIndex = (info.currentIndex + 1) % info.effect.cycleClips.Count;
+        
+        // 获取新音源
+        info.nextSource = GetAvailableAudioSource() ?? CreateNewAudioSource();
+        info.nextSource.clip = info.effect.cycleClips[info.currentIndex];
+        
+        // 配置相同参数
+        info.nextSource.pitch = currentSource.pitch;
+        info.nextSource.spatialBlend = currentSource.spatialBlend;
+        info.nextSource.outputAudioMixerGroup = currentSource.outputAudioMixerGroup;
+        info.nextSource.transform.position = currentSource.transform.position;
+        
+        // 初始设置
+        info.nextSource.volume = 0f;
+        info.nextSource.PlayDelayed(0.1f); // 提前0.1秒开始准备
+        info.transitionProgress = 0f;
+    }
+
+    // 轮播完成过渡
+    private void CompleteTransition(AudioSource oldSource, CyclePlaybackInfo info)
+    {
+        oldSource.Stop();
+        activeCycleSources.Remove(oldSource);
+        
+        // 将新音源设为当前音源
+        activeCycleSources[info.nextSource] = info;
+        info.nextSource.volume = GetFinalVolume(info.nextSource, info);
+        info.nextSource = null;
+    }
+
+    // 轮播计算最终音量
+    private float GetFinalVolume(AudioSource source, CyclePlaybackInfo info)
+    {
+        float masterVolume = GetCategoryVolume(AudioCategory.Master);
+        float categoryVolume = GetCategoryVolume(info.effect.category);
+        return info.effect.defaultVolume * masterVolume * categoryVolume * info.dynamicVolume;
     }
 
     /// <summary>
@@ -328,18 +443,88 @@ public class AudioManager : MonoBehaviour
         Debug.LogWarning($"尝试设置不存在的分类: {categoryType}");
     }
 
-    /// <summary>
-    /// 停止所有正在播放的音效
-    /// </summary>
+    // 所有者关联停止方法
+    public void Stop(string soundName, MonoBehaviour owner)
+    {
+        foreach (var kvp in playbackContexts.ToList())
+        {
+            if (kvp.Value.soundName == soundName && 
+                kvp.Value.owner == owner && 
+                kvp.Key.isPlaying)
+            {
+                Stop(kvp.Key);
+            }
+        }
+    }
+
+    // Stop方法
+    public void Stop(AudioSource source)
+    {
+        if (source == null) return;
+        
+        // 新增：停止过渡中的音源
+        if (activeCycleSources.TryGetValue(source, out var info) && info.nextSource != null)
+        {
+            info.nextSource.Stop();
+            activeCycleSources.Remove(info.nextSource); // 确保也移除
+        }
+        
+        source.Stop();
+        activeCycleSources.Remove(source);
+        activeSounds.Remove(source);
+        playbackContexts.Remove(source);
+    }
+
+    // 自动清理机制
+    private IEnumerator MonitorOwnerLifecycle(AudioSource source, MonoBehaviour owner)
+    {
+        while (source.isPlaying && owner != null)
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+        
+        // 当所有者被销毁时自动停止音效
+        if (owner == null && source.isPlaying)
+        {
+            Stop(source);
+        }
+    }
+ 
+
     public void StopAll()
     {
         foreach (var source in audioSourcePool)
         {
             source.Stop();
         }
+        activeCycleSources.Clear();
+        activeSounds.Clear();
+        playbackContexts.Clear();
+    }
+    private void CleanInvalidContexts()
+    {
+        foreach (var kvp in playbackContexts.ToList())
+        {
+            if (kvp.Key == null || !kvp.Key.isPlaying)
+            {
+                playbackContexts.Remove(kvp.Key);
+            }
+        }
+    }
+    private void CleanInactiveSources()
+    {
+        foreach (var source in audioSourcePool.ToList())
+        {
+            if (!source.isPlaying)
+            {
+                activeCycleSources.Remove(source);
+                activeSounds.Remove(source);
+                playbackContexts.Remove(source);
+            }
+        }
     }
     /// <summary>
-    /// 切换3D音频功能（未完成
+    /// 切换3D音频功能
     /// </summary>
     public void Toggle3DAudio(bool enable)
     {
@@ -350,57 +535,13 @@ public class AudioManager : MonoBehaviour
         }
     }
     /// <summary>
-    /// 控制混响效果开关（未完成
+    /// 控制混响效果开关
     /// </summary>
     /// <param name="enable">true启用混响，false关闭</param>
     public void ToggleReverb(bool enable)
     {
         // 通过音频混合器控制
         audioMixer.SetFloat("ReverbMix", enable ? 0f : -80f); // 0dB启用，-80dB静音
-    }
-    /// <summary>
-    /// 停止指定名称的所有音效实例
-    /// </summary>
-    public void Stop(string soundName)
-    {
-        List<AudioSource> toStop = new List<AudioSource>();
-        
-        foreach (var pair in activeSources)
-        {
-            if (pair.Value.soundName == soundName && pair.Key.isPlaying)
-            {
-                toStop.Add(pair.Key);
-            }
-        }
-
-        foreach (var source in toStop)
-        {
-            source.Stop();
-            if (activeSources.TryGetValue(source, out var state))
-            {
-                StopCoroutine(state.tracker);
-                activeSources.Remove(source);
-            }
-        }
-    }
-
-    /// <summary>
-    /// 停止指定的AudioSource实例
-    /// </summary>
-    //用法演示：
-    //AudioSource mySource = AudioManager.Instance.Play("背景音乐", loop: true);
-    // ...稍后...
-    //AudioManager.Instance.Stop(mySource);  // 停止这个特定的循环音效
-    public void Stop(AudioSource source)
-    {
-        if (source == null) return;
-
-        if (activeSources.TryGetValue(source, out var state))
-        {
-            source.Stop();
-            StopCoroutine(state.tracker);
-            activeSources.Remove(source);
-        }
     }
     #endregion
 

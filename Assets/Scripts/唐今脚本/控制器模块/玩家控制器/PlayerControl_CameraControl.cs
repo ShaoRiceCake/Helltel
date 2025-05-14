@@ -35,15 +35,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     [SerializeField] private float collisionDamping = 0.5f; // 碰撞阻尼系数
     [SerializeField] private float lookAtHeightRatio = 0.5f; 
     [SerializeField] private float lookAtSmoothTime = 0.2f; 
-
-    [Header("透明度设置")]
-    [SerializeField] private bool enableTransparency = true; // 新增：是否启用透明度功能
-    [SerializeField] private Renderer targetRenderer; // 要调整透明度的人物模型Renderer
-    [SerializeField] private float minAlpha = 0.3f; // 最小透明度值
-    [SerializeField] private float maxAlpha = 1.0f; // 最大透明度值
-    [SerializeField] private float fadeStartDistance = 3.0f; // 开始淡出的距离
-    [SerializeField] private float fadeEndDistance = 0.5f; // 完全淡出的距离
-    [SerializeField] private float fadeSmoothTime = 0.2f; // 淡出平滑时间
     
     [Header("Follow Mode")]
     [SerializeField] private bool useLazyFollow = false; // 是否使用慵懒跟随模式
@@ -75,6 +66,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         controlHandler.onCameraControl.AddListener(EnableCameraControl);
         controlHandler.onStopCameraControl.AddListener(DisableCameraControl);
+        controlHandler.onMouseMoveUpdate.AddListener(MouseMoveUpdate);
 
         if (controlledCamera == null) controlledCamera = Camera.main;
         if (target == null)
@@ -87,7 +79,7 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         
         _currentDistance = distance;
         _targetDistance = distance;
-        _dampedDistance = distance; // 初始化阻尼距离
+        _dampedDistance = distance;
         var angles = controlledCamera.transform.eulerAngles;
         _currentX = angles.y;
         _currentY = angles.x;
@@ -97,20 +89,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         _targetHeightOffset = _originalHeightOffset;
         
         _currentLookAtHeightOffset = 0f;
-        
-        //
-        // if (targetRenderer == null) return;
-        // _materials = targetRenderer.materials;
-        // _originalAlphas = new float[_materials.Length];
-        //     
-        // for (var i = 0; i < _materials.Length; i++)
-        // {
-        //     _originalAlphas[i] = _materials[i].GetColor(BaseColor).a;
-        //         
-        //     SetupUrpMaterial(_materials[i], _originalAlphas[i]);
-        // }
-        //     
-        // _currentAlpha = maxAlpha;
     }
 
     private void Update()
@@ -125,72 +103,19 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
         }
         
         _currentDistance = Mathf.SmoothDamp(_currentDistance, _targetDistance, ref _zoomVelocity, zoomSmoothTime);
-        //
-        // if (enableTransparency) // 只在启用透明度时更新透明度
-        // {
-        //     UpdateTransparency();
-        // }
     }
 
-    // private void UpdateTransparency()
-    // {
-    //     if (!targetRenderer || _materials == null) return;
-    //     
-    //     var distanceRatio = Mathf.InverseLerp(fadeEndDistance, fadeStartDistance, _currentDistance);
-    //     var targetAlpha = Mathf.Lerp(minAlpha, maxAlpha, distanceRatio);
-    //     
-    //     _currentAlpha = Mathf.SmoothDamp(_currentAlpha, targetAlpha, ref _alphaVelocity, fadeSmoothTime);
-    //     
-    //     for (var i = 0; i < _materials.Length; i++)
-    //     {
-    //         SetupUrpMaterial(_materials[i], _currentAlpha * _originalAlphas[i]);
-    //     }
-    // }
-    //
-    // // 新增方法：启用/禁用透明度功能
-    // public void SetTransparencyEnabled(bool enabled)
-    // {
-    //     enableTransparency = enabled;
-    //     
-    //     if (enabled || !targetRenderer || _materials == null || _originalAlphas == null) return;
-    //     for (var i = 0; i < _materials.Length; i++)
-    //     {
-    //         SetupUrpMaterial(_materials[i], _originalAlphas[i]);
-    //     }
-    //     _currentAlpha = maxAlpha;
-    // }
-    //
-    //
-    // private static void SetupUrpMaterial(Material material, float targetAlpha)
-    // {
-    //     if (!Mathf.Approximately(material.GetFloat(Surface), 1))
-    //     {
-    //         material.SetFloat(Surface, 1); 
-    //         material.SetOverrideTag("RenderType", "Transparent");
-    //         material.renderQueue = (int)RenderQueue.Transparent;
-    //         material.SetInt(SrcBlend, (int)BlendMode.SrcAlpha);
-    //         material.SetInt(DstBlend, (int)BlendMode.OneMinusSrcAlpha);
-    //         material.SetInt(ZWrite, 0);
-    //         material.DisableKeyword("_ALPHATEST_ON");
-    //         material.EnableKeyword("_ALPHABLEND_ON");
-    //         material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-    //         material.renderQueue = (int)RenderQueue.Transparent;
-    //     }
-    //
-    //     var baseColor = material.GetColor(BaseColor);
-    //     baseColor.a = targetAlpha;
-    //     material.SetColor(BaseColor, baseColor);
-    // }
+    
 
-    private void LateUpdate()
+    private void MouseMoveUpdate(Vector2 arg0)
     {
 
         if (!controlledCamera || !target) return;
         
         if (_isCameraControlActive)
         {
-            _currentX += Input.GetAxis("Mouse X") * mouseSensitivity;
-            _currentY -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+            _currentX += arg0.x * mouseSensitivity;
+            _currentY -= arg0.y * mouseSensitivity;
             _currentY = Mathf.Clamp(_currentY, minVerticalAngle, maxVerticalAngle);
         }
 
@@ -339,36 +264,6 @@ public class PlayerControl_CameraControl : PlayerControl_BaseControl
     public float GetCurrentY()
     {
         return _currentY;
-    }
-    
-    // 新增方法：设置目标Renderer
-    public void SetTargetRenderer(Renderer newRenderer)
-    {
-        targetRenderer = newRenderer;
-        
-        // 重新初始化材质
-        if (targetRenderer == null) return;
-        _materials = targetRenderer.materials;
-        _originalAlphas = new float[_materials.Length];
-            
-        for (var i = 0; i < _materials.Length; i++)
-        {
-            _originalAlphas[i] = _materials[i].color.a;
-        }
-    }
-
-    // 新增方法：设置淡出距离范围
-    public void SetFadeDistance(float start, float end)
-    {
-        fadeStartDistance = Mathf.Max(start, end);
-        fadeEndDistance = Mathf.Min(start, end);
-    }
-
-    // 新增方法：设置透明度范围
-    public void SetAlphaRange(float min, float max)
-    {
-        minAlpha = Mathf.Clamp01(min);
-        maxAlpha = Mathf.Clamp01(max);
     }
 }
 
