@@ -60,10 +60,16 @@ public class MothController : GuestBase, IHurtable
     {
         return false; // 禁用导航代理
     }
+    public void Init(MothGroupController group)
+    {
+        belongToGroup = group;
+        group.RegisterMoth(this.gameObject); // 注册到组
+        
+    }
+
     protected override void Awake()
     {
         base.Awake();
-        belongToGroup.RegisterMoth(this.gameObject); // 注册虫子到虫群
         InitSettings();
     }
     protected override void Start()
@@ -112,7 +118,7 @@ public class MothController : GuestBase, IHurtable
     }
     private void Configurablejointinit(Rigidbody targetRB)
     {
-        if(_joint == null)
+        if (_joint == null)
         {
             _joint = this.gameObject.AddComponent<ConfigurableJoint>();
         }
@@ -515,7 +521,7 @@ public class MothController : GuestBase, IHurtable
 
     private void OnCollisionEnter(Collision collision)
     {
-        if ((collision.gameObject.CompareTag("Player")||collision.gameObject.CompareTag("PlayerBodyItem")) && BehaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
+        if ((collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("PlayerBodyItem")) && BehaviorTree.Blackboard["State"].Equals(MothState.Dash.ToString()))
             if (!belongToGroup.attachingMoth)
             {
                 belongToGroup.attachingMoth = this.gameObject; // 设置当前虫子为附着虫子
@@ -572,7 +578,7 @@ public class MothController : GuestBase, IHurtable
         belongToGroup.attachingMoth = null; // 清除附着虫子
         _rb.isKinematic = false;         // 恢复物理
         _rb.useGravity = true;           // 可选：恢复重力
-    
+
         _attachTarget = null;            // 清除附着对象
         SetMothState(MothState.UnderGroup); // 回到集体行动状态或其他状态
     }
@@ -588,7 +594,7 @@ public class MothController : GuestBase, IHurtable
         base.OnDestroy();
         belongToGroup.UnregisterMoth(this.gameObject);
     }
-    
+
     public void SetMothState(MothState state)
     {
         BehaviorTree.Blackboard["State"] = state.ToString();

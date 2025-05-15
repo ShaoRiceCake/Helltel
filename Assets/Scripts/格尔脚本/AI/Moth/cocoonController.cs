@@ -12,10 +12,9 @@ public class cocoonController : MonoBehaviour
     [Header("羽衣蛾预制体")] public GameObject mothPrefab; //羽衣蛾预制体
     [Header("触发后孵卵时间范围")] public Vector2 hatchTimeRange = new Vector2(5f, 10f); //触发后孵卵时间范围
     [Header("所属虫群")] public MothGroupController mothGroup; //所属虫群
+    [Header("连锁范围")] float chainDistance = 5f; //连锁范围
 
-    private GuestPresenter presenter; //表现层组件
-    private Collider col; //碰撞体组件
-
+    public Animator animator; //动画组件
     private bool hatchlock = false; //孵化锁
 
     void Awake()
@@ -35,45 +34,58 @@ public class cocoonController : MonoBehaviour
         if (this.gameObject.GetComponent<GuestPresenter>() == null)
             this.gameObject.AddComponent<GuestPresenter>(); //添加表现层组件
 
-        presenter = this.gameObject.AddComponent<GuestPresenter>(); //添加表现层组件
 
 
     }
 
-    void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider other)
     {
+
         Debug.Log("Collision"); //调试信息
         Debug.Log(other.gameObject.name); //调试信息
         if ((other.gameObject.CompareTag("Player") || other.gameObject.CompareTag("PlayerBodyItem")) && !hatchlock) //如果碰撞到玩家
         {
-            StartCoroutine(GenerateMoth()); //开始孵化协程
+            animator.SetTrigger("Hatch"); //播放孵化动画
+            // 动画状态切换
             Debug.Log("Player Enter"); //调试信息
         }
     }
 
-    /// <summary>
-    ///  孵化协程
-    /// <summary>
-    IEnumerator GenerateMoth()
+    public void OnHatchEnd()
     {
-        hatchlock = true; //锁定孵化
-
-        float hatchTime = Random.Range(hatchTimeRange.x, hatchTimeRange.y); //随机孵化时间
-
-        // set clip time to hatchTime
-        presenter.SetTrigger("Hatch"); //播放孵化动画
-        Debug.Log("Hatch"); //调试信息
-        yield return new WaitUntil(() => presenter.GetCurrentAnimationState().IsName("Hatching")); //等待动画播放完成
-
-        // float clipTime = presenter.GetCurrentAnimationCliplength(); //获取动画片段时间
-        // presenter.SetAnimatiorSpeed(clipTime / hatchTime); //设置动画速度
-        yield return new WaitForSeconds(hatchTime); //等待孵化时间
-
-        presenter.SetAnimatiorSpeed(1f); //重置动画速度
-
-        GameObject moth = Instantiate(mothPrefab, transform.position, Quaternion.identity); //生成羽衣蛾
-        Destroy(this.gameObject); //销毁茧
+        Debug.Log("Hatch End"); //调试信息
+        hatch(); //调用孵化方法
 
     }
 
+    public void hatch()
+    {
+        if (hatchlock) return; //如果孵化锁为真，返回
+        hatchlock = true; //设置孵化锁为真
+        MothController moth = Instantiate(mothPrefab, transform.position, Quaternion.identity).GetComponent<MothController>(); //实例化羽衣蛾预制体        
+        moth.Init(mothGroup); //初始化羽衣蛾
+
+        // 查找周围连锁范围内的其他茧
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, chainDistance);
+        foreach (var hit in hitColliders)
+        {
+            if (hit.gameObject == this.gameObject) continue; // 忽略自己
+            cocoonController otherCocoon = hit.GetComponent<cocoonController>();
+            if (otherCocoon != null)
+            {
+                // 触发其他茧的孵化动画
+                otherCocoon.animator.SetTrigger("Hatch");
+            }
+        }
+
+        // 最终销毁 GameObject 本体
+        Destroy(this.transform.root.gameObject, 0.5f); //销毁本体
+        
+    }
+    void OnDrawGizmos()
+    {
+        // 绘制连锁范围
+        Gizmos.color = Color.blue; //设置颜色为红色
+        Gizmos.DrawWireSphere(transform.position, chainDistance); //绘制连锁范围
+    }
 }

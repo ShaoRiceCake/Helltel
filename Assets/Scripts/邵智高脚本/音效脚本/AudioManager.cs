@@ -173,9 +173,11 @@ public class AudioManager : MonoBehaviour
             return null;
         }
 
+
         AudioSource source = GetAvailableAudioSource() ?? CreateNewAudioSource();
         ConfigureAudioSource(source, effect, position, dynamicVolume, loop);
         source.Play();
+   
         // 记录播放上下文
         if (owner != null)
         {
@@ -245,7 +247,7 @@ public class AudioManager : MonoBehaviour
     // 处理循环列表播放
     private void HandleCyclePlayback()
     {
-        float transitionDuration = 0.5f; // 过渡时间(秒)
+        float transitionDuration = 5f; // 过渡时间(秒)
 
         foreach (var kvp in activeCycleSources.ToList())
         {
