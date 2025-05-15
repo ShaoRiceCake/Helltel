@@ -52,14 +52,9 @@ public class MRBunnyController : GuestBase, IHurtable
                         BuildChesingBranch(), // 追击
                         BuildPatrolBranch() // 巡逻 
                     )
-
                 )
-
             )
-
-
         );
-
     }
     private Node BuildChesingBranch()
     {
