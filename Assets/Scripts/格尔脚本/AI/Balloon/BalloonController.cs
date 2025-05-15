@@ -21,41 +21,25 @@ public class BalloonController : GuestBase, IHurtable
     [Header("时间参数")]
     public float approachTime = 5f; // 追踪
     public float cooldownTime = 20f; // 冷却时间
-    private GameObject curTarget;
-    private float approachTimer = 0f;
-    private float cooldownTimer = 0f;
+    
+    private float _approachTimer = 0f;
+    private float _cooldownTimer = 0f;
 
-    private bool isApproaching = false;
-    private bool isCoolingdown = false;
-    private bool exploded = false;
-
-
-
-
-    protected override void Awake()
-    {
-        base.Awake();
-
-        sensor = this.gameObject.GetComponent<GuestSensor>();
-        sensor.viewDistance = detectRadius; // 气球的搜索精度和探测范围是一致的
-        if (sensor == null)
-        {
-            sensor = this.gameObject.AddComponent<GuestSensor>();
-        }
-
-    }
-
+    private bool _isApproaching = false;
+    private bool _isCoolingDown = false;
+    private bool _exploded = false;
+    
     protected override void Start()
     {
         base.Start();
-        behaviorTree = GetBehaviorTree();
+        BehaviorTree = GetBehaviorTree();
 #if UNITY_EDITOR
-        Debugger debugger = gameObject.AddComponent<Debugger>();
-        debugger.BehaviorTree = behaviorTree;
+        var debugger = gameObject.AddComponent<Debugger>();
+        debugger.BehaviorTree = BehaviorTree;
 #endif
-        behaviorTree.Blackboard["isDead"] = false;
-        behaviorTree.Blackboard["chaseTimer"] = 0f;
-        behaviorTree.Start();
+        BehaviorTree.Blackboard["isDead"] = false;
+        BehaviorTree.Blackboard["chaseTimer"] = 0f;
+        BehaviorTree.Start();
     }
 
     protected override Root GetBehaviorTree()
@@ -66,7 +50,7 @@ public class BalloonController : GuestBase, IHurtable
                 new Selector(
                     new Condition(IsNavAgentOnNavmesh, Stops.IMMEDIATE_RESTART,
                         new Selector(
-                            new Condition(() => !isCoolingdown, Stops.IMMEDIATE_RESTART,
+                            new Condition(() => !_isCoolingDown, Stops.IMMEDIATE_RESTART,
                                 new Selector(
                                     BuildApproachBranch(),
                                     BuildcantseeApproachBranch()
@@ -94,54 +78,49 @@ public class BalloonController : GuestBase, IHurtable
             }),
             new Action(() =>
             {
-                if (!exploded)
-                {
-                    exploded = true; // 设置为已爆炸
-                    StartCoroutine(ExplodeCoroutine());
-                }
+                if (_exploded) return;
+                _exploded = true; // 设置为已爆炸
+                StartCoroutine(ExplodeCoroutine());
             }),
 
             new WaitUntilStopped()
             ));
     }
-    IEnumerator ExplodeCoroutine()
+
+    private IEnumerator ExplodeCoroutine()
     {
-        // 等待一段时间后执行爆炸
         yield return new WaitForSeconds(2f);
         Explode();
     }
+    
     private Node BuildApproachBranch()
     {
         // 追逐状态
-        return new Condition(() => IsEnemyCanSee(), Stops.LOWER_PRIORITY,
+        return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
             new Sequence(
                 new Action(() =>
                 {
-                    approachTimer = approachTime; // 刷新追逐时间
-                    isApproaching = true; // 设置追逐状态
+                    _approachTimer = approachTime; // 刷新追逐时间
+                    _isApproaching = true; // 设置追逐状态
                 }),
                 new Action(() =>
                 {
-                    if (curTarget != null && IsNavAgentOnNavmesh())
-                    {
-                        agent.speed = approachSpeed; // 设置追逐速度
-                        agent.SetDestination(curTarget.transform.position); // 追逐目标
-                    }
+                    if (!_curTarget || !IsNavAgentOnNavmesh()) return;
+                    agent.speed = approachSpeed; // 设置追逐速度
+                    agent.SetDestination(_curTarget.transform.position); // 追逐目标
                 })
             )
         );
     }
     private Node BuildcantseeApproachBranch() //持续追逐目标
     {
-        return new Condition(() => isApproaching, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+        return new Condition(() => _isApproaching, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
             new Sequence(
                 new Action(() =>
                 {
-                    if (curTarget != null && IsNavAgentOnNavmesh())
-                    {
-                        agent.speed = approachSpeed; // 设置追逐速度
-                        agent.SetDestination(curTarget.transform.position); // 追逐目标
-                    }
+                    if (!_curTarget || !IsNavAgentOnNavmesh()) return;
+                    agent.speed = approachSpeed; // 设置追逐速度
+                    agent.SetDestination(_curTarget.transform.position); // 追逐目标
                 })
             )
         );
@@ -167,102 +146,53 @@ public class BalloonController : GuestBase, IHurtable
     public void TakeDamage(int damage)
     {   
         Debug.Log("气球受伤：" + damage);
-        if (!exploded)
-        {
-            curHealth.Value -= damage;
-            Debug.Log("气球当前血量：" + curHealth.Value);
-            if (curHealth.Value <= 0)
-            {
-                behaviorTree.Blackboard["isDead"] = true;
-                Debug.Log("气球死亡");
-                Debug.Log("气球当前血量：" + curHealth.Value);
-            }
-        }
+        if (_exploded) return;
+        curHealth.Value -= damage;
+        Debug.Log("气球当前血量：" + curHealth.Value);
+        if (!(curHealth.Value <= 0)) return;
+        BehaviorTree.Blackboard["isDead"] = true;
+        Debug.Log("气球死亡");
+        Debug.Log("气球当前血量：" + curHealth.Value);
     }
 
-    bool IsEnemyCanSee()
-    {
-        if (sensor != null)
-        {
-            if (sensor.detectedTargets.Count > 0)
-            {
-                foreach (var target in sensor.detectedTargets)
-                {
-                    // if (EnemyList.Contains(target.gameObject.transform.root.gameObject))
-                    if (GameManager.instance.playerIdentifiers.Contains(target.gameObject.transform)) // 单机版本特供，仅有一个玩家
-                    {
-                        curTarget = target.gameObject;
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
     private void Explode()
     {
         //
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, explosionRadius,LayerMask.NameToLayer("PlayerDetect"));
+        var hitColliders =
+            Physics.OverlapSphere(transform.position, explosionRadius, LayerMask.NameToLayer("PlayerDetect"));
 
-        ///<summary>
-        /// 多玩家时
-        ///<summary>
         foreach (var hit in hitColliders)
         {
-            float dist = Vector3.Distance(transform.position, hit.transform.position);
-            int damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
-            ///<summary>
-            /// 多玩家时
-            ///<summary>
-            // 玩家s受伤 IHurtable 接口
-            // hit.GetComponent<IHurtable>()?.TakeDamage(Mathf.RoundToInt(damage));
-            ///<summary>
-            /// 单玩家特供
-            ///<summary>
+            var dist = Vector3.Distance(transform.position, hit.transform.position);
+            var damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
             GameController.Instance.DeductHealth(damage);
+            
+            AudioManager.Instance.Play("气球爆炸", this.transform.position);
+
+            Destroy(gameObject);
         }
-
- 
-        // 播放爆炸动画或特效
-        Debug.Log("气球爆炸！");
-        AudioManager.Instance.Play("气球爆炸",this.transform.position);
-
-        // 自毁
-        Destroy(gameObject);
     }
+
     protected override void Update()
     {
 
         base.Update();
-        if (isApproaching)
+        if (_isApproaching)
         {
-            approachTimer -= Time.deltaTime;
-            // Debug.Log("气球追逐中，剩余时间：" + approachTimer);
-            if (approachTimer <= 0f)
+            _approachTimer -= Time.deltaTime;
+            if (_approachTimer <= 0f)
             {
-                isApproaching = false; // 结束追逐状态
-                cooldownTimer = cooldownTime; // 开启冷却时间
-                isCoolingdown = true; // 设置冷却状态
+                _isApproaching = false; // 结束追逐状态
+                _cooldownTimer = cooldownTime; // 开启冷却时间
+                _isCoolingDown = true; // 设置冷却状态
             }
         }
-
-        if (isCoolingdown)
+        if (!_isCoolingDown) return;
+        _cooldownTimer -= Time.deltaTime;
+        if (_cooldownTimer <= 0f)
         {
-            cooldownTimer -= Time.deltaTime;
-            // Debug.Log("气球冷却中，剩余时间：" + cooldownTimer);
-            if (cooldownTimer <= 0f)
-            {
-                isCoolingdown = false; // 结束冷却状态
-            }
+            _isCoolingDown = false; // 结束冷却状态
         }
     }
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, detectRadius);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, explosionRadius);
-    }
-
     
 }
