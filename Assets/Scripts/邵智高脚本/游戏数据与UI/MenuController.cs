@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuPanel : MonoBehaviour
@@ -61,10 +62,11 @@ public class MenuPanel : MonoBehaviour
         //这里预留自杀逻辑
     }
     //返回主菜单
-    private void BackToMainMenu()
+    public static void BackToMainMenu()
     {
-        //这里预留返回主菜单逻辑
+        SceneManager.LoadSceneAsync("开始场景");
     }
+    
     //关闭游戏
     private void QuitGame()
     {

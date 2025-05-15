@@ -1,36 +1,28 @@
 using System.Collections;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
+using Michsky.LSS;
 
 public class PlayerDieController : MonoBehaviour
 {
     private GameDataModel _data;
     private PlayerControlInformationProcess _playerControl;
-
-
-    
-
     
     [Header("Death Settings")]
-
-    [SerializeField] private float _blackScreenDelay = 3f;
-
+    private float _blackScreenDelay = 8f;
     
     [Header("References")]
-
+    [SerializeField]  private GameObject upCube;
+    private Coroutine _deathSequenceCoroutine;
 
     
-    private Coroutine _deathSequenceCoroutine;
 
     private void Awake()
     {
         _data = Resources.Load<GameDataModel>("GameData");
         _data.OnIsPlayerDiedChangedEvent += PlayerDie;
         
-        _playerControl = FindObjectOfType<PlayerControlInformationProcess>();
-
-        
-
+        _playerControl = GetComponent<PlayerControlInformationProcess>();
     }
 
     private void OnDestroy()
@@ -43,7 +35,7 @@ public class PlayerDieController : MonoBehaviour
         }
     }
 
-    void PlayerDie(bool isDie)
+    private void PlayerDie(bool isDie)
     {
         if (isDie && _deathSequenceCoroutine == null)
         {
@@ -53,42 +45,42 @@ public class PlayerDieController : MonoBehaviour
 
     private IEnumerator DeathSequence()
     {
-        // 1. 停止玩家控制
-        if (_playerControl != null)
+        // 停止玩家控制
+        if (_playerControl)
         {
             _playerControl.stopPlayerControl = true;
         }
-
-        // 2. 播放死亡动画
-
-
-        // 3. 播放死亡音效
-        AudioManager.Instance.Play("气球爆炸");
         
-        // 4. 生成血液效果
-
-
-        // 5. 屏幕血液效果
-
-
-        // 6. 移动摄像机到死亡视角（可不做）
-
+        // 生成血液效果
+        var emitterCount = 1000;
+        var emissionSpeed = 2;
+        var randomness = 0.2f;
+        var rotation = Quaternion.identity;
+        EventBus<BloodSprayEvent>.Publish(
+            new BloodSprayEvent(
+                upCube.transform.position,
+                rotation,
+                emitterCount,
+                emissionSpeed,
+                randomness
+            )
+        );
         
+        BloodEffectController.ActivateBloodEffect();
 
+        // 播放死亡动画
+        upCube.SetActive(false);
+        
+        // 播放死亡音效
+        AudioManager.Instance.Play("死亡");
 
-        // 7. 屏幕变黑白
-
-
-        // 8. 等待片刻
         yield return new WaitForSeconds(_blackScreenDelay);
-
-        // 9. 渐变为黑色 (使用渐晕效果)
-
-        // 10. 返回开始界面
-        
-        // GameManager.Instance.ReturnToMainMenu();
-        // GameManager.instance.ReturnToMainMenu();
-        
+        // // 返回开始界面
+        // if(GameController.Instance != null)
+        // {
+        //     GameController.Instance.lSS_Manager.LoadScene();
+        // }
+        SceneManager.LoadSceneAsync("开始场景");        
         _deathSequenceCoroutine = null;
     }
 }

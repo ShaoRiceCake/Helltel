@@ -239,12 +239,23 @@ public class GlobalUIController : MonoBehaviour
     {
         Time.timeScale = 0;
         SetPause(true);
+        if(_data.CurrentLoadedScene == _data.dungeon ||_data.CurrentLoadedScene == _data.shop)
+        {
+            AudioManager.Instance.Stop("压抑氛围环境音",owner:this);
+        }
+        
         canPressESC = false;
     }
     public void HandleFinishLoading()
     {
         Time.timeScale = 1;
         SetPause(false);
+        if(_data.CurrentLoadedScene == _data.dungeon ||_data.CurrentLoadedScene == _data.shop)
+        {
+            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+        }
+        
+        
         canPressESC = true;
     }
     

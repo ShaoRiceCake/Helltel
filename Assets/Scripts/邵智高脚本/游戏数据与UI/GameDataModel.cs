@@ -45,11 +45,6 @@ public class GameDataModel : ScriptableObject
     public event Action<string> FloorIS;      // 楼层类型为
     public event Action<bool> OnIsPlayerDiedChangedEvent;      // 玩家死亡状态变化事件
 
-   
-     
-    
-
-
     // 属性封装（数据访问入口）
     public int Health {
         get => _health;
@@ -140,10 +135,11 @@ public class GameDataModel : ScriptableObject
     //进商店层调用这个
     public void NewShopFloorData()
     {
-        Money += Performance;
+        // Money += Performance;
         Health = MaxHealth;
-        Performance = 0;
+        // Performance = 0;
 
+        //改由商店内部脚本实现
     }
     //进地牢层调用这个
     public void NewDungeonFloorData()

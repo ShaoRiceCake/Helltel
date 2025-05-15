@@ -84,6 +84,9 @@ public class ObiEmitterManager : MonoBehaviour
 
     private void TriggerBurst(int burstCount)
     {
+        // 确保发射器已初始化
+        if (!_obiEmitter) return;
+        _obiEmitter.UpdateEmitter(); // 显式调用初始化
         _obiEmitter.emissionMethod = ObiEmitter.EmissionMethod.BURST;
         StartCoroutine(ExecuteBurst(burstCount));
     }

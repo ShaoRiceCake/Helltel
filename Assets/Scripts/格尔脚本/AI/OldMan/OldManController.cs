@@ -34,14 +34,14 @@ namespace Helltal.Gelercat
             base.Awake();
 
 
-            behaviorTree = GetBehaviorTree();
+            BehaviorTree = GetBehaviorTree();
 #if UNITY_EDITOR
             Debugger debugger = (Debugger)this.gameObject.AddComponent(typeof(Debugger));
-            debugger.BehaviorTree = behaviorTree;
+            debugger.BehaviorTree = BehaviorTree;
 #endif
-            behaviorTree.Blackboard["Dead"] = false; // 死亡标志
-            behaviorTree.Blackboard["Lonely"] = false; // 孤独标志
-            behaviorTree.Blackboard["Happying"] = false; // 高兴标志
+            BehaviorTree.Blackboard["Dead"] = false; // 死亡标志
+            BehaviorTree.Blackboard["Lonely"] = false; // 孤独标志
+            BehaviorTree.Blackboard["Happying"] = false; // 高兴标志
             Debug.Log("presenter:" + presenter.isActiveAndEnabled);
 
         }
@@ -49,7 +49,7 @@ namespace Helltal.Gelercat
         {
 
             base.Start();
-            behaviorTree.Start();
+            BehaviorTree.Start();
         }
         protected override Root GetBehaviorTree()
         {
@@ -85,7 +85,7 @@ namespace Helltal.Gelercat
                 {
 
                     // 转为孤独状态
-                    behaviorTree.Blackboard["Lonely"] = true;
+                    BehaviorTree.Blackboard["Lonely"] = true;
 
                 })
             );
@@ -119,15 +119,15 @@ namespace Helltal.Gelercat
                 new Sequence(
                     new Action(() =>
                     {
-                        if (behaviorTree.Blackboard.Get<bool>("Lonely"))
+                        if (BehaviorTree.Blackboard.Get<bool>("Lonely"))
                         {
                             presenter.SetTrigger("ToHappy");
                             // 从孤独状态进入高兴状态，触发奖励结算
                             int coins = Mathf.FloorToInt(10 + lonelyDuration * lonelyDuration / 1000f + 0.3f * lonelyDuration);
                             DropCoinBag(coins);
                             StopBlackFog();
-                            behaviorTree.Blackboard["Lonely"] = false; // 重置孤独状态
-                            behaviorTree.Blackboard["Happying"] = true; // 设置高兴状态
+                            BehaviorTree.Blackboard["Lonely"] = false; // 重置孤独状态
+                            BehaviorTree.Blackboard["Happying"] = true; // 设置高兴状态
 
                         }
 
@@ -149,7 +149,7 @@ namespace Helltal.Gelercat
                     {
                         Debug.Log("HAPPY to wait 4");
                         presenter.SetTrigger("HappyToWait"); // 播放高兴动画
-                        behaviorTree.Blackboard["Happying"] = false; // 重置高兴状态
+                        BehaviorTree.Blackboard["Happying"] = false; // 重置高兴状态
                     })
                 )
             );
@@ -161,15 +161,15 @@ namespace Helltal.Gelercat
         // ===================== 状态4：死亡 =====================
         private Node BuildDeathBranch()
         {
-            return new Condition(() => behaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold, Stops.IMMEDIATE_RESTART,
+            return new Condition(() => BehaviorTree.Blackboard.Get<bool>("Lonely") && lonelyDuration >= lonelyDeathThreshold, Stops.IMMEDIATE_RESTART,
                     new Sequence(
                     new Action(() =>
                     {
 
                         TriggerDeath(); // 启动表现层的死亡动画、音效等
                         StartBlackFog2();   // 黑雾加速 & 伤害翻倍
-                        behaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入                            
-                        behaviorTree.Blackboard["Dead"] = true;
+                        BehaviorTree.Blackboard["Lonely"] = false; // 阻止状态重入                            
+                        BehaviorTree.Blackboard["Dead"] = true;
                     }),
                     new WaitUntilStopped()
                     )
@@ -220,7 +220,7 @@ namespace Helltal.Gelercat
         private void StartBlackFog()
         {
 
-            if (Debugging) Debug.Log("黑雾启动");
+            if (debugging) Debug.Log("黑雾启动");
             blackFogController.StartFogStage1(); // 启动第一阶段黑雾
         }
 
@@ -229,7 +229,6 @@ namespace Helltal.Gelercat
         private void StopBlackFog()
         {
 
-            if (Debugging) Debug.Log("黑雾停止");
             // blackFogController.StopFog(); // 停止黑雾
             blackFogController.FadeOutFog(); // 淡出黑雾
         }
@@ -238,7 +237,7 @@ namespace Helltal.Gelercat
         private void TriggerDeath()
         {
             // TODO: 播放全层音效、动画，黑雾继续扩散 & 本层熵值上限 ×1.5，触发额外客人生成
-            if (Debugging) Debug.Log("老人死亡");
+            if (debugging) Debug.Log("老人死亡");
             presenter.SetTrigger("ToDiedIDLE"); // 播放死亡动画
 
         }
@@ -246,7 +245,7 @@ namespace Helltal.Gelercat
         private void StartBlackFog2()
         {
             // TODO: 黑雾扩散速度 *3，伤害翻倍
-            if (Debugging) Debug.Log("黑雾加速");
+            if (debugging) Debug.Log("黑雾加速");
             blackFogController.StartFogStage2(); // 启动第二阶段黑雾
         }
 
@@ -288,22 +287,22 @@ namespace Helltal.Gelercat
         {
             base.Update();
 
-            if (Debugging)
+            if (debugging)
             {
                 DEBUG_chatting = Input.GetKey(KeyCode.R);
 
 
             }
-            if (behaviorTree != null)
+            if (BehaviorTree != null)
             {
                 // timer
-                if (behaviorTree.Blackboard.Get<bool>("Lonely"))
+                if (BehaviorTree.Blackboard.Get<bool>("Lonely"))
                 {
                     lonelyDuration += Time.deltaTime;
                     if (lonelyDuration >= lonelyDeathThreshold)
                     {
                         // 触发死亡状态
-                        behaviorTree.Blackboard["Dead"] = true;
+                        BehaviorTree.Blackboard["Dead"] = true;
                     }
                 }
             }
@@ -313,7 +312,7 @@ namespace Helltal.Gelercat
         // gui 上现实lonelyDuration，方便调试
         void OnGUI()
         {
-            if (Debugging)
+            if (debugging)
             {
                 GUI.Label(new Rect(10, 10, 200, 20), "lonelyDuration: " + lonelyDuration.ToString("F2"));
                 GUI.Label(new Rect(10, 30, 200, 20), "lonelyDeathThreshold: " + lonelyDeathThreshold.ToString("F2"));
@@ -324,14 +323,12 @@ namespace Helltal.Gelercat
         {
 
             // 玩家进入触发器
-            if (Debugging) Debug.Log("玩家进入触发器");
             playerstayTimmer = 0f; // 重置玩家在触发器内的时间
 
         }
         void OnTriggerExit(Collider other)
         {
 
-            if (Debugging) Debug.Log("玩家离开触发器");
 
             // 离开时重置状态
             playerstayTimmer = 0f;
@@ -342,7 +339,7 @@ namespace Helltal.Gelercat
         void OnTriggerStay(Collider other)
         {
             // 只有在“孤独状态”才允许判定聊天
-            if (behaviorTree.Blackboard.Get<bool>("Lonely"))
+            if (BehaviorTree.Blackboard.Get<bool>("Lonely"))
             {
                 playerstayTimmer += Time.deltaTime;
 
@@ -350,7 +347,6 @@ namespace Helltal.Gelercat
                 {
                     isPlayerChatting = true;
                     hasTriggeredReward = true; // 防止重复奖励
-                    if (Debugging) Debug.Log("聊天条件达成，准备奖励");
                 }
             }
             else

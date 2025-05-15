@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5633702580240512881}
   - component: {fileID: 1204146176841051737}
   - component: {fileID: 5846796235303903000}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -117,7 +117,9 @@ GameObject:
   - component: {fileID: 7574513636862081137}
   - component: {fileID: 2226126407571395597}
   - component: {fileID: 5570773215921746641}
-  m_Layer: 0
+  - component: {fileID: 3764316814807602894}
+  - component: {fileID: 418748118280619943}
+  m_Layer: 6
   m_Name: "\u7A97\u6237_1"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +135,7 @@ Transform:
   m_GameObject: {fileID: 5343370063151627190}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -54.510307, y: 0, z: 24.906307}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -191,3 +193,42 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &3764316814807602894
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5343370063151627190}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 6.334053, y: 6.2554364, z: 0.39999995}
+  m_Center: {x: 0.06639862, y: 1.9686406, z: 0}
+--- !u!114 &418748118280619943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5343370063151627190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6757b231cedd544c583ef8aeaf773b2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  thickness: 0
+  inverted: 0
+  material: {fileID: 0}
+  filter: -65535
+  m_SourceCollider: {fileID: 3764316814807602894}
+  m_DistanceField: {fileID: 0}

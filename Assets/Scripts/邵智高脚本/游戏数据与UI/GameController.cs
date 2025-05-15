@@ -28,10 +28,14 @@ public class GameController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.M))
         {
             AddPerformance(50);
+            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+            
         }
         if(Input.GetKeyDown(KeyCode.J))
         {
             DeductHealth(50);
+            AudioManager.Instance.Stop("压抑氛围环境音",owner:this);
+            
         }
     }
     
@@ -77,15 +81,14 @@ public class GameController : MonoBehaviour
         if (_gameData.Health >= amount)
         {
             _gameData.Health -= amount;
+            BloodEffectController.ActivateBloodEffect();
             Debug.Log("玩家扣除血量" + amount);
         }
         else
         {
             Debug.Log("死亡");
-
             return;
         }
-      
     }
 
     // 增加玩家资金接口
