@@ -44,7 +44,6 @@ public class MonsterCollisionHandler : MonoBehaviour
         // 计算最终伤害值
         var finalDamage = Mathf.RoundToInt(interactable.ItemDamage * damageCoefficient);
         
-        // 调用MRBunnyController的受伤方法
         if (bunnyController != null)
         {
             bunnyController.TakeDamage(finalDamage);
