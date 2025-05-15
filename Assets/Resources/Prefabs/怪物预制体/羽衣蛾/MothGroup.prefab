@@ -81,8 +81,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1013751075
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1245930546
+  InScenePlacedSourceGlobalObjectIdHash: 2001816144
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -107,23 +107,20 @@ MonoBehaviour:
   curHealth:
     m_InternalValue: 0
   entropyValue: 0
-  Debugging: 1
+  playerItemDetector: {fileID: 0}
+  debugStopBehaviorTree: 0
+  debugging: 0
   navPointsManager: {fileID: 0}
   agent: {fileID: 0}
   presenter: {fileID: 0}
-  sensor: {fileID: 0}
-  aiState:
-    m_InternalValue: 0
+  _curTarget: {fileID: 0}
   nearDist: 534.5
-  collisionDist: 4.5
+  collisionDist: 4.25
   velocityMatchingAmt: -0.2
   flockCenteringAmt: 0.11
   collisionAvoidanceAmt: -2.62
   velocityLerpAmt: 0.2
-  TargetAmt: 0.54
-  CurTarget: {fileID: 0}
-  EnemyList:
-  - {fileID: 0}
+  targetAmt: 0.98
   attachingMoth: {fileID: 0}
 --- !u!33 &7553564621654550465
 MeshFilter:
@@ -183,7 +180,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6033328729637640911}
   m_Enabled: 1
-  m_AgentTypeID: -1372625422
+  m_AgentTypeID: 0
   m_Radius: 0.24674998
   m_Speed: 3.5
   m_Acceleration: 8
@@ -194,7 +191,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.4
-  m_BaseOffset: 0.44
+  m_BaseOffset: 2.92
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!114 &3158552014557737466
@@ -215,5 +212,8 @@ MonoBehaviour:
   detectionLayer:
     serializedVersion: 2
     m_Bits: 128
+  ObstructionLayer:
+    serializedVersion: 2
+    m_Bits: 0
   isDebug: 1
   detectedTargets: []
