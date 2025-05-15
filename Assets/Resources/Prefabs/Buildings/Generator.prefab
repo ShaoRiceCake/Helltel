@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6104168369536445510}
-  - component: {fileID: 1749888415820453054}
   - component: {fileID: 5420871367105433588}
   - component: {fileID: 323091406950577307}
   - component: {fileID: 6911422506595817717}
@@ -36,27 +35,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1749888415820453054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5816238570797794469}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2221856620
-  InScenePlacedSourceGlobalObjectIdHash: 757902631
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!114 &5420871367105433588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70,33 +48,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   elevatorTile: {fileID: 0}
-  startTile: {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
+  startTile: {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
   tilePrefabs:
-  - {fileID: 7190530939421546850, guid: 9c80dc5f4645cf74d9851cbd558a0f12, type: 3}
-  - {fileID: 6881580276718791791, guid: 8bdd27933c8f88c4daa5272f777a6935, type: 3}
-  - {fileID: 100115147929507902, guid: ce3843f051ac8c04e81f9475d66ba977, type: 3}
-  - {fileID: 5443963354124768107, guid: 08cc10f2a9b6ef24f817c5ccd007f735, type: 3}
-  - {fileID: 6276907580013792170, guid: bcdee0a1391b358438dfbc05a609fbdd, type: 3}
-  - {fileID: 3800089055459983552, guid: f6273d317b83e5e4dbadbf392838b62b, type: 3}
-  - {fileID: 2065003035382943739, guid: 94976f29aecffa3459a3dbd0ea9939b3, type: 3}
-  - {fileID: 7711801737612265155, guid: 03382eeb7aea5f346bf5fa200f4d2e6a, type: 3}
-  - {fileID: 3085792305767753245, guid: 03da9269498df5c40869511a39593473, type: 3}
-  - {fileID: 4058601648260230325, guid: c7f5ff5b2ceefa64f9743fb72cd4c0a4, type: 3}
+  - {fileID: 6608069338348396907, guid: 588fb77bbab254b429a4e6b5346cf39a, type: 3}
+  - {fileID: 8591107998280404216, guid: 2ef88f83e9cadab42a15505df935aeab, type: 3}
+  - {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
+  - {fileID: 8969548195116703779, guid: 8041f7c0dff0c3e47b8ed2782714f12e, type: 3}
+  - {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
+  - {fileID: 2455173326042482039, guid: d1dc04601d8ad9b4988f8adc4be75ac0, type: 3}
   blockedPrefabs:
-  - {fileID: 2610976636490881824, guid: e4747030a16d4a44b8e5bf6089eeea8d, type: 3}
-  - {fileID: 8115512967877152173, guid: 1dda69844c4237643b761b4d5e62b532, type: 3}
+  - {fileID: 5343370063151627190, guid: 4c49da63c5918444a95a69cddac0e9cd, type: 3}
+  - {fileID: 6143833312253660151, guid: 287a6a07b521f844a8a78cb15bb1369e, type: 3}
+  - {fileID: 8719785782222926197, guid: 216ac384280a49747919f52394d95d6b, type: 3}
+  - {fileID: 497921899292682526, guid: cfdcdc3f97785ea4d9ec5116d2fc803e, type: 3}
   doorPrefabs:
-  - {fileID: 4693191324333178762, guid: d0b58bc455ae1f74f8c8694a964a7935, type: 3}
   - {fileID: 2424739538366229017, guid: 776880d4fe899df4eab9edb824c2a8f4, type: 3}
-  exitPrefabs:
-  - {fileID: 6551577643172991279, guid: ea8fc1f633e83ea4d82763558c6479e0, type: 3}
-  - {fileID: 1717768317796168926, guid: a22d74c84fe16b2478066d7d14b5aa79, type: 3}
-  - {fileID: 6146908721503945696, guid: 5ab258f7799ce344f98fe48166f8c16b, type: 3}
-  mainLength: 10
-  branchLenght: 12
-  branchNum: 10
+  - {fileID: 4693191324333178762, guid: d0b58bc455ae1f74f8c8694a964a7935, type: 3}
+  exitPrefabs: []
   doorPercent: 65
-  constructionDelay: 0
   generatedTiles: []
   availableConnectors: []
   dungeonState: 0
@@ -155,15 +124,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c31c4bf057a93440a47fbad9f9e7611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentFloor: -1
-  baseEntropy: 50
-  floorMultiplier: 15
+  baseEntropy: 15
+  floorMultiplier: 10
   timeFactor: 0.3
   moneyFactor: 0.05
-  deathFactorD: 1
-  deathFactorE: 9
   baseGuestElevatorCount: 8
   guestElevatorFloorMultiplier: 3
-  checkInterval: 30
+  checkInterval: 3
   monsterPrefabs:
-  - {fileID: 781970947012123368, guid: 1937ab7ac48954d4eaacd545abe834bf, type: 3}
+  - {fileID: 6896343395691544031, guid: a741fd3db6444334ea00125e49e23c82, type: 3}
+  - {fileID: 6071780852534440434, guid: b6e4212177eb2a049affe109f052c52b, type: 3}

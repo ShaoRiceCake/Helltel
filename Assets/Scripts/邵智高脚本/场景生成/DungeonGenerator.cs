@@ -21,7 +21,7 @@ using UnityEngine.Events;
 /// </summary>
 public enum DungeonState { inActive, generatingMain, generatingBranches, cleanup, completed }
 
-public class DungeonGenerator : NetworkBehaviour
+public class DungeonGenerator : MonoBehaviour
 {
     const float ROOM_SCALE = 1.3f;
     [Header("电梯配置")]

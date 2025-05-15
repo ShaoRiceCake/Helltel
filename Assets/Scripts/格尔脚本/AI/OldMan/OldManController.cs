@@ -185,7 +185,7 @@ namespace Helltal.Gelercat
 
             // FOR Debug:
 
-            if (Debugging)
+            if (debugging)
             {
                 if (DEBUG_chatting)
                 {
@@ -207,7 +207,7 @@ namespace Helltal.Gelercat
         private void StartBlackFog()
         {
 
-            if (Debugging) Debug.Log("黑雾启动");
+            if (debugging) Debug.Log("黑雾启动");
             blackFogController.StartFogStage1(); // 启动第一阶段黑雾
         }
 
@@ -216,7 +216,7 @@ namespace Helltal.Gelercat
         private void StopBlackFog()
         {
 
-            if (Debugging) Debug.Log("黑雾停止");
+            if (debugging) Debug.Log("黑雾停止");
             blackFogController.StopFog(); // 停止黑雾
         }
 
@@ -224,7 +224,7 @@ namespace Helltal.Gelercat
         private void TriggerDeath()
         {
             // TODO: 播放全层音效、动画，黑雾继续扩散 & 本层熵值上限 ×1.5，触发额外客人生成
-            if (Debugging) Debug.Log("老人死亡");
+            if (debugging) Debug.Log("老人死亡");
             presenter.SetTrigger("ToDiedIDLE"); // 播放死亡动画
 
         }
@@ -232,7 +232,7 @@ namespace Helltal.Gelercat
         private void StartBlackFog2()
         {
             // TODO: 黑雾扩散速度 *3，伤害翻倍
-            if (Debugging) Debug.Log("黑雾加速");
+            if (debugging) Debug.Log("黑雾加速");
             blackFogController.StartFogStage2(); // 启动第二阶段黑雾
         }
 
@@ -271,7 +271,7 @@ namespace Helltal.Gelercat
         {
             base.Update();
 
-            if (Debugging)
+            if (debugging)
             {
                 DEBUG_chatting = Input.GetKey(KeyCode.R);
 
@@ -293,7 +293,7 @@ namespace Helltal.Gelercat
         // gui 上现实lonelyDuration，方便调试
         void OnGUI()
         {
-            if (Debugging)
+            if (debugging)
             {
                 GUI.Label(new Rect(10, 10, 200, 20), "lonelyDuration: " + lonelyDuration.ToString("F2"));
                 GUI.Label(new Rect(10, 30, 200, 20), "lonelyDeathThreshold: " + lonelyDeathThreshold.ToString("F2"));

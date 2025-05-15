@@ -100,7 +100,7 @@ namespace Helltal.Gelercat
 
         void Update()
         {
-            if (Debugging)
+            if (debugging)
                 Debug.Log("Current Patrol State: " + patrolState);
         }
     }

@@ -1,11 +1,15 @@
 // MonsterSpawnSystem.cs
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Helltal.Gelercat;
 using NUnit.Framework;
 using UnityEngine;
 using Unity.Netcode;
-public class MonsterSpawnSystem : NetworkBehaviour
+using Random = UnityEngine.Random;
+
+public class MonsterSpawnSystem : MonoBehaviour
 {
     //============== 核心参数配置区 ==============
 
@@ -46,21 +50,6 @@ public class MonsterSpawnSystem : NetworkBehaviour
         
         InitializeSpawnData();
         StartCoroutine(SpawnRoutine());
-        // if (NetworkManager.Singleton)
-        // {
-        //     if (IsHost)
-        //     {
-        //         //InitializeElevators();
-        //         InitializeSpawnData();
-        //         StartCoroutine(SpawnRoutine());
-        //     }
-        // }
-        // else
-        // {
-        //     InitializeSpawnData();
-        //     StartCoroutine(SpawnRoutine());
-        // }
-
     }
 
     /// <summary>
@@ -145,9 +134,6 @@ public class MonsterSpawnSystem : NetworkBehaviour
     /// <summary>
     /// 生成条件检查
     /// </summary>
-    
-    
-
     bool CanSpawn(GuestBase monster, float currentEntropy, float limit)
     {
         //注释这段是因为怪物基类里还没有这几个变量
@@ -159,23 +145,13 @@ public class MonsterSpawnSystem : NetworkBehaviour
         bool underEntropyLimit = (currentEntropy + monster.entropyValue) <= limit;
 
         return underSpawnLimit && underEntropyLimit;
-        
-       
     }
     
     /// <summary>
     /// 执行生成操作
     /// </summary>
-    void ExecuteSpawn(GameObject prefab, GuestBase monster)
+    private void ExecuteSpawn(GameObject prefab, GuestBase monster)
     {
-        // if (activeGuestElevators.Count == 0)
-        // {
-        //     Debug.LogWarning("没有可用客梯用于生成");
-        //     return;
-        // }
-
-        // 随机选择客梯
-        //Transform elevator = activeGuestElevators[Random.Range(0, activeGuestElevators.Count)];
         NavPointsManager navPointsManager = FindObjectOfType<NavPointsManager>();
 
         List<NavPoint> navPoints = navPointsManager.GetNavPoints();
@@ -219,8 +195,7 @@ public class MonsterSpawnSystem : NetworkBehaviour
     {
         return baseEntropy 
             + _data.Level * floorMultiplier;
-            //+ floorTimeCounter * timeFactor
-            //+ totalMoney * moneyFactor;
+ 
     }
 
     /// <summary>
@@ -246,8 +221,21 @@ public class MonsterSpawnSystem : NetworkBehaviour
         activeMonsters.Remove(monster);
         
     }
+    private void CleanupBeforeNextLevel()
+    {
+        // 清理所有存活怪物
+        foreach (var monster in activeMonsters.ToArray()) 
+        {
+            if (monster) Destroy(monster.gameObject);
+        }
+        activeMonsters.Clear();
 
- 
+        // 强制GC回收（可选）
+        System.GC.Collect();
+    }
 
-   
+    private void OnDestroy()
+    {
+        CleanupBeforeNextLevel();
+    }
 }

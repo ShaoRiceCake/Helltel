@@ -44,11 +44,10 @@ public class MonsterCollisionHandler : MonoBehaviour
         // 计算最终伤害值
         var finalDamage = Mathf.RoundToInt(interactable.ItemDamage * damageCoefficient);
         
-        // 调用MRBunnyController的受伤方法
-        if (bunnyController != null)
+        if (bunnyController)
         {
             bunnyController.TakeDamage(finalDamage);
-            _isMonsterDead = bunnyController.behaviorTree.Blackboard.Get<bool>("isDead");
+            _isMonsterDead = bunnyController.BehaviorTree.Blackboard.Get<bool>("isDead");
         }
 
         var hitPosition = collision.transform.position;
