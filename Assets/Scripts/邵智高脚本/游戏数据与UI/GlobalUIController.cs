@@ -55,6 +55,7 @@ public class GlobalUIController : MonoBehaviour
         if(canPressESC == false)return;
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
         
+       
         //根据当前界面状态处理
         //当处于设置或宾客簿界面时
         if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
@@ -84,6 +85,7 @@ public class GlobalUIController : MonoBehaviour
             // 打开菜单
             OpenMenu();
         }
+        
     }
    
 
@@ -194,14 +196,27 @@ public class GlobalUIController : MonoBehaviour
         
         canPressESC = false;
     }
+    
+    private Coroutine bgmCoroutine;
     public void HandleFinishLoading()
     {
         SetPause(false);
         if(_data.CurrentLoadedScene == _data.dungeon ||_data.CurrentLoadedScene == _data.shop)
         {
-            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+            // 先停止可能正在运行的旧协程
+            if(bgmCoroutine != null) 
+            {
+                StopCoroutine(bgmCoroutine);
+            }
+            bgmCoroutine = StartCoroutine(PlayBGMAfterDelay(1f));
         }
+        
         canPressESC = true;
+    }
+    private IEnumerator PlayBGMAfterDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay); // 等待指定秒数
+        AudioManager.Instance.Play("压抑氛围环境音", owner:this);
     }
     
 }
