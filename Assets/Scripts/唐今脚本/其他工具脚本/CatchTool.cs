@@ -281,8 +281,8 @@ public class CatchTool : MonoBehaviour
         if (item.itemPrice > 0 && !item.IsPurchase)
         {
             var price = item.itemPrice;
-            var hasEnoughMoney = CheckPlayerMoney(playerID, price);
-        
+            var hasEnoughMoney = CheckPlayerMoney(price);
+            
             if (hasEnoughMoney)
             {
                 DeductPlayerMoney(playerID, price);
@@ -349,7 +349,7 @@ public class CatchTool : MonoBehaviour
         return _isGrabbing && _isGrabbingKinematic;
     }
     
-    private bool CheckPlayerMoney(ulong playerId, int price)
+    private bool CheckPlayerMoney(int price)
     {
         return GameController.Instance.GetMoney() >= price;
     }
