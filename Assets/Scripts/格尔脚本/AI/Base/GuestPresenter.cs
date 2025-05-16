@@ -17,10 +17,18 @@ namespace Helltal.Gelercat
 
         private void Awake()
         {
-            animator = this.gameObject.GetComponent<Animator>();
-            if (animator == null)
+            // animator = this.gameObject.GetComponent<Animator>();
+            // if (animator == null)
+            // {
+            //     animator = this.gameObject.AddComponent<Animator>();
+            // }
+            if(animator == null)
             {
-                animator = this.gameObject.AddComponent<Animator>();
+                animator = GetComponent<Animator>();
+                if (animator == null)
+                {
+                    animator = gameObject.AddComponent<Animator>();
+                }
             }
         }
 

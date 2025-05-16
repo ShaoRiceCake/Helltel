@@ -25,16 +25,17 @@ public class MothGroupController : GuestBase
     public float velocityLerpAmt = 0.25f; //线性插值法计算新速度的 乘数
     [Header("目标吸引")]
     public float targetAmt = 0.01f; // 目标吸引力系数(影响新速度)
-    
+
     // public List<GameObject> EnemyList = new List<GameObject>(); //敌人列表
     public GameObject attachingMoth; //当前附着的虫子
     public object CurTarget { get; set; }
 
 
+
     protected override void Start()
     {
         base.Start();
-
+        
         BehaviorTree = GetBehaviorTree();
 
 #if UNITY_EDITOR
@@ -100,7 +101,7 @@ public class MothGroupController : GuestBase
             })
         );
     }
-    
+
     public List<MothController> GetMothList()
     {
         return _mothList;

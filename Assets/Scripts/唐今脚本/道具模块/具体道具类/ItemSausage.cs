@@ -43,12 +43,12 @@ public class ItemSausage : ActiveItem
             }
         }
         
-        GameController.Instance.AddHealth(amount);
+        GameController.Instance.AddMaxHealth(amount);
         
         SelfDetach(true);
     }
 
-    private GameObject PlayEffect(GameObject effectPrefab, Vector3 position)
+    private static GameObject PlayEffect(GameObject effectPrefab, Vector3 position)
     {
         var effectInstance = Instantiate(
             effectPrefab, 

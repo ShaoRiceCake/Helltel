@@ -66,6 +66,7 @@ public class MRBunnyController : GuestBase, IHurtable
         return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
             new Action(() =>
             {
+                Debug.Log("MR-Bunny追击目标！");
                 if (!_curTarget || !agent.isOnNavMesh) return;
                 var distance = Vector3.Distance(transform.position, _curTarget.transform.position);
                 if (distance <= attackDistance)
@@ -90,6 +91,7 @@ public class MRBunnyController : GuestBase, IHurtable
                 new Action(
                     () =>
                     {
+                        Debug.Log("MR-Bunny巡逻中！");
                         agent.speed = moveSpeed;
                     }
                 ),
@@ -222,18 +224,19 @@ public class MRBunnyController : GuestBase, IHurtable
             var targetRotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
-        else if (_curTarget && BehaviorTree.Blackboard["isDead"].Equals(false))
-        {
-            agent.ResetPath(); // 停止追击
-            agent.speed = 0f; // 保证站定
+        // why???
+        // else if (_curTarget && BehaviorTree.Blackboard["isDead"].Equals(false))
+        // {
+        //     agent.ResetPath(); // 停止追击
+        //     agent.speed = 0f; // 保证站定
 
-            var targetPosition = _curTarget.transform.position;
-            var direction = targetPosition - transform.position;
-            direction.y = 0; // 确保只在水平方向旋转
-            if (direction == Vector3.zero) return;
-            var targetRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-        }
+        //     var targetPosition = _curTarget.transform.position;
+        //     var direction = targetPosition - transform.position;
+        //     direction.y = 0; // 确保只在水平方向旋转
+        //     if (direction == Vector3.zero) return;
+        //     var targetRotation = Quaternion.LookRotation(direction);
+        //     transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+        // }
     }
     protected override void LateUpdate()
     {

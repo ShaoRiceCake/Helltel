@@ -17,16 +17,9 @@ public class GlobalUIController : MonoBehaviour
     private GameDataModel _data;
     private  bool canPressESC = true;
 
-    // // 属性访问（无需基类）
-    // public MenuPanel Menu => _menu;
-    // public SettingsPanel Settings => _settings;
-    // public GuestBookPanel GuestBook => _guestBook;
-
-    //public bool isPaused = false;
-
     private void Awake()
     {
-        if (Instance != null)
+        if (Instance)
         {
             Destroy(gameObject);
             return;
@@ -59,47 +52,10 @@ public class GlobalUIController : MonoBehaviour
 
     private void HandleEscapeInput()
     {
-        // if (!Input.GetKeyDown(KeyCode.Escape)) return;
-
-
-        // //根据当前界面状态处理
-        // //当处于设置或宾客簿界面时
-        // if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
-        // {
-        //     if(gameManager.isGameing == true )
-        //     {
-        //         // 从二级界面返回菜单
-        //         OpenMenu();
-        //     }
-        //     else
-        //     {
-        //         CloseAllGlobalUI();
-        //         AudioManager.Instance.Play("泡泡音");
-        //     }
-            
-        // }
-        // //当处于菜单界面时
-        // else if (Menu.gameObject.activeSelf)
-        // {
-        //     // 关闭菜单返回游戏,继续游戏
-        //     ReturnGame();
-            
-        // }
-        // //当处于游戏场景且未打开UI界面
-        // else
-        // {
-        //     if(gameManager.isGameing == true )
-        //     {
-        //         // 打开菜单
-        //         OpenMenu();
-                
-        //         Time.timeScale = 0;
-        //     }
-        // }
         if(canPressESC == false)return;
         if (!Input.GetKeyDown(KeyCode.Escape)) return;
-
-
+        
+       
         //根据当前界面状态处理
         //当处于设置或宾客簿界面时
         if (Settings.gameObject.activeSelf || GuestBook.gameObject.activeSelf)
@@ -121,7 +77,6 @@ public class GlobalUIController : MonoBehaviour
         {
             // 关闭菜单返回游戏,继续游戏
             ReturnGame();
-            
         }
         //当处于游戏场景且未打开UI界面
         else
@@ -129,16 +84,14 @@ public class GlobalUIController : MonoBehaviour
             if (SceneManager.GetActiveScene().name == "单机正式主菜单") return;
             // 打开菜单
             OpenMenu();
-                
-            Time.timeScale = 0;
         }
+        
     }
    
 
     // 设置暂停/继续游戏
     public void SetPause(bool isPaused)
     {
-        // Time.timeScale = isPaused ? 0 : 1;
         StartCoroutine(SetCursorStateWithDelay(isPaused));
     }
 
@@ -169,7 +122,6 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
-            Time.timeScale = 1;
             SetPause(false);
         }
         AudioManager.Instance.Play("泡泡音");
@@ -180,7 +132,6 @@ public class GlobalUIController : MonoBehaviour
         CloseAllGlobalUI();
         if(SceneManager.GetActiveScene().name != "单机正式主菜单")
         {
-            Time.timeScale = 0;
             SetPause(true);
         }
         Menu.gameObject.SetActive(true);
@@ -237,7 +188,6 @@ public class GlobalUIController : MonoBehaviour
     }
     public void HandleStartLoading()
     {
-        Time.timeScale = 0;
         SetPause(true);
         if(_data.CurrentLoadedScene == _data.dungeon ||_data.CurrentLoadedScene == _data.shop)
         {
@@ -246,17 +196,27 @@ public class GlobalUIController : MonoBehaviour
         
         canPressESC = false;
     }
+    
+    private Coroutine bgmCoroutine;
     public void HandleFinishLoading()
     {
-        Time.timeScale = 1;
         SetPause(false);
         if(_data.CurrentLoadedScene == _data.dungeon ||_data.CurrentLoadedScene == _data.shop)
         {
-            AudioManager.Instance.Play("压抑氛围环境音",owner:this);
+            // 先停止可能正在运行的旧协程
+            if(bgmCoroutine != null) 
+            {
+                StopCoroutine(bgmCoroutine);
+            }
+            bgmCoroutine = StartCoroutine(PlayBGMAfterDelay(1f));
         }
         
-        
         canPressESC = true;
+    }
+    private IEnumerator PlayBGMAfterDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay); // 等待指定秒数
+        AudioManager.Instance.Play("压抑氛围环境音", owner:this);
     }
     
 }
