@@ -123,8 +123,8 @@ public class ItemBottom : ActiveItem
         Debug.Log("按钮已完全按下");
         if(_data.CheckPerformance() == true ||_data.CurrentLoadedScene == _data.shop)
         {
-            GameFlow gameFlow = FindObjectOfType<GameFlow>();
-            if(gameFlow != null)
+            var gameFlow = FindObjectOfType<GameFlow>();
+            if(gameFlow)
             {
                 gameFlow.LeaveThisFloor();
             }
@@ -135,8 +135,7 @@ public class ItemBottom : ActiveItem
         }
         else
         {
-            //ToDo执行未达成绩效的逻辑
-            AudioManager.Instance.Play("未达成绩效");
+            EventBus<UIMessageEvent>.Publish(new UIMessageEvent("绩效未达标！", 2f, UIMessageType.Warning));
             IsExhaust = false;
         }
     }

@@ -42,12 +42,6 @@ public class GameController : MonoBehaviour
     // 增加血上限接口
     public void AddMaxHealth(int amount)
     {
-        if (amount < 0)
-        {
-            Debug.LogError("请使用 DeductHealth 方法扣除血量");
-            return;
-        }
-        
         _gameData.MaxHealth += amount;
     }
 

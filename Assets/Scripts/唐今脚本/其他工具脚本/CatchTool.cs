@@ -292,7 +292,7 @@ public class CatchTool : MonoBehaviour
             }
             else
             {
-                AudioManager.Instance.Play("无法购买", _catchBall.transform.position, 0.7f);
+                EventBus<UIMessageEvent>.Publish(new UIMessageEvent("资金不足，无法购买！", 2f, UIMessageType.Warning));
                 return;
             }
         }

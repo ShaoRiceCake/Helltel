@@ -83,7 +83,12 @@ public class SelectedState : ItemState
 public class ReadyToGrabState : ItemState
 {
     public ReadyToGrabState(ItemBase item) : base(item) => stateType = EItemState.ReadyToGrab;
-    public override void Enter() => Item.gameObject.layer = Item.TargetLayer; // 设置交互专用层级
+
+    public override void Enter()
+    {
+        Item.gameObject.layer = Item.TargetLayer; // 设置交互专用层级
+        (Item as ItemBase)?.SendItemDescribe();
+    }
 }
 
 public class GrabbedState : ItemState
@@ -108,6 +113,9 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
     [SerializeField] protected string itemName; 
     public string ItemName => itemName;         
     [SerializeField] protected int itemDamage;  
+    
+    [SerializeField] protected string itemDescribe = "";  
+    
     public int ItemDamage
     {
         get => itemDamage;
@@ -127,6 +135,9 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         }
     }
     private bool _isPurchase = false;
+    
+    private bool _isShowMessage= false;
+
     
     // 权限管理字段
     private ulong _currentGrabbingPlayerId = ulong.MaxValue; // 当前持有玩家ID
@@ -183,6 +194,13 @@ public abstract class ItemBase : MonoBehaviour, IInteractable, IGrabbable
         {
             UpdateOrbitRotation();
         }
+    }
+
+    public void SendItemDescribe()
+    {
+        if(_isShowMessage)  return;
+        EventBus<UIMessageEvent>.Publish(new UIMessageEvent(itemDescribe, 4f));
+        _isShowMessage = true;
     }
 
     protected virtual void UpdateOrbitRotation()
