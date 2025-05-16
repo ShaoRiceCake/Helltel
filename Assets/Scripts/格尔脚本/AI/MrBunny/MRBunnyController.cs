@@ -170,13 +170,14 @@ public class MRBunnyController : GuestBase, IHurtable
         Debug.Log("强制退出攻击节点！");
     }
     
-   public override void TakeDamage(int damage)
+   public void TakeDamage(int damage)
     {
         if (damage >= curHealth.Value)
         {
             curHealth.Value = 0;
             Debug.Log("MR-Bunny死亡！当前血量：" + curHealth.Value);
             BehaviorTree.Blackboard["isDead"] = true; // 设置死亡标志
+            IsDead = true;
         }
         else
         {

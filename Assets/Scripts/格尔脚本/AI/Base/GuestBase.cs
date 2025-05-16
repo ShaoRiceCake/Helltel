@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace Helltal.Gelercat
 {
-    public class GuestBase:MonoBehaviour
+    public class GuestBase:MonoBehaviour,IDie
     {
         // 同步transform，基础数据
         // 基础属性
@@ -32,14 +32,9 @@ namespace Helltal.Gelercat
         public NPBehave.Root BehaviorTree; // 显式声明命名空间
 
         public GameObject _curTarget;
-        
+
         protected virtual void Update()
         {
-        }
-
-        public virtual void TakeDamage(int damage)
-        {
-            
         }
         
         protected virtual void LateUpdate()
@@ -126,5 +121,7 @@ namespace Helltal.Gelercat
             if (BehaviorTree is not { IsActive: true }) return;
             BehaviorTree.Stop();
         }
+
+        public bool IsDead { get; set; }
     }
 }

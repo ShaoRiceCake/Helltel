@@ -147,7 +147,7 @@ public class BalloonController : GuestBase, IHurtable
             );
     }
 
-    public override void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {   
         Debug.Log("气球受伤：" + damage);
         if (_exploded) return;
@@ -155,6 +155,7 @@ public class BalloonController : GuestBase, IHurtable
         Debug.Log("气球当前血量：" + curHealth.Value);
         if (!(curHealth.Value <= 0)) return;
         BehaviorTree.Blackboard["isDead"] = true;
+        IsDead = true;
         Debug.Log("气球死亡");
         Debug.Log("气球当前血量：" + curHealth.Value);
     }

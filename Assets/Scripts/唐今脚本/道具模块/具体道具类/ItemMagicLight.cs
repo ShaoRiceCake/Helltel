@@ -77,10 +77,10 @@ public class ItemMagicLight : ActiveItem
         
         var effect = PlayEffect(monsterHitEffect, transform.position);
 
-        var monster = GetComponentInParent<Helltal.Gelercat.GuestBase>();
-
-        if (monster)
-            monster.TakeDamage(100);
+        if (other.gameObject.GetComponentInParent<IHurtable>() is { } hurtable)
+        {
+            hurtable.TakeDamage(100); 
+        }
         
         AudioManager.Instance.Play("魔法灯爆炸",transform.position);
         

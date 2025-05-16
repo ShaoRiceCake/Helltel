@@ -9,20 +9,12 @@ public class MonsterCollisionHandler : MonoBehaviour
 
     [Header("伤害系数")]
     public float damageCoefficient = 1f;
-
-    public MRBunnyController bunnyController;
-
+    
     private bool _isMonsterDead;
     
     private void Awake()
     {
-        // 获取MRBunnyController组件
-        bunnyController = GetComponent<MRBunnyController>();
-        if (!bunnyController)
-        {
-            bunnyController = GetComponentInParent<MRBunnyController>();
-        }
-
+        
         if (detectionCollider) return;
         detectionCollider = GetComponent<Collider>();
         if (!detectionCollider)
@@ -39,24 +31,26 @@ public class MonsterCollisionHandler : MonoBehaviour
         }
         
         var interactable = collision.gameObject.GetComponent<IInteractable>();
-        if (interactable == null) return; // 如果没有接口，直接返回
+        if (interactable == null) return; 
 
-        // 计算最终伤害值
         var finalDamage = Mathf.RoundToInt(interactable.ItemDamage * damageCoefficient);
         
-        if (bunnyController)
+        if (collision.gameObject.GetComponentInParent<IHurtable>() is { } hurtable)
         {
-            bunnyController.TakeDamage(finalDamage);
-            _isMonsterDead = bunnyController.BehaviorTree.Blackboard.Get<bool>("isDead");
+            hurtable.TakeDamage(finalDamage); 
         }
-
+        
+        if (collision.gameObject.GetComponentInParent<IDie>() is { } die)
+        {
+            _isMonsterDead = die.IsDead;
+        }
+        
         var hitPosition = collision.transform.position;
         
-        AudioManager.Instance.Play("兔子挨打", hitPosition);
+        // AudioManager.Instance.Play("兔子挨打", hitPosition);
         
-        // 出现受伤飘字    
         BroadcastMonsterHurtEvent(hitPosition,finalDamage,collision);
-        // 处理血液喷射效果
+
         HandleBloodSpray(hitPosition, finalDamage, collision);
 
         if (!_isMonsterDead) return;
