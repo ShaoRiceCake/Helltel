@@ -10,11 +10,14 @@ public class ItemBottom : ActiveItem
     [Header("动画设置")]
     [Tooltip("混合形状动画过渡的持续时间（秒）")]
     [SerializeField] private float blendShapeDuration = 2f;
+    [Tooltip("回弹动画的持续时间（秒）")]
+    [SerializeField] private float reboundDuration = 1f; // 新增：回弹持续时间
     [Tooltip("目标对象（如果为空则使用自身）")]
     [SerializeField] private GameObject targetObject; // 可配置的外部目标对象
 
     private SkinnedMeshRenderer targetSkinnedMeshRenderer; // 目标对象的SkinnedMeshRenderer
     private Coroutine blendShapeCoroutine;
+    private Coroutine reboundCoroutine; // 新增：回弹协程引用
     private GameDataModel _data;
     private int originalLayer; // 存储目标对象原始layer
      
@@ -59,12 +62,17 @@ public class ItemBottom : ActiveItem
     {
         if(IsExhaust) return;
         
+        // 停止所有正在进行的动画
         if (blendShapeCoroutine != null)
         {
             StopCoroutine(blendShapeCoroutine);
         }
+        if (reboundCoroutine != null)
+        {
+            StopCoroutine(reboundCoroutine);
+        }
 
-        if (targetSkinnedMeshRenderer != null)
+        if (targetSkinnedMeshRenderer)
         {
             blendShapeCoroutine = StartCoroutine(AnimateBlendShape());
         }
@@ -74,8 +82,8 @@ public class ItemBottom : ActiveItem
 
     private IEnumerator AnimateBlendShape()
     {
-        float timer = 0f;
-        int blendShapeCount = targetSkinnedMeshRenderer.sharedMesh.blendShapeCount;
+        var timer = 0f;
+        var blendShapeCount = targetSkinnedMeshRenderer.sharedMesh.blendShapeCount;
 
         if (blendShapeCount == 0)
         {
@@ -83,13 +91,14 @@ public class ItemBottom : ActiveItem
             yield break;
         }
 
+        // 按下动画
         while (timer < blendShapeDuration)
         {
             timer += 3 * Time.deltaTime;
-            float progress = Mathf.Clamp01(timer / blendShapeDuration);
-            float blendValue = progress * 100f;
+            var progress = Mathf.Clamp01(timer / blendShapeDuration);
+            var blendValue = progress * 100f;
 
-            for (int i =  0; i < blendShapeCount; i++)
+            for (int i = 0; i < blendShapeCount; i++)
             {
                 targetSkinnedMeshRenderer.SetBlendShapeWeight(i, blendValue);
             }
@@ -97,25 +106,48 @@ public class ItemBottom : ActiveItem
             yield return null;
         }
 
-        for (int i = 0; i < blendShapeCount; i++)
+        // 确保完全按下
+        for (var i = 0; i < blendShapeCount; i++)
         {
             targetSkinnedMeshRenderer.SetBlendShapeWeight(i, 100f);
         }
 
         OnButtonFullyPressed();
+        
+        // 开始回弹动画
+        reboundCoroutine = StartCoroutine(ReboundAnimation());
+        
         blendShapeCoroutine = null;
     }
 
-    private void OnDestroy()
+    // 新增：回弹动画协程
+    private IEnumerator ReboundAnimation()
     {
-        OnUseStart.RemoveListener(StartUseProcess);
-        GameController.Instance._gameData.OnFloorChanged -= ResetIsExhaust;
+        var timer = 0f;
+        var blendShapeCount = targetSkinnedMeshRenderer.sharedMesh.blendShapeCount;
 
-        if (blendShapeCoroutine != null)
+        while (timer < reboundDuration)
         {
-            StopCoroutine(blendShapeCoroutine);
+            timer += Time.deltaTime;
+            var progress = Mathf.Clamp01(timer / reboundDuration);
+            // 使用平滑的插值函数使回弹更自然
+            var blendValue = Mathf.SmoothStep(100f, 0f, progress);
+
+            for (int i = 0; i < blendShapeCount; i++)
+            {
+                targetSkinnedMeshRenderer.SetBlendShapeWeight(i, blendValue);
+            }
+
+            yield return null;
         }
 
+        // 确保完全回弹
+        for (var i = 0; i < blendShapeCount; i++)
+        {
+            targetSkinnedMeshRenderer.SetBlendShapeWeight(i, 0f);
+        }
+
+        reboundCoroutine = null;
     }
 
     private void OnButtonFullyPressed()
@@ -143,5 +175,20 @@ public class ItemBottom : ActiveItem
     private void ResetIsExhaust()
     {
         IsExhaust = false;
+    }
+
+    private void OnDestroy()
+    {
+        OnUseStart.RemoveListener(StartUseProcess);
+        GameController.Instance._gameData.OnFloorChanged -= ResetIsExhaust;
+
+        if (blendShapeCoroutine != null)
+        {
+            StopCoroutine(blendShapeCoroutine);
+        }
+        if (reboundCoroutine != null)
+        {
+            StopCoroutine(reboundCoroutine);
+        }
     }
 }
