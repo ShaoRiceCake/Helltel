@@ -46,7 +46,7 @@ public class ItemLantern : PassiveItem
         lanternLight.enabled = false;
     }
 
-    private void Update()
+    protected override void Update()
     {
         base.Update();
         

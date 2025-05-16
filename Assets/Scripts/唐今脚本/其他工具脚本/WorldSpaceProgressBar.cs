@@ -12,8 +12,8 @@ public class WorldSpaceProgressBar : MonoBehaviour
     [SerializeField] private Vector3 worldOffset = Vector3.up * 0.5f;
     [SerializeField] private float edgePadding = 50f;
     [SerializeField] private float minViewportSize = 0.3f;
-    [SerializeField] private float appearDuration = 0.3f;
-    [SerializeField] private float disappearDuration = 0.2f;
+    // [SerializeField] private float appearDuration = 0.3f;
+    // [SerializeField] private float disappearDuration = 0.2f;
     
     private Camera mainCamera;
     private Transform targetTransform;

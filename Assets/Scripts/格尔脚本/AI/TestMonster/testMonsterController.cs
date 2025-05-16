@@ -98,8 +98,9 @@ namespace Helltal.Gelercat
             return !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance && !agent.hasPath;
         }
 
-        void Update()
+        protected override void Update()
         {
+            base.Update();
             if (debugging)
                 Debug.Log("Current Patrol State: " + patrolState);
         }

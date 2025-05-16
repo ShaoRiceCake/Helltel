@@ -9,12 +9,12 @@ public class LoadingScreenAni : MonoBehaviour
     
     [Header("场景配置")]
     private string loadingSceneName = "Loading";
-    private float minDisplayTime = 20f;
+    // private float minDisplayTime = 20f;
 
     [Header("两侧设置")]
     [SerializeField] RectTransform[] foreground;  // 两张无缝拼接的前景
     [SerializeField] RectTransform[] ironChain;  // 两张无缝拼接的前景
-    float scrollSpeed = 800f;
+    // float scrollSpeed = 800f;
     [Header("齿轮设置")]
     [SerializeField] Transform gearUI,gear1,gear2,gear3,gear4;                 // 齿轮Transform
     float gearRotationSpeed = 200f;  // 旋转速度（度/秒）
