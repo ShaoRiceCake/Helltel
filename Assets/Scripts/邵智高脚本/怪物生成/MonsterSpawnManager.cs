@@ -17,10 +17,7 @@ public class MonsterSpawnSystem : MonoBehaviour
     public float baseEntropy = 20f;
     [Header("每层变化的熵值")]
     public float floorMultiplier = 8f;
-    [Header("每分钟增加的熵值")]
-    public float timeFactor = 0.3f;
-    [Header("每一块钱增加的熵值")]
-    public float moneyFactor = 0.05f;
+
 
     [Header("基础客梯数")]
     public int baseGuestElevatorCount = 8;

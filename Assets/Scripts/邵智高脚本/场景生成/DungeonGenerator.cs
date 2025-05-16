@@ -128,9 +128,9 @@ public class DungeonGenerator : MonoBehaviour
     }
     public void ReSetDungeonValue()
     {
-        mainLength = GameController.Instance._gameData.Level*1+4;
-        branchLength = GameController.Instance._gameData.Level*1+2;
-        branchNumber = GameController.Instance._gameData.Level*1+2;
+        mainLength = GameController.Instance._gameData.Level*1+3;
+        branchLength = GameController.Instance._gameData.Level*1+1;
+        branchNumber = GameController.Instance._gameData.Level*1+1;
         StartCoroutine(DungeonBuild());
     }
 
