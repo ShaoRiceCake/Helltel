@@ -321,7 +321,7 @@ public class MothController : GuestBase, IHurtable
     }
 
     // 实现 IHurtable 接口
-    public void TakeDamage(int damage)
+    public override void TakeDamage(int damage)
     {
         // 处理伤害逻辑
         if (damage >= curHealth.Value)

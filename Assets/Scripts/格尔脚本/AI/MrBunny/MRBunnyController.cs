@@ -170,7 +170,7 @@ public class MRBunnyController : GuestBase, IHurtable
         Debug.Log("强制退出攻击节点！");
     }
     
-   public void TakeDamage(int damage)
+   public override void TakeDamage(int damage)
     {
         if (damage >= curHealth.Value)
         {

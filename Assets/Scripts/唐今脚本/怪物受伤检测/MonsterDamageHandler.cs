@@ -18,14 +18,14 @@ public class MonsterCollisionHandler : MonoBehaviour
     {
         // 获取MRBunnyController组件
         bunnyController = GetComponent<MRBunnyController>();
-        if (bunnyController == null)
+        if (!bunnyController)
         {
             bunnyController = GetComponentInParent<MRBunnyController>();
         }
 
-        if (detectionCollider != null) return;
+        if (detectionCollider) return;
         detectionCollider = GetComponent<Collider>();
-        if (detectionCollider == null)
+        if (!detectionCollider)
         {
             Debug.LogWarning("未找到碰撞器组件，请手动指定或添加碰撞器", this);
         }
@@ -33,7 +33,7 @@ public class MonsterCollisionHandler : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (detectionCollider != null && !IsCollisionFromOurCollider(collision))
+        if (detectionCollider && !IsCollisionFromOurCollider(collision))
         {
             return;
         }

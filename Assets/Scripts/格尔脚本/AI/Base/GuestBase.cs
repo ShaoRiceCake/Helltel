@@ -36,6 +36,11 @@ namespace Helltal.Gelercat
         protected virtual void Update()
         {
         }
+
+        public virtual void TakeDamage(int damage)
+        {
+            
+        }
         
         protected virtual void LateUpdate()
         {

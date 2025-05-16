@@ -147,7 +147,7 @@ public class BalloonController : GuestBase, IHurtable
             );
     }
 
-    public void TakeDamage(int damage)
+    public override void TakeDamage(int damage)
     {   
         Debug.Log("气球受伤：" + damage);
         if (_exploded) return;
