@@ -576,7 +576,7 @@ namespace Michsky.LSS
         // ========== 内部变量 ==========
         public int spinnerHelper;                     // 加载动画类型辅助变量
         public bool updateHelper = false;              // 更新辅助标记
-        private bool onFinishInvoked = false;          // 完成事件触发标记
+        // private bool onFinishInvoked = false;          // 完成事件触发标记
         //public static bool processLoading = false;     // 加载过程状态标记
         private static bool fcgHelper = false;         // CanvasGroup辅助标记
         private static string sceneHelper;             // 场景名称临时存储
