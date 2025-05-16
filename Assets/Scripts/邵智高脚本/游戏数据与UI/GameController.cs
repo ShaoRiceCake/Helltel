@@ -90,7 +90,7 @@ public class GameController : MonoBehaviour
         _gameData.Money -= amount; 
     }
 
-// 扣绩效接口
+    // 扣绩效接口
     public void DeductPerformance(int amount)
     {
         _gameData.Performance -= amount;  

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 
@@ -21,9 +22,10 @@ public class ShopTrigger : MonoBehaviour
     private Coroutine _performanceConversionCoroutine;
     private float _currentSoundInterval;
     private float _lastSoundTime;
-
+    
     private void OnTriggerEnter(Collider other)
     {
+
         if (_hasTriggered || !other.CompareTag("Player")) return;
 
         isShopActive = true;
@@ -47,14 +49,15 @@ public class ShopTrigger : MonoBehaviour
     {
         var gameData = GameController.Instance._gameData;
         var remainingPerformance = gameData.Performance;
-    
+        
+        
         if (remainingPerformance <= 0)
         {
             yield break;
         }
     
         // 配置参数
-        const float conversionRate = 10f; // 每秒转换10金币
+        const float conversionRate = 20f; // 每秒转换10金币
         const float updateInterval = 0.1f; // 每0.1秒更新一次
     
         // 激活外部物体
@@ -67,15 +70,15 @@ public class ShopTrigger : MonoBehaviour
         _currentSoundInterval = 0.2f;
     
         // 开始转换
-        float accumulatedTime = 0f;
+        var accumulatedTime = 0f;
         while (remainingPerformance > 0)
         {
             yield return new WaitForSeconds(updateInterval);
             accumulatedTime += updateInterval;
         
             // 计算本次应该转换的数量
-            float desiredConversion = conversionRate * accumulatedTime;
-            int actualAmount = Mathf.FloorToInt(desiredConversion);
+            var desiredConversion = conversionRate * accumulatedTime;
+            var actualAmount = Mathf.FloorToInt(desiredConversion);
         
             if (actualAmount <= 0) continue;
         
