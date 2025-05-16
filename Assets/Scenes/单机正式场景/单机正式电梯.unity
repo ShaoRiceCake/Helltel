@@ -811,6 +811,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 691872b4669c9ee45847d2d10286d82f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1795710016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1795710018}
+  - component: {fileID: 1795710017}
+  m_Layer: 0
+  m_Name: Global Volume
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1795710017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795710016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: f6aac51474f127942837321c720cea61, type: 2}
+--- !u!4 &1795710018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795710016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.7021229, y: -2.2899723, z: -37.295135}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &1797062571 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 224067025959442890, guid: 08f7a0bfb79ffb74d8cf1900c35c5004, type: 3}
@@ -1442,6 +1491,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerSolver
       objectReference: {fileID: 0}
+    - target: {fileID: 6705137967644126045, guid: 62c2ff5147fe8634e90615214749746a, type: 3}
+      propertyPath: m_RenderPostProcessing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7229534226980036978, guid: 62c2ff5147fe8634e90615214749746a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1
@@ -1633,3 +1686,4 @@ SceneRoots:
   - {fileID: 1499763933}
   - {fileID: 1413666491778479211}
   - {fileID: 1552716604}
+  - {fileID: 1795710018}
