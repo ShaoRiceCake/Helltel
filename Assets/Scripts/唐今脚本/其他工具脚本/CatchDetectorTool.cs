@@ -2,27 +2,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
-using TMPro;
 
 public class CatchDetectorTool : MonoBehaviour
 {
     public event Action<List<GameObject>> OnDetectedObjectsUpdated;
-    public GameObject warningSignPrefab;    // 警告提示牌（金额不足）
-    public GameObject approvedSignPrefab;  // 许可提示牌（金额足够）
+    public PriceShowTool priceShowPrefab;  // 单一UI告示牌预制体（包含状态切换功能）
     public float signHeight = 1f;          // 提示牌固定高度
 
     private int _frameCounter;
     public Collider triggerCollider;
     public List<GameObject> detectedObjects = new();
-    private readonly Dictionary<GameObject, GameObject> _objectSignMap = new();
+    private readonly Dictionary<GameObject, PriceShowTool> _objectSignMap = new();
 
     private void Start()
     {
-        if (triggerCollider != null)
-        {
-            triggerCollider.isTrigger = true;
-        }
-        else
+        if (triggerCollider == null)
         {
             Debug.LogError("No Collider found on this GameObject!");
         }
@@ -34,7 +28,6 @@ public class CatchDetectorTool : MonoBehaviour
         if (_frameCounter < 5) return;
         _frameCounter = 0;
         UpdateDetectedObjects();
-        UpdateSignsPositionAndRotation();
     }
     
     private void UpdateDetectedObjects()
@@ -76,24 +69,21 @@ public class CatchDetectorTool : MonoBehaviour
     private void UpdateOrCreateSign(GameObject targetObject, ItemBase item)
     {
         var canAfford = GameController.Instance.GetMoney() >= item.itemPrice;
-        var correctPrefab = canAfford ? approvedSignPrefab : warningSignPrefab;
-        var correctTag = canAfford ? "ApprovedSign" : "WarningSign";
+        var newState = canAfford ? PriceShowTool.PurchaseState.Purchasable : PriceShowTool.PurchaseState.NonPurchasable;
 
         if (_objectSignMap.TryGetValue(targetObject, out var existingSign))
         {
-            if (existingSign.CompareTag(correctTag)) 
-            {
-                return; 
-            }
-            RemoveSignForObject(targetObject);
+            existingSign.SetState(newState);
+            existingSign.SetText(item.itemPrice.ToString());
+            return;
         }
 
-        CreateSignForObject(targetObject, item.itemPrice, correctPrefab, correctTag);
+        CreateSignForObject(targetObject, item.itemPrice, newState);
     }
 
-    private void CreateSignForObject(GameObject targetObject, int price, GameObject prefab, string tag)
+    private void CreateSignForObject(GameObject targetObject, int price, PriceShowTool.PurchaseState state)
     {
-        if (!prefab || price == 0) return;
+        if (!priceShowPrefab || price == 0) return;
 
         var signPosition = new Vector3(
             targetObject.transform.position.x,
@@ -101,10 +91,11 @@ public class CatchDetectorTool : MonoBehaviour
             targetObject.transform.position.z
         );
         
-        var sign = Instantiate(prefab, signPosition, Quaternion.identity);
-        sign.tag = tag;
+        var sign = Instantiate(priceShowPrefab, signPosition, Quaternion.identity);
+        sign.SetText(price.ToString());
+        sign.SetState(state);
+        sign.SetTarget(targetObject.transform);
         _objectSignMap[targetObject] = sign;
-
     }
 
     private void RemoveSignForObject(GameObject targetObject)
@@ -113,31 +104,8 @@ public class CatchDetectorTool : MonoBehaviour
         
         if (sign)
         {
-            Destroy(sign);
+            Destroy(sign.gameObject);
         }
         _objectSignMap.Remove(targetObject);
-    }
-    
-    private void UpdateSignsPositionAndRotation()
-    {
-        if (_objectSignMap.Count == 0) return;
-        
-        foreach (var kvp in _objectSignMap.ToList())
-        {
-            if (!kvp.Value || !kvp.Key)
-            {
-                _objectSignMap.Remove(kvp.Key);
-                continue;
-            }
-            
-            var targetPos = kvp.Key.transform.position;
-            kvp.Value.transform.position = Vector3.Lerp(
-                kvp.Value.transform.position,
-                new Vector3(targetPos.x, targetPos.y + signHeight, targetPos.z),
-                10f * Time.deltaTime
-            );
-            
-            kvp.Value.transform.Rotate(100 * Time.deltaTime, 100 * Time.deltaTime, 100 * Time.deltaTime, Space.World);
-        }
     }
 }
