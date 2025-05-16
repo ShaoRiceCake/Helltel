@@ -660,7 +660,6 @@ Transform:
   - {fileID: 3614382545982001308}
   - {fileID: 450116499115365659}
   - {fileID: 3046609519619615485}
-  - {fileID: 1483562082706888347}
   - {fileID: 7045237765141364159}
   - {fileID: 5566208039397483853}
   - {fileID: 5838284814524403402}
@@ -680,6 +679,7 @@ Transform:
   - {fileID: 3691334989180358528}
   - {fileID: 3985496806448176555}
   - {fileID: 308258834278870938}
+  - {fileID: 6115799327052850157}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &5945079249395494948
@@ -1706,7 +1706,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5736462529597901959
+--- !u!1 &5247197837902715262
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1714,9 +1714,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1483562082706888347}
-  - component: {fileID: 3664295505384956465}
-  - component: {fileID: 3417757404880721016}
+  - component: {fileID: 6115799327052850157}
+  - component: {fileID: 6866810679775953884}
+  - component: {fileID: 4624928046021873295}
   m_Layer: 0
   m_Name: "\u7ACB\u65B9\u4F53.016"
   m_TagString: Untagged
@@ -1724,36 +1724,36 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1483562082706888347
+--- !u!4 &6115799327052850157
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5736462529597901959}
+  m_GameObject: {fileID: 5247197837902715262}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.70710677, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0.0000024414062, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.000002441406, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5681534003137990969}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3664295505384956465
+--- !u!33 &6866810679775953884
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5736462529597901959}
-  m_Mesh: {fileID: 4602173385145746816, guid: 205c30c1b2ae0e9469fbf3dd94902948, type: 3}
---- !u!23 &3417757404880721016
+  m_GameObject: {fileID: 5247197837902715262}
+  m_Mesh: {fileID: 4602173385145746816, guid: 933408763f8d9db4c9981c83709b608f, type: 3}
+--- !u!23 &4624928046021873295
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5736462529597901959}
+  m_GameObject: {fileID: 5247197837902715262}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -1767,7 +1767,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -7705339368589165950, guid: 205c30c1b2ae0e9469fbf3dd94902948, type: 3}
+  - {fileID: -7705339368589165950, guid: 933408763f8d9db4c9981c83709b608f, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2498,7 +2498,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2560,7 +2561,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Connector
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4892198492754697393, guid: 8d36915db4c98464c8408790083a1a70, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2622,7 +2624,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2684,7 +2687,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Connector (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4892198492754697393, guid: 8d36915db4c98464c8408790083a1a70, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2746,7 +2750,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (2)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2808,7 +2813,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2870,7 +2876,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (4)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2932,7 +2939,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (6)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -2994,7 +3002,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (5)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3056,7 +3065,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Connector (1)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4892198492754697393, guid: 8d36915db4c98464c8408790083a1a70, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3180,7 +3190,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: NavPoint (7)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5323543723962776578, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -3242,7 +3253,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Connector (3)
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4892198492754697393, guid: 8d36915db4c98464c8408790083a1a70, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
