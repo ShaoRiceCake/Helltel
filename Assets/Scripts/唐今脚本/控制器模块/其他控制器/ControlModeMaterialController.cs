@@ -12,7 +12,7 @@ public class ControlModeMaterialController : MonoBehaviour
         public float inactiveValue = 10f;
         public float transitionSpeed = 1f;
         
-        [HideInInspector] public Coroutine transitionCoroutine;
+        [HideInInspector] public Coroutine TransitionCoroutine;
     }
 
     [System.Serializable]
@@ -24,7 +24,7 @@ public class ControlModeMaterialController : MonoBehaviour
         public float inactiveValue = 10f;
         public float transitionSpeed = 1f;
         
-        [HideInInspector] public Coroutine transitionCoroutine;
+        [HideInInspector] public Coroutine TransitionCoroutine;
     }
 
     [System.Serializable]
@@ -36,7 +36,7 @@ public class ControlModeMaterialController : MonoBehaviour
         public float inactiveValue = 10f;
         public float transitionSpeed = 1f;
         
-        [HideInInspector] public Coroutine transitionCoroutine;
+        [HideInInspector] public Coroutine TransitionCoroutine;
     }
 
     [Header("Material References")]
@@ -47,48 +47,45 @@ public class ControlModeMaterialController : MonoBehaviour
     [Header("Debug Options")]
     [SerializeField] private bool debugDisableAll = false;
 
-    private PlayerControlInformationProcess controlInfo;
-    private bool isCameraModeActive = false;
-    private bool isPlayerDead = false;
+    private PlayerControlInformationProcess _controlInfo;
+    private bool _isCameraModeActive = false;
+    private bool _isPlayerDead = false;
     private GameDataModel _data;
 
     private void Start()
     {
-        controlInfo = GetComponent<PlayerControlInformationProcess>();
-        if (!controlInfo)
+        _controlInfo = GetComponent<PlayerControlInformationProcess>();
+        if (!_controlInfo)
         {
             Debug.LogError("PlayerControlInformationProcess not found!");
             return;
         }
 
-        // 初始化材质
         InitializeMaterial(handMaterial);
         InitializeMaterial(legMaterial);
         InitializeMaterial(hatMaterial);
 
-        // 订阅事件
-        controlInfo.onSwitchControlMode.AddListener(OnControlModeChanged);
-        controlInfo.onCameraControl.AddListener(OnCameraModeActivated);
-        controlInfo.onStopCameraControl.AddListener(OnCameraModeDeactivated);
+        _controlInfo.onSwitchControlMode.AddListener(OnControlModeChanged);
+        _controlInfo.onCameraControl.AddListener(OnCameraModeActivated);
+        _controlInfo.onStopCameraControl.AddListener(OnCameraModeDeactivated);
         
-        if (_data != null)
+        if (_data)
         {
             _data.OnIsPlayerDiedChangedEvent += PlayerDie;
         }
 
-        // 初始状态更新
         UpdateMaterialStates();
     }
 
     private void OnDestroy()
     {
-        if (controlInfo == null) return;
+        if (!_controlInfo) return;
         
-        controlInfo.onSwitchControlMode.RemoveListener(OnControlModeChanged);
-        controlInfo.onCameraControl.RemoveListener(OnCameraModeActivated);
-        controlInfo.onStopCameraControl.RemoveListener(OnCameraModeDeactivated);
+        _controlInfo.onSwitchControlMode.RemoveListener(OnControlModeChanged);
+        _controlInfo.onCameraControl.RemoveListener(OnCameraModeActivated);
+        _controlInfo.onStopCameraControl.RemoveListener(OnCameraModeDeactivated);
         
-        if (_data != null)
+        if (_data)
         {
             _data.OnIsPlayerDiedChangedEvent -= PlayerDie;
         }
@@ -96,7 +93,7 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void PlayerDie(bool isDead)
     {
-        isPlayerDead = isDead;
+        _isPlayerDead = isDead;
         UpdateMaterialStates();
     }
 
@@ -126,7 +123,7 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void OnControlModeChanged()
     {
-        if (!isCameraModeActive)
+        if (!_isCameraModeActive)
         {
             UpdateMaterialStates();
         }
@@ -134,34 +131,33 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void OnCameraModeActivated()
     {
-        isCameraModeActive = true;
+        _isCameraModeActive = true;
         UpdateMaterialStates();
     }
 
     private void OnCameraModeDeactivated()
     {
-        isCameraModeActive = false;
+        _isCameraModeActive = false;
         UpdateMaterialStates();
     }
 
     private void UpdateMaterialStates()
     {
-        if (debugDisableAll || isPlayerDead)
+        if (debugDisableAll || _isPlayerDead)
         {
             ResetAllMaterials();
             return;
         }
 
-        if (isCameraModeActive)
+        if (_isCameraModeActive)
         {
-            // 摄像机模式 - 只激活帽子材质
             SetMaterialValue(handMaterial, handMaterial.inactiveValue);
             SetMaterialValue(legMaterial, legMaterial.inactiveValue);
             SetMaterialValue(hatMaterial, hatMaterial.activeValue);
         }
         else
         {
-            switch (controlInfo.mCurrentControlMode)
+            switch (_controlInfo.mCurrentControlMode)
             {
                 case PlayerControlInformationProcess.ControlMode.HandControl:
                     SetMaterialValue(handMaterial, handMaterial.activeValue);
@@ -180,15 +176,15 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void SetMaterialValue(HandMaterialSettings settings, float targetValue)
     {
-        if (settings.targetMaterial == null || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
+        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
             return;
 
-        if (settings.transitionCoroutine != null)
+        if (settings.TransitionCoroutine != null)
         {
-            StopCoroutine(settings.transitionCoroutine);
+            StopCoroutine(settings.TransitionCoroutine);
         }
 
-        settings.transitionCoroutine = StartCoroutine(TransitionMaterial(
+        settings.TransitionCoroutine = StartCoroutine(TransitionMaterial(
             settings.targetMaterial, 
             settings.cutoffProperty, 
             settings.targetMaterial.GetFloat(settings.cutoffProperty), 
@@ -199,15 +195,15 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void SetMaterialValue(LegMaterialSettings settings, float targetValue)
     {
-        if (settings.targetMaterial == null || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
+        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
             return;
 
-        if (settings.transitionCoroutine != null)
+        if (settings.TransitionCoroutine != null)
         {
-            StopCoroutine(settings.transitionCoroutine);
+            StopCoroutine(settings.TransitionCoroutine);
         }
 
-        settings.transitionCoroutine = StartCoroutine(TransitionMaterial(
+        settings.TransitionCoroutine = StartCoroutine(TransitionMaterial(
             settings.targetMaterial, 
             settings.cutoffProperty, 
             settings.targetMaterial.GetFloat(settings.cutoffProperty), 
@@ -218,15 +214,15 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private void SetMaterialValue(HatMaterialSettings settings, float targetValue)
     {
-        if (settings.targetMaterial == null || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
+        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
             return;
 
-        if (settings.transitionCoroutine != null)
+        if (settings.TransitionCoroutine != null)
         {
-            StopCoroutine(settings.transitionCoroutine);
+            StopCoroutine(settings.TransitionCoroutine);
         }
 
-        settings.transitionCoroutine = StartCoroutine(TransitionMaterial(
+        settings.TransitionCoroutine = StartCoroutine(TransitionMaterial(
             settings.targetMaterial, 
             settings.cutoffProperty, 
             settings.targetMaterial.GetFloat(settings.cutoffProperty), 
@@ -237,19 +233,18 @@ public class ControlModeMaterialController : MonoBehaviour
 
     private IEnumerator TransitionMaterial(Material material, string property, float startValue, float targetValue, float speed)
     {
-        float elapsedTime = 0f;
-        float duration = 1f / Mathf.Max(0.01f, speed);
+        var elapsedTime = 0f;
+        var duration = 1f / Mathf.Max(0.01f, speed);
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-            float currentValue = Mathf.Lerp(startValue, targetValue, t);
+            var t = Mathf.Clamp01(elapsedTime / duration);
+            var currentValue = Mathf.Lerp(startValue, targetValue, t);
             material.SetFloat(property, currentValue);
             yield return null;
         }
 
-        // 确保最终值准确
         material.SetFloat(property, targetValue);
     }
 
@@ -257,13 +252,13 @@ public class ControlModeMaterialController : MonoBehaviour
     {
         StopAllCoroutines();
 
-        if (handMaterial.targetMaterial != null && handMaterial.targetMaterial.HasProperty(handMaterial.cutoffProperty))
+        if (handMaterial.targetMaterial && handMaterial.targetMaterial.HasProperty(handMaterial.cutoffProperty))
             handMaterial.targetMaterial.SetFloat(handMaterial.cutoffProperty, handMaterial.inactiveValue);
         
-        if (legMaterial.targetMaterial != null && legMaterial.targetMaterial.HasProperty(legMaterial.cutoffProperty))
+        if (legMaterial.targetMaterial && legMaterial.targetMaterial.HasProperty(legMaterial.cutoffProperty))
             legMaterial.targetMaterial.SetFloat(legMaterial.cutoffProperty, legMaterial.inactiveValue);
         
-        if (hatMaterial.targetMaterial != null && hatMaterial.targetMaterial.HasProperty(hatMaterial.cutoffProperty))
+        if (hatMaterial.targetMaterial && hatMaterial.targetMaterial.HasProperty(hatMaterial.cutoffProperty))
             hatMaterial.targetMaterial.SetFloat(hatMaterial.cutoffProperty, hatMaterial.inactiveValue);
     }
 }
