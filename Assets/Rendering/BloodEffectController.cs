@@ -11,7 +11,7 @@ public class BloodEffectController : MonoBehaviour
     [Tooltip("效果持续时间(秒)")]
     public float effectDuration = 3f;
 
-    private const string FeatureName = "FullScreenPassRendererFeature";
+    private const string FeatureName = "GetHurt";
     private Coroutine _effectCoroutine;
     private ScriptableRendererFeature _rendererFeature;
     

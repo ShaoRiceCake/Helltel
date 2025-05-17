@@ -281,8 +281,8 @@ public class CatchTool : MonoBehaviour
         if (item.itemPrice > 0 && !item.IsPurchase)
         {
             var price = item.itemPrice;
-            var hasEnoughMoney = CheckPlayerMoney(playerID, price);
-        
+            var hasEnoughMoney = CheckPlayerMoney(price);
+            
             if (hasEnoughMoney)
             {
                 DeductPlayerMoney(playerID, price);
@@ -292,7 +292,7 @@ public class CatchTool : MonoBehaviour
             }
             else
             {
-                AudioManager.Instance.Play("无法购买", _catchBall.transform.position, 0.7f);
+                EventBus<UIMessageEvent>.Publish(new UIMessageEvent("资金不足，无法购买！", 2f, UIMessageType.Warning));
                 return;
             }
         }
@@ -349,7 +349,7 @@ public class CatchTool : MonoBehaviour
         return _isGrabbing && _isGrabbingKinematic;
     }
     
-    private bool CheckPlayerMoney(ulong playerId, int price)
+    private bool CheckPlayerMoney(int price)
     {
         return GameController.Instance.GetMoney() >= price;
     }

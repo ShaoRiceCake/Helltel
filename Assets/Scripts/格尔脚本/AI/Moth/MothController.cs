@@ -23,6 +23,8 @@ public enum MothState
     Attached, // 附着
     Dead, // 死亡
 }
+
+
 public class MothController : GuestBase, IHurtable
 {
     [Header("这个虫子属于哪个组")]
@@ -180,6 +182,7 @@ public class MothController : GuestBase, IHurtable
                     _rb.AddForce(Vector3.back * 10f, ForceMode.Impulse); // 向后弹起
                     Debug.Log("开始死亡表现！");
                     _rb.useGravity = true;
+                    IsDead = true;
                 }),
                 new Wait(5.0f), // 表现等待时间，动画时长
                 new Action(() =>

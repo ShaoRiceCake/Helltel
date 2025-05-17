@@ -128,9 +128,9 @@ public class DungeonGenerator : MonoBehaviour
     }
     public void ReSetDungeonValue()
     {
-        mainLength = GameController.Instance._gameData.Level*1+4;
-        branchLength = GameController.Instance._gameData.Level*1+2;
-        branchNumber = GameController.Instance._gameData.Level*1+2;
+        mainLength = GameController.Instance._gameData.Level*1+3;
+        branchLength = GameController.Instance._gameData.Level*1+1;
+        branchNumber = GameController.Instance._gameData.Level*1+1;
         StartCoroutine(DungeonBuild());
     }
 
@@ -298,10 +298,9 @@ public class DungeonGenerator : MonoBehaviour
         // {
         //     tileIndex = Random.Range(0, tilePrefabs.Length);
         // }
-        GameObject tile = Instantiate(tilePrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
+        var tile = Instantiate(tilePrefabs[tileIndex], Vector3.zero, Quaternion.identity, container);
         tile.transform.localScale = Vector3.one * ROOM_SCALE;
         tile.name = tilePrefabs[tileIndex].name;
-        int yRotRandom;
         // 设置随机朝向
         // float yRot;
         // yRotRandom = Random.Range(0, 4);

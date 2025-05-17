@@ -52,9 +52,9 @@ public abstract class PlayerControl_FootControl : PlayerControl_BaseControl
         SubscribeEvents();
     }
 
-    protected new virtual void OnDestroy()
+    protected virtual void OnDestroy()
     {
-        if (controlHandler != null)
+        if (controlHandler)
         {
             UnsubscribeEvents();
         }

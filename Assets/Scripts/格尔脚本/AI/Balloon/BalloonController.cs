@@ -19,7 +19,7 @@ public class BalloonController : GuestBase, IHurtable
     public float explosionRadius = 5f;
     public float explosionDamage = 80f;
     [Header("时间参数")]
-    public float approachTime = 5f; // 追踪
+    public float approachTime = 4.5f; // 追踪
     public float cooldownTime = 20f; // 冷却时间
     
     private float _approachTimer = 0f;
@@ -112,6 +112,7 @@ public class BalloonController : GuestBase, IHurtable
                     if (!_curTarget || !IsNavAgentOnNavmesh()) return;
                     agent.speed = approachSpeed; // 设置追逐速度
                     agent.SetDestination(_curTarget.transform.position); // 追逐目标
+
                 })
             )
         );
@@ -125,6 +126,7 @@ public class BalloonController : GuestBase, IHurtable
                     if (!_curTarget || !IsNavAgentOnNavmesh()) return;
                     agent.speed = approachSpeed; // 设置追逐速度
                     agent.SetDestination(_curTarget.transform.position); // 追逐目标
+                    
                 })
             )
         );
@@ -137,6 +139,7 @@ public class BalloonController : GuestBase, IHurtable
                     () =>
                     {
                         agent.speed = patrolSpeed; // 设置巡逻速度
+                        //AudioManager.Instance.Play("气球巡逻",loop:true,owner:this);
                     }
                 ),
 
@@ -155,6 +158,7 @@ public class BalloonController : GuestBase, IHurtable
         Debug.Log("气球当前血量：" + curHealth.Value);
         if (!(curHealth.Value <= 0)) return;
         BehaviorTree.Blackboard["isDead"] = true;
+        IsDead = true;
         Debug.Log("气球死亡");
         Debug.Log("气球当前血量：" + curHealth.Value);
     }
@@ -170,7 +174,8 @@ public class BalloonController : GuestBase, IHurtable
             var dist = Vector3.Distance(transform.position, hit.transform.position);
             var damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
             GameController.Instance.DeductHealth(damage);
-            
+      
+            AudioManager.Instance.Stop("气球靠近",owner:this);
             AudioManager.Instance.Play("气球爆炸", this.transform.position);
 
             Destroy(gameObject);

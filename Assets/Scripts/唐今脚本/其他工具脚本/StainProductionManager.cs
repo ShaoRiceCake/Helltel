@@ -24,10 +24,13 @@ public class StainProductionManager : MonoBehaviour
     private bool _isEmitting;
     private bool _isDungeonReady;
     private bool _isInitialized;
+    private GameDataModel _gameData;
 
     private void Start()
     {
+        _gameData = Resources.Load<GameDataModel>("GameData");
         Initialize();
+        
     }
 
     private void Initialize()
@@ -35,7 +38,7 @@ public class StainProductionManager : MonoBehaviour
         if (_isInitialized) return;
         
         _isInitialized = true;
-        GameController.Instance._gameData.OnFloorChanged += OnFloorChanged;
+        _gameData.OnFloorChanged += OnFloorChanged;
         DungeonGenerator.OnDungeonBuildCompleted += OnDungeonBuilt;
     }
 
@@ -44,7 +47,7 @@ public class StainProductionManager : MonoBehaviour
         if (!_isInitialized) return;
         
         // 清理事件订阅
-        GameController.Instance._gameData.OnFloorChanged -= OnFloorChanged;
+        _gameData.OnFloorChanged -= OnFloorChanged;
         DungeonGenerator.OnDungeonBuildCompleted -= OnDungeonBuilt;
     }
     private void OnFloorChanged()
@@ -55,7 +58,7 @@ public class StainProductionManager : MonoBehaviour
     private void OnDungeonBuilt(DungeonGenerator generator)
     {
         // 地牢生成完成后才准备污渍布置
-        if (GameController.Instance._gameData.CurrentLoadedScene != GameController.Instance._gameData.dungeon) return;
+        if (_gameData.CurrentLoadedScene != _gameData.dungeon) return;
         _isDungeonReady = true;
         PrepareStainProduction();
     }
@@ -78,7 +81,7 @@ public class StainProductionManager : MonoBehaviour
         }
 
         // 设置发射目标
-        _requiredEmissionTarget = GameController.Instance._gameData.PerformanceTarget * 
+        _requiredEmissionTarget = _gameData.PerformanceTarget * 
                                  (specialEmissionMode ? 4 : 2);
         _totalEmittedCount = 0;
         _isEmitting = true;
@@ -156,8 +159,8 @@ public class StainProductionManager : MonoBehaviour
     // 公开方法用于手动开始污渍布置
     public void StartStainProduction()
     {
-        if (GameController.Instance._gameData.CurrentLoadedScene == 
-            GameController.Instance._gameData.dungeon)
+        if (_gameData.CurrentLoadedScene == 
+            _gameData.dungeon)
         {
             PrepareStainProduction();
         }

@@ -27,8 +27,8 @@ public class DamageNumberProcess : MonoBehaviour
 
     private void OnMonsterHurt(MonsterHurtEvent hurtEvent)
     {
+        if(hurtEvent.damage == 0) return;
         var displayPosition = hurtEvent.hurtPosition + Vector3.up * yOffset;
         var damageNumber = numberPrefab.Spawn(displayPosition, hurtEvent.damage);
-        // damageNumber.SetScale(0.5f + hurtEvent.damage * 0.5f, 0);
     }
 }

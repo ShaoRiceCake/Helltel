@@ -576,7 +576,7 @@ namespace Michsky.LSS
         // ========== 内部变量 ==========
         public int spinnerHelper;                     // 加载动画类型辅助变量
         public bool updateHelper = false;              // 更新辅助标记
-        private bool onFinishInvoked = false;          // 完成事件触发标记
+        // private bool onFinishInvoked = false;          // 完成事件触发标记
         //public static bool processLoading = false;     // 加载过程状态标记
         private static bool fcgHelper = false;         // CanvasGroup辅助标记
         private static string sceneHelper;             // 场景名称临时存储
@@ -659,7 +659,7 @@ namespace Michsky.LSS
 
                 // 强制设置Canvas可见
                 instance.canvasGroup.alpha = 1;
-                Debug.Log("1");
+
             }
             catch { Debug.LogError("<b>[LSS]</b> Prefab加载失败: Resources/Loading Screens/" + prefabName); }
         }
@@ -672,7 +672,7 @@ namespace Michsky.LSS
                 vltTimer += Time.unscaledDeltaTime;
                 progressBar.value = Mathf.Clamp01(vltTimer / virtualLoadingTimer);
                 statusObj.text = $"{(progressBar.value * 100):F0}%";
-                Debug.Log("2");
+  
 
                 // 虚拟时间结束后直接销毁
                 if (vltTimer >= virtualLoadingTimer)
@@ -680,7 +680,7 @@ namespace Michsky.LSS
                     // 直接加载使用（注意资源路径大小写敏感）
                     GameDataModel data = Resources.Load<GameDataModel>("GameData");
                     data?.SendFinishLoading();
-                    Debug.Log("3");
+              
                     
                     
                     enableFading = true;
@@ -691,13 +691,14 @@ namespace Michsky.LSS
             // 处理淡出逻辑
             if (enableFading)
             {
-                Debug.Log("4");
+         
                 canvasGroup.alpha -= fadingAnimationSpeed * Time.unscaledDeltaTime;
+                
                 
                 // 完全透明后销毁对象
                 if (canvasGroup.alpha <= 0)
                 {
-                    Debug.Log("5");
+                    
                     Destroy(gameObject);
                 }
             }

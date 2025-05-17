@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace Helltal.Gelercat
 {
-    public class GuestBase:MonoBehaviour
+    public class GuestBase:MonoBehaviour,IDie
     {
         // 同步transform，基础数据
         // 基础属性
@@ -29,10 +29,9 @@ namespace Helltal.Gelercat
 
         public GuestPresenter presenter;  // 表现层的api，动画用animator控制器控制
 
-        public Root BehaviorTree;
+        public NPBehave.Root BehaviorTree; // 显式声明命名空间
 
         public GameObject _curTarget;
-
 
         protected virtual void Update()
         {
@@ -49,7 +48,6 @@ namespace Helltal.Gelercat
             }
             else
             {
-                // 只有完全停止后才能重新启动
                 if (BehaviorTree.CurrentState == NPBehave.Node.State.INACTIVE && !BehaviorTree.IsActive)
                 {
                     BehaviorTree.Start();
@@ -61,10 +59,7 @@ namespace Helltal.Gelercat
         {
             return playerItemDetector && playerItemDetector.isDetectPlayer;
         }
-        
-        /// <summary>
-        /// 在这里写组件初始化逻辑 
-        /// </summary>
+
         protected virtual void Awake()
         {
             // if (!IsHost && NetworkManager.Singleton) return;
@@ -126,5 +121,7 @@ namespace Helltal.Gelercat
             if (BehaviorTree is not { IsActive: true }) return;
             BehaviorTree.Stop();
         }
+
+        public bool IsDead { get; set; }
     }
 }

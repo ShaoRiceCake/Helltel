@@ -23,12 +23,12 @@ public class ItemMagicLight : ActiveItem
     protected override void Awake()
     {
         base.Awake();
-        if (pointLight == null) pointLight = GetComponent<Light>();
-        if (triggerCollider == null) triggerCollider = GetComponent<Collider>();
+        if (!pointLight) pointLight = GetComponent<Light>();
+        if (!triggerCollider) triggerCollider = GetComponent<Collider>();
 
-        if (triggerCollider != null) triggerCollider.isTrigger = true;
+        if (triggerCollider) triggerCollider.isTrigger = true;
 
-        if (pointLight != null)
+        if (pointLight)
         {
             _originalIntensity = pointLight.intensity;
             pointLight.color = startColor; // 初始化颜色
@@ -55,7 +55,7 @@ public class ItemMagicLight : ActiveItem
             if (pointLight)
             {
                 // 同时渐变亮度和颜色
-                float progress = elapsedTime / activationTime;
+                var progress = elapsedTime / activationTime;
                 pointLight.intensity = Mathf.Lerp(_originalIntensity, targetIntensity, progress);
                 pointLight.color = Color.Lerp(startColor, endColor, progress);
             }
@@ -63,11 +63,10 @@ public class ItemMagicLight : ActiveItem
             yield return null;
         }
 
-        if (pointLight)
-        {
-            pointLight.intensity = targetIntensity;
-            pointLight.color = endColor; // 确保最终颜色准确
-        }
+        if (!pointLight) yield break;
+        pointLight.intensity = targetIntensity;
+        pointLight.color = endColor; // 确保最终颜色准确
+        AudioManager.Instance.Play("魔法灯激活",transform.position);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -78,8 +77,16 @@ public class ItemMagicLight : ActiveItem
         
         var effect = PlayEffect(monsterHitEffect, transform.position);
 
+        if (other.gameObject.GetComponentInParent<IHurtable>() is { } hurtable)
+        {
+            hurtable.TakeDamage(100); 
+        }
+        
+        AudioManager.Instance.Play("魔法灯爆炸",transform.position);
+        
         if (IsGrabbed)
         {
+            GameController.Instance.DeductHealth(100);
             SelfDetach(true);
         }
         else

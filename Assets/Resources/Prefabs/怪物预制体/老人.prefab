@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3603382873
+  GlobalObjectIdHash: 1624158115
   InScenePlacedSourceGlobalObjectIdHash: 1624158115
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -70,20 +70,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d95f6e5dd3916a48a017a18614afe59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpawnCount: 100
+  maxSpawnCount: 1
   maxHealth: 15
   curHealth:
     m_InternalValue: 0
-  entropyValue: 0
-  DEBUG_STOP_BEHAVIOR_TREE: 0
-  Debugging: 1
+  entropyValue: 15
+  playerItemDetector: {fileID: 0}
+  debugStopBehaviorTree: 0
+  debugging: 0
   navPointsManager: {fileID: 0}
   agent: {fileID: 0}
   presenter: {fileID: 0}
-  sensor: {fileID: 0}
-  EnemyList: []
-  aiState:
-    m_InternalValue: 0
+  _curTarget: {fileID: 0}
   waitingTimer: 10
   happyTimer: 10
   lonelyDeathMin: 12

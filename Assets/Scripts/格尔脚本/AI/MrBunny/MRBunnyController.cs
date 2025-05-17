@@ -52,14 +52,9 @@ public class MRBunnyController : GuestBase, IHurtable
                         BuildChesingBranch(), // 追击
                         BuildPatrolBranch() // 巡逻 
                     )
-
                 )
-
             )
-
-
         );
-
     }
     private Node BuildChesingBranch()
     {
@@ -182,6 +177,7 @@ public class MRBunnyController : GuestBase, IHurtable
             curHealth.Value = 0;
             Debug.Log("MR-Bunny死亡！当前血量：" + curHealth.Value);
             BehaviorTree.Blackboard["isDead"] = true; // 设置死亡标志
+            IsDead = true;
         }
         else
         {

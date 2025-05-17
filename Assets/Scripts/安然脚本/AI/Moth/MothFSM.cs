@@ -4,12 +4,12 @@ using UnityEngine;
 using Unity.Netcode;
 public class MothFSM : FSM,IHurt
 {
-    [Header("µ±Ç°Ä¿±êÍæ¼Ò")] public List<GameObject> targets = new List<GameObject>();
-    [Header("ÉËº¦")] public float damage = 15f;
+    [Header("ï¿½ï¿½Ç°Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½")] public List<GameObject> targets = new List<GameObject>();
+    [Header("ï¿½Ëºï¿½")] public float damage = 15f;
 
-    [Header("½øÈë·õ»¯µÄÅö×²¾àÀë")] public float distance;
-    [Header("ÊÇ·ñÎªÁìÍ·¶ê")] public bool IsLeader;
-    [Header("ÓðÒÂ¶ê×é")] public List<MothFSM> moths=new List<MothFSM>();
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½")] public float distance;
+    [Header("ï¿½Ç·ï¿½Îªï¿½ï¿½Í·ï¿½ï¿½")] public bool IsLeader;
+    [Header("ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ï¿½")] public List<MothFSM> moths=new List<MothFSM>();
     public Animator animator;
     protected override void Init()
     {
@@ -31,7 +31,7 @@ public class MothFSM : FSM,IHurt
         base.Init();
     }
 
-    public virtual MothFSM GetLeader()//·õ»¯ÁìÍ·¶ê
+    public virtual MothFSM GetLeader()//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½
     {
         MothFSM leader = null;
         float shorter = Mathf.Infinity;
@@ -47,7 +47,7 @@ public class MothFSM : FSM,IHurt
         return leader;
     }
 
-    public virtual GameObject GetNearTarget()//Íæ¼ÒÄÚ¾àÀëÁìÍ·¶ê×î½üµÄ
+    public virtual GameObject GetNearTarget()//ï¿½ï¿½ï¿½ï¿½Ú¾ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         GameObject target = null;
         float shorter = Mathf.Infinity;
@@ -87,7 +87,7 @@ public class MothFSM : FSM,IHurt
     }
 }
 /// <summary>
-/// ¼ë
+/// ï¿½ï¿½
 /// </summary>
 public class MothCocoon : IState
 {
@@ -123,7 +123,7 @@ public class MothCocoon : IState
     }
 }
 /// <summary>
-/// ·õ»¯
+/// ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class MothIncubate : IState
 {
@@ -158,7 +158,7 @@ public class MothIncubate : IState
     }
 }
 /// <summary>
-/// ×Ô¶¯Ñ°Â·
+/// ï¿½Ô¶ï¿½Ñ°Â·
 /// </summary>
 public class MothChasing : IState
 {
@@ -202,14 +202,14 @@ public class MothChasing : IState
         }
         else
         {
-            manager.SetDestination(manager.GetLeader().transform);//²»ÊÇÁìÍ·¶ê¸úËæÁìÍ·¶ê
+            manager.SetDestination(manager.GetLeader().transform);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½
 
         }
 
     }
 }
 /// <summary>
-/// ¼¤Å­
+/// ï¿½ï¿½Å­
 /// </summary>
 public class MothAnger : IState
 {
@@ -254,12 +254,12 @@ public class MothAnger : IState
     }
 }
 /// <summary>
-/// ÂþÓÎ
+/// ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class MothPatrol : IState
 {
     MothFSM manager;
-    float waitTimer = 3f;
+    // float waitTimer = 3f;
     float waitime = 0;
     int waypointIndex = 0;
     int waypointlenth;
