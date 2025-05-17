@@ -65,14 +65,14 @@ namespace Helltal.Gelercat
                 )
             );
         }
-
+        
         private NavPoint GetClosestUnvisitedNavPoint()
         {
             NavPoint closest = null;
             float minDist = float.MaxValue;
             Vector3 pos = transform.position;
 
-            foreach (var nav in navPointsManager.GetNavPoints())
+            foreach (var nav in navPointsManager.GetNearestPoints(pos))
             {
                 if (nav == null || visitDict.ContainsKey(nav)) continue;
 
