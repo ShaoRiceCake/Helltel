@@ -13,6 +13,7 @@ public class cocoonController : MonoBehaviour
     [Header("所属虫群")] public MothGroupController mothGroup;
     [Header("连锁范围")] public float chainDistance = 5f;
 
+    private MaterialFadeAndDestroy materialController;
     public Animator animator;
 
     private bool hatchlock = false;
@@ -28,6 +29,7 @@ public class cocoonController : MonoBehaviour
         }
         collider.convex = true;
         collider.isTrigger = true; // ✅ 使用 Trigger 检测
+        materialController = GetComponent<MaterialFadeAndDestroy>();
     }
 
     public void OnTriggerEnter(Collider other)
@@ -80,8 +82,8 @@ public class cocoonController : MonoBehaviour
         }
 
         // 动画播放完毕后销毁本体
-        yield return new WaitForSeconds(1f); // 确保动画完成
-        Destroy(gameObject); // 销毁自身
+        yield return new WaitForSeconds(1.5f); // 确保动画完成
+        materialController.StartFadeAndDestroy();
     }
 
     void OnDrawGizmos()
