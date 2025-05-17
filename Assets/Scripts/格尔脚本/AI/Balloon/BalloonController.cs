@@ -89,10 +89,11 @@ public class BalloonController : GuestBase, IHurtable
 
     private IEnumerator ExplodeCoroutine()
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
         Explode();
     }
     
+    bool audioLock = false;
     private Node BuildApproachBranch()
     {
         // 追逐状态
@@ -102,7 +103,10 @@ public class BalloonController : GuestBase, IHurtable
                 {
                     _approachTimer = approachTime; // 刷新追逐时间
                     _isApproaching = true; // 设置追逐状态
+
+
                 }),
+
                 new Action(() =>
                 {
                     if (!_curTarget || !IsNavAgentOnNavmesh()) return;
