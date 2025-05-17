@@ -122,6 +122,11 @@ namespace Helltal.Gelercat
             BehaviorTree.Stop();
         }
 
+
+        protected virtual void Die()
+        {
+            
+        }
         public bool IsDead { get; set; }
     }
 }

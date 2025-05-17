@@ -13,6 +13,9 @@ public class MothGroupController : GuestBase
     [Header("虫群的碰撞范围")]
     public float collisionDist = 5f; //判定为最近的虫子的最小范围值(具有碰撞风险)
 
+    [Header("虫群最低数量")]
+    public int minMothCount = 3;
+
 
     [Header("速度匹配系数")]
     public float velocityMatchingAmt = 0.01f; //与 附近的虫子的平均速度 乘数(影响新速度)
@@ -35,7 +38,7 @@ public class MothGroupController : GuestBase
     protected override void Start()
     {
         base.Start();
-        
+
         BehaviorTree = GetBehaviorTree();
 
 #if UNITY_EDITOR
@@ -76,15 +79,16 @@ public class MothGroupController : GuestBase
     {
         return new Root(
             new Selector(
+                new Condition(() => { if (_mothList.Count > minMothCount) return false; else return true; }, Stops.IMMEDIATE_RESTART,
+                    new WaitUntilStopped()
+                ),
+                BuildChasingBranch(),
+                new Condition(IsNavAgentOnNavmesh,
+                    new Repeater(
+                        new Cooldown(1f,
+                        new Patrol(agent, navPointsManager))
+                    )){Label = "Patrol"}
 
-                BuildChasingBranch(),//追击分支
-                new Selector(
-                    new Condition(IsNavAgentOnNavmesh,
-                        new Repeater(
-                            new Cooldown(1f,
-                            new Patrol(agent, navPointsManager))
-                        ))
-                    )
             )
         );
     }

@@ -12,6 +12,7 @@ public class cocoonController : MonoBehaviour
     [Header("触发后孵卵时间范围")] public Vector2 hatchTimeRange = new Vector2(0.2f, 0.8f);
     [Header("所属虫群")] public MothGroupController mothGroup;
     [Header("连锁范围")] public float chainDistance = 5f;
+    [Header("孵化出几只")] public int hatchCount = 1;
 
     private MaterialFadeAndDestroy materialController;
     public Animator animator;
@@ -61,11 +62,15 @@ public class cocoonController : MonoBehaviour
         // 实例化蛾子
         if (mothPrefab != null)
         {
-            GameObject mothGO = Instantiate(mothPrefab, transform.position, Quaternion.identity);
-            MothController moth = mothGO.GetComponent<MothController>();
-            if (moth != null)
+            for (int i = 0; i < hatchCount; i++)
             {
-                moth.Init(mothGroup);
+                Vector3 offset = Random.insideUnitSphere * 0.5f; // 随机偏移
+                GameObject mothGO = Instantiate(mothPrefab, transform.position+offset, Quaternion.identity);
+                MothController moth = mothGO.GetComponent<MothController>();
+                if (moth != null)
+                {
+                    moth.Init(mothGroup);
+                }
             }
         }
 
