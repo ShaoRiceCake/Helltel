@@ -42,8 +42,10 @@ public class MRBunnyController : GuestBase, IHurtable
     {
         _getDamageNode = BuildGetDamageBranch(); // 受伤被打断
         _attackNode = BuildAttackBranch(); // 攻击被打断
+        // MyClock clock = new MyClock();
+        // return new Root(new Blackboard(clock) , clock,
         return new Root(
-            new Selector(
+            new Selector( 
                 BuildDeadBranch(),
                 new Selector(
                     _getDamageNode,

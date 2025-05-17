@@ -48,8 +48,7 @@ public class MothController : GuestBase, IHurtable
     public int attachDamage = 2; // 附着伤害
     [Header("虫子冲刺伤害")]
     public int dashDamage = 2; // 冲刺伤害
-
-
+    
     private Vector3 _dashTarget; // 冲刺目标位置
 
 
@@ -245,6 +244,11 @@ public class MothController : GuestBase, IHurtable
     private Node BuildAttachingBranch()
     {
         return new BlackboardCondition("State", Operator.IS_EQUAL, MothState.Attached.ToString(), Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+            new Sequence(
+            new Action(() =>
+            {
+                presenter.SetTrigger("attack"); // 播放附着动画
+            }),
             new Service(
                 3.0f, // 每 1 秒执行一次
                 () =>
@@ -253,7 +257,7 @@ public class MothController : GuestBase, IHurtable
                     GameController.Instance.DeductHealth(attachDamage); // 扣除玩家血量
                 },
                 new WaitUntilStopped()
-            )
+            ))
         );
     }
 
