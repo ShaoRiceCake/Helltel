@@ -14,7 +14,6 @@ public class PlayerDieController : MonoBehaviour
     [Header("References")]
     [SerializeField]  private GameObject upCube;
     private Coroutine _deathSequenceCoroutine;
-
     
 
     private void Awake()
