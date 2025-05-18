@@ -20,6 +20,7 @@ namespace Helltal.Gelercat
 
         [Header("触发奖励时间")] public float triggerRewardTime = 3f; // 触发奖励时间
         public LayerMask TriggerMask; // 触发器层级
+        private Transform moneySpendPoint; // 钱袋生成位置 
         bool DEBUG_chatting = false;
 
         private Collider aroundCollider; // 触发器  玩家如果进入，就开启
@@ -44,6 +45,7 @@ namespace Helltal.Gelercat
             BehaviorTree.Blackboard["Happying"] = false; // 高兴标志
             Debug.Log("presenter:" + presenter.isActiveAndEnabled);
 
+            moneySpendPoint = transform.Find("金币点");
         }
         protected override void Start()
         {
@@ -255,25 +257,30 @@ namespace Helltal.Gelercat
             // TODO: 生成一个钱袋物体，金币数量为 amount
 
             Debug.Log("爆金币:" + amount);
-            GameObject coinBag = Instantiate(moneybag, transform.position, Quaternion.identity);
-            MoneyPackage moneyPackage = coinBag.GetComponent<MoneyPackage>();
-            if (moneyPackage != null)
+            for (int i = 0; i < amount; i++)
             {
-                moneyPackage.Init(amount);
-            }
-            // 给钱袋一个随机的抛物线
-            // 给钱袋一个随机的抛物线（需要 Rigidbody 组件）
-            Rigidbody rb = coinBag.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                Vector3 randomDir = new Vector3(
-                   UnityEngine.Random.Range(-1f, 1f),     // 左右
-                    1f,                        // 向上（保证一定抛物线）
-                    UnityEngine.Random.Range(-1f, 1f)      // 前后
-                ).normalized;
+                // Instantiate(moneybag, transform.position, Quaternion.identity);
 
-                float force = UnityEngine.Random.Range(4f, 7f); // 可调的爆炸力度
-                rb.AddForce(randomDir * force, ForceMode.Impulse);
+                GameObject coinBag = Instantiate(moneybag, moneySpendPoint.position, Quaternion.identity);
+                MoneyPackage moneyPackage = coinBag.GetComponent<MoneyPackage>();
+                if (moneyPackage != null)
+                {
+                    moneyPackage.Init(amount);
+                }
+                // 给钱袋一个随机的抛物线
+                // 给钱袋一个随机的抛物线（需要 Rigidbody 组件）
+                Rigidbody rb = coinBag.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    Vector3 randomDir = new Vector3(
+                       UnityEngine.Random.Range(-1f, 1f),     // 左右
+                        1.4f,                        // 向上（保证一定抛物线）
+                        UnityEngine.Random.Range(-1f, 1f)      // 前后
+                    ).normalized;
+
+                    float force = UnityEngine.Random.Range(7f, 12f); // 可调的爆炸力度
+                    rb.AddForce(randomDir * force, ForceMode.Impulse);
+                }
             }
 
         }
@@ -355,6 +362,15 @@ namespace Helltal.Gelercat
                 playerstayTimmer = 0f;
                 isPlayerChatting = false;
                 hasTriggeredReward = false;
+            }
+        }
+        void OnDrawGizmos()
+        {
+            //画出触发器的范围
+            if (aroundCollider != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawWireSphere(aroundCollider.bounds.center, aroundCollider.bounds.extents.magnitude);
             }
         }
     }
