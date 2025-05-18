@@ -24,7 +24,7 @@ public class BalloonController : GuestBase, IHurtable
     public float explosionForce = 1000f; // 爆炸力度
     private float _approachTimer = 0f;
     private float _cooldownTimer = 0f;
-    [Header("特效")]    
+    [Header("特效")]
     public GameObject effectPrefab; // 预制体引用
     private bool _isApproaching = false;
     private bool _isCoolingDown = false;
@@ -225,16 +225,17 @@ public class BalloonController : GuestBase, IHurtable
                 {
                     // 计算方向与爆炸力
                     Vector3 forceDir = (moveBodyBall.position - effectAnchor.position).normalized;
-                    
+
                     rb.AddForce(forceDir * explosionForce, ForceMode.Impulse);
-                }
+                }            // 插值伤害（以Player根节点为距离参考）
+                float dist = Vector3.Distance(transform.position, playerRoot.position);
+                int damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
+
+                GameController.Instance.DeductHealth(damage);
                 break; // 找到第一个就可以了
             }
 
-            // 插值伤害（以Player根节点为距离参考）
-            float dist = Vector3.Distance(transform.position, playerRoot.position);            
-            int damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
-            GameController.Instance.DeductHealth(damage);
+
         }
 
         // 音效与销毁
@@ -244,7 +245,7 @@ public class BalloonController : GuestBase, IHurtable
         var fx = Instantiate(effectPrefab, effectAnchor.position, Quaternion.identity);
         fx.transform.localScale = new Vector3(2, 2, 2);
         Destroy(fx, 1f);
-        Destroy(this.gameObject,0.05f);
+        Destroy(this.gameObject, 0.05f);
     }
     protected override void Update()
     {

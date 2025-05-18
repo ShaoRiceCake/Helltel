@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 8488402764156901410}
   - component: {fileID: 158822353667299993}
   - component: {fileID: 5120103752615298807}
+  - component: {fileID: 5910744853537280454}
   m_Layer: 0
   m_Name: HandCollider
   m_TagString: Untagged
@@ -278,6 +279,20 @@ MonoBehaviour:
   filter: -65535
   m_SourceCollider: {fileID: 158822353667299993}
   m_DistanceField: {fileID: 0}
+--- !u!114 &5910744853537280454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6190950602777215882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cd64b4c21c484b429b478c5b74a3278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackCooldown: 0.5
+  attackDamage: 1
 --- !u!1 &6375525739977248810
 GameObject:
   m_ObjectHideFlags: 0
@@ -293,6 +308,7 @@ GameObject:
   - component: {fileID: 8656896629570063737}
   - component: {fileID: 9164307098666651071}
   - component: {fileID: 1121860557329012149}
+  - component: {fileID: 3333183056601652626}
   m_Layer: 0
   m_Name: HandCollider
   m_TagString: Untagged
@@ -435,6 +451,20 @@ MonoBehaviour:
   filter: -65535
   m_SourceCollider: {fileID: 9164307098666651071}
   m_DistanceField: {fileID: 0}
+--- !u!114 &3333183056601652626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6375525739977248810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cd64b4c21c484b429b478c5b74a3278, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackCooldown: 0.5
+  attackDamage: 1
 --- !u!1001 &6013943870583406734
 PrefabInstance:
   m_ObjectHideFlags: 0
