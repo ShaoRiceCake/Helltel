@@ -2,7 +2,7 @@ using System.Linq;
 using Helltal.Gelercat;
 using NPBehave;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class MRBunnyController : GuestBase, IHurtable
 {
@@ -18,12 +18,12 @@ public class MRBunnyController : GuestBase, IHurtable
 
     [Header("搜索精度")]
     public float searchAccuracy = 5f; // 搜索精度
-    
+
     private Node _getDamageNode;
     private Node _attackNode;
     private bool _canAttack = true;
 
-    
+
     protected override void Start()
     {
         base.Start();
@@ -45,7 +45,7 @@ public class MRBunnyController : GuestBase, IHurtable
         // MyClock clock = new MyClock();
         // return new Root(new Blackboard(clock) , clock,
         return new Root(
-            new Selector( 
+            new Selector(
                 BuildDeadBranch(),
                 new Selector(
                     _getDamageNode,
@@ -60,10 +60,16 @@ public class MRBunnyController : GuestBase, IHurtable
     }
     private Node BuildChesingBranch()
     {
-        return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY,
+        return new Condition(IsEnemyCanSee, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
+        new Sequence(
             new Action(() =>
             {
                 Debug.Log("MR-Bunny追击目标！");
+                // 开始播放音效等
+            }),
+            new Service(0.05f,
+           () => //
+            {
                 if (!_curTarget || !agent.isOnNavMesh) return;
                 var distance = Vector3.Distance(transform.position, _curTarget.transform.position);
                 if (distance <= attackDistance)
@@ -76,11 +82,12 @@ public class MRBunnyController : GuestBase, IHurtable
                     agent.SetDestination(_curTarget.transform.position);
                     agent.speed = (distance >= chaseDistance) ? moveSpeed : chaseSpeed;
                 }
-            }));
+            }, new WaitUntilStopped())
+));
     }
 
 
-    
+
     private Node BuildPatrolBranch()
     {
         return new Condition(IsNavAgentOnNavmesh, Stops.NONE,
@@ -92,15 +99,10 @@ public class MRBunnyController : GuestBase, IHurtable
                         agent.speed = moveSpeed;
                     }
                 ),
-
-                new Repeater(
-                new Cooldown(1f,
-                new Patrol(agent, navPointsManager,searchAccuracy))
-            ))
-
+                new Patrol(agent, navPointsManager, searchAccuracy))
         );
     }
-    
+
     private Node BuildDeadBranch()
     {
         var branch = new BlackboardCondition("isDead", Operator.IS_EQUAL, true, Stops.SELF,
@@ -114,7 +116,7 @@ public class MRBunnyController : GuestBase, IHurtable
             ));
         return branch;
     }
-    
+
     private Node BuildGetDamageBranch()
     {
         return new BlackboardCondition("getDamage", Operator.IS_EQUAL, true, Stops.IMMEDIATE_RESTART,
@@ -143,7 +145,7 @@ public class MRBunnyController : GuestBase, IHurtable
         Debug.Log("监听到：受伤结束！");
         BehaviorTree.Blackboard["getDamage"] = false; // 重置受伤标志
     }
-    
+
     private Node BuildAttackBranch()
     {
 
@@ -159,7 +161,7 @@ public class MRBunnyController : GuestBase, IHurtable
         )
     );
     }
-    
+
     // 监听攻击结束
     private void OnAttackEnd()
     {
@@ -171,8 +173,8 @@ public class MRBunnyController : GuestBase, IHurtable
         _attackNode.Stop();  // 强制退出攻击节点
         Debug.Log("强制退出攻击节点！");
     }
-    
-   public void TakeDamage(int damage)
+
+    public void TakeDamage(int damage)
     {
         if (damage >= curHealth.Value)
         {

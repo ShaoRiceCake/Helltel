@@ -72,7 +72,7 @@ namespace Helltal.Gelercat
             float minDist = float.MaxValue;
             Vector3 pos = transform.position;
 
-            foreach (var nav in navPointsManager.GetNearestPoints(pos))
+            foreach (var nav in navPointsManager.GetNearestPointsList(pos))
             {
                 if (nav == null || visitDict.ContainsKey(nav)) continue;
 

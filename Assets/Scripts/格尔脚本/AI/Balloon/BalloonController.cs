@@ -50,16 +50,15 @@ public class BalloonController : GuestBase, IHurtable
                 new Selector(
                     new Condition(IsNavAgentOnNavmesh, Stops.IMMEDIATE_RESTART,
                         new Selector(
-                            new Condition(() => !_isCoolingDown, Stops.IMMEDIATE_RESTART,
+                            new Condition(() => !_isCoolingDown, Stops.LOWER_PRIORITY,
                                 new Selector(
                                     BuildApproachBranch(),
                                     BuildcantseeApproachBranch()
                                 )
-                            ),
-
+                            ){Label="notCoolingDown"},
                             BuildPatrolBranch()
                         )
-                    )
+                    ){Label="NavAgentOnNavmesh"}
 
                 )
             )
@@ -139,14 +138,10 @@ public class BalloonController : GuestBase, IHurtable
                     () =>
                     {
                         agent.speed = patrolSpeed; // 设置巡逻速度
-                        //AudioManager.Instance.Play("气球巡逻",loop:true,owner:this);
+                        AudioManager.Instance.Play("气球巡逻",loop:true,owner:this);
                     }
-                ),
-
-                new Repeater(
-                new Cooldown(1f,
-                new Patrol(agent, navPointsManager, detectRadius))
-            )
+                ){},
+                new Patrol(agent, navPointsManager, detectRadius){Label = "Patrol" }
             );
     }
 
