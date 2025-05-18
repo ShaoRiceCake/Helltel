@@ -38,7 +38,10 @@ namespace NPBehave
         {
             Debug.Log("Patrol: Stopped");
             this.Clock.RemoveUpdateObserver(OnUpdate);
-            agent.ResetPath();
+            if(agent != null && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+            }
             this.Stopped(true);
         }
 
