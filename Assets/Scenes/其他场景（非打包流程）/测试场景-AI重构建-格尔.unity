@@ -607,50 +607,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8689129577026789891, guid: ba2d581a5b461a54e829a42170af2822, type: 3}
   m_PrefabInstance: {fileID: 504026204}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &476236579
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 476236581}
-  - component: {fileID: 476236580}
-  m_Layer: 0
-  m_Name: ComputeCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &476236580
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476236579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &476236581
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 476236579}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &476870394 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9155265390297421893, guid: ba2d581a5b461a54e829a42170af2822, type: 3}
@@ -705,11 +661,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61429af3e7e75b14baec1e4fd223668a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  alwaysDrawPath: 0
-  drawAsLoop: 0
-  drawNumbers: 1
-  debugColour: {r: 1, g: 1, b: 1, a: 1}
-  gridCellSize: 30
+  maxPointsPerLeaf: 16
+  kNearest: 5
 --- !u!1001 &504026204
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2426,6 +2379,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5796865201664423073, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
   m_PrefabInstance: {fileID: 1109963267}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1394552469
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1394552471}
+  - component: {fileID: 1394552470}
+  m_Layer: 0
+  m_Name: ComputeCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1394552470
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394552469}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1394552471
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394552469}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1395121438 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5796865201664423073, guid: be26121abefa79d4f89ea2d31604d834, type: 3}
@@ -3595,6 +3592,14 @@ PrefabInstance:
       propertyPath: hatchCount
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1076796923934645190, guid: 447f928ba80778644b672cb4d13b8b45, type: 3}
+      propertyPath: hatchTimeRange.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1076796923934645190, guid: 447f928ba80778644b672cb4d13b8b45, type: 3}
+      propertyPath: hatchTimeRange.y
+      value: 3.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2334000213802096226, guid: 447f928ba80778644b672cb4d13b8b45, type: 3}
       propertyPath: m_Name
       value: "\u8327"
@@ -4131,4 +4136,4 @@ SceneRoots:
   - {fileID: 504026204}
   - {fileID: 7320399561019556281}
   - {fileID: 4332039028568741906}
-  - {fileID: 476236581}
+  - {fileID: 1394552471}
