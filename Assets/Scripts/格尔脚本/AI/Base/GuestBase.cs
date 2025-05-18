@@ -7,10 +7,8 @@ using UnityEngine.Serialization;
 
 namespace Helltal.Gelercat
 {
-    public class GuestBase:MonoBehaviour,IDie
+    public class GuestBase: MonoBehaviour,IDie
     {
-        // 同步transform，基础数据
-        // 基础属性
         [Header("最大生成数")] public int maxSpawnCount = 100;
         [Header("最大生命值")] public int maxHealth = 15;
         [Header("当前生命值")] public NetworkVariable<float> curHealth = new NetworkVariable<float>();

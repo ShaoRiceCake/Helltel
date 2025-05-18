@@ -9,7 +9,7 @@ using UnityEngine;
 public class cocoonController : MonoBehaviour
 {
     [Header("羽衣蛾预制体")] public GameObject mothPrefab;
-    [Header("触发后孵卵时间范围")] public Vector2 hatchTimeRange = new Vector2(0.2f, 0.8f);
+    [Header("触发后孵卵时间范围")] public Vector2 hatchTimeRange = new Vector2(3.5f, 5f);
     [Header("所属虫群")] public MothGroupController mothGroup;
     [Header("连锁范围")] public float chainDistance = 5f;
     [Header("孵化出几只")] public int hatchCount = 1;
@@ -58,7 +58,7 @@ public class cocoonController : MonoBehaviour
     {
         float delay = Random.Range(hatchTimeRange.x, hatchTimeRange.y);
         yield return new WaitForSeconds(delay);
-
+        AudioManager.Instance.Play("蛾子孵化",transform.position);
         // 实例化蛾子
         if (mothPrefab != null)
         {
@@ -87,7 +87,7 @@ public class cocoonController : MonoBehaviour
         }
 
         // 动画播放完毕后销毁本体
-        yield return new WaitForSeconds(1.5f); // 确保动画完成
+        yield return new WaitForSeconds(0.5f); // 确保动画完成
         materialController.StartFadeAndDestroy();
     }
 

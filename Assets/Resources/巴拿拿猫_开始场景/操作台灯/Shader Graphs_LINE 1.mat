@@ -7,28 +7,26 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: "\u4E94\u989C\u516D\u8272\u5C0F\u6309\u952E 2"
-  m_Shader: {fileID: -6465566751694194690, guid: f8ec870d1e9870941b85e97e17b71f91, type: 3}
+  m_Name: Shader Graphs_LINE 1
+  m_Shader: {fileID: -6465566751694194690, guid: 33011a2a2b73d824882d395989ce8f13, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALPHAPREMULTIPLY_ON
   - _ALPHATEST_ON
-  - _SURFACE_TYPE_TRANSPARENT
+  - _SPECULAR_SETUP
   m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap:
-    RenderType: Transparent
-  disabledShaderPasses:
-  - DepthOnly
+    RenderType: TransparentCutout
+  disabledShaderPasses: []
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _base_color:
+    - _Texture2D:
         m_Texture: {fileID: 2800000, guid: 1396cee8e55634648a10ec59b18f57a4, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -46,28 +44,32 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _: 0.2
     - _AlphaClip: 1
-    - _AlphaToMask: 0
+    - _AlphaToMask: 1
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _CastShadows: 1
     - _Cull: 0
-    - _DstBlend: 10
+    - _DstBlend: 0
+    - _Float: 1.83
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _SPEED: 1.4
+    - _SCALE: 1.77
     - _SrcBlend: 1
-    - _Surface: 1
-    - _WorkflowMode: 1
+    - _Surface: 0
+    - _WorkflowMode: 0
     - _ZTest: 4
-    - _ZWrite: 0
+    - _ZWrite: 1
     - _ZWriteControl: 0
     m_Colors:
-    - _Color: {r: 5.5908804, g: 5.5908804, b: 5.5908804, a: 0}
+    - _: {r: 19.468575, g: 8.485359, b: 8.485359, a: 0}
+    - _Color_1: {r: 1024, g: 678.15845, b: 678.15845, a: 0.7058824}
+    - _Vector2: {r: 0.56, g: 0.19, b: 0, a: 0}
+    - _Vector4: {r: 0.7, g: 0.5, b: 0.5, a: 0.92}
+    - __1: {r: 27.532719, g: 20.62356, b: 20.62356, a: 0.5333334}
   m_BuildTextureStacks: []
---- !u!114 &5135227069977924726
+--- !u!114 &6674570106217180479
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
