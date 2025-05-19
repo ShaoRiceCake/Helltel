@@ -31,6 +31,7 @@ public class BalloonController : GuestBase, IHurtable
     private bool _exploded = false;
     private Transform effectAnchor;
 
+    public Animator animator;
     protected override void Awake()
     {
         base.Awake();
@@ -101,7 +102,7 @@ public class BalloonController : GuestBase, IHurtable
         Explode();
     }
 
-    bool audioLock = false;
+
     private Node BuildApproachBranch()
     {
         // 追逐状态
@@ -111,7 +112,7 @@ public class BalloonController : GuestBase, IHurtable
                 {
                     _approachTimer = approachTime; // 刷新追逐时间
                     _isApproaching = true; // 设置追逐状态
-
+                    animator.SetTrigger("靠近");  
 
                 }),
 
@@ -129,13 +130,18 @@ public class BalloonController : GuestBase, IHurtable
     {
         return new Condition(() => _isApproaching, Stops.LOWER_PRIORITY_IMMEDIATE_RESTART,
             new Sequence(
-                new Action(() =>
-                {
-                    if (!_curTarget || !IsNavAgentOnNavmesh()) return;
-                    agent.speed = approachSpeed; // 设置追逐速度
-                    agent.SetDestination(_curTarget.transform.position); // 追逐目标
-
-                })
+            new Action(() =>
+            {
+                
+            }),
+            new Service(0.05f,
+            () =>
+            {
+                if (!_curTarget || !IsNavAgentOnNavmesh()) return;
+                agent.speed = approachSpeed; // 设置追逐速度
+                agent.SetDestination(_curTarget.transform.position);
+            },
+            new WaitUntilStopped()) // 追逐目标)
             )
         );
     }
@@ -147,7 +153,7 @@ public class BalloonController : GuestBase, IHurtable
                     () =>
                     {
                         agent.speed = patrolSpeed; // 设置巡逻速度
-                        AudioManager.Instance.Play("气球巡逻", loop: true, owner: this);
+                        // AudioManager.Instance.Play("气球巡逻", loop: true, owner: this);
                     }
                 )
                 { },
@@ -239,7 +245,7 @@ public class BalloonController : GuestBase, IHurtable
         }
 
         // 音效与销毁
-        AudioManager.Instance.Stop("气球靠近", owner: this);
+
         AudioManager.Instance.Play("气球爆炸", this.transform.position);
 
         var fx = Instantiate(effectPrefab, effectAnchor.position, Quaternion.identity);
@@ -259,6 +265,7 @@ public class BalloonController : GuestBase, IHurtable
                 _isApproaching = false; // 结束追逐状态
                 _cooldownTimer = cooldownTime; // 开启冷却时间
                 _isCoolingDown = true; // 设置冷却状态
+                animator.SetTrigger("巡逻");
             }
         }
         if (!_isCoolingDown) return;
