@@ -182,7 +182,7 @@ public class MRBunnyController : GuestBase, IHurtable
             Debug.Log("MR-Bunny死亡！当前血量：" + curHealth.Value);
             BehaviorTree.Blackboard["isDead"] = true; // 设置死亡标志
             IsDead = true;
-            // AudioManager.Instance.Play()
+            AudioManager.Instance.Play("兔子受伤", transform.position);
         }
         else
         {
