@@ -15,6 +15,7 @@ public class bunnyAttackColliderController : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Player"))
         {
+            AudioManager.Instance.Play("兔子打击到", transform.position);
             Debug.Log("兔子攻击命中玩家！");
             GameController.Instance.DeductHealth(attackDamage);
 
