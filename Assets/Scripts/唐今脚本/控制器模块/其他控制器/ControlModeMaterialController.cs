@@ -11,8 +11,10 @@ public class ControlModeMaterialController : MonoBehaviour
         public float activeValue = 2f;
         public float inactiveValue = 10f;
         public float transitionSpeed = 1f;
+        public float flashSpeed = 2f; // Speed of the flashing effect
         
         [HideInInspector] public Coroutine TransitionCoroutine;
+        [HideInInspector] public Coroutine FlashCoroutine;
     }
 
     [System.Serializable]
@@ -23,26 +25,15 @@ public class ControlModeMaterialController : MonoBehaviour
         public float activeValue = 1f;
         public float inactiveValue = 10f;
         public float transitionSpeed = 1f;
+        public float flashSpeed = 2f; // Speed of the flashing effect
         
         [HideInInspector] public Coroutine TransitionCoroutine;
-    }
-
-    [System.Serializable]
-    public class HatMaterialSettings
-    {
-        public Material targetMaterial;
-        public string cutoffProperty = "Vector1_CFBBCBA";
-        public float activeValue = 3f;
-        public float inactiveValue = 10f;
-        public float transitionSpeed = 1f;
-        
-        [HideInInspector] public Coroutine TransitionCoroutine;
+        [HideInInspector] public Coroutine FlashCoroutine;
     }
 
     [Header("Material References")]
     [SerializeField] private HandMaterialSettings handMaterial;
     [SerializeField] private LegMaterialSettings legMaterial;
-    [SerializeField] private HatMaterialSettings hatMaterial;
 
     [Header("Debug Options")]
     [SerializeField] private bool debugDisableAll = false;
@@ -63,7 +54,6 @@ public class ControlModeMaterialController : MonoBehaviour
 
         InitializeMaterial(handMaterial);
         InitializeMaterial(legMaterial);
-        InitializeMaterial(hatMaterial);
 
         _controlInfo.onSwitchControlMode.AddListener(OnControlModeChanged);
         _controlInfo.onCameraControl.AddListener(OnCameraModeActivated);
@@ -89,6 +79,9 @@ public class ControlModeMaterialController : MonoBehaviour
         {
             _data.OnIsPlayerDiedChangedEvent -= PlayerDie;
         }
+        
+        // Stop all coroutines
+        StopAllCoroutines();
     }
 
     private void PlayerDie(bool isDead)
@@ -106,14 +99,6 @@ public class ControlModeMaterialController : MonoBehaviour
     }
 
     private void InitializeMaterial(LegMaterialSettings settings)
-    {
-        if (settings.targetMaterial != null && settings.targetMaterial.HasProperty(settings.cutoffProperty))
-        {
-            settings.targetMaterial.SetFloat(settings.cutoffProperty, settings.inactiveValue);
-        }
-    }
-
-    private void InitializeMaterial(HatMaterialSettings settings)
     {
         if (settings.targetMaterial != null && settings.targetMaterial.HasProperty(settings.cutoffProperty))
         {
@@ -151,26 +136,94 @@ public class ControlModeMaterialController : MonoBehaviour
 
         if (_isCameraModeActive)
         {
+            // Camera mode - set both to inactive
+            StopFlashing(handMaterial);
+            StopFlashing(legMaterial);
             SetMaterialValue(handMaterial, handMaterial.inactiveValue);
             SetMaterialValue(legMaterial, legMaterial.inactiveValue);
-            SetMaterialValue(hatMaterial, hatMaterial.activeValue);
         }
         else
         {
             switch (_controlInfo.mCurrentControlMode)
             {
                 case PlayerControlInformationProcess.ControlMode.HandControl:
-                    SetMaterialValue(handMaterial, handMaterial.activeValue);
+                    StopFlashing(legMaterial);
                     SetMaterialValue(legMaterial, legMaterial.inactiveValue);
-                    SetMaterialValue(hatMaterial, hatMaterial.inactiveValue);
+                    StartFlashing(handMaterial);
                     break;
                 
                 case PlayerControlInformationProcess.ControlMode.LegControl:
+                    StopFlashing(handMaterial);
                     SetMaterialValue(handMaterial, handMaterial.inactiveValue);
-                    SetMaterialValue(legMaterial, legMaterial.activeValue);
-                    SetMaterialValue(hatMaterial, hatMaterial.inactiveValue);
+                    StartFlashing(legMaterial);
                     break;
             }
+        }
+    }
+
+    private void StartFlashing(HandMaterialSettings settings)
+    {
+        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
+            return;
+
+        // Stop any existing transitions or flashes
+        if (settings.TransitionCoroutine != null)
+        {
+            StopCoroutine(settings.TransitionCoroutine);
+        }
+        if (settings.FlashCoroutine != null)
+        {
+            StopCoroutine(settings.FlashCoroutine);
+        }
+
+        settings.FlashCoroutine = StartCoroutine(FlashMaterial(
+            settings.targetMaterial, 
+            settings.cutoffProperty, 
+            settings.inactiveValue, 
+            settings.activeValue, 
+            settings.flashSpeed
+        ));
+    }
+
+    private void StartFlashing(LegMaterialSettings settings)
+    {
+        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
+            return;
+
+        // Stop any existing transitions or flashes
+        if (settings.TransitionCoroutine != null)
+        {
+            StopCoroutine(settings.TransitionCoroutine);
+        }
+        if (settings.FlashCoroutine != null)
+        {
+            StopCoroutine(settings.FlashCoroutine);
+        }
+
+        settings.FlashCoroutine = StartCoroutine(FlashMaterial(
+            settings.targetMaterial, 
+            settings.cutoffProperty, 
+            settings.inactiveValue, 
+            settings.activeValue, 
+            settings.flashSpeed
+        ));
+    }
+
+    private void StopFlashing(HandMaterialSettings settings)
+    {
+        if (settings.FlashCoroutine != null)
+        {
+            StopCoroutine(settings.FlashCoroutine);
+            settings.FlashCoroutine = null;
+        }
+    }
+
+    private void StopFlashing(LegMaterialSettings settings)
+    {
+        if (settings.FlashCoroutine != null)
+        {
+            StopCoroutine(settings.FlashCoroutine);
+            settings.FlashCoroutine = null;
         }
     }
 
@@ -212,25 +265,6 @@ public class ControlModeMaterialController : MonoBehaviour
         ));
     }
 
-    private void SetMaterialValue(HatMaterialSettings settings, float targetValue)
-    {
-        if (!settings.targetMaterial || !settings.targetMaterial.HasProperty(settings.cutoffProperty))
-            return;
-
-        if (settings.TransitionCoroutine != null)
-        {
-            StopCoroutine(settings.TransitionCoroutine);
-        }
-
-        settings.TransitionCoroutine = StartCoroutine(TransitionMaterial(
-            settings.targetMaterial, 
-            settings.cutoffProperty, 
-            settings.targetMaterial.GetFloat(settings.cutoffProperty), 
-            targetValue, 
-            settings.transitionSpeed
-        ));
-    }
-
     private IEnumerator TransitionMaterial(Material material, string property, float startValue, float targetValue, float speed)
     {
         var elapsedTime = 0f;
@@ -248,6 +282,18 @@ public class ControlModeMaterialController : MonoBehaviour
         material.SetFloat(property, targetValue);
     }
 
+    private IEnumerator FlashMaterial(Material material, string property, float minValue, float maxValue, float speed)
+    {
+        while (true)
+        {
+            // Ping-pong between min and max values
+            float t = Mathf.PingPong(Time.time * speed, 1f);
+            float currentValue = Mathf.Lerp(minValue, maxValue, t);
+            material.SetFloat(property, currentValue);
+            yield return null;
+        }
+    }
+
     private void ResetAllMaterials()
     {
         StopAllCoroutines();
@@ -257,8 +303,5 @@ public class ControlModeMaterialController : MonoBehaviour
         
         if (legMaterial.targetMaterial && legMaterial.targetMaterial.HasProperty(legMaterial.cutoffProperty))
             legMaterial.targetMaterial.SetFloat(legMaterial.cutoffProperty, legMaterial.inactiveValue);
-        
-        if (hatMaterial.targetMaterial && hatMaterial.targetMaterial.HasProperty(hatMaterial.cutoffProperty))
-            hatMaterial.targetMaterial.SetFloat(hatMaterial.cutoffProperty, hatMaterial.inactiveValue);
     }
 }

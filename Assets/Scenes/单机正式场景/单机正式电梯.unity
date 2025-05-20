@@ -420,7 +420,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 08f7a0bfb79ffb74d8cf1900c35c5004, type: 3}
---- !u!1 &272127404
+--- !u!224 &841087843 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1867212237649701133, guid: e0760ca6392ba2c4a994b007b9a6e80c, type: 3}
+  m_PrefabInstance: {fileID: 2058673642}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1099358591
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -428,8 +433,8 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 272127406}
-  - component: {fileID: 272127405}
+  - component: {fileID: 1099358593}
+  - component: {fileID: 1099358592}
   m_Layer: 0
   m_Name: ComputeCollisionWorld
   m_TagString: Untagged
@@ -437,25 +442,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &272127405
+--- !u!114 &1099358592
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272127404}
+  m_GameObject: {fileID: 1099358591}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce0ddc77554954cd78643d83b0505396, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &272127406
+--- !u!4 &1099358593
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272127404}
+  m_GameObject: {fileID: 1099358591}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -464,11 +469,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!224 &841087843 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 1867212237649701133, guid: e0760ca6392ba2c4a994b007b9a6e80c, type: 3}
-  m_PrefabInstance: {fileID: 2058673642}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1240793315
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -973,21 +973,17 @@ MonoBehaviour:
   handMaterial:
     targetMaterial: {fileID: 2100000, guid: 71f57388bef6b6a4385563ad485519c2, type: 2}
     cutoffProperty: Vector1_CFBBCBA
-    activeValue: 2.5
-    inactiveValue: 10
+    activeValue: -0.2
+    inactiveValue: 0.5
     transitionSpeed: 1
+    flashSpeed: 2
   legMaterial:
     targetMaterial: {fileID: 2100000, guid: 6b48405bce2b11e4f8c84a394bfbf71f, type: 2}
     cutoffProperty: Vector1_CFBBCBA
-    activeValue: 1.5
-    inactiveValue: 10
+    activeValue: -1
+    inactiveValue: 1
     transitionSpeed: 1
-  hatMaterial:
-    targetMaterial: {fileID: 2100000, guid: 732be53606953bc49a524b1a1e3fbd5d, type: 2}
-    cutoffProperty: Vector1_CFBBCBA
-    activeValue: 3
-    inactiveValue: 10
-    transitionSpeed: 1
+    flashSpeed: 2
   debugDisableAll: 0
 --- !u!1001 &2058673642
 PrefabInstance:
@@ -1725,4 +1721,4 @@ SceneRoots:
   - {fileID: 1499763933}
   - {fileID: 1413666491778479211}
   - {fileID: 1795710018}
-  - {fileID: 272127406}
+  - {fileID: 1099358593}
