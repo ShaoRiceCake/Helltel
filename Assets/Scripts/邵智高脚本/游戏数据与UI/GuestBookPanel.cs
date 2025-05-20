@@ -14,8 +14,6 @@ public class GuestBookPanel : MonoBehaviour
 
         // 绑定按钮事件
         btn_BackOfGuestBookPanel.onClick.AddListener(globalUIController.CloseGuestBook);
-
-        
         
     }
 }
