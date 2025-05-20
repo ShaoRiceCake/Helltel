@@ -8,6 +8,7 @@ using UnityEngine;
 /// </summary>
 public class AudioEventBunny : MonoBehaviour
 {
+    public Animator animator;
     public void PlayAttack_1()
     {
         AudioManager.Instance.Play("兔子攻击1", transform.position);
@@ -21,10 +22,22 @@ public class AudioEventBunny : MonoBehaviour
         AudioManager.Instance.Play("兔子攻击3", transform.position);
     }
 
-    public void PlayBunnyMove()
+    public void PlayBunnyMoveLowSpeed()
     {
-        AudioManager.Instance.Play("兔子移动", transform.position);
+        if (animator.speed > 0.6f)
+        {
+            return;
+        }
+        else
+        { AudioManager.Instance.Play("兔子移动", transform.position); }
     }
-
-
+    public void PlayBunnyMovehighSpeed()
+    {
+        if (animator.speed < 0.6f)
+        {
+            return;
+        }
+        else
+        { AudioManager.Instance.Play("兔子移动", transform.position); }
+    }
 }
