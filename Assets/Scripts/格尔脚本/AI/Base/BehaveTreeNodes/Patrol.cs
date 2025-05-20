@@ -26,7 +26,6 @@ namespace NPBehave
         {
             if (agent == null || navPointsManager == null)
             {
-                Debug.LogWarning("Patrol: agent or navPointsManager is null!");
                 this.Stopped(false);
                 return;
             }
@@ -36,7 +35,6 @@ namespace NPBehave
 
         protected override void DoStop()
         {
-            Debug.Log("Patrol: Stopped");
             this.Clock.RemoveUpdateObserver(OnUpdate);
             if(agent != null && agent.isOnNavMesh)
             {
@@ -94,7 +92,8 @@ namespace NPBehave
         private NavPoint GetClosestUnvisitedNavPoint()
         {
             Vector3 pos = agent.transform.position;
-            var points = navPointsManager.GetNearestPointsList(pos);            foreach (var nav in points)
+            var points = navPointsManager.GetNearestPointsList(pos);
+            foreach (var nav in points)
             {
                 if (nav != null && !visitDict.ContainsKey(nav))
                     return nav;
