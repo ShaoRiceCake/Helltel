@@ -58,8 +58,8 @@ public class MainMenu : MonoBehaviour
             if (btn == null) Debug.LogWarning("菜单按钮数组中存在空引用！");
             else Debug.Log($"注册按钮: {btn.name}");
         }
-        AudioManager.Instance.Play("开头结尾环境音", loop: true);
-        AudioManager.Instance.Play("平静氛围环境音", loop: true);
+        AudioManager.Instance.Play("开头结尾环境音", loop: true,owner:this);
+        AudioManager.Instance.Play("平静氛围环境音", loop: true,owner:this);
     }
 
     private void Update()
@@ -176,7 +176,7 @@ public class MainMenu : MonoBehaviour
             switch (currentHoveredButton.name)
             {
                 case "SinglePlayerButton":
-                    SinglePlayerButton();
+                    StartCoroutine(SinglePlayerButton());
                     break;
                 case "OpenOnlineMultiplayerButton":
                     OpenOnlineMultiplayerPanel();
@@ -216,21 +216,26 @@ public class MainMenu : MonoBehaviour
         
         // 按下效果
         button.transform.position = pressedPosition;
-        
+        AudioManager.Instance.Play("开始场景按下按钮");
         // 等待短暂时间
         yield return new WaitForSeconds(0.1f);
         
         // 恢复原位置
         button.transform.position = originalPosition;
     }
-    
+
     /// <summary>
     /// 创建单人游戏按钮点击事件
     /// </summary>
-    public void SinglePlayerButton()
+    public System.Collections.IEnumerator SinglePlayerButton()
     {
+        AudioManager.Instance.Play("开头结尾环境音", loop: true,owner:this);
+        AudioManager.Instance.Play("平静氛围环境音", loop: true,owner:this);
+        // 等待短暂时间
+        yield return new WaitForSeconds(0.4f);
         lSS_Manager.LoadScene();
         SceneManager.LoadScene("单机正式电梯");
+        
     }
     
     /// <summary>
