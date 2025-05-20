@@ -16,7 +16,7 @@ public class BalloonController : GuestBase, IHurtable
 
     [Header("爆炸参数")]
     public float explosionRadius = 5f;
-    public float explosionDamage = 80f;
+    public int explosionDamage = 50;
     [Header("时间参数")]
     public float approachTime = 4.5f; // 追踪
     public float cooldownTime = 20f; // 冷却时间
@@ -81,8 +81,12 @@ public class BalloonController : GuestBase, IHurtable
             new Sequence(
             new Action(() =>
             {
-                agent.isStopped = true; // 停止移动
-                agent.ResetPath(); // 重置路径
+                if (IsNavAgentOnNavmesh())
+                {
+                    agent.isStopped = true; // 停止移动
+                    agent.ResetPath(); // 重置路径
+                }
+            
 
             }),
             new Action(() =>
@@ -235,7 +239,7 @@ public class BalloonController : GuestBase, IHurtable
                     rb.AddForce(forceDir * explosionForce, ForceMode.Impulse);
                 }            // 插值伤害（以Player根节点为距离参考）
                 float dist = Vector3.Distance(transform.position, playerRoot.position);
-                int damage = Mathf.RoundToInt(Mathf.Lerp(explosionDamage, 0f, dist / explosionRadius));
+                int damage = explosionDamage;
 
                 GameController.Instance.DeductHealth(damage);
                 break; // 找到第一个就可以了
