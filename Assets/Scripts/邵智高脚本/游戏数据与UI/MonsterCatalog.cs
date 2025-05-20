@@ -171,7 +171,12 @@ public class MonsterCatalog : MonoBehaviour
 
     public void NextMonster()
     {
-        if(isAnimating) return;
+        if(isAnimating) {
+        Debug.Log("正在动画中，忽略点击");
+        return;
+        }
+        Debug.Log($"切换到下一个怪物，当前索引: {currentIndex}");
+       
         AudioManager.Instance.Play("翻页");
         currentIndex = (currentIndex + 1) % monsters.Length;
         UpdateDisplay();

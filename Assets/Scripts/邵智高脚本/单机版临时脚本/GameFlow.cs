@@ -11,7 +11,7 @@ public class GameFlow : MonoBehaviour
     public SceneOverlayer sceneOverlayer;
     
     private void Awake() {
-        if (Instance == null) {
+        if (!Instance) {
             Instance = this;
         } else {
             Destroy(gameObject);
