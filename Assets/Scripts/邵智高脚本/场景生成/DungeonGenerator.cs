@@ -391,9 +391,8 @@ public class DungeonGenerator : MonoBehaviour
                                 Quaternion.Inverse(startConnector.transform.localRotation);
 
         // 计算基于实际缩放的位置偏移
-        Vector3 scaledOffset = (elevatorConnector.transform.forward * ROOM_SCALE) *
-                         (startConnector.transform.localPosition.magnitude +
-                          elevatorConnector.transform.localPosition.magnitude);
+        Vector3 scaledOffset = elevatorConnector.transform.forward * (ROOM_SCALE * (startConnector.transform.localPosition.magnitude +
+            elevatorConnector.transform.localPosition.magnitude));
 
         // 应用缩放补偿
         //offset = Vector3.Scale(offset, scaleCompensation);

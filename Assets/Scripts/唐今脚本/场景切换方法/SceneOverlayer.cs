@@ -12,7 +12,7 @@ public class SceneOverlayer : MonoBehaviour
     // [SerializeField] private bool ready=true;
     public void Awake()
     {
-        _data = GameController.Instance._gameData;
+        _data = Resources.Load<GameDataModel>("GameData");
     }
 
     public void SwitchToDungeon()
