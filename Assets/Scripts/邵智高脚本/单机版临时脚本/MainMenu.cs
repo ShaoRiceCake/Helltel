@@ -237,20 +237,29 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("单机正式电梯");
         
     }
-    
-    /// <summary>
-    /// 打开多人联机界面
-    /// </summary>
+    [SerializeField] private WarningPopupTMP warningPopup; // 确保这个引用被正确赋值
+
     public void OpenOnlineMultiplayerPanel()
     {
-        onlineMultiplayerPanel.SetActive(true);
+        if (warningPopup == null)
+        {
+            Debug.LogError("warningPopup 未赋值！", this);
+            return;
+        }
+
+        AudioManager.Instance.Play("消息警告");
+        warningPopup.ShowWarning("该功能未完成");
     }
     
-    /// <summary>
-    /// 打开教程界面
-    /// </summary>
     public void OpenTutorialPanel()
     {
-        onlineMultiplayerPanel.SetActive(false);
+        if (warningPopup == null)
+        {
+            Debug.LogError("warningPopup 未赋值！", this);
+            return;
+        }
+
+        AudioManager.Instance.Play("消息警告");
+        warningPopup.ShowWarning("该功能未完成");
     }
 }
