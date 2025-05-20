@@ -64,8 +64,6 @@ public class MRBunnyController : GuestBase, IHurtable
         new Sequence(
             new Action(() =>
             {
-                Debug.Log("MR-Bunny追击目标！");
-                // 开始播放音效等
             }),
             new Service(0.05f,
            () => //
@@ -95,7 +93,6 @@ public class MRBunnyController : GuestBase, IHurtable
                 new Action(
                     () =>
                     {
-                        Debug.Log("MR-Bunny巡逻中！");
                         agent.speed = moveSpeed;
                     }
                 ),
@@ -142,7 +139,6 @@ public class MRBunnyController : GuestBase, IHurtable
 
     private void OnHurtEnd()
     {
-        Debug.Log("监听到：受伤结束！");
         BehaviorTree.Blackboard["getDamage"] = false; // 重置受伤标志
     }
 
