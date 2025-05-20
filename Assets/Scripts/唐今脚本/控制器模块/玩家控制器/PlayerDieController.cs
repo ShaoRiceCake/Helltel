@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Michsky.LSS;
+
 
 public class PlayerDieController : MonoBehaviour
 {

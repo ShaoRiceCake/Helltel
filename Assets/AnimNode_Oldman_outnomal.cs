@@ -1,6 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using Mono.Cecil;
+
 using UnityEngine;
 
 public class AnimNode_Oldman_outnomal: StateMachineBehaviour
