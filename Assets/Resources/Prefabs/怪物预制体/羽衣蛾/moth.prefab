@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 2389458952792501613}
   - component: {fileID: 6356353333286488904}
   - component: {fileID: 3898042814458994253}
+  - component: {fileID: 7606002224349591256}
   m_Layer: 0
   m_Name: moth
   m_TagString: Untagged
@@ -236,6 +237,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 3936293755982909670}
+--- !u!114 &7606002224349591256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8143320597824407564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33b95e52e9a6e9b4e91293048075466d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionCollider: {fileID: 2337565257181625089}
+  damageCoefficient: 1
+  bunnyController: {fileID: 0}
 --- !u!1001 &6228995493826058626
 PrefabInstance:
   m_ObjectHideFlags: 0

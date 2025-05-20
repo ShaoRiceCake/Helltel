@@ -19,7 +19,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5095777057513168175
 Transform:
   m_ObjectHideFlags: 0
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 0.5
-  attackDamage: 1
+  attackDamage: 15
 --- !u!1 &6375525739977248810
 GameObject:
   m_ObjectHideFlags: 0
@@ -464,7 +464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackCooldown: 0.5
-  attackDamage: 1
+  attackDamage: 15
 --- !u!1001 &6013943870583406734
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -619,6 +619,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   detectionCollider: {fileID: 2235808849854569098}
   damageCoefficient: 1
+  bunnyController: {fileID: 0}
 --- !u!4 &6895976628744204128 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8302742002908090386, guid: 79b1e6b273ec1e64da0c94e07f5b1a77, type: 3}

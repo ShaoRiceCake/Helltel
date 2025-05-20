@@ -172,6 +172,7 @@ public class MRBunnyController : GuestBase, IHurtable
 
     public void TakeDamage(int damage)
     {
+        Debug.Log("接口调用");
         if (damage >= curHealth.Value)
         {
             curHealth.Value = 0;

@@ -12,9 +12,10 @@ public class MonsterCollisionHandler : MonoBehaviour
     
     private bool _isMonsterDead;
     
+    public MRBunnyController bunnyController;
     private void Awake()
     {
-        
+
         if (detectionCollider) return;
         detectionCollider = GetComponent<Collider>();
         if (!detectionCollider)
@@ -34,12 +35,9 @@ public class MonsterCollisionHandler : MonoBehaviour
         if (interactable == null) return; 
 
         var finalDamage = Mathf.RoundToInt(interactable.ItemDamage * damageCoefficient);
-        
-        if (collision.gameObject.GetComponentInParent<IHurtable>() is { } hurtable)
-        {
-            hurtable.TakeDamage(finalDamage); 
-        }
-        
+
+        this.gameObject.GetComponentInParent<IHurtable>()?.TakeDamage(finalDamage);
+
         if (collision.gameObject.GetComponentInParent<IDie>() is { } die)
         {
             _isMonsterDead = die.IsDead;
