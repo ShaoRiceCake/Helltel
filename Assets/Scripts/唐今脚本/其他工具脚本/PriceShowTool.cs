@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -34,40 +33,14 @@ public class PriceShowTool : MonoBehaviour
 
     private void Awake()
     {
-        // 获取父Canvas
-        _parentCanvas = GetComponent<Canvas>();
         // 初始化状态
         SetState(currentState);
-        _raycaster = GetComponent<GraphicRaycaster>();
-    }
-
-    private void Start()
-    {
-        // 更可靠的方式获取主相机
-        var mainCamera = Camera.main;
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (!mainCamera)
-        {
-            // 如果没有标记为MainCamera的相机，尝试查找玩家相机
-            if (player)
-            {
-                mainCamera = player.GetComponentInChildren<Camera>();
-            }
-        }
         
-        if (_parentCanvas && mainCamera)
-        {
-            _parentCanvas.worldCamera = mainCamera;
-        }
-        else
-        {
-            Debug.LogWarning("无法找到主相机或Canvas未设置");
-        }
 
-        var tool = FindFirstObjectByType<CatchDetectorTool>();
+        _raycaster = GetComponent<GraphicRaycaster>();
 
-        tool.priceShowPrefab = this;
     }
+
     private void FixedUpdate()
     {
         // 绕Y轴自转
@@ -93,7 +66,7 @@ public class PriceShowTool : MonoBehaviour
     public void SetTarget(Transform target)
     {
         targetObject = target;
-        if (target)
+        if (target != null)
         {
             // 立即设置初始位置
             transform.position = target.position + Vector3.up;

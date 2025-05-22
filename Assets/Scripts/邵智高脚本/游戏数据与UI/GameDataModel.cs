@@ -36,6 +36,8 @@ public class GameDataModel : ScriptableObject
     public event Action<int> OnMoneyChanged;      // 金钱变化
     public event Action<int> OnPerformanceChanged;// 绩效变化
     public event Action<int> OnPerformanceTargetChanged;// 绩效要求变化
+    //public event Action<bool> IsPerformancePassed;  // 绩效是否达标
+    //public event Action OnPerformanceFailed;      // 绩效失败
     public event Action<int> OnLevelChanged;      // 关卡变化
     public event Action OnFloorChanged;  //层级变化
     public event Action StartLoading;  //开始加载
@@ -79,12 +81,15 @@ public class GameDataModel : ScriptableObject
         set {
             _performance = value;
             OnPerformanceChanged?.Invoke(_performance);
+            // 数值变化时自动检查绩效，并传递是否达标的事件
+            //IsPerformancePassed?.Invoke(CheckPerformance());
+
         }
     }
 
     public int PerformanceTarget {
         get => _performanceTarget;
-        private set {
+        set {
              _performanceTarget = value;
             OnPerformanceTargetChanged?.Invoke(_performanceTarget);
           
@@ -127,13 +132,15 @@ public class GameDataModel : ScriptableObject
         _currentLoadedScene = "";
         IsPlayerDied = false;
     }
-    
     //进商店层调用这个
     public void NewShopFloorData()
     {
+        // Money += Performance;
         Health = MaxHealth;
+        // Performance = 0;
+
+        //改由商店内部脚本实现
     }
-    
     //进地牢层调用这个
     public void NewDungeonFloorData()
     {
@@ -161,6 +168,7 @@ public class GameDataModel : ScriptableObject
             _isPerformancePassed = false;
             return false;
         }
+        
     }
     public void SendOnFloorChangedEvent()
     {
@@ -174,4 +182,8 @@ public class GameDataModel : ScriptableObject
     {
         FinishLoading?.Invoke(); 
     }
+    
+    
+
+
 }

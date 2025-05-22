@@ -35,7 +35,7 @@ public class CatchTool : MonoBehaviour
         {
             if (_catchBall == value) return;
 
-            if (_catchBall && !value && _isGrabbing && _isGrabbingKinematic)
+            if (_catchBall != null && value == null && _isGrabbing && _isGrabbingKinematic)
             {
                 ReleaseObject();
             }
@@ -61,14 +61,14 @@ public class CatchTool : MonoBehaviour
 
     private void Start()
     {
-        if (!catchDetectorTool)
+        if (catchDetectorTool == null)
         {
             Debug.LogError("catchDetectCylinder未分配！");
             return;
         }
         catchDetectorTool.OnDetectedObjectsUpdated += UpdatePreSelectedObjects;
         // 初始化进度条
-        if (progressBar)
+        if (progressBar != null)
         {
             progressBar.gameObject.SetActive(false);
         }
