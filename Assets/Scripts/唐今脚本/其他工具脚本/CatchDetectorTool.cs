@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.Serialization;
 
 public class CatchDetectorTool : MonoBehaviour
 {
@@ -16,12 +17,12 @@ public class CatchDetectorTool : MonoBehaviour
 
     private void Start()
     {
-        if (triggerCollider == null)
+        if (!triggerCollider)
         {
             Debug.LogError("No Collider found on this GameObject!");
         }
     }
-
+    
     private void FixedUpdate()
     {
         _frameCounter++;

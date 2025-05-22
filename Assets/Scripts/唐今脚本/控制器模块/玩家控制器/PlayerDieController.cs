@@ -79,7 +79,7 @@ public class PlayerDieController : MonoBehaviour
         // {
         //     GameController.Instance.lSS_Manager.LoadScene();
         // }
-        SceneManager.LoadSceneAsync("开始场景");        
+        SceneManager.LoadSceneAsync($"单机正式菜单");        
         _deathSequenceCoroutine = null;
     }
 }
