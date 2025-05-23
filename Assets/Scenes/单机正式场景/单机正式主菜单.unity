@@ -5442,7 +5442,6 @@ GameObject:
   - component: {fileID: 597706917}
   - component: {fileID: 597706916}
   - component: {fileID: 597706919}
-  - component: {fileID: 597706920}
   m_Layer: 0
   m_Name: "\u5DE5\u5382\u76F8\u673A"
   m_TagString: MainCamera
@@ -5568,27 +5567,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!95 &597706920
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 597706915}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: bbfffce35822d5748b0c54fdc5b04661, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &634992634
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6292,6 +6270,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Global UI Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 8280909446763759430, guid: f00c02f6ce2e2f74a88c764d24327eee, type: 3}
+      propertyPath: m_text
+      value: "\u70B9\u6309\u9F20\u6807\u4E2D\u952E"
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6356,7 +6338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3869230321
+  GlobalObjectIdHash: 3167426525
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
