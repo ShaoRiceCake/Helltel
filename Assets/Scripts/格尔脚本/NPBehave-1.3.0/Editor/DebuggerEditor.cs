@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 namespace NPBehave
 {
     [CustomEditor(typeof(Debugger))]
@@ -21,3 +22,4 @@ namespace NPBehave
         }
     }
 }
+#endif

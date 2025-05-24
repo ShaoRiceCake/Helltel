@@ -26,11 +26,7 @@ public class LoadingScreenAni : MonoBehaviour
     private float foregroundHeight,ironChainHeight;
 
     private Vector2 screenSize =new Vector2(1920,1080);
-
-
-
-
-
+    
  
 
     private void Start()
