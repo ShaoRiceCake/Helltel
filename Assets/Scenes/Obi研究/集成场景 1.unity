@@ -122,6 +122,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &66425687
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 66425689}
+  - component: {fileID: 66425688}
+  m_Layer: 0
+  m_Name: BurstCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &66425688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66425687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1a161c4294214a4fbcb7e9e94800494, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellSpans:
+    m_AlignBytes: 16
+--- !u!4 &66425689
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 66425687}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &67011521
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,16 +937,33 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 788861867}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99ecaf6329b00d6449226215a87ac25b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tetherStiffness: 1
+  colliderTag: TestObi
   enableVisualization: 1
   collidingParticleColor: {r: 1, g: 0, b: 0, a: 1}
   anchorParticleColor: {r: 0, g: 0, b: 1, a: 1}
   logConstraintCount: 1
+--- !u!114 &788861888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788861867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 541ff87e4f95511468446a234aa0b86e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectionStrength: 1
+  colliderTag: TestObi
+  enableVisualization: 1
+  projectedParticleColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &798128878
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,8 +1167,12 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 5276406339315962609, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
-      propertyPath: tetherConstraintParameters.enabled
+      propertyPath: pinConstraintParameters.enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5276406339315962609, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
+      propertyPath: tetherConstraintParameters.enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5276406339315962609, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
       propertyPath: distanceConstraintParameters.enabled
@@ -1219,6 +1286,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 435336633543861568, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 788861887}
+    - targetCorrespondingSourceObject: {fileID: 435336633543861568, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 788861888}
   m_SourcePrefab: {fileID: 100100000, guid: 77f31382b5e36ba44bc4cd23c59e2bc6, type: 3}
 --- !u!4 &1030869398 stripped
 Transform:
@@ -1536,52 +1606,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 70.783, y: -77.545, z: -52.977}
---- !u!1 &1525683009
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1525683011}
-  - component: {fileID: 1525683010}
-  m_Layer: 0
-  m_Name: BurstCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1525683010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1525683009}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1a161c4294214a4fbcb7e9e94800494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cellSpans:
-    m_AlignBytes: 16
---- !u!4 &1525683011
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1525683009}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1661606660
 GameObject:
   m_ObjectHideFlags: 0
@@ -2031,7 +2055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e371b91ec5e12e7468336e991f0e022d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  target: {fileID: 1314042677}
   distance: 5
   minDistance: 1
   maxDistance: 15
@@ -26217,4 +26241,4 @@ SceneRoots:
   - {fileID: 1661606662}
   - {fileID: 2132379585}
   - {fileID: 990759685}
-  - {fileID: 1525683011}
+  - {fileID: 66425689}
