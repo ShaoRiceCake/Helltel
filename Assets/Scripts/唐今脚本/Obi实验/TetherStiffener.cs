@@ -11,6 +11,8 @@ public class TetherStiffener : MonoBehaviour
     [Tooltip("临时系绳约束的硬度 (0-1)。设为1以获得最大强度。")]
     [Range(0f, 1f)]
     public float tetherStiffness = 1f;
+    [Tooltip("只对拥有此Tag的物体加强碰撞。留空则对所有碰撞生效。")]
+    public string colliderTag; // <--- 补全缺失的变量
 
     [Header("可视化与调试")]
     public bool enableVisualization = true;
@@ -22,11 +24,9 @@ public class TetherStiffener : MonoBehaviour
     private ObiSoftbody softbody;
     private ObiSolver solver;
 
-    // 存储本帧需要创建的系绳约束，Item1是碰撞粒子，Item2是锚点粒子
     private List<Tuple<int, int>> tethersToApply = new List<Tuple<int, int>>();
-    
-    // 用于恢复颜色的字典
     private Dictionary<int, Color> originalParticleColors = new Dictionary<int, Color>();
+    private bool isInitialized = false;
 
     void Start()
     {
@@ -35,6 +35,7 @@ public class TetherStiffener : MonoBehaviour
         {
             solver = softbody.solver;
             solver.OnCollision += Solver_OnCollision;
+            isInitialized = true;
         }
     }
 
@@ -47,17 +48,17 @@ public class TetherStiffener : MonoBehaviour
 
     void LateUpdate()
     {
-        if (softbody == null || !softbody.isLoaded) return;
+        if (!isInitialized || !softbody.isLoaded) return;
 
-        // 获取Actor端的系绳约束数据容器
         var tetherConstraintsData = softbody.GetConstraintsByType(Oni.ConstraintType.Tether) as ObiTetherConstraintsData;
+        
         if (tetherConstraintsData == null) 
         {
-             // 如果蓝图中没有，我们需要手动为Actor添加一个
-            tetherConstraintsData = softbody.gameObject.AddComponent<ObiTetherConstraintsData>();
+            if (tethersToApply.Count > 0)
+                Debug.LogWarning("TetherStiffener: 软体蓝图中未启用Tether约束，脚本无法工作。请在蓝图编辑器中启用Tether约束。", this);
+            return;
         }
         
-        // 使用我们在之前版本中验证过的“实时增删”工作流
         tetherConstraintsData.Clear();
         RestoreAllParticleColors();
 
@@ -75,14 +76,13 @@ public class TetherStiffener : MonoBehaviour
             int collidingParticle = pair.Item1;
             int anchorParticle = pair.Item2;
             
-            // 系绳约束的长度是最大允许拉伸长度，我们设置为当前距离，不允许拉伸
             float maxLength = Vector3.Distance(
                 solver.positions[softbody.solverIndices[collidingParticle]],
                 solver.positions[softbody.solverIndices[anchorParticle]]
             );
 
-            // AddConstraint(被约束的粒子, 锚点粒子/或-1代表固定点, 最大长度, 压缩/拉伸硬度)
-            newBatch.AddConstraint(collidingParticle, anchorParticle, maxLength, tetherStiffness);
+            newBatch.AddConstraint(new Vector2Int(collidingParticle, anchorParticle), maxLength, 1.0f);
+            newBatch.stiffnesses[newBatch.constraintCount - 1] = tetherStiffness;
         }
         newBatch.activeConstraintCount = tethersToApply.Count;
         
@@ -101,14 +101,13 @@ public class TetherStiffener : MonoBehaviour
 
     private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
     {
-        if (contacts.count == 0) return;
+        if (!isInitialized || contacts.count == 0) return;
 
         tethersToApply.Clear();
         HashSet<int> collidingParticles = FindCollidingParticles(contacts);
 
         if (collidingParticles.Count == 0) return;
 
-        // 对于每一个碰撞粒子，找到一个稳定的邻居作为锚点
         var dc = softbody.GetConstraintsByType(Oni.ConstraintType.ShapeMatching) as ObiConstraints<ObiShapeMatchingConstraintsBatch>;
         if (dc == null) return;
 
@@ -122,24 +121,37 @@ public class TetherStiffener : MonoBehaviour
         }
     }
 
-    // 辅助方法：从碰撞数据中找出所有属于我们软体的碰撞粒子
     private HashSet<int> FindCollidingParticles(ObiNativeContactList contacts)
     {
         HashSet<int> result = new HashSet<int>();
         for (int i = 0; i < contacts.count; i++)
         {
-            int particleSolverIndex = contacts[i].bodyA;
+            Oni.Contact contact = contacts[i];
+
+            int particleSolverIndex = contact.bodyA;
+            int colliderIndex = contact.bodyB;
+
             if (!IsParticleFromOurSoftbody(particleSolverIndex))
             {
-                particleSolverIndex = contacts[i].bodyB;
+                particleSolverIndex = contact.bodyB;
+                colliderIndex = contact.bodyA;
                 if (!IsParticleFromOurSoftbody(particleSolverIndex)) continue;
             }
+
+            var colliderHandles = ObiColliderWorld.GetInstance().colliderHandles;
+            if (colliderIndex < 0 || colliderIndex >= colliderHandles.Count) continue;
+            var otherColliderHandle = colliderHandles[colliderIndex];
+            if (!otherColliderHandle.owner) continue;
+
+            // *** 修正：重新加入碰撞体Tag过滤 ***
+            if (!string.IsNullOrEmpty(colliderTag) && !otherColliderHandle.owner.CompareTag(colliderTag))
+                continue;
+
             result.Add(solver.particleToActor[particleSolverIndex].indexInActor);
         }
         return result;
     }
 
-    // 辅助方法：为指定的碰撞粒子，从其邻居团中找到一个未碰撞的锚点
     private int FindStableAnchor(int collidingParticleIndex, HashSet<int> allCollidingParticles, ObiConstraints<ObiShapeMatchingConstraintsBatch> shapeMatchingData)
     {
         for (int j = 0; j < shapeMatchingData.batchCount; ++j)
@@ -150,40 +162,33 @@ public class TetherStiffener : MonoBehaviour
                 bool containsCollidingParticle = false;
                 int firstStableNeighbor = -1;
 
-                // 遍历邻居团的粒子
                 for (int k = 0; k < batch.numIndices[i]; ++k)
                 {
                     int pIndex = batch.particleIndices[batch.firstIndex[i] + k];
                     if (pIndex == collidingParticleIndex)
                         containsCollidingParticle = true;
                     
-                    // 如果这个粒子不是碰撞粒子，它可以作为锚点
                     if (!allCollidingParticles.Contains(pIndex))
                         firstStableNeighbor = pIndex;
                 }
 
-                // 如果这个邻居团包含了我们的目标碰撞粒子，并且我们找到了一个稳定邻居
                 if (containsCollidingParticle && firstStableNeighbor != -1)
                 {
-                    return firstStableNeighbor; // 立刻返回找到的第一个稳定锚点
+                    return firstStableNeighbor;
                 }
             }
         }
-        return -1; // 未找到合适的锚点
+        return -1;
     }
     
-    // 颜色更新与恢复、约束清理、粒子归属判断等辅助方法
     private void UpdateColors()
     {
         if (!enableVisualization) return;
         RestoreAllParticleColors();
         foreach (var pair in tethersToApply)
         {
-            int collidingParticle = pair.Item1;
-            int anchorParticle = pair.Item2;
-            
-            SetParticleColor(collidingParticle, collidingParticleColor);
-            SetParticleColor(anchorParticle, anchorParticleColor);
+            SetParticleColor(pair.Item1, collidingParticleColor);
+            SetParticleColor(pair.Item2, anchorParticleColor);
         }
         if (tethersToApply.Count > 0) solver.colors.Upload();
     }
