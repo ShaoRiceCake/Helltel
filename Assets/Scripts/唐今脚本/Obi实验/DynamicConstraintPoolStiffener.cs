@@ -12,30 +12,25 @@ public class CollisionStiffener : MonoBehaviour
     [Range(0f, 1f)]
     public float temporaryStiffness = 1f;
 
-    [Tooltip("预创建的约束池大小。")]
-    public int constraintPoolSize = 200;
-
     [Tooltip("只对拥有此Tag的物体加强碰撞。留空则对所有碰撞生效。")]
     public string colliderTag;
 
-    [Header("可视化配置")]
+    [Header("可视化与调试")]
     public bool enableVisualization = true;
     public Color activeConstraintColor = Color.red;
+    [Tooltip("勾选后，将在碰撞时于控制台打印当前激活的临时约束数量。")]
+    public bool logConstraintCount = true;
 
     private ObiSoftbody softbody;
     private ObiSolver solver;
-    private ObiDistanceConstraintsData distanceConstraintsData;
 
-    private List<int> simplexParticlesBuffer = new List<int>();
-    private HashSet<int> collidingParticlesInActor = new HashSet<int>();
-    private Queue<int> availableConstraintIndicesInPool;
-    private Dictionary<Tuple<int, int>, int> activeTemporaryConstraints;
-    private List<Tuple<int, int>> constraintsToDeactivate = new List<Tuple<int, int>>();
-    
-    private Dictionary<int, Color> originalParticleColors;
-
+    // --- 补全缺失的成员变量 ---
     private bool isInitialized = false;
-    private int poolBatchIndex = -1;
+    private HashSet<int> collidingParticlesInActor = new HashSet<int>();
+    private List<Tuple<int, int>> constraintsToApply = new List<Tuple<int, int>>();
+    private Dictionary<Tuple<int, int>, bool> activeTemporaryConstraints = new Dictionary<Tuple<int, int>, bool>();
+    private Dictionary<int, Color> originalParticleColors = new Dictionary<int, Color>();
+    private HashSet<int> particlesToColorThisFrame = new HashSet<int>();
 
     void Start()
     {
@@ -44,7 +39,11 @@ public class CollisionStiffener : MonoBehaviour
         {
             solver = softbody.solver;
             solver.OnCollision += Solver_OnCollision;
-            StartCoroutine(Initialize());
+            isInitialized = true; // 在Start中标记为已初始化
+        }
+        else
+        {
+            Debug.LogError("未能找到ObiSolver!");
         }
     }
 
@@ -53,114 +52,77 @@ public class CollisionStiffener : MonoBehaviour
         if (solver != null)
             solver.OnCollision -= Solver_OnCollision;
         
-        if (isInitialized && enableVisualization)
-            RestoreAllParticleColors();
-    }
-
-    private IEnumerator Initialize()
-    {
-        yield return new WaitForFixedUpdate();
-        yield return new WaitForFixedUpdate();
-
-        distanceConstraintsData = softbody.softbodyBlueprint.distanceConstraintsData;
-        if (distanceConstraintsData == null)
-        {
-            Debug.LogError("ObiSoftbody 蓝图中不包含 DistanceConstraintsData!", this);
-            yield break;
-        }
-
-        var poolBatch = distanceConstraintsData.CreateBatch();
-        availableConstraintIndicesInPool = new Queue<int>(constraintPoolSize);
-        for (int i = 0; i < constraintPoolSize; i++)
-        {
-            poolBatch.AddConstraint(new Vector2Int(0, 0), 1f);
-            availableConstraintIndicesInPool.Enqueue(i);
-        }
-        poolBatch.activeConstraintCount = poolBatch.constraintCount;
-
-        distanceConstraintsData.AddBatch(poolBatch);
-        poolBatchIndex = distanceConstraintsData.batchCount - 1;
-
-        softbody.SetConstraintsDirty(Oni.ConstraintType.Distance);
-
-        activeTemporaryConstraints = new Dictionary<Tuple<int, int>, int>();
-        originalParticleColors = new Dictionary<int, Color>();
-        isInitialized = true;
+        ClearTemporaryConstraints();
     }
 
     void LateUpdate()
     {
-        if (!isInitialized) return;
+        if (!isInitialized || !softbody.isLoaded) return;
 
-        constraintsToDeactivate.Clear();
-        foreach (var entry in activeTemporaryConstraints)
+        var distanceConstraintsData = softbody.GetConstraintsByType(Oni.ConstraintType.Distance) as ObiDistanceConstraintsData;
+        if (distanceConstraintsData == null) return;
+
+        // 状态维持逻辑：仅当本帧有碰撞时才更新，无碰撞时才清除
+        if (constraintsToApply.Count > 0)
         {
-            if (!collidingParticlesInActor.Contains(entry.Key.Item1) && !collidingParticlesInActor.Contains(entry.Key.Item2))
+            ApplyNewConstraints(distanceConstraintsData);
+        }
+        else
+        {
+            if (activeTemporaryConstraints.Count > 0)
             {
-                constraintsToDeactivate.Add(entry.Key);
+                ClearTemporaryConstraints(distanceConstraintsData);
             }
         }
-
-        if (constraintsToDeactivate.Count > 0)
-            DeactivateTemporaryConstraints(constraintsToDeactivate);
         
-        collidingParticlesInActor.Clear();
+        constraintsToApply.Clear();
     }
-
+    
     private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
     {
         if (!isInitialized || contacts.count == 0) return;
-        
-        Debug.Log($"<color=cyan>【LOG 1】: OnCollision 事件触发, 接触点数量: {contacts.count}</color>");
 
+        constraintsToApply.Clear();
+        particlesToColorThisFrame.Clear();
         collidingParticlesInActor.Clear();
 
         for (int i = 0; i < contacts.count; ++i)
         {
             Oni.Contact contact = contacts[i];
             
-            // --- 关键修正：交换 bodyA 和 bodyB 的角色 ---
-            // 我们现在假设 bodyA 是碰撞体，bodyB 是软体的单纯形
-            var otherColliderHandle = ObiColliderWorld.GetInstance().colliderHandles[contact.bodyA];
-            if (!otherColliderHandle.owner) continue;
+            int particleSolverIndex = contact.bodyA;
+            int colliderIndex = contact.bodyB;
 
-            // --- 新增诊断日志 ---
-            Debug.Log($"  <color=grey>接触点 {i}: Simplex Index (bodyB) = {contact.bodyB}, Collider Handle Index (bodyA) = {contact.bodyA}</color>");
+            if (!IsParticleFromOurSoftbody(particleSolverIndex))
+            {
+                particleSolverIndex = contact.bodyB;
+                colliderIndex = contact.bodyA;
+                if (!IsParticleFromOurSoftbody(particleSolverIndex))
+                    continue; 
+            }
+            
+            var colliderHandles = ObiColliderWorld.GetInstance().colliderHandles;
+            if (colliderIndex < 0 || colliderIndex >= colliderHandles.Count) continue;
+            var otherColliderHandle = colliderHandles[colliderIndex];
+            if (!otherColliderHandle.owner) continue;
 
             if (!string.IsNullOrEmpty(colliderTag) && !otherColliderHandle.owner.CompareTag(colliderTag))
                 continue;
-
-            simplexParticlesBuffer.Clear();
-            GetParticlesFromSimplex(contact.bodyB, simplexParticlesBuffer); // 使用 bodyB 获取粒子
-
-            // --- 新增诊断日志 ---
-            if (simplexParticlesBuffer.Count > 0)
-                Debug.Log($"  <color=grey>从Simplex {contact.bodyB} 中解析出 {simplexParticlesBuffer.Count} 个粒子。</color>");
-
-
-            foreach (int particleSolverIndex in simplexParticlesBuffer)
-            {
-                if (particleSolverIndex < 0 || particleSolverIndex >= solver.particleToActor.Length) continue;
-
-                var pInActor = solver.particleToActor[particleSolverIndex];
-                if (pInActor != null && pInActor.actor == softbody)
-                {
-                    Debug.Log($"<color=yellow>【LOG 2】: 找到碰撞粒子! Actor Index: {pInActor.indexInActor}, Solver Index: {particleSolverIndex}</color>");
-                    collidingParticlesInActor.Add(pInActor.indexInActor);
-                }
-            }
+            
+            var pInActor = solver.particleToActor[particleSolverIndex];
+            collidingParticlesInActor.Add(pInActor.indexInActor);
         }
         
         if (collidingParticlesInActor.Count > 0)
         {
-            Debug.Log($"<color=orange>【LOG 3】: 准备强化 {collidingParticlesInActor.Count} 个碰撞粒子所在的邻域...</color>");
+            // 补全缺失的方法调用
             StrengthenCollidingNeighborhoods();
         }
     }
-    
+
+    // --- 补全缺失的完整方法 ---
     private void StrengthenCollidingNeighborhoods()
     {
-        bool needsUpload = false;
         var dc = softbody.GetConstraintsByType(Oni.ConstraintType.ShapeMatching) as ObiConstraints<ObiShapeMatchingConstraintsBatch>;
         if (dc == null) return;
 
@@ -182,77 +144,145 @@ public class CollisionStiffener : MonoBehaviour
 
                 if (neighborhoodIsColliding)
                 {
-                    // 【调试日志 4】
-                    Debug.Log($"<color=magenta>【LOG 4】: 找到碰撞邻域 (ShapeMatching约束 {i}), 准备激活内部约束。</color>");
                     int centerParticleIndex = batch.particleIndices[batch.firstIndex[i]];
                     for (int k = 1; k < batch.numIndices[i]; ++k)
                     {
                         int spokeParticleIndex = batch.particleIndices[batch.firstIndex[i] + k];
-                        if (ActivateTemporaryConstraint(centerParticleIndex, spokeParticleIndex))
-                            needsUpload = true;
+                        Tuple<int, int> pair = centerParticleIndex < spokeParticleIndex 
+                            ? new Tuple<int, int>(centerParticleIndex, spokeParticleIndex) 
+                            : new Tuple<int, int>(spokeParticleIndex, centerParticleIndex);
+                        
+                        constraintsToApply.Add(pair);
+                        particlesToColorThisFrame.Add(centerParticleIndex);
+                        particlesToColorThisFrame.Add(spokeParticleIndex);
                     }
                 }
             }
         }
-
-        if (needsUpload)
-        {
-            var solverConstraints = solver.GetConstraintsByType(Oni.ConstraintType.Distance) as ObiDistanceConstraintsData;
-            var solverPoolBatch = solverConstraints.batches[poolBatchIndex];
-            
-            solverPoolBatch.particleIndices.Upload();
-            solverPoolBatch.restLengths.Upload();
-            solverPoolBatch.stiffnesses.Upload();
-            
-            if (enableVisualization)
-                solver.colors.Upload();
-        }
     }
 
-    private bool ActivateTemporaryConstraint(int particleIndex1, int particleIndex2)
+    private void ApplyNewConstraints(ObiDistanceConstraintsData distanceConstraintsData)
     {
-        Tuple<int, int> key = particleIndex1 < particleIndex2 ? Tuple.Create(particleIndex1, particleIndex2) : Tuple.Create(particleIndex2, particleIndex1);
-        if (activeTemporaryConstraints.ContainsKey(key)) return false;
-        if (availableConstraintIndicesInPool.Count == 0) 
+        // 找出真正需要新创建的约束（避免重复添加）
+        bool needsRebuild = false;
+        foreach (var pair in constraintsToApply)
         {
-            Debug.LogWarning("约束池耗尽，无法激活新的临时约束！");
-            return false;
+            if (!activeTemporaryConstraints.ContainsKey(pair))
+            {
+                activeTemporaryConstraints.Add(pair, true);
+                needsRebuild = true;
+            }
+        }
+        
+        // 移除不再需要的约束
+        List<Tuple<int, int>> toRemove = new List<Tuple<int, int>>();
+        HashSet<Tuple<int, int>> requiredThisFrame = new HashSet<Tuple<int, int>>(constraintsToApply);
+        foreach (var pair in activeTemporaryConstraints.Keys)
+        {
+            if (!requiredThisFrame.Contains(pair))
+            {
+                toRemove.Add(pair);
+            }
         }
 
-        // 【调试日志 5】
-        Debug.Log($"<color=green>【LOG 5】: 正在激活约束! 连接 Actor粒子 {particleIndex1} <-> {particleIndex2}。</color>");
-
-        var solverConstraints = solver.GetConstraintsByType(Oni.ConstraintType.Distance) as ObiDistanceConstraintsData;
-        var solverPoolBatch = solverConstraints.batches[poolBatchIndex];
-        int offset = softbody.solverBatchOffsets[(int)Oni.ConstraintType.Distance][poolBatchIndex];
-
-        int poolIndex = availableConstraintIndicesInPool.Dequeue();
-        activeTemporaryConstraints.Add(key, poolIndex);
-
-        int solverIndex = offset + poolIndex;
-        int solverP1 = softbody.solverIndices[particleIndex1];
-        int solverP2 = softbody.solverIndices[particleIndex2];
-
-        float restLength = Vector3.Distance(solver.positions[solverP1], solver.positions[solverP2]);
-
-        solverPoolBatch.particleIndices[solverIndex * 2] = solverP1;
-        solverPoolBatch.particleIndices[solverIndex * 2 + 1] = solverP2;
-        solverPoolBatch.restLengths[solverIndex] = restLength;
-        solverPoolBatch.stiffnesses[solverIndex] = new Vector2(temporaryStiffness, temporaryStiffness);
-
-        if (enableVisualization)
+        foreach (var pair in toRemove)
         {
-            if (!originalParticleColors.ContainsKey(solverP1)) originalParticleColors[solverP1] = solver.colors[solverP1];
-            if (!originalParticleColors.ContainsKey(solverP2)) originalParticleColors[solverP2] = solver.colors[solverP2];
-            solver.colors[solverP1] = activeConstraintColor;
-            solver.colors[solverP2] = activeConstraintColor;
+            activeTemporaryConstraints.Remove(pair);
+            needsRebuild = true;
         }
 
-        return true;
+        if (!needsRebuild) return;
+        
+        // ---- 重建约束 ----
+        var newBatch = distanceConstraintsData.CreateBatch();
+        foreach (var pair in activeTemporaryConstraints.Keys)
+        {
+            int p1 = pair.Item1;
+            int p2 = pair.Item2;
+            
+            float restLength = Vector3.Distance(
+                solver.positions[softbody.solverIndices[p1]],
+                solver.positions[softbody.solverIndices[p2]]
+            );
+
+            newBatch.AddConstraint(new Vector2Int(p1, p2), restLength);
+            newBatch.stiffnesses[newBatch.constraintCount - 1] = new Vector2(temporaryStiffness, temporaryStiffness);
+        }
+        
+        distanceConstraintsData.Clear();
+        newBatch.activeConstraintCount = activeTemporaryConstraints.Count;
+        distanceConstraintsData.AddBatch(newBatch);
+        softbody.SetConstraintsDirty(Oni.ConstraintType.Distance);
+        
+        UpdateColors();
+
+        if (logConstraintCount)
+        {
+            Debug.Log($"<color=lime>约束更新: 本帧维持/新增了 {activeTemporaryConstraints.Count} 个临时距离约束。</color>");
+        }
     }
 
-    // 其他辅助方法与上一版相同...
-    private void DeactivateTemporaryConstraints(List<Tuple<int, int>> keysToDeactivate){/*...*/}
-    private void RestoreAllParticleColors(){/*...*/}
-    private void GetParticlesFromSimplex(int simplexIndex, List<int> outParticles){/*...*/}
+    private void ClearTemporaryConstraints(ObiDistanceConstraintsData distanceConstraintsData = null)
+    {
+        if (softbody == null || !softbody.isLoaded) return;
+        var constraints = distanceConstraintsData != null ? distanceConstraintsData : softbody.GetConstraintsByType(Oni.ConstraintType.Distance) as ObiDistanceConstraintsData;
+        
+        if (constraints != null)
+        {
+            constraints.Clear();
+            softbody.SetConstraintsDirty(Oni.ConstraintType.Distance);
+        }
+        
+        activeTemporaryConstraints.Clear();
+        RestoreAllParticleColors();
+
+        if (logConstraintCount)
+        {
+             Debug.Log("<color=red>碰撞结束: 所有临时约束已清除。</color>");
+        }
+    }
+    
+    private void UpdateColors()
+    {
+        if (!enableVisualization) return;
+        RestoreAllParticleColors(); // 先恢复所有颜色
+        foreach (var pair in activeTemporaryConstraints.Keys) // 再为当前激活的约束上色
+        {
+            int p1 = pair.Item1;
+            int p2 = pair.Item2;
+            particlesToColorThisFrame.Add(p1);
+
+            int solverIndex1 = softbody.solverIndices[p1];
+            if (!originalParticleColors.ContainsKey(solverIndex1))
+                originalParticleColors[solverIndex1] = solver.colors[solverIndex1];
+            solver.colors[solverIndex1] = activeConstraintColor;
+            
+            int solverIndex2 = softbody.solverIndices[p2];
+            if (!originalParticleColors.ContainsKey(solverIndex2))
+                originalParticleColors[solverIndex2] = solver.colors[solverIndex2];
+            solver.colors[solverIndex2] = activeConstraintColor;
+        }
+        if (originalParticleColors.Count > 0)
+            solver.colors.Upload();
+    }
+
+    private void RestoreAllParticleColors()
+    {
+        if (!enableVisualization || originalParticleColors.Count == 0) return;
+        foreach (var pair in originalParticleColors)
+        {
+            if (pair.Key < solver.colors.count)
+               solver.colors[pair.Key] = pair.Value;
+        }
+        if (originalParticleColors.Count > 0)
+            solver.colors.Upload();
+        originalParticleColors.Clear();
+    }
+
+    private bool IsParticleFromOurSoftbody(int particleSolverIndex)
+    {
+        if (particleSolverIndex < 0 || particleSolverIndex >= solver.particleToActor.Length) return false;
+        var pInActor = solver.particleToActor[particleSolverIndex];
+        return pInActor != null && pInActor.actor == softbody;
+    }
 }
