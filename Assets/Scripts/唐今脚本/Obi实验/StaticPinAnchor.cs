@@ -37,7 +37,7 @@ public class StaticPinAnchor : MonoBehaviour
     private ObiActorBlueprint blueprint;
 
     // --- 生命周期 ---
-    void OnEnable()
+    void Start()
     {
         softbody = GetComponent<ObiSoftbody>();
         softbody.OnBlueprintLoaded += OnBlueprintLoaded;

@@ -551,6 +551,52 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!1 &335718474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 335718476}
+  - component: {fileID: 335718475}
+  m_Layer: 0
+  m_Name: BurstCollisionWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &335718475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335718474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1a161c4294214a4fbcb7e9e94800494, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellSpans:
+    m_AlignBytes: 16
+--- !u!4 &335718476
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 335718474}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &461329735
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1549,52 +1595,6 @@ Transform:
   - {fileID: 72511893}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1780613038
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1780613040}
-  - component: {fileID: 1780613039}
-  m_Layer: 0
-  m_Name: BurstCollisionWorld
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1780613039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780613038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1a161c4294214a4fbcb7e9e94800494, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cellSpans:
-    m_AlignBytes: 16
---- !u!4 &1780613040
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1780613038}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1855081454
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2320,6 +2320,7 @@ GameObject:
   - component: {fileID: 788861887}
   - component: {fileID: 788861888}
   - component: {fileID: 8813639549204842218}
+  - component: {fileID: 8813639549204842219}
   m_Layer: 0
   m_Name: Prism
   m_TagString: Untagged
@@ -27056,14 +27057,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colliderTag: TestObi
   pinPoolSize: 32
-  minPenetrationDepth: 0
-  pinEntireNeighborhood: 0
   pinStiffness: 1
-  constrainOrientation: 0
-  orientationStiffness: 1
+  disengagementDistance: 0.1
   enableVisualization: 1
-  pinnedParticleColor: {r: 0, g: 1, b: 1, a: 1}
-  neighborhoodParticleColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  pinnedParticleColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &8813639549204842219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435336633728200261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 689c8180e96564b47a813ce3421c85c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colliderTag: TestObi
+  constrainOrientation: 0
+  enableVisualization: 1
+  anchoredParticleColor: {r: 1, g: 0, b: 1, a: 1}
 --- !u!23 &8831171525212943500
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -27429,4 +27442,4 @@ SceneRoots:
   - {fileID: 1661606662}
   - {fileID: 2132379585}
   - {fileID: 6393188990509933343}
-  - {fileID: 1780613040}
+  - {fileID: 335718476}
