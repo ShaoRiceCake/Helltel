@@ -15,7 +15,7 @@ public class PositionProjector : MonoBehaviour
 
     [Header("可视化")]
     public bool enableVisualization = true;
-    public Color projectedParticleColor = Color.green;
+    public Color projectedParticleColor = Color.red;
 
     private ObiSoftbody softbody;
     private ObiSolver solver;
