@@ -3,8 +3,8 @@ using Obi;
 using System.Collections.Generic;
 
 /// <summary>
-/// (V15: 修正版 - 正确的约束池管理与生命周期)
-/// 修复了Pin约束不生效的问题。
+/// (V16: 最终版 - 正确的 Burst Job 交互)
+/// 修复了 IndexOutOfRangeException，实现了稳定、可控、高性能的动态Pin约束。
 /// </summary>
 [RequireComponent(typeof(ObiSoftbody))]
 public class DynamicPinStiffener : MonoBehaviour
@@ -12,8 +12,8 @@ public class DynamicPinStiffener : MonoBehaviour
     [Header("核心功能配置")]
     [Tooltip("只对拥有此Tag的物体加强碰撞。留空则对所有碰撞生效。")]
     public string colliderTag;
-    [Tooltip("预分配的 Pin 约束池大小。")]
-    public int pinPoolSize = 64;
+    [Tooltip("可以同时存在的最大Pin约束数量。")]
+    public int maxPins = 64;
 
     [Header("固定模式与强度")]
     [Tooltip("Pin约束的硬度 (0-1)。将直接影响粒子'粘'在碰撞体上的强度。")]
@@ -30,8 +30,8 @@ public class DynamicPinStiffener : MonoBehaviour
     public bool enableVisualization = true;
     public Color pinnedParticleColor = Color.cyan;
     
-    // C# 层的状态追踪器，现在只用于柔化挣脱逻辑和颜色恢复
-    private class PinInfo { public int ParticleSolverIndex = -1; public ObiColliderBase Collider = null; public Vector3 LocalOffset; }
+    // C# 层的状态追踪器，是唯一的数据源头。
+    private class PinInfo { public bool IsActive = false; public int ParticleSolverIndex; public ObiColliderBase Collider; public Vector3 LocalOffset; }
     private PinInfo[] pinInfos;
     
     private ObiSoftbody softbody;
@@ -41,122 +41,80 @@ public class DynamicPinStiffener : MonoBehaviour
     private readonly Dictionary<int, Color> originalParticleColors = new Dictionary<int, Color>();
 
 
-    void OnEnable() 
-    {
-        softbody = GetComponent<ObiSoftbody>(); 
-        softbody.OnBlueprintLoaded += OnBlueprintLoaded; 
-        if (softbody.isLoaded) OnBlueprintLoaded(softbody, softbody.sourceBlueprint); 
-    }
-
-    void OnDisable() 
-    {
-        softbody.OnBlueprintLoaded -= OnBlueprintLoaded;
-        RemoveDynamicBatch();
-        RestoreAllParticleColors();
-    }
-
-    private void OnBlueprintLoaded(ObiActor actor, ObiActorBlueprint blueprint) 
-    { 
-        SetupDynamicBatch(); 
-        SubscribeToSolver(); 
-    }
-
-    private void SubscribeToSolver() 
-    { 
-        if (solver != null) solver.OnCollision -= Solver_OnCollision; 
-        solver = softbody.solver; 
-        if (solver != null) solver.OnCollision += Solver_OnCollision; 
-    }
+    void OnEnable() { softbody = GetComponent<ObiSoftbody>(); softbody.OnBlueprintLoaded += OnBlueprintLoaded; if (softbody.isLoaded) OnBlueprintLoaded(softbody, softbody.sourceBlueprint); }
+    void OnDisable() { softbody.OnBlueprintLoaded -= OnBlueprintLoaded; RemoveDynamicBatch(); RestoreAllParticleColors(); }
+    private void OnBlueprintLoaded(ObiActor actor, ObiActorBlueprint blueprint) { SetupDynamicBatch(); SubscribeToSolver(); }
+    private void SubscribeToSolver() { if (solver != null) solver.OnCollision -= Solver_OnCollision; solver = softbody.solver; if (solver != null) solver.OnCollision += Solver_OnCollision; }
 
     private void SetupDynamicBatch()
     {
-        // 确保旧的Batch被正确移除
         RemoveDynamicBatch();
-        
         pinConstraintsData = softbody.GetConstraintsByType(Oni.ConstraintType.Pin) as ObiPinConstraintsData;
-        if (pinConstraintsData == null) 
-        { 
-            Debug.LogError($"[{this.name}] ObiSoftbody上缺少PinConstraints组件。请添加一个Obi Pin Constraints。", this); 
-            enabled = false; 
-            return; 
-        }
+        if (pinConstraintsData == null) { Debug.LogError($"[{this.name}] ...", this); enabled = false; return; }
 
-        // *** 关键修改 1: 正确的批处理初始化 ***
         dynamicPinBatch = new ObiPinConstraintsBatch();
-        pinInfos = new PinInfo[pinPoolSize]; // C#状态追踪器
-
-        for (int i = 0; i < pinPoolSize; ++i) 
-        {
-            // 为池中每个槽位添加一个“占位符”约束。
-            // 粒子索引为-1是关键，它告诉Solver这是一个无效/待用的约束。
-            dynamicPinBatch.AddConstraint(-1, null, Vector3.zero, Quaternion.identity, 1f, 1f);
+        pinConstraintsData.AddBatch(dynamicPinBatch); // 添加一个空的 batch
+        
+        // 初始化C#层的追踪器
+        pinInfos = new PinInfo[maxPins];
+        for (int i = 0; i < maxPins; ++i) 
             pinInfos[i] = new PinInfo();
-        }
-        
-        // 设置活动约束数量为池的大小，让Solver知道这个批处理的总容量
-        dynamicPinBatch.activeConstraintCount = pinPoolSize;
-        
-        // 将准备好的、但所有约束都无效的批处理添加到Actor
-        pinConstraintsData.AddBatch(dynamicPinBatch);
     }
 
     private void RemoveDynamicBatch() 
     {
         if (solver != null) solver.OnCollision -= Solver_OnCollision; 
-        solver = null; 
-
         if (pinConstraintsData != null && dynamicPinBatch != null) 
         {
             pinConstraintsData.RemoveBatch(dynamicPinBatch);
             if (softbody.isLoaded) softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
         }
-        dynamicPinBatch = null; 
-        pinConstraintsData = null; 
+        dynamicPinBatch = null; pinConstraintsData = null; 
     }
 
     void LateUpdate()
     {
-        if (!softbody.isLoaded || dynamicPinBatch == null || !enableDisengagement) return;
+        if (!softbody.isLoaded || dynamicPinBatch == null) return;
 
-        bool needsUpdate = false;
-        for (int i = 0; i < pinPoolSize; ++i)
+        // 步骤1：(可选) 脱离检测，更新 C# 层的 pinInfos 状态
+        if (enableDisengagement)
         {
-            // 通过检查批处理中的粒子索引来判断槽位是否激活
-            if (dynamicPinBatch.particleIndices[i] != -1)
+            for (int i = 0; i < maxPins; ++i)
             {
-                var info = pinInfos[i];
-                var targetCollider = info.Collider;
-
-                if (targetCollider == null || !targetCollider.gameObject.activeInHierarchy)
+                if (pinInfos[i].IsActive)
                 {
-                    DeactivatePin(i);
-                    needsUpdate = true;
-                    continue;
-                }
-                
-                Vector3 currentParticlePos = solver.positions[info.ParticleSolverIndex];
-                Vector3 pinWorldPos = targetCollider.transform.TransformPoint(info.LocalOffset);
-
-                if (Vector3.SqrMagnitude(currentParticlePos - pinWorldPos) > disengagementDistance * disengagementDistance)
-                {
-                    DeactivatePin(i);
-                    needsUpdate = true;
+                    var info = pinInfos[i];
+                    if (info.Collider == null || !info.Collider.gameObject.activeInHierarchy || 
+                        Vector3.SqrMagnitude((Vector3)solver.positions[info.ParticleSolverIndex] - info.Collider.transform.TransformPoint(info.LocalOffset)) > disengagementDistance * disengagementDistance)                    {
+                        info.IsActive = false; // 只更新C#状态
+                    }
                 }
             }
         }
 
-        if (needsUpdate)
+        // 步骤2：根据 C# 层的状态，重建物理 Batch
+        dynamicPinBatch.Clear(); // 清空物理Batch，准备重建
+        
+        float compliance = 1f - pinStiffness;
+        foreach (var info in pinInfos)
         {
-            softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
-            UpdateColors();
+            if (info.IsActive)
+            {
+                dynamicPinBatch.AddConstraint(info.ParticleSolverIndex, info.Collider, info.LocalOffset, Quaternion.identity, compliance, 1f);
+            }
         }
+
+        // 步骤3：通知 Solver
+        softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
+        
+        // 步骤4：更新颜色
+        UpdateColors();
     }
 
     private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
     {
         if (contacts.count == 0) return;
 
-        bool needsUpdate = false;
         for (int i = 0; i < contacts.count; ++i)
         {
             Oni.Contact contact = contacts[i];
@@ -164,11 +122,7 @@ public class DynamicPinStiffener : MonoBehaviour
             if (particleSolverIndex == -1 || IsParticleAlreadyPinned(particleSolverIndex)) continue;
             
             int freeSlotIndex = FindFreePinSlot();
-            if (freeSlotIndex == -1) 
-            {
-                Debug.LogWarning("Pin约束池已满，无法创建新的约束。");
-                break; 
-            }
+            if (freeSlotIndex == -1) break; 
 
             var otherCollider = ObiColliderWorld.GetInstance().colliderHandles[GetColliderIndexFromContact(contact)].owner;
             if (otherCollider == null || !otherCollider.gameObject.activeInHierarchy) continue;
@@ -178,97 +132,75 @@ public class DynamicPinStiffener : MonoBehaviour
             Vector3 pinOffset = bindMatrix.MultiplyPoint3x4(solver.positions[particleSolverIndex]);
             if (float.IsNaN(pinOffset.x)) continue;
             
-            ActivatePin(freeSlotIndex, particleSolverIndex, otherCollider, pinOffset);
-            needsUpdate = true;
+            // 激活 C# 层的槽位，真正的物理约束将在 LateUpdate 中创建
+            var info = pinInfos[freeSlotIndex];
+            info.IsActive = true;
+            info.ParticleSolverIndex = particleSolverIndex;
+            info.Collider = otherCollider;
+            info.LocalOffset = pinOffset;
         }
-
-        if (needsUpdate)
-        {
-            softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
-            UpdateColors(); 
-        }
-    }
-
-    private void ActivatePin(int slotIndex, int particleSolverIndex, ObiColliderBase collider, Vector3 offset)
-    {
-        // *** 关键修改 2: 正确的约束激活 ***
-        // 直接修改批处理数组中的数据
-        dynamicPinBatch.particleIndices[slotIndex] = particleSolverIndex;
-        dynamicPinBatch.pinBodies[slotIndex] = collider.Handle;
-        dynamicPinBatch.colliderIndices[slotIndex] = collider.Handle.index;
-        dynamicPinBatch.offsets[slotIndex] = offset;
-        
-        // 1 - stiffness 正确地将硬度[0,1]映射到柔顺度[1,0]
-        dynamicPinBatch.stiffnesses[slotIndex * 2] = 1f - pinStiffness; 
-        dynamicPinBatch.stiffnesses[slotIndex * 2 + 1] = 1f; // 旋转方向的柔顺度，1表示完全自由
-
-        // 更新C#层的追踪信息
-        var info = pinInfos[slotIndex];
-        info.ParticleSolverIndex = particleSolverIndex;
-        info.Collider = collider;
-        info.LocalOffset = offset;
-    }
-
-    private void DeactivatePin(int slotIndex)
-    {
-        // *** 关键修改 3: 正确的约束停用 ***
-        // 必须将粒子索引设为-1，这才是真正“释放”了约束槽
-        dynamicPinBatch.particleIndices[slotIndex] = -1;
-
-        // 将柔顺度设回默认值(1)，虽然不是必须的，但是个好习惯
-        dynamicPinBatch.stiffnesses[slotIndex * 2] = 1f;
-        dynamicPinBatch.stiffnesses[slotIndex * 2 + 1] = 1f;
-        
-        // 清理C#层的追踪信息
-        var info = pinInfos[slotIndex];
-        info.ParticleSolverIndex = -1;
-        info.Collider = null;
     }
     
-    // *** 关键修改 4: 查找和判断逻辑的调整 ***
     private int FindFreePinSlot()
     {
-        for (int i = 0; i < pinPoolSize; i++)
+        for (int i = 0; i < maxPins; i++)
         {
-            // 通过检查批处理中的粒子索引来查找空闲槽位
-            if (dynamicPinBatch.particleIndices[i] == -1) 
-                return i;
+            if (!pinInfos[i].IsActive) return i;
         }
-        return -1; // 池已满
+        return -1;
     }
 
     private bool IsParticleAlreadyPinned(int particleSolverIndex)
     {
-        for (int i = 0; i < pinPoolSize; i++)
+        foreach (var info in pinInfos)
         {
-            // 通过检查批处理中的粒子索引来判断是否已固定
-            if (dynamicPinBatch.particleIndices[i] == particleSolverIndex) 
+            if (info.IsActive && info.ParticleSolverIndex == particleSolverIndex) 
                 return true;
         }
         return false;
     }
 
-    // --- 颜色和辅助方法 (与之前版本基本相同) ---
+    // --- 颜色和辅助方法 ---
     private void UpdateColors()
     {
         if (!enableVisualization || solver == null) return;
         
-        // 先恢复所有颜色
-        RestoreAllParticleColors();
-        
-        // 再为当前固定的粒子上色
-        for(int i = 0; i < pinPoolSize; ++i)
+        // 建立当前帧需要上色的粒子列表
+        var currentPinnedParticles = new HashSet<int>();
+        foreach (var info in pinInfos)
         {
-            int solverIndex = dynamicPinBatch.particleIndices[i];
-            if(solverIndex != -1)
+            if (info.IsActive)
             {
-                if(!originalParticleColors.ContainsKey(solverIndex))
-                {
-                    originalParticleColors[solverIndex] = solver.colors[solverIndex];
-                }
+                currentPinnedParticles.Add(info.ParticleSolverIndex);
+            }
+        }
+
+        // 恢复不再被 Pin 的粒子的颜色
+        var keysToRemove = new List<int>();
+        foreach (var pair in originalParticleColors)
+        {
+            if (!currentPinnedParticles.Contains(pair.Key))
+            {
+                if (pair.Key >= 0 && pair.Key < solver.colors.count)
+                    solver.colors[pair.Key] = pair.Value;
+                keysToRemove.Add(pair.Key);
+            }
+        }
+        foreach (var key in keysToRemove)
+        {
+            originalParticleColors.Remove(key);
+        }
+
+        // 为新被 Pin 的粒子上色
+        foreach (int solverIndex in currentPinnedParticles)
+        {
+            if (!originalParticleColors.ContainsKey(solverIndex))
+            {
+                originalParticleColors[solverIndex] = solver.colors[solverIndex];
                 solver.colors[solverIndex] = pinnedParticleColor;
             }
         }
+
         solver.colors.Upload();
     }
     
