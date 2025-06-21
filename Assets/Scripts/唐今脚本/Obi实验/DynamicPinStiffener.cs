@@ -1,11 +1,10 @@
 using UnityEngine;
 using Obi;
-using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
 /// 通过动态调节 Pin 约束的柔度（Compliance）来模拟临时约束，以防止穿透。
-/// (V8: 参数化调优版 - 暴露所有关键参数以供实验)
+/// (V9: 状态维持版 - 实现约束连贯性，避免闪烁，直到脱离接触才释放)
 /// </summary>
 [RequireComponent(typeof(ObiSoftbody))]
 public class DynamicPinStiffener : MonoBehaviour
@@ -13,60 +12,42 @@ public class DynamicPinStiffener : MonoBehaviour
     [Header("核心功能配置")]
     [Tooltip("只对拥有此Tag的物体加强碰撞。留空则对所有碰撞生效。")]
     public string colliderTag;
-
-    [Tooltip("预分配的 Pin 约束池大小。应大于场景中可能同时发生的最大碰撞点数。")]
-    public int pinPoolSize = 32;
-
-    [Header("触发机制")]
-    [Tooltip("只有当粒子穿透碰撞体超过此深度时，才触发Pin约束。设为0则在任何接触时都触发。")]
-    [Range(0, 0.1f)]
-    public float minPenetrationDepth = 0f;
-    
-    [Tooltip("是否将约束应用到整个碰撞粒子所在的邻域（ShapeMatching簇），而不仅仅是单个粒子。")]
-    public bool pinEntireNeighborhood = false;
+    [Tooltip("预分配的 Pin 约束池大小。")]
+    public int pinPoolSize = 64;
 
     [Header("固定模式与强度")]
-    [Tooltip("临时Pin约束的硬度 (0-1)。1为最强。")]
+    [Tooltip("Pin约束的硬度 (0-1)。")]
     [Range(0f, 1f)]
     public float pinStiffness = 1f;
 
-    [Tooltip("是否同时约束粒子的朝向。仅当软体启用了Oriented Particles时有效。")]
-    public bool constrainOrientation = false;
-    
-    [Tooltip("约束朝向的硬度 (0-1)。")]
-    [Range(0f, 1f)]
-    public float orientationStiffness = 1f;
-    
-    [Header("可视化与调试")]
+    [Header("脱离检测")]
+    [Tooltip("当粒子与其锚定点的距离超过此值时，释放Pin约束。")]
+    public float disengagementDistance = 0.1f;
+
+    [Header("可视化")]
     public bool enableVisualization = true;
     public Color pinnedParticleColor = Color.cyan;
-    public Color neighborhoodParticleColor = Color.yellow;
 
+    // --- 内部状态 ---
+    private class PinSlot
+    {
+        public bool IsActive = false;
+        public int ParticleSolverIndex = -1;
+        public ObiColliderBase Collider = null;
+    }
+    private PinSlot[] pinSlots;
 
-    // 内部工作变量
     private ObiSoftbody softbody;
     private ObiSolver solver;
     private ObiPinConstraintsData pinConstraintsData;
     private ObiPinConstraintsBatch dynamicPinBatch;
-    private ObiShapeMatchingConstraintsData shapeMatchingData;
 
-    private struct DynamicPinInfo
-    {
-        public int particleSolverIndex;
-        public ObiColliderBase collider;
-        public Vector3 pinOffset;
-    }
-    private readonly List<DynamicPinInfo> pinsToApply = new List<DynamicPinInfo>();
-    
-    private readonly Dictionary<int, Color> originalParticleColors = new Dictionary<int, Color>();
-    private readonly HashSet<int> neighborhoodParticlesToColor = new HashSet<int>();
-
+    // --- 生命周期 ---
     void OnEnable()
     {
         softbody = GetComponent<ObiSoftbody>();
         softbody.OnBlueprintLoaded += OnBlueprintLoaded;
-        if (softbody.isLoaded)
-            OnBlueprintLoaded(softbody, softbody.sourceBlueprint);
+        if (softbody.isLoaded) OnBlueprintLoaded(softbody, softbody.sourceBlueprint);
     }
 
     void OnDisable()
@@ -78,7 +59,6 @@ public class DynamicPinStiffener : MonoBehaviour
     
     private void OnBlueprintLoaded(ObiActor actor, ObiActorBlueprint blueprint)
     {
-        shapeMatchingData = softbody.GetConstraintsByType(Oni.ConstraintType.ShapeMatching) as ObiShapeMatchingConstraintsData;
         SetupDynamicBatch();
         SubscribeToSolver();
     }
@@ -97,15 +77,18 @@ public class DynamicPinStiffener : MonoBehaviour
         if (pinConstraintsData == null)
         {
             Debug.LogError("DynamicPinStiffener: 软体上必须启用 'Pin Constraints' 才能工作。", this);
-            enabled = false;
-            return;
+            enabled = false; return;
         }
 
         if (dynamicPinBatch == null)
         {
             dynamicPinBatch = pinConstraintsData.CreateBatch();
+            pinSlots = new PinSlot[pinPoolSize];
             for (int i = 0; i < pinPoolSize; ++i)
+            {
+                pinSlots[i] = new PinSlot();
                 dynamicPinBatch.AddConstraint(-1, null, Vector3.zero, Quaternion.identity, 1f, 1f);
+            }
             dynamicPinBatch.activeConstraintCount = pinPoolSize;
         }
     }
@@ -124,37 +107,71 @@ public class DynamicPinStiffener : MonoBehaviour
         pinConstraintsData = null;
     }
 
+    // --- 核心逻辑 ---
+
     void LateUpdate()
     {
         if (!softbody.isLoaded || dynamicPinBatch == null) return;
 
         bool needsUpdate = false;
-        float activePositionalCompliance = 1f - pinStiffness;
-        float activeOrientationCompliance = 1f - orientationStiffness;
 
-        // Reset previous frame's active pins to be soft
-        for (int i = 0; i < dynamicPinBatch.activeConstraintCount; ++i)
+        // 步骤 1: 脱离检测 - 检查所有活动的 Pin
+        for (int i = 0; i < pinPoolSize; ++i)
         {
-            if (dynamicPinBatch.stiffnesses[i * 2] < 1f)
+            if (pinSlots[i].IsActive)
             {
-                dynamicPinBatch.stiffnesses[i * 2] = 1f;
-                dynamicPinBatch.stiffnesses[i * 2 + 1] = 1f;
-                needsUpdate = true;
+                var slot = pinSlots[i];
+                Vector3 currentParticlePos = solver.positions[slot.ParticleSolverIndex];
+                Vector3 pinWorldPos = slot.Collider.transform.TransformPoint(dynamicPinBatch.offsets[i]);
+
+                if (Vector3.SqrMagnitude(currentParticlePos - pinWorldPos) > disengagementDistance * disengagementDistance)
+                {
+                    // 脱离了，释放这个 Pin
+                    DeactivatePin(i);
+                    needsUpdate = true;
+                }
             }
         }
-        
-        // Activate new pins for the current frame
-        int pinsToActivateCount = Mathf.Min(pinsToApply.Count, pinPoolSize);
-        for (int i = 0; i < pinsToActivateCount; ++i)
+
+        // 如果有任何状态改变，通知求解器
+        if (needsUpdate)
         {
-            var pinInfo = pinsToApply[i];
-            dynamicPinBatch.particleIndices[i] = pinInfo.particleSolverIndex;
-            dynamicPinBatch.pinBodies[i] = pinInfo.collider.Handle;
-            dynamicPinBatch.colliderIndices[i] = pinInfo.collider.Handle.index;
-            dynamicPinBatch.offsets[i] = pinInfo.pinOffset;
+            softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
+        }
+
+        UpdateColors();
+    }
+
+    private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
+    {
+        if (contacts.count == 0) return;
+
+        bool needsUpdate = false;
+
+        for (int i = 0; i < contacts.count; ++i)
+        {
+            Oni.Contact contact = contacts[i];
             
-            dynamicPinBatch.stiffnesses[i * 2] = activePositionalCompliance;
-            dynamicPinBatch.stiffnesses[i * 2 + 1] = constrainOrientation ? activeOrientationCompliance : 1f;
+            int particleSolverIndex = GetParticleSolverIndexFromContact(contact);
+            if (particleSolverIndex == -1 || IsParticleAlreadyPinned(particleSolverIndex)) continue;
+
+            // 寻找一个空闲的槽位来激活
+            int freeSlotIndex = FindFreePinSlot();
+            if (freeSlotIndex == -1)
+            {
+                //Debug.LogWarning("Pin pool is full!");
+                break; // 池已满
+            }
+
+            var otherCollider = ObiColliderWorld.GetInstance().colliderHandles[GetColliderIndexFromContact(contact)].owner;
+            if (otherCollider == null || !otherCollider.gameObject.activeInHierarchy) continue;
+            if (!string.IsNullOrEmpty(colliderTag) && !otherCollider.CompareTag(colliderTag)) continue;
+            
+            Vector3 pinOffset = otherCollider.transform.InverseTransformPoint(contact.pointB);
+            if (float.IsNaN(pinOffset.x)) continue;
+
+            // 激活 Pin
+            ActivatePin(freeSlotIndex, particleSolverIndex, otherCollider, pinOffset);
             needsUpdate = true;
         }
 
@@ -162,121 +179,77 @@ public class DynamicPinStiffener : MonoBehaviour
         {
             softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
         }
-
-        UpdateColors();
-        pinsToApply.Clear();
     }
 
-    private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
+    // --- Pin 管理 ---
+
+    private void ActivatePin(int slotIndex, int particleSolverIndex, ObiColliderBase collider, Vector3 offset)
     {
-        pinsToApply.Clear();
-        neighborhoodParticlesToColor.Clear();
-        if (contacts.count == 0) return;
+        // 更新槽状态
+        pinSlots[slotIndex].IsActive = true;
+        pinSlots[slotIndex].ParticleSolverIndex = particleSolverIndex;
+        pinSlots[slotIndex].Collider = collider;
 
-        var processedParticles = new HashSet<int>();
-        var collidingParticlesInfo = new List<(int solverIndex, Oni.Contact contact)>();
+        // 更新 Batch 数据
+        dynamicPinBatch.particleIndices[slotIndex] = particleSolverIndex;
+        dynamicPinBatch.pinBodies[slotIndex] = collider.Handle;
+        dynamicPinBatch.colliderIndices[slotIndex] = collider.Handle.index;
+        dynamicPinBatch.offsets[slotIndex] = offset;
+        dynamicPinBatch.stiffnesses[slotIndex * 2] = 1f - pinStiffness; // Positional
+        dynamicPinBatch.stiffnesses[slotIndex * 2 + 1] = 1f;           // Rotational
+    }
 
-        // Step 1: Filter contacts and gather initial collision info
-        for (int i = 0; i < contacts.count; ++i)
-        {
-            Oni.Contact contact = contacts[i];
-            if (contact.distance > -minPenetrationDepth) continue;
+    private void DeactivatePin(int slotIndex)
+    {
+        // 更新槽状态
+        pinSlots[slotIndex].IsActive = false;
+        pinSlots[slotIndex].ParticleSolverIndex = -1;
+        pinSlots[slotIndex].Collider = null;
 
-            int particleSolverIndex = GetParticleSolverIndexFromContact(contact);
-            if (particleSolverIndex == -1) continue;
-
-            var otherCollider = ObiColliderWorld.GetInstance().colliderHandles[GetColliderIndexFromContact(contact)].owner;
-            if (otherCollider == null || !otherCollider.gameObject.activeInHierarchy) continue;
-            if (!string.IsNullOrEmpty(colliderTag) && !otherCollider.CompareTag(colliderTag)) continue;
-            
-            collidingParticlesInfo.Add((particleSolverIndex, contact));
-        }
-
-        // Step 2: Process collisions, either individually or by neighborhood
-        foreach(var info in collidingParticlesInfo)
-        {
-            if (pinsToApply.Count >= pinPoolSize) break;
-            if (processedParticles.Contains(info.solverIndex)) continue;
-
-            var otherCollider = ObiColliderWorld.GetInstance().colliderHandles[GetColliderIndexFromContact(info.contact)].owner;
-
-            if (pinEntireNeighborhood && shapeMatchingData != null)
-            {
-                // Pin entire neighborhood
-                int particleActorIndex = solver.particleToActor[info.solverIndex].indexInActor;
-                int clusterIndex = FindClusterForParticle(particleActorIndex);
-                if (clusterIndex != -1)
-                {
-                    var batch = shapeMatchingData.batches[0]; // Assuming one batch
-                    int first = batch.firstIndex[clusterIndex];
-                    int num = batch.numIndices[clusterIndex];
-
-                    for (int k = 0; k < num; ++k)
-                    {
-                        int neighborActorIndex = batch.particleIndices[first + k];
-                        int neighborSolverIndex = softbody.solverIndices[neighborActorIndex];
-                        if (processedParticles.Contains(neighborSolverIndex) || pinsToApply.Count >= pinPoolSize) continue;
-                        
-                        // For neighbors, we approximate their pin position based on the original contact.
-                        // A more accurate way would be to project them, but this is a good start.
-                        Vector3 worldPos = solver.positions[neighborSolverIndex];
-                        Vector3 pinOffset = otherCollider.transform.InverseTransformPoint(worldPos);
-                        
-                        if (float.IsNaN(pinOffset.x)) continue;
-                        pinsToApply.Add(new DynamicPinInfo { particleSolverIndex = neighborSolverIndex, collider = otherCollider, pinOffset = pinOffset });
-                        processedParticles.Add(neighborSolverIndex);
-                        neighborhoodParticlesToColor.Add(neighborSolverIndex);
-                    }
-                }
-            }
-            else
-            {
-                // Pin just the single colliding particle
-                Vector3 worldContactPoint = info.contact.pointB; 
-                Vector3 pinOffset = otherCollider.transform.InverseTransformPoint(worldContactPoint);
-            
-                if (float.IsNaN(pinOffset.x)) continue;
-                pinsToApply.Add(new DynamicPinInfo { particleSolverIndex = info.solverIndex, collider = otherCollider, pinOffset = pinOffset });
-                processedParticles.Add(info.solverIndex);
-            }
-        }
+        // 更新 Batch 数据 (设为软)
+        dynamicPinBatch.particleIndices[slotIndex] = -1; // 无效化
+        dynamicPinBatch.stiffnesses[slotIndex * 2] = 1f;
+        dynamicPinBatch.stiffnesses[slotIndex * 2 + 1] = 1f;
     }
     
-    // --- Helper and Visualization Methods ---
-
-    private int FindClusterForParticle(int particleActorIndex)
+    private int FindFreePinSlot()
     {
-        if (shapeMatchingData == null || shapeMatchingData.batchCount == 0) return -1;
-        var batch = shapeMatchingData.batches[0];
-        for (int i = 0; i < batch.activeConstraintCount; ++i)
+        for (int i = 0; i < pinPoolSize; i++)
         {
-            for (int k = 0; k < batch.numIndices[i]; ++k)
-            {
-                if (batch.particleIndices[batch.firstIndex[i] + k] == particleActorIndex)
-                    return i; 
-            }
+            if (!pinSlots[i].IsActive) return i;
         }
         return -1;
     }
+
+    private bool IsParticleAlreadyPinned(int particleSolverIndex)
+    {
+        for (int i = 0; i < pinPoolSize; i++)
+        {
+            if (pinSlots[i].IsActive && pinSlots[i].ParticleSolverIndex == particleSolverIndex)
+                return true;
+        }
+        return false;
+    }
+
+
+    // --- 辅助与可视化 ---
+    
+    private readonly Dictionary<int, Color> originalParticleColors = new Dictionary<int, Color>();
 
     private void UpdateColors()
     {
         RestoreAllParticleColors();
         if (!enableVisualization) return;
 
-        // Color neighborhood particles first
-        foreach (int solverIndex in neighborhoodParticlesToColor)
+        for (int i = 0; i < pinPoolSize; ++i)
         {
-             if (!originalParticleColors.ContainsKey(solverIndex)) originalParticleColors[solverIndex] = solver.colors[solverIndex];
-             solver.colors[solverIndex] = neighborhoodParticleColor;
-        }
-
-        // Color directly pinned particles, overriding neighborhood color if necessary
-        foreach (var pinInfo in pinsToApply)
-        {
-            int solverIndex = pinInfo.particleSolverIndex;
-            if (!originalParticleColors.ContainsKey(solverIndex)) originalParticleColors[solverIndex] = solver.colors[solverIndex];
-            solver.colors[solverIndex] = pinnedParticleColor;
+            if (pinSlots[i].IsActive)
+            {
+                int solverIndex = pinSlots[i].ParticleSolverIndex;
+                if (!originalParticleColors.ContainsKey(solverIndex))
+                    originalParticleColors[solverIndex] = solver.colors[solverIndex];
+                solver.colors[solverIndex] = pinnedParticleColor;
+            }
         }
 
         if (originalParticleColors.Count > 0)
@@ -303,12 +276,12 @@ public class DynamicPinStiffener : MonoBehaviour
         if (IsParticleFromOurSoftbody(contact.bodyB)) return contact.bodyB;
         return -1;
     }
-    
+
     private int GetColliderIndexFromContact(Oni.Contact contact)
     {
         return IsParticleFromOurSoftbody(contact.bodyA) ? contact.bodyB : contact.bodyA;
     }
-
+    
     private bool IsParticleFromOurSoftbody(int particleSolverIndex)
     {
         if (solver == null || particleSolverIndex < 0 || particleSolverIndex >= solver.particleToActor.Length) return false;
