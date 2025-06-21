@@ -3,7 +3,7 @@ using Obi;
 using System.Collections.Generic;
 
 /// <summary>
-/// (V11.1: 稳定框架 + 深度监控版 - 基于V11，增加详细日志)
+/// (V12: 混合模式 - 使用 Pin 约束定义硬度，并手动强制定位以确保跟随)
 /// </summary>
 [RequireComponent(typeof(ObiSoftbody))]
 public class DynamicPinStiffener : MonoBehaviour
@@ -22,15 +22,15 @@ public class DynamicPinStiffener : MonoBehaviour
     [Header("可视化与调试")]
     public bool enableVisualization = true;
     public Color pinnedParticleColor = Color.cyan;
-    [Tooltip("勾选后，将持续在控制台打印当前激活的Pin约束状态。")]
-    public bool logPinStatus = true;
-
+    public bool logPinStatus = false;
 
     // --- 内部状态 ---
     private class PinSlot
     {
         public bool IsActive = false;
         public int ParticleSolverIndex = -1;
+        public ObiColliderBase Collider = null;
+        public Vector3 LocalOffset;
     }
     private PinSlot[] pinSlots;
     private int activePinCount = 0;
@@ -40,7 +40,7 @@ public class DynamicPinStiffener : MonoBehaviour
     private ObiPinConstraintsData pinConstraintsData;
     private ObiPinConstraintsBatch dynamicPinBatch;
 
-    // --- 生命周期 ---
+    // --- 生命周期 (与V11.1完全相同) ---
     void OnEnable()
     {
         softbody = GetComponent<ObiSoftbody>();
@@ -71,13 +71,11 @@ public class DynamicPinStiffener : MonoBehaviour
     private void SetupDynamicBatch()
     {
         pinConstraintsData = softbody.GetConstraintsByType(Oni.ConstraintType.Pin) as ObiPinConstraintsData;
-
         if (pinConstraintsData == null)
         {
-            Debug.LogError($"[{this.name}] DynamicPinStiffener: 软体上必须启用 'Pin Constraints' 才能工作。", this);
+            Debug.LogError($"[{this.name}] ...", this);
             enabled = false; return;
         }
-
         if (dynamicPinBatch == null)
         {
             dynamicPinBatch = pinConstraintsData.CreateBatch();
@@ -85,7 +83,6 @@ public class DynamicPinStiffener : MonoBehaviour
             for (int i = 0; i < pinPoolSize; ++i)
             {
                 pinSlots[i] = new PinSlot();
-                // 使用 AddConstraint 来正确初始化 Batch 内部列表的大小
                 dynamicPinBatch.AddConstraint(-1, null, Vector3.zero, Quaternion.identity, 1f, 1f);
             }
             dynamicPinBatch.activeConstraintCount = pinPoolSize;
@@ -96,7 +93,6 @@ public class DynamicPinStiffener : MonoBehaviour
     {
         if (solver != null) solver.OnCollision -= Solver_OnCollision;
         solver = null;
-
         if (pinConstraintsData != null && dynamicPinBatch != null)
         {
             pinConstraintsData.RemoveBatch(dynamicPinBatch);
@@ -111,10 +107,34 @@ public class DynamicPinStiffener : MonoBehaviour
 
     void LateUpdate()
     {
-        // V11.1 中 LateUpdate 保持为空，因为我们是“只加不减”
-        
-        // ** DEBUG LOGGING **
-        if (logPinStatus && Time.frameCount % 120 == 0) // 每 2 秒打印一次状态
+        if (!softbody.isLoaded || activePinCount == 0) return;
+
+        // *** 核心修正：手动强制定位 ***
+        // 遍历所有激活的 Pin
+        for (int i = 0; i < pinPoolSize; ++i)
+        {
+            if (pinSlots[i].IsActive)
+            {
+                var slot = pinSlots[i];
+                var targetCollider = slot.Collider;
+
+                if (targetCollider == null || !targetCollider.gameObject.activeInHierarchy)
+                    continue;
+
+                // 1. 计算出粒子“应该在”的世界位置 (在求解器空间中)
+                Matrix4x4 attachmentMatrix = solver.transform.worldToLocalMatrix * targetCollider.transform.localToWorldMatrix;
+                Vector3 targetPosition = attachmentMatrix.MultiplyPoint3x4(slot.LocalOffset);
+
+                // 2. 强制将粒子位置和速度设置为目标状态
+                // 注意：我们只设置位置，让求解器在下一次迭代中自己计算速度，这样更自然。
+                // 如果需要更强的“粘滞”，可以同时设置速度为0。
+                solver.positions[slot.ParticleSolverIndex] = targetPosition;
+                // solver.velocities[slot.ParticleSolverIndex] = Vector3.zero; // 可选：如果需要完全静止
+            }
+        }
+
+        // 调试日志
+        if (logPinStatus && Time.frameCount % 120 == 0)
         {
             LogCurrentStatus();
         }
@@ -123,34 +143,22 @@ public class DynamicPinStiffener : MonoBehaviour
     private void Solver_OnCollision(ObiSolver solver, ObiNativeContactList contacts)
     {
         if (contacts.count == 0) return;
-
         bool needsUpdate = false;
-
         for (int i = 0; i < contacts.count; ++i)
         {
             Oni.Contact contact = contacts[i];
-            
             int particleSolverIndex = GetParticleSolverIndexFromContact(contact);
             if (particleSolverIndex == -1 || IsParticleAlreadyPinned(particleSolverIndex)) continue;
-
             int freeSlotIndex = FindFreePinSlot();
-            if (freeSlotIndex == -1) 
-            {
-                if (logPinStatus) Debug.LogWarning($"[{this.name}] Pin pool is full! Cannot create more pins.");
-                break; 
-            }
-
+            if (freeSlotIndex == -1) break; 
             var otherCollider = ObiColliderWorld.GetInstance().colliderHandles[GetColliderIndexFromContact(contact)].owner;
             if (otherCollider == null || !otherCollider.gameObject.activeInHierarchy) continue;
             if (!string.IsNullOrEmpty(colliderTag) && !otherCollider.CompareTag(colliderTag)) continue;
-            
             Vector3 pinOffset = otherCollider.transform.InverseTransformPoint(contact.pointB);
             if (float.IsNaN(pinOffset.x)) continue;
-
             ActivatePin(freeSlotIndex, particleSolverIndex, otherCollider, pinOffset);
             needsUpdate = true;
         }
-
         if (needsUpdate)
         {
             softbody.SetConstraintsDirty(Oni.ConstraintType.Pin);
@@ -158,14 +166,17 @@ public class DynamicPinStiffener : MonoBehaviour
         }
     }
 
-    // --- Pin 管理 ---
-
     private void ActivatePin(int slotIndex, int particleSolverIndex, ObiColliderBase collider, Vector3 offset)
     {
-        pinSlots[slotIndex].IsActive = true;
-        pinSlots[slotIndex].ParticleSolverIndex = particleSolverIndex;
+        // 更新我们自己的状态跟踪器
+        var slot = pinSlots[slotIndex];
+        slot.IsActive = true;
+        slot.ParticleSolverIndex = particleSolverIndex;
+        slot.Collider = collider;
+        slot.LocalOffset = offset;
         activePinCount++;
 
+        // 更新 Batch 数据（仍然需要，以定义硬度）
         dynamicPinBatch.particleIndices[slotIndex] = particleSolverIndex;
         dynamicPinBatch.pinBodies[slotIndex] = collider.Handle;
         dynamicPinBatch.colliderIndices[slotIndex] = collider.Handle.index;
@@ -173,18 +184,14 @@ public class DynamicPinStiffener : MonoBehaviour
         dynamicPinBatch.stiffnesses[slotIndex * 2] = 1f - pinStiffness; 
         dynamicPinBatch.stiffnesses[slotIndex * 2 + 1] = 1f;           
 
-        // ** DEBUG LOGGING **
         if (logPinStatus)
         {
             Debug.Log($"<color=lime>[{this.name}] Pin Activated! Slot: {slotIndex}</color>\n" +
-                      $"- Particle (Solver Index): {particleSolverIndex}\n" +
-                      $"- Target Collider: {collider.name} (Handle Index: {collider.Handle.index})\n" +
-                      $"- Local Offset: {offset.ToString("F4")}\n" +
-                      $"- Stiffness/Compliance: {pinStiffness} / {1f-pinStiffness}\n" +
-                      $"- Total Active Pins: {activePinCount}");
+                      $"- Particle (Solver Index): {particleSolverIndex}, Target Collider: {collider.name}, Local Offset: {offset.ToString("F4")}");
         }
     }
     
+    // ... (FindFreePinSlot, IsParticleAlreadyPinned, LogCurrentStatus, UpdateColors, RestoreAllParticleColors, Get...FromContact, IsParticleFromOurSoftbody 与V11.1相同)
     private int FindFreePinSlot()
     {
         for (int i = 0; i < pinPoolSize; i++)
@@ -203,8 +210,6 @@ public class DynamicPinStiffener : MonoBehaviour
         }
         return false;
     }
-
-    // --- 调试与可视化 ---
     
     private void LogCurrentStatus()
     {
@@ -216,17 +221,10 @@ public class DynamicPinStiffener : MonoBehaviour
             {
                 status += $"  - Slot {i}: Particle {dynamicPinBatch.particleIndices[i]}, Target Handle: {dynamicPinBatch.pinBodies[i].index}, Compliance: {dynamicPinBatch.stiffnesses[i * 2]:F2}\n";
                 loggedPins++;
-                if (loggedPins >= 5) // 最多打印5个，防止刷屏
-                {
-                    status += "  - ... (and more)\n";
-                    break;
-                }
+                if (loggedPins >= 5) { status += "  - ... (and more)\n"; break; }
             }
         }
-        if (activePinCount == 0)
-        {
-            status += "  No active pins.";
-        }
+        if (activePinCount == 0) status += "  No active pins.";
         Debug.Log(status);
     }
     
@@ -235,7 +233,6 @@ public class DynamicPinStiffener : MonoBehaviour
     private void UpdateColors()
     {
         if (!enableVisualization) return;
-        
         for (int i = 0; i < pinPoolSize; ++i)
         {
             if (pinSlots[i].IsActive)
